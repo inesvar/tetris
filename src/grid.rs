@@ -1,6 +1,5 @@
 use opengl_graphics::GlGraphics;
 use crate::block::Block;
-use crate::grid::GridCell::Empty;
 
 pub enum GridCell {
     Empty,
@@ -19,7 +18,7 @@ impl Grid {
         for _ in 0..height {
             let mut row = Vec::with_capacity(width);
             for _ in 0..width {
-                row.push(Empty);
+                row.push(GridCell::Empty);
             }
             rows.push(row);
         }
@@ -34,8 +33,8 @@ impl Grid {
         for row in &self.rows {
             for cell in row {
                 match cell {
-                    Empty => {},
-                    Block(block) => block.render(gl)
+                    GridCell::Empty => {},
+                    GridCell::Block(block) => block.render(gl)
                 }
             }
         }
