@@ -1,3 +1,4 @@
+use opengl_graphics::GlGraphics;
 use crate::block::Block;
 use crate::grid::GridCell::Empty;
 
@@ -26,6 +27,17 @@ impl Grid {
             width,
             height,
             rows
+        }
+    }
+
+    pub fn render(&self, gl: &mut GlGraphics) {
+        for row in &self.rows {
+            for cell in row {
+                match cell {
+                    Empty => {},
+                    Block(block) => block.render(gl)
+                }
+            }
         }
     }
 }
