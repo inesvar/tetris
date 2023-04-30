@@ -1,6 +1,9 @@
+use graphics::{Context, rectangle};
+use graphics::math::margin_rectangle;
 use crate::point::{Point, Transformable};
 use graphics::types::Color;
 use opengl_graphics::GlGraphics;
+use crate::settings::{BLOCK_SHRINK, BLOCK_SIZE};
 
 pub struct Block {
     color: Color,
@@ -20,8 +23,16 @@ impl Block {
         self
     }
 
-    pub fn render(&self, gl: &mut GlGraphics) {
-        todo!("Implement Block::render")
+    pub fn render(&self, ctx: &Context, gl: &mut GlGraphics) {
+        let mut square = rectangle::square(
+            self.position.x as f64 * BLOCK_SIZE,
+            self.position.y as f64 * BLOCK_SIZE,
+            BLOCK_SIZE,
+        );
+
+        square = margin_rectangle(square, BLOCK_SHRINK);
+
+        rectangle(self.color, square, ctx.transform, gl);
     }
 }
 
