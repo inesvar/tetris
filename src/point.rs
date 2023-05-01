@@ -1,56 +1,62 @@
-pub struct Point<T> {
-    pub x: T,
-    pub y: T,
+
+pub struct Point {
+    pub x: i8,
+    pub y: i8,
 }
 
-impl<T> Point<T> {
-    pub fn new(x: T, y: T) -> Self {
-        Point::<T> { x, y }
+impl Point{
+    pub fn new(x: i8, y: i8) -> Self {
+        Point { x, y }
+    }
+
+    pub fn set(&mut self, x: i8, y: i8) {
+        self.x = x;
+        self.y = y;
     }
 }
 
-impl<T: std::ops::Add<Output = T>> std::ops::Add for Point<T> {
-    type Output = Point<T>;
-    fn add(self, other: Point<T>) -> Self::Output {
-        Point::<T>::new(self.x + other.x, self.y + other.y)
+impl std::ops::Add for Point {
+    type Output = Point;
+    fn add(self, other: Point) -> Self::Output {
+        Point::new(self.x + other.x, self.y + other.y)
     }
 }
 pub trait Transformable {
-    fn down(self);
-    fn right(self);
-    fn left(self);
-    fn turn_clockwise(self);
-    fn turn_counterclockwise(self);
+    fn down(&mut self);
+    fn right(&mut self);
+    fn left(&mut self);
+    fn turn_clockwise(&mut self, other: &Point);
+    fn turn_counterclockwise(&mut self, other: &Point);
 }
 
-impl Transformable for Point<i8> {
-    fn down(mut self) {
+impl Transformable for Point {
+    /* methode to new
+    
+    fn down(self) -> Self {
+        self + Point::new(0, -1)
+    }*/
+
+    fn down(&mut self) {
         self.y += -1;
     }
 
-    /* methode sans emplace
-    
-    fn right(self) -> Self {
-        self + Point::new(1, 0)
-    }*/
-
-    fn left(mut self) {
+    fn left(&mut self) {
         self.x += -1;
     }
 
-    fn right(mut self) {
+    fn right(&mut self) {
         self.x += 1;
     }
 
-    fn turn_clockwise(mut self) {
-        let temp = self.x;
-        self.x = self.y;
-        self.y = -temp;
+    fn turn_clockwise(&mut self, other: &Point) {
+        let temp = self.x - other.x;
+        self.x = other.x + self.y - other.y;
+        self.y = other.y - temp;
     }
 
-    fn turn_counterclockwise(mut self) {
-        let temp = self.x;
-        self.x = -self.y;
-        self.y = temp;
+    fn turn_counterclockwise(&mut self, other: &Point) {
+        let temp = self.x - other.x;
+        self.x = other.x - self.y;
+        self.y = other.y + temp;
     }
 }

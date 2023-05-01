@@ -1,13 +1,15 @@
-use graphics::{Context, rectangle};
-use graphics::math::{margin_rectangle, Matrix2d, Scalar};
 use crate::point::{Point, Transformable};
-use graphics::types::Color;
-use opengl_graphics::GlGraphics;
 use crate::settings::{BLOCK_SHRINK, BLOCK_SIZE};
+use graphics::math::margin_rectangle;
+use graphics::math::{margin_rectangle, Matrix2d, Scalar};
+use graphics::types::Color;
+use graphics::{rectangle, Context};
+use graphics::{rectangle, Context};
+use opengl_graphics::GlGraphics;
 
 pub struct Block {
     color: Color,
-    position: Point<i8>,
+    position: Point,
 }
 
 impl Block {
@@ -18,10 +20,9 @@ impl Block {
         }
     }
 
-    pub fn set_position(mut self, position: Point<i8>) -> Self {
-        self.position = position;
-        self
-    }
+    /*pub fn set_position(mut self, x: i8, y: i8) {
+        Point::set(&mut self.position, x, y);
+    }*/
 
     pub fn render(&self, transform: Matrix2d, gl: &mut GlGraphics) {
         let mut dims = rectangle::square(
@@ -36,30 +37,30 @@ impl Block {
 }
 
 impl Transformable for Block {
-    fn down(self) {
-        self.position.down();
-    }
+    /* methode to new
 
-    /* methode sans enplace
-    
-    fn right(mut self) -> Self {
-        self.position = self.position.right();
+    fn down(mut self) -> Self {
+        self.position = self.position.down();
         self
     }*/
 
-    fn left(self) {
+    fn down(&mut self) {
+        self.position.down();
+    }
+
+    fn left(&mut self) {
         self.position.left();
     }
 
-    fn right(self) {
+    fn right(&mut self) {
         self.position.right();
     }
 
-    fn turn_clockwise(self) {
-        self.position.turn_clockwise();
+    fn turn_clockwise(&mut self, other: &Point) {
+        self.position.turn_clockwise(other);
     }
 
-    fn turn_counterclockwise(self) {
-        self.position.turn_counterclockwise();
+    fn turn_counterclockwise(&mut self, other: &Point) {
+        self.position.turn_counterclockwise(other);
     }
 }
