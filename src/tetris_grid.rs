@@ -6,15 +6,10 @@ use opengl_graphics::GlGraphics;
 use crate::block::Block;
 use crate::settings::{BLOCK_SHRINK, BLOCK_SIZE, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-pub enum GridCell {
-    Empty,
-    Block(Block)
-}
-
 pub struct TetrisGrid {
     pub nb_columns: i8,
     pub nb_rows: i8,
-    pub rows: Vec<Vec<GridCell>>,
+    pub rows: Vec<Vec<Option<Block>>>,
     pub width: f64,
     pub height: f64
 }
@@ -25,7 +20,7 @@ impl TetrisGrid {
         for _ in 0..nb_rows {
             let mut row = Vec::with_capacity(nb_columns as usize);
             for _ in 0..nb_columns {
-                row.push(GridCell::Empty);
+                row.push(None);
             }
             rows.push(row);
         }
@@ -44,9 +39,9 @@ impl TetrisGrid {
             let mut row = Vec::with_capacity(nb_columns as usize);
             for x in 0..nb_columns {
                 if rand::random::<f32>() < probability {
-                    row.push(GridCell::Block(Block::new([1.0, 0.0, 0.0, 1.0], x, y)));
+                    row.push(Some(Block::new([1.0, 0.0, 0.0, 1.0], x, y)));
                 } else {
-                    row.push(GridCell::Empty);
+                    row.push(None);
                 }
             }
             rows.push(row);
@@ -72,7 +67,7 @@ impl TetrisGrid {
                 outline_rect.draw(outline_dims, &ctx.draw_state, grid_transform, gl);
 
                 match cell {
-                    GridCell::Empty => {
+                    None => {
                         let mut empty_dims = rectangle::square(
                             x as Scalar * BLOCK_SIZE,
                             y as Scalar * BLOCK_SIZE,
@@ -81,7 +76,7 @@ impl TetrisGrid {
                         empty_dims = margin_rectangle(empty_dims, BLOCK_SHRINK);
                         rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, grid_transform, gl);
                     },
-                    GridCell::Block(block) => block.render(grid_transform, gl)
+                    Some(block) => block.render(grid_transform, gl)
                 }
             }
         }
