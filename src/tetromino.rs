@@ -1,4 +1,5 @@
-use graphics::types::Color;
+use graphics::types::{Color, Matrix2d};
+use opengl_graphics::GlGraphics;
 use crate::point::{Point, Transformable};
 
 use crate::{block::Block};
@@ -33,36 +34,44 @@ impl Tetromino {
 
 /* TRANSFORMABLE METHODS */
 impl Tetromino {
-    fn down(&mut self) {
+    pub fn down(&mut self) {
         for i in 0..4 {
             self.blocks[i].down();
         }
         self.center.down();
     }
 
-    fn left(&mut self) {
+    pub fn left(&mut self) {
         for i in 0..4 {
             self.blocks[i].left();
         }
         self.center.left();
     }
 
-    fn right(&mut self) {
+    pub fn right(&mut self) {
         for i in 0..4 {
             self.blocks[i].right();
         }
         self.center.right();
     }
 
-    fn turn_clockwise(&mut self) {
+    pub fn turn_clockwise(&mut self) {
         for i in 0..4 {
             self.blocks[i].turn_clockwise(&self.center);
         }
     }
 
-    fn turn_counterclockwise(&mut self) {
+    pub fn turn_counterclockwise(&mut self) {
         for i in 0..4 {
             self.blocks[i].turn_counterclockwise(&self.center);
+        }
+    }
+}
+
+impl Tetromino {
+    pub fn render(&self, transform: Matrix2d, gl: &mut GlGraphics) {
+        for i in 0..4 {
+            self.blocks[i].render(transform, gl);
         }
     }
 }
