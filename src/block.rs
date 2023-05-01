@@ -1,6 +1,6 @@
 use crate::point::{Point, Transformable};
 use crate::assets::TetrisColor;
-use crate::settings::{BLOCK_SHRINK, BLOCK_SIZE};
+use crate::settings::{BLOCK_SIZE};
 use graphics::math::{margin_rectangle, Matrix2d, Scalar};
 use graphics::types::Color;
 use graphics::{rectangle, Context, DrawState, Image};
@@ -26,12 +26,11 @@ impl Block {
     }*/
 
     pub fn render(&self, transform: Matrix2d, draw_state: &DrawState, gl: &mut GlGraphics, assets: &Assets) {
-        let mut dims = rectangle::square(
+        let dims = rectangle::square(
             self.position.x as Scalar * BLOCK_SIZE,
             self.position.y as Scalar * BLOCK_SIZE,
             BLOCK_SIZE,
         );
-        dims = margin_rectangle(dims, BLOCK_SHRINK);
 
         Image::new().rect(dims).draw(
             assets.texture_from_tetris_color(&self.color),

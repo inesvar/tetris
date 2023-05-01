@@ -19,7 +19,7 @@ use crate::assets::{Assets, TetrisColor};
 mod tetris_grid;
 mod tetromino;
 
-use crate::settings::{WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 use tetris_grid::TetrisGrid;
 
 use piston_window::*;
@@ -43,7 +43,7 @@ impl App {
             // Clear the screen.
             clear(BG_COLOR, gl);
 
-            self.grid.render(&ctx, gl, &self.assets);
+            self.grid.render(args, &ctx, gl, &self.assets);
         });
     }
 
@@ -61,7 +61,7 @@ fn main() {
     let opengl = OpenGL::V4_5;
 
     // Create a Glutin window.
-    let mut window: PistonWindow = WindowSettings::new("TETRIS", [WINDOW_WIDTH, WINDOW_HEIGHT])
+    let mut window: PistonWindow = WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
