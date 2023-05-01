@@ -1,17 +1,19 @@
 use crate::point::{Point, Transformable};
+use crate::assets::TetrisColor;
 use crate::settings::{BLOCK_SHRINK, BLOCK_SIZE};
 use graphics::math::{margin_rectangle, Matrix2d, Scalar};
 use graphics::types::Color;
-use graphics::{rectangle, Context};
+use graphics::{rectangle, Context, DrawState, Image};
 use opengl_graphics::GlGraphics;
+use crate::assets::Assets;
 
 pub struct Block {
-    color: Color,
+    color: TetrisColor,
     position: Point,
 }
 
 impl Block {
-    pub fn new(color: Color, x: i8, y: i8) -> Self {
+    pub fn new(color: TetrisColor, x: i8, y: i8) -> Self {
         Block {
             color,
             position: Point::new(x, y),
@@ -22,7 +24,7 @@ impl Block {
         Point::set(&mut self.position, x, y);
     }*/
 
-    pub fn render(&self, transform: Matrix2d, gl: &mut GlGraphics) {
+    pub fn render(&self, transform: Matrix2d, draw_state: &DrawState, gl: &mut GlGraphics, assets: &Assets) {
         let mut dims = rectangle::square(
             self.position.x as Scalar * BLOCK_SIZE,
             self.position.y as Scalar * BLOCK_SIZE,
@@ -30,7 +32,12 @@ impl Block {
         );
         dims = margin_rectangle(dims, BLOCK_SHRINK);
 
-        rectangle(self.color, dims, transform, gl);
+        Image::new().rect(dims).draw(
+            assets.texture_from_tetris_color(&self.color),
+            draw_state,
+            transform,
+            gl,
+        );
     }
 }
 

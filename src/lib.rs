@@ -4,3 +4,4 @@ pub mod renderer;
 mod tetris_grid;
 mod block;
 mod settings;
+mod assets;
