@@ -2,9 +2,10 @@ use graphics::types::Color;
 use crate::point::{Point, Transformable};
 
 use crate::{block::Block};
+use crate::assets::TetrisColor;
 
 pub struct Tetromino {
-    color: Color,
+    color: TetrisColor,
     center: Point,
     blocks: [Block; 4],
     rotation_status: Rotation,
@@ -18,7 +19,7 @@ pub enum Rotation {
 }
 
 impl Tetromino {
-    pub fn new(color: Color, positions: &[i8]) -> Self {
+    pub fn new(color: TetrisColor, positions: &[i8]) -> Self {
         Tetromino {
             color,
             center: Point::new(positions[0], positions[1]),

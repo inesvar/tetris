@@ -2,6 +2,7 @@ extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
+extern crate find_folder;
 
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
@@ -15,13 +16,18 @@ mod renderer;
 mod tetris_grid;
 mod block;
 mod settings;
+mod assets;
 
 use tetris_grid::TetrisGrid;
+use crate::assets::Assets;
 use crate::settings::{WINDOW_HEIGHT, WINDOW_WIDTH};
+
+use piston_window::*;
 
 pub struct App {
     gl: GlGraphics,
     grid: TetrisGrid,
+    assets: Assets
 }
 
 impl App {
@@ -37,7 +43,7 @@ impl App {
             // Clear the screen.
             clear(BG_COLOR, gl);
 
-            self.grid.render(&ctx, gl);
+            self.grid.render(&ctx, gl, &self.assets);
         });
     }
 
@@ -51,16 +57,21 @@ fn main() {
     let opengl = OpenGL::V4_5;
 
     // Create a Glutin window.
-    let mut window: Window = WindowSettings::new("TETRIS", [WINDOW_WIDTH, WINDOW_HEIGHT])
+    let mut window: PistonWindow = WindowSettings::new("TETRIS", [WINDOW_WIDTH, WINDOW_HEIGHT])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
         .unwrap();
 
+    let assets_folder = find_folder::Search::ParentsThenKids(3, 3).for_folder("assets").unwrap();
+
+    let assets = Assets::new(assets_folder);
+
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
         grid: TetrisGrid::new_random(10, 20, 0.5),
+        assets
     };
 
     let mut events = Events::new(EventSettings::new());

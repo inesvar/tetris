@@ -3,6 +3,7 @@ use graphics::math::margin_rectangle;
 use graphics::types::{Color, Rectangle, Scalar};
 use graphics::Transformed;
 use opengl_graphics::GlGraphics;
+use crate::assets::{Assets, TetrisColor};
 use crate::block::Block;
 use crate::settings::{BLOCK_SHRINK, BLOCK_SIZE, WINDOW_WIDTH, WINDOW_HEIGHT};
 
@@ -39,7 +40,7 @@ impl TetrisGrid {
             let mut row = Vec::with_capacity(nb_columns as usize);
             for x in 0..nb_columns {
                 if rand::random::<f32>() < probability {
-                    row.push(Some(Block::new([1.0, 0.0, 0.0, 1.0], x, y)));
+                    row.push(Some(Block::new(TetrisColor::ORANGE, x, y)));
                 } else {
                     row.push(None);
                 }
@@ -55,7 +56,7 @@ impl TetrisGrid {
         }
     }
 
-    pub fn render(&self, ctx: &Context, gl: &mut GlGraphics) {
+    pub fn render(&self, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
         let grid_transform = ctx.transform.trans(
             WINDOW_WIDTH as f64 / 2.0 - self.width / 2.0,
             WINDOW_HEIGHT as f64 / 2.0 - self.height / 2.0
@@ -76,7 +77,7 @@ impl TetrisGrid {
                         empty_dims = margin_rectangle(empty_dims, BLOCK_SHRINK);
                         rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, grid_transform, gl);
                     },
-                    Some(block) => block.render(grid_transform, gl)
+                    Some(block) => block.render(grid_transform, &ctx.draw_state, gl, assets)
                 }
             }
         }
