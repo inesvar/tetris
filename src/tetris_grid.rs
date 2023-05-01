@@ -3,9 +3,10 @@ use graphics::math::margin_rectangle;
 use graphics::types::{Color, Rectangle, Scalar};
 use graphics::Transformed;
 use opengl_graphics::GlGraphics;
+use piston_window::RenderArgs;
 use crate::assets::{Assets, TetrisColor};
 use crate::block::Block;
-use crate::settings::{BLOCK_SHRINK, BLOCK_SIZE, WINDOW_WIDTH, WINDOW_HEIGHT};
+use crate::settings::{BLOCK_SIZE, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT};
 use crate::tetromino::Tetromino;
 
 pub struct TetrisGrid {
@@ -21,8 +22,7 @@ impl TetrisGrid {
     pub fn new(nb_columns: i8, nb_rows: i8) -> TetrisGrid {
         let mut rows = Vec::with_capacity(nb_rows as usize);
         for _ in 0..nb_rows {
-            let row = vec![None; nb_columns as usize];
-            rows.push(row);
+            rows.push(vec![None; nb_columns as usize]);
         }
         
         let line_sum = vec![0; nb_columns as usize];
@@ -68,10 +68,10 @@ impl TetrisGrid {
         }
     }
 
-    pub fn render(&self, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
+    pub fn render(&self, args: &RenderArgs, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
         let grid_transform = ctx.transform.trans(
-            WINDOW_WIDTH as f64 / 2.0 - self.width / 2.0,
-            WINDOW_HEIGHT as f64 / 2.0 - self.height / 2.0
+            args.window_size[0] / 2.0 - self.width / 2.0,
+            args.window_size[1] / 2.0 - self.height / 2.0
         );
         for (y, row) in self.rows.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
@@ -81,12 +81,11 @@ impl TetrisGrid {
 
                 match cell {
                     None => {
-                        let mut empty_dims = rectangle::square(
+                        let empty_dims = rectangle::square(
                             x as Scalar * BLOCK_SIZE,
                             y as Scalar * BLOCK_SIZE,
                             BLOCK_SIZE
                         );
-                        empty_dims = margin_rectangle(empty_dims, BLOCK_SHRINK);
                         rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, grid_transform, gl);
                     },
                     Some(block) => block.render(grid_transform, &ctx.draw_state, gl, assets)
