@@ -1,12 +1,12 @@
-use graphics::{color, Context, draw_state, rectangle};
-use graphics::math::{abs_transform, margin_rectangle, Matrix2d};
-use graphics::types::{Color, Rectangle, Scalar};
+use graphics::{Context, rectangle};
+use graphics::math::{Matrix2d};
+use graphics::types::{Rectangle, Scalar};
 use graphics::Transformed;
 use opengl_graphics::GlGraphics;
 use piston_window::RenderArgs;
 use crate::assets::{Assets, TetrisColor};
 use crate::block::Block;
-use crate::settings::{BLOCK_SIZE, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, GRID_THICKNESS, GRID_COLOR};
+use crate::settings::{BLOCK_SIZE, GRID_THICKNESS, GRID_COLOR};
 use crate::tetromino::Tetromino;
 
 pub struct TetrisGrid {
@@ -77,6 +77,9 @@ impl TetrisGrid {
             args.window_size[1] / 2.0 - self.height / 2.0
         );
 
+        let empty_dims: Rectangle = [0.0, 0.0, self.width, self.height];
+        rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, self.transform, gl);
+
         for (y, row) in self.rows.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
                 let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
@@ -84,15 +87,8 @@ impl TetrisGrid {
                 outline_rect.draw(outline_dims, &ctx.draw_state, self.transform, gl);
 
                 match cell {
-                    None => {
-                        let empty_dims = rectangle::square(
-                            x as Scalar * BLOCK_SIZE,
-                            y as Scalar * BLOCK_SIZE,
-                            BLOCK_SIZE
-                        );
-                        rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, self.transform, gl);
-                    },
-                    Some(block) => block.render(self.transform, &ctx.draw_state, gl, assets)
+                    Some(block) => block.render(self.transform, &ctx.draw_state, gl, assets),
+                    None => {}
                 }
             }
         }
