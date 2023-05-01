@@ -37,7 +37,7 @@ impl Transformable for Point {
     }*/
 
     fn down(&mut self) {
-        self.y += -1;
+        self.y += 1;
     }
 
     fn left(&mut self) {
@@ -50,13 +50,13 @@ impl Transformable for Point {
 
     fn turn_clockwise(&mut self, other: &Point) {
         let temp = self.x - other.x;
-        self.x = other.x + self.y - other.y;
-        self.y = other.y - temp;
+        self.x = other.x - self.y + other.y;
+        self.y = other.y + temp;
     }
 
     fn turn_counterclockwise(&mut self, other: &Point) {
         let temp = self.x - other.x;
-        self.x = other.x - self.y;
-        self.y = other.y + temp;
+        self.x = other.x + self.y - other.y;
+        self.y = other.y - temp;
     }
 }
