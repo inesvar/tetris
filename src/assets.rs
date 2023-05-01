@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use graphics::{color, Text};
 use opengl_graphics::*;
 
 #[derive(Clone, Copy)]
