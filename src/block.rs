@@ -2,9 +2,8 @@ use crate::assets::Assets;
 use crate::assets::TetrisColor;
 use crate::point::{Point, Transformable};
 use crate::settings::BLOCK_SIZE;
-use graphics::math::{margin_rectangle, Matrix2d, Scalar};
-use graphics::types::Color;
-use graphics::{rectangle, Context, DrawState, Image};
+use graphics::math::{Matrix2d, Scalar};
+use graphics::{rectangle, DrawState, Image};
 use opengl_graphics::GlGraphics;
 
 #[derive(Clone, Copy)]
