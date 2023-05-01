@@ -12,6 +12,23 @@ pub enum TetrisColor {
     GREEN,
 }
 
+impl TetrisColor {
+    pub fn random() -> TetrisColor {
+        use rand::Rng;
+        let mut rng = rand::thread_rng();
+        match rng.gen_range(0..7) {
+            0 => TetrisColor::CYAN,
+            1 => TetrisColor::YELLOW,
+            2 => TetrisColor::RED,
+            3 => TetrisColor::BLUE,
+            4 => TetrisColor::ORANGE,
+            5 => TetrisColor::PURPLE,
+            6 => TetrisColor::GREEN,
+            _ => panic!("random number out of range"),
+        }
+    }
+}
+
 pub struct Assets {
     pub cyan: Texture,
     pub red: Texture,

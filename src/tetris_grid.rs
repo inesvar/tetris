@@ -1,5 +1,5 @@
 use graphics::{color, Context, draw_state, rectangle};
-use graphics::math::margin_rectangle;
+use graphics::math::{abs_transform, margin_rectangle, Matrix2d};
 use graphics::types::{Color, Rectangle, Scalar};
 use graphics::Transformed;
 use opengl_graphics::GlGraphics;
@@ -15,7 +15,8 @@ pub struct TetrisGrid {
     pub rows: Vec<Vec<Option<Block>>>,
     pub line_sum : Vec<u8>,
     pub width: f64,
-    pub height: f64
+    pub height: f64,
+    pub transform: Matrix2d<f64>
 }
 
 impl TetrisGrid {
@@ -32,11 +33,12 @@ impl TetrisGrid {
             rows,
             line_sum: line_sum,
             width: nb_columns as f64 * BLOCK_SIZE,
-            height: nb_rows as f64 * BLOCK_SIZE
+            height: nb_rows as f64 * BLOCK_SIZE,
+            transform: Matrix2d::default()
         }
     }
 
-    pub fn add_tetromino(&mut self, tetromino: Tetromino) {
+    pub fn freeze_tetromino(&mut self, tetromino: Tetromino) {
         let blocks = tetromino.split();
         for i in 0..4 {
             self.rows[blocks[i].position.y as usize][blocks[i].position.x as usize] = Some(blocks[i]);
@@ -64,20 +66,22 @@ impl TetrisGrid {
             rows,
             line_sum,
             width: nb_columns as f64 * BLOCK_SIZE,
-            height: nb_rows as f64 * BLOCK_SIZE
+            height: nb_rows as f64 * BLOCK_SIZE,
+            transform: Matrix2d::default()
         }
     }
 
-    pub fn render(&self, args: &RenderArgs, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
-        let grid_transform = ctx.transform.trans(
+    pub fn render(&mut self, args: &RenderArgs, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
+        self.transform = ctx.transform.trans(
             args.window_size[0] / 2.0 - self.width / 2.0,
             args.window_size[1] / 2.0 - self.height / 2.0
         );
+
         for (y, row) in self.rows.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
                 let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
                 let outline_dims = rectangle::square(x as Scalar * BLOCK_SIZE, y as Scalar * BLOCK_SIZE, BLOCK_SIZE);
-                outline_rect.draw(outline_dims, &ctx.draw_state, grid_transform, gl);
+                outline_rect.draw(outline_dims, &ctx.draw_state, self.transform, gl);
 
                 match cell {
                     None => {
@@ -86,9 +90,9 @@ impl TetrisGrid {
                             y as Scalar * BLOCK_SIZE,
                             BLOCK_SIZE
                         );
-                        rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, grid_transform, gl);
+                        rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, self.transform, gl);
                     },
-                    Some(block) => block.render(grid_transform, &ctx.draw_state, gl, assets)
+                    Some(block) => block.render(self.transform, &ctx.draw_state, gl, assets)
                 }
             }
         }
