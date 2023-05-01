@@ -29,14 +29,6 @@ pub trait Transformable {
     fn rotate_counterclockwise(&mut self, other: &Point);
 }
 
-pub trait Collision {
-    fn fall(&mut self) -> bool;
-    fn right(&mut self) -> bool;
-    fn left(&mut self) -> bool;
-    fn turn_clockwise(&mut self, other: &Point) -> bool;
-    fn turn_counterclockwise(&mut self, other: &Point) -> bool;
-}
-
 impl Transformable for Point {
     /* methode to new
     
@@ -69,29 +61,4 @@ impl Transformable for Point {
     }
 }
 
-impl Collision for Point {
 
-    fn fall(&mut self) {
-        self.y += 1;
-    }
-
-    fn left(&mut self) {
-        self.x = self.x.saturating_sub(1);
-    }
-
-    fn right(&mut self) {
-        self.x += 1;
-    }
-
-    fn turn_clockwise(&mut self, other: &Point) {
-        let temp = self.x - other.x;
-        self.x = other.x - self.y + other.y;
-        self.y = other.y + temp;
-    }
-
-    fn turn_counterclockwise(&mut self, other: &Point) {
-        let temp = self.x - other.x;
-        self.x = other.x + self.y - other.y;
-        self.y = other.y - temp;
-    }
-}
