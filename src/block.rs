@@ -1,9 +1,7 @@
 use crate::point::{Point, Transformable};
 use crate::settings::{BLOCK_SHRINK, BLOCK_SIZE};
-use graphics::math::margin_rectangle;
 use graphics::math::{margin_rectangle, Matrix2d, Scalar};
 use graphics::types::Color;
-use graphics::{rectangle, Context};
 use graphics::{rectangle, Context};
 use opengl_graphics::GlGraphics;
 
