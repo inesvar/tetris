@@ -9,9 +9,7 @@ use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
-
-use graphics::*;
-
+use graphics::{color, Transformed};
 
 mod block;
 mod point;
@@ -25,22 +23,34 @@ mod tetromino;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 use tetris_grid::TetrisGrid;
 
-use piston_window::*;
-
-pub struct App {
+pub struct App<'a> {
     gl: GlGraphics,
     grid: TetrisGrid,
-    assets: Assets,
+    assets: Assets<'a>,
     clock: f64,
     frame_counter: u64,
     active_tetromino: Tetromino
 }
 
-impl App {
+impl App<'_> {
     fn render(&mut self, args: &RenderArgs) {
         self.gl.draw(args.viewport(), |ctx, gl| {
             // Clear the screen.
-            clear(BG_COLOR, gl);
+            graphics::clear(BG_COLOR, gl);
+
+            let title_transform = ctx.transform.trans(180.0, 50.0);
+            graphics::text::Text::new_color(color::WHITE, 16).draw(
+                "T", &mut self.assets.tetris_font, &ctx.draw_state,
+                title_transform,
+                gl
+            ).unwrap();
+
+            let timer_transform = ctx.transform.trans(0.0, 200.0);
+            graphics::text::Text::new_color(color::WHITE, 16).draw(
+                format!("Elapsed: {}s", self.clock.to_string()).as_str(), &mut self.assets.main_font, &ctx.draw_state,
+                timer_transform,
+                gl
+            ).unwrap();
 
             self.grid.render(args, &ctx, gl, &self.assets);
 
@@ -63,8 +73,9 @@ fn main() {
     let opengl = OpenGL::V4_5;
 
     // Create a Glutin window.
-    let mut window: PistonWindow = WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
+    let mut window: piston_window::PistonWindow = WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
         .graphics_api(opengl)
+        .vsync(true)
         .exit_on_esc(true)
         .build()
         .unwrap();
