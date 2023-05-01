@@ -17,6 +17,7 @@ mod block;
 mod settings;
 
 use tetris_grid::TetrisGrid;
+use crate::settings::{WINDOW_HEIGHT, WINDOW_WIDTH};
 
 pub struct App {
     gl: GlGraphics,
@@ -32,11 +33,11 @@ impl App {
 
         let (window_width, window_height) = (args.window_size[0], args.window_size[1]);
 
-        self.gl.draw(args.viewport(), |c, gl| {
+        self.gl.draw(args.viewport(), |ctx, gl| {
             // Clear the screen.
             clear(BG_COLOR, gl);
 
-            self.grid.render(&c, gl);
+            self.grid.render(&ctx, gl);
         });
     }
 
@@ -50,7 +51,7 @@ fn main() {
     let opengl = OpenGL::V4_5;
 
     // Create a Glutin window.
-    let mut window: Window = WindowSettings::new("spinning-square", [500, 500])
+    let mut window: Window = WindowSettings::new("TETRIS", [WINDOW_WIDTH, WINDOW_HEIGHT])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
