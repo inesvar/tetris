@@ -3,25 +3,29 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 
+use tetromino::Tetromino;
 use glutin_window::GlutinWindow as Window;
+use graphics::color;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
 
-mod point;
-mod tetromino;
-mod renderer;
-mod tetris_grid;
 mod block;
+mod point;
+mod renderer;
 mod settings;
+mod tetris_grid;
+mod tetromino;
 
-use tetris_grid::TetrisGrid;
 use crate::settings::{WINDOW_HEIGHT, WINDOW_WIDTH};
+use tetris_grid::TetrisGrid;
 
 pub struct App {
     gl: GlGraphics,
     grid: TetrisGrid,
+    test_tetromino: Tetromino,
+    counter: u8,
 }
 
 impl App {
@@ -38,11 +42,20 @@ impl App {
             clear(BG_COLOR, gl);
 
             self.grid.render(&ctx, gl);
+            self.test_tetromino.render(ctx.transform, gl);
         });
     }
 
     fn update(&mut self, args: &UpdateArgs) {
-        // nothing here for now
+        self.counter = if self.counter == 255 {
+            0
+        } else {
+            self.counter + 1
+        };
+        if self.counter == 255 {
+            self.test_tetromino.turn_counterclockwise();
+            //self.test_tetromino.down();
+        }
     }
 }
 
@@ -60,7 +73,9 @@ fn main() {
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
-        grid: TetrisGrid::new_random(10, 20, 0.5),
+        grid: TetrisGrid::new(10, 15),
+        test_tetromino: Tetromino::new(color::PURPLE, &[5, 15, 6, 15, 4, 15, 5, 15, 5, 16]),
+        counter: 100,
     };
 
     let mut events = Events::new(EventSettings::new());
