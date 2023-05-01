@@ -7,9 +7,10 @@ use graphics::{rectangle, Context, DrawState, Image};
 use opengl_graphics::GlGraphics;
 use crate::assets::Assets;
 
+#[derive(Clone, Copy)]
 pub struct Block {
     color: TetrisColor,
-    position: Point,
+    pub position: Point,
 }
 
 impl Block {

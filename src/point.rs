@@ -1,4 +1,4 @@
-
+#[derive(Clone, Copy)]
 pub struct Point {
     pub x: i8,
     pub y: i8,
@@ -41,7 +41,7 @@ impl Transformable for Point {
     }
 
     fn left(&mut self) {
-        self.x += -1;
+        self.x = self.x.saturating_sub(1);
     }
 
     fn right(&mut self) {
