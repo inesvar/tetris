@@ -10,6 +10,9 @@ use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
 
+use graphics::*;
+
+
 mod block;
 mod point;
 mod settings;
@@ -19,7 +22,7 @@ use crate::assets::{Assets, TetrisColor};
 mod tetris_grid;
 mod tetromino;
 
-use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
+use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 use tetris_grid::TetrisGrid;
 
 use piston_window::*;
@@ -28,31 +31,30 @@ pub struct App {
     gl: GlGraphics,
     grid: TetrisGrid,
     assets: Assets,
-    counter: u8,
+    clock: f64,
+    frame_counter: u64,
+    active_tetromino: Tetromino
 }
 
 impl App {
     fn render(&mut self, args: &RenderArgs) {
-        use graphics::*;
-
-        const BG_COLOR: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
-
-        let (window_width, window_height) = (args.window_size[0], args.window_size[1]);
-
         self.gl.draw(args.viewport(), |ctx, gl| {
             // Clear the screen.
             clear(BG_COLOR, gl);
 
             self.grid.render(args, &ctx, gl, &self.assets);
+
+            self.active_tetromino.render(self.grid.transform, &ctx, gl, &self.assets);
         });
     }
 
     fn update(&mut self, args: &UpdateArgs) {
-        self.counter = if self.counter == 255 {
-            0
-        } else {
-            self.counter + 1
-        };
+        self.clock += args.dt;
+        self.frame_counter = self.frame_counter.wrapping_add(1);
+
+        if self.frame_counter % 32 == 0 {
+            self.active_tetromino.go_down();
+        }
     }
 }
 
@@ -75,14 +77,14 @@ fn main() {
     let mut app = App {
         gl: GlGraphics::new(opengl),
         assets,
-        grid: TetrisGrid::new(10, 20),
-        counter: 100,
+        grid: TetrisGrid::new(10, 22),
+        clock: 0.0,
+        frame_counter: 0,
+        active_tetromino: Tetromino::new(TetrisColor::random(), &mut [2, 2, 1, 0, -1, 0, 0, 0, 0, 1]),
     };
 
-    app.grid.add_tetromino(Tetromino::new(TetrisColor::PURPLE, &mut [2, 2, 1, 0, -1, 0, 0, 0, 0, 1]));
-    app.grid.add_tetromino(Tetromino::new(TetrisColor::RED, &mut [5, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
-    app.grid.add_tetromino(Tetromino::new(TetrisColor::BLUE, &mut [2, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
-    app.grid.add_tetromino(Tetromino::new(TetrisColor::GREEN, &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.freeze_tetromino(Tetromino::new(TetrisColor::random(), &mut [5, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.freeze_tetromino(Tetromino::new(TetrisColor::random(), &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]));
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
