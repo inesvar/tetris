@@ -5,8 +5,6 @@ extern crate piston;
 extern crate find_folder;
 
 use tetromino::Tetromino;
-use glutin_window::GlutinWindow as Window;
-use graphics::color;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
@@ -14,7 +12,6 @@ use piston::window::WindowSettings;
 
 mod block;
 mod point;
-mod renderer;
 mod settings;
 mod assets;
 
@@ -39,7 +36,6 @@ impl App {
         use graphics::*;
 
         const BG_COLOR: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
-        const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
         let (window_width, window_height) = (args.window_size[0], args.window_size[1]);
 
@@ -57,12 +53,6 @@ impl App {
         } else {
             self.counter + 1
         };
-        if self.counter == 255 {
-            self.grid.add_tetromino(Tetromino::new(TetrisColor::PURPLE, &mut [2, 2, 1, 0, -1, 0, 0, 0, 0, 1]));
-            self.grid.add_tetromino(Tetromino::new(TetrisColor::RED, &mut [5, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
-            self.grid.add_tetromino(Tetromino::new(TetrisColor::BLUE, &mut [2, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
-            self.grid.add_tetromino(Tetromino::new(TetrisColor::GREEN, &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]));
-        }
     }
 }
 
@@ -85,9 +75,14 @@ fn main() {
     let mut app = App {
         gl: GlGraphics::new(opengl),
         assets,
-        grid: TetrisGrid::new(10, 15),
+        grid: TetrisGrid::new(10, 20),
         counter: 100,
     };
+
+    app.grid.add_tetromino(Tetromino::new(TetrisColor::PURPLE, &mut [2, 2, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.add_tetromino(Tetromino::new(TetrisColor::RED, &mut [5, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.add_tetromino(Tetromino::new(TetrisColor::BLUE, &mut [2, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.add_tetromino(Tetromino::new(TetrisColor::GREEN, &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]));
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
