@@ -22,21 +22,56 @@ impl std::ops::Add for Point {
     }
 }
 pub trait Transformable {
-    fn down(&mut self);
-    fn right(&mut self);
-    fn left(&mut self);
-    fn turn_clockwise(&mut self, other: &Point);
-    fn turn_counterclockwise(&mut self, other: &Point);
+    fn go_down(&mut self);
+    fn go_right(&mut self);
+    fn go_left(&mut self);
+    fn rotate_clockwise(&mut self, other: &Point);
+    fn rotate_counterclockwise(&mut self, other: &Point);
+}
+
+pub trait Collision {
+    fn fall(&mut self) -> bool;
+    fn right(&mut self) -> bool;
+    fn left(&mut self) -> bool;
+    fn turn_clockwise(&mut self, other: &Point) -> bool;
+    fn turn_counterclockwise(&mut self, other: &Point) -> bool;
 }
 
 impl Transformable for Point {
     /* methode to new
     
-    fn down(self) -> Self {
+    fn go_down(self) -> Self {
         self + Point::new(0, -1)
     }*/
 
-    fn down(&mut self) {
+    fn go_down(&mut self) {
+        self.y += 1;
+    }
+
+    fn go_left(&mut self) {
+        self.x = self.x.saturating_sub(1);
+    }
+
+    fn go_right(&mut self) {
+        self.x += 1;
+    }
+
+    fn rotate_clockwise(&mut self, other: &Point) {
+        let temp = self.x - other.x;
+        self.x = other.x - self.y + other.y;
+        self.y = other.y + temp;
+    }
+
+    fn rotate_counterclockwise(&mut self, other: &Point) {
+        let temp = self.x - other.x;
+        self.x = other.x + self.y - other.y;
+        self.y = other.y - temp;
+    }
+}
+
+impl Collision for Point {
+
+    fn fall(&mut self) {
         self.y += 1;
     }
 
