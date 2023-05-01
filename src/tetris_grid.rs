@@ -21,7 +21,7 @@ impl TetrisGrid {
     pub fn new(nb_columns: i8, nb_rows: i8) -> TetrisGrid {
         let mut rows = Vec::with_capacity(nb_rows as usize);
         for _ in 0..nb_rows {
-            let row = vec![None; nb_rows as usize];
+            let row = vec![None; nb_columns as usize];
             rows.push(row);
         }
         

@@ -1,5 +1,5 @@
 use graphics::Context;
-use graphics::types::{Color, Matrix2d};
+use graphics::types::{Matrix2d};
 use opengl_graphics::GlGraphics;
 use crate::point::{Point, Transformable};
 
