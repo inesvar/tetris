@@ -75,7 +75,7 @@ fn main() {
     let mut app = App {
         gl: GlGraphics::new(opengl),
         assets,
-        grid: TetrisGrid::new(10, 20),
+        grid: TetrisGrid::new(10, 22),
         counter: 100,
     };
 
