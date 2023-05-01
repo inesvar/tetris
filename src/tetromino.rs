@@ -1,9 +1,11 @@
+use graphics::Context;
 use graphics::types::{Color, Matrix2d};
 use opengl_graphics::GlGraphics;
 use crate::point::{Point, Transformable};
 
 use crate::{block::Block};
 use crate::assets::TetrisColor;
+use crate::assets::Assets;
 
 pub struct Tetromino {
     color: TetrisColor,
@@ -70,9 +72,9 @@ impl Tetromino {
 }
 
 impl Tetromino {
-    pub fn render(&self, transform: Matrix2d, gl: &mut GlGraphics) {
+    pub fn render(&self, transform: Matrix2d, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
         for i in 0..4 {
-            self.blocks[i].render(transform, gl);
+            self.blocks[i].render(transform, &ctx.draw_state, gl, assets);
         }
     }
 }
