@@ -1,5 +1,5 @@
 use graphics::{Context, rectangle};
-use graphics::math::margin_rectangle;
+use graphics::math::{margin_rectangle, Matrix2d, Scalar};
 use crate::point::{Point, Transformable};
 use graphics::types::Color;
 use opengl_graphics::GlGraphics;
@@ -23,16 +23,15 @@ impl Block {
         self
     }
 
-    pub fn render(&self, ctx: &Context, gl: &mut GlGraphics) {
-        let mut square = rectangle::square(
-            self.position.x as f64 * BLOCK_SIZE,
-            self.position.y as f64 * BLOCK_SIZE,
+    pub fn render(&self, transform: Matrix2d, gl: &mut GlGraphics) {
+        let mut dims = rectangle::square(
+            self.position.x as Scalar * BLOCK_SIZE,
+            self.position.y as Scalar * BLOCK_SIZE,
             BLOCK_SIZE,
         );
+        dims = margin_rectangle(dims, BLOCK_SHRINK);
 
-        square = margin_rectangle(square, BLOCK_SHRINK);
-
-        rectangle(self.color, square, ctx.transform, gl);
+        rectangle(self.color, dims, transform, gl);
     }
 }
 
