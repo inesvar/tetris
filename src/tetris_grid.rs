@@ -6,7 +6,7 @@ use opengl_graphics::GlGraphics;
 use piston_window::RenderArgs;
 use crate::assets::{Assets, TetrisColor};
 use crate::block::Block;
-use crate::settings::{BLOCK_SIZE, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT};
+use crate::settings::{BLOCK_SIZE, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, GRID_THICKNESS, GRID_COLOR};
 use crate::tetromino::Tetromino;
 
 pub struct TetrisGrid {
@@ -75,7 +75,7 @@ impl TetrisGrid {
         );
         for (y, row) in self.rows.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
-                let outline_rect = graphics::Rectangle::new_border(color::GRAY, 0.2);
+                let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
                 let outline_dims = rectangle::square(x as Scalar * BLOCK_SIZE, y as Scalar * BLOCK_SIZE, BLOCK_SIZE);
                 outline_rect.draw(outline_dims, &ctx.draw_state, grid_transform, gl);
 
