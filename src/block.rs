@@ -44,28 +44,28 @@ impl Block {
 impl Transformable for Block {
     /* methode to new
 
-    fn down(mut self) -> Self {
-        self.position = self.position.down();
+    fn go_down(mut self) -> Self {
+        self.position = self.position.go_down();
         self
     }*/
 
-    fn down(&mut self) {
-        self.position.down();
+    fn go_down(&mut self) {
+        self.position.go_down();
     }
 
-    fn left(&mut self) {
-        self.position.left();
+    fn go_left(&mut self) {
+        self.position.go_left();
     }
 
-    fn right(&mut self) {
-        self.position.right();
+    fn go_right(&mut self) {
+        self.position.go_right();
     }
 
-    fn turn_clockwise(&mut self, other: &Point) {
-        self.position.turn_clockwise(other);
+    fn rotate_clockwise(&mut self, other: &Point) {
+        self.position.rotate_clockwise(other);
     }
 
-    fn turn_counterclockwise(&mut self, other: &Point) {
-        self.position.turn_counterclockwise(other);
+    fn rotate_counterclockwise(&mut self, other: &Point) {
+        self.position.rotate_counterclockwise(other);
     }
 }

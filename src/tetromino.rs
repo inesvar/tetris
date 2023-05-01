@@ -41,40 +41,41 @@ impl Tetromino {
 
 /* TRANSFORMABLE METHODS */
 impl Tetromino {
-    pub fn down(&mut self) {
+    pub fn go_down(&mut self) {
         for i in 0..4 {
-            self.blocks[i].down();
+            self.blocks[i].go_down();
         }
-        self.center.down();
+        self.center.go_down();
     }
 
-    pub fn left(&mut self) {
+    pub fn go_left(&mut self) {
         for i in 0..4 {
-            self.blocks[i].left();
+            self.blocks[i].go_left();
         }
-        self.center.left();
+        self.center.go_left();
     }
 
-    pub fn right(&mut self) {
+    pub fn go_right(&mut self) {
         for i in 0..4 {
-            self.blocks[i].right();
+            self.blocks[i].go_right();
         }
-        self.center.right();
+        self.center.go_right();
     }
 
-    pub fn turn_clockwise(&mut self) {
+    pub fn rotate_clockwise(&mut self) {
         for i in 0..4 {
-            self.blocks[i].turn_clockwise(&self.center);
+            self.blocks[i].rotate_clockwise(&self.center);
         }
     }
 
-    pub fn turn_counterclockwise(&mut self) {
+    pub fn rotate_counterclockwise(&mut self) {
         for i in 0..4 {
-            self.blocks[i].turn_counterclockwise(&self.center);
+            self.blocks[i].rotate_counterclockwise(&self.center);
         }
     }
 }
 
+/* RENDER METHOD */
 impl Tetromino {
     pub fn render(&self, transform: Matrix2d, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
         for i in 0..4 {
@@ -88,3 +89,6 @@ impl Tetromino {
         self.blocks
     }
 }
+
+/* COLLISION METHODS */
+
