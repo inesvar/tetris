@@ -1,12 +1,12 @@
-use graphics::{color, Context, draw_state, rectangle};
-use graphics::math::{abs_transform, margin_rectangle, Matrix2d};
-use graphics::types::{Color, Rectangle, Scalar};
+use graphics::{Context, rectangle};
+use graphics::math::{Matrix2d};
+use graphics::types::{Scalar};
 use graphics::Transformed;
 use opengl_graphics::GlGraphics;
 use piston_window::RenderArgs;
 use crate::assets::{Assets, TetrisColor};
 use crate::block::Block;
-use crate::settings::{BLOCK_SIZE, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, GRID_THICKNESS, GRID_COLOR};
+use crate::settings::{BLOCK_SIZE, GRID_THICKNESS, GRID_COLOR};
 use crate::tetromino::Tetromino;
 
 pub struct TetrisGrid {
