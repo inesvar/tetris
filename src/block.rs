@@ -81,61 +81,60 @@ pub enum NewBlock {
 }
 
 pub trait Collision {
-    fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
-    fn right(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
-    fn left(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
-    fn turn_clockwise(&mut self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
-    fn turn_counterclockwise(
-        &mut self,
-        other: &Point,
-        matrix: &Vec<Vec<Option<Block>>>,
-    ) -> NewBlock;
+    fn fall(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
+    fn right(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
+    fn left(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
+    fn turn_clockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
+    fn turn_counterclockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
 }
 
 impl Collision for Block {
-    fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
-        if self.position.y <= 0 {
+    fn fall(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
+        let mut copy = *self;
+        copy.go_down();
+        if copy.position.y as usize > matrix.len() - 1 {
             NewBlock::Error
         } else {
-            match matrix[(self.position.y - 1) as usize][self.position.x as usize] {
+            match matrix[copy.position.y as usize][copy.position.x as usize] {
                 Some(_) => NewBlock::Error,
                 None => {
-                    self.go_down();
-                    NewBlock::Success(*self)
+                    NewBlock::Success(copy)
                 }
             }
         }
     }
 
-    fn left(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
-        if self.position.x <= 0 {
+    fn left(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
+        let mut copy = *self;
+        copy.go_down();
+        if copy.position.x < 0 {
             NewBlock::Error
         } else {
-            match matrix[self.position.y as usize][(self.position.x - 1) as usize] {
+            match matrix[copy.position.y as usize][copy.position.x as usize] {
                 Some(_) => NewBlock::Error,
                 None => {
-                    self.go_left();
-                    NewBlock::Success(*self)
+                    NewBlock::Success(copy)
                 }
             }
         }
     }
 
-    fn right(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
-        if self.position.x as usize >= matrix[0].len() - 1 {
+    fn right(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
+        let mut copy = *self;
+        copy.go_down();
+        if copy.position.x as usize > matrix[0].len() - 1 {
             NewBlock::Error
         } else {
-            match matrix[self.position.y as usize][(self.position.x - 1) as usize] {
+            match matrix[copy.position.y as usize][copy.position.x as usize] {
                 Some(_) => NewBlock::Error,
                 None => {
-                    self.go_right();
-                    NewBlock::Success(*self)
+                    NewBlock::Success(copy)
                 }
             }
         }
     }
 
-    fn turn_clockwise(&mut self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
+    fn turn_clockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
         let mut copy = self.position;
         copy.rotate_clockwise(other);
         match (copy.x, copy.y) {
@@ -156,7 +155,7 @@ impl Collision for Block {
         }
     }
 
-    fn turn_counterclockwise(&mut self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
+    fn turn_counterclockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
         let mut copy = self.position;
         copy.rotate_counterclockwise(other);
         match (copy.x, copy.y) {

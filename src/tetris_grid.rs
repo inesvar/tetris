@@ -26,7 +26,7 @@ impl TetrisGrid {
             rows.push(vec![None; nb_columns as usize]);
         }
         
-        let line_sum = vec![0; nb_columns as usize];
+        let line_sum = vec![0; nb_rows as usize];
         TetrisGrid {
             nb_columns,
             nb_rows,
@@ -38,7 +38,7 @@ impl TetrisGrid {
         }
     }
 
-    pub fn freeze_tetromino(&mut self, tetromino: Tetromino) {
+    pub fn freeze_tetromino(&mut self, tetromino: &mut Tetromino) {
         let blocks = tetromino.split();
         for i in 0..4 {
             self.rows[blocks[i].position.y as usize][blocks[i].position.x as usize] = Some(blocks[i]);

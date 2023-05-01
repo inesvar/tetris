@@ -1,7 +1,7 @@
 use crate::block::{Block, Collision, NewBlock};
 use crate::point::{Point, Transformable};
 use graphics::types::Matrix2d;
-use graphics::Context;
+use graphics::{rectangle, Context, Image};
 use opengl_graphics::GlGraphics;
 
 use crate::assets::Assets;
@@ -51,7 +51,7 @@ impl Tetromino {
 }
 
 impl Tetromino {
-    pub fn split(self) -> [Block; 4] {
+    pub fn split(&mut self) -> [Block; 4] {
         self.blocks
     }
 }
@@ -65,11 +65,15 @@ pub enum NewTetromino {
 /* COLLISION METHODS */
 impl Tetromino {
     pub fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
-        let mut new_blocks = vec!();
+        let mut new_blocks = vec![];
         for i in 0..4 {
             match self.blocks[i].fall(matrix) {
-                NewBlock::Error => {return NewTetromino::Error;},
-                NewBlock::Success(block) => {new_blocks[i] = block;},
+                NewBlock::Error => {
+                    return NewTetromino::Error;
+                }
+                NewBlock::Success(block) => {
+                    new_blocks.push(block);
+                }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
@@ -77,11 +81,15 @@ impl Tetromino {
     }
 
     pub fn left(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
-        let mut new_blocks = vec!();
+        let mut new_blocks = vec![];
         for i in 0..4 {
             match self.blocks[i].left(matrix) {
-                NewBlock::Error => {return NewTetromino::Error;},
-                NewBlock::Success(block) => {new_blocks[i] = block;},
+                NewBlock::Error => {
+                    return NewTetromino::Error;
+                }
+                NewBlock::Success(block) => {
+                    new_blocks[i] = block;
+                }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
@@ -89,11 +97,15 @@ impl Tetromino {
     }
 
     pub fn right(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
-        let mut new_blocks = vec!();
+        let mut new_blocks = vec![];
         for i in 0..4 {
             match self.blocks[i].right(matrix) {
-                NewBlock::Error => {return NewTetromino::Error;},
-                NewBlock::Success(block) => {new_blocks[i] = block;},
+                NewBlock::Error => {
+                    return NewTetromino::Error;
+                }
+                NewBlock::Success(block) => {
+                    new_blocks[i] = block;
+                }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
@@ -101,11 +113,15 @@ impl Tetromino {
     }
 
     pub fn turn_clockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
-        let mut new_blocks = vec!();
+        let mut new_blocks = vec![];
         for i in 0..4 {
             match self.blocks[i].turn_clockwise(&self.center, matrix) {
-                NewBlock::Error => {return NewTetromino::Error;},
-                NewBlock::Success(block) => {new_blocks[i] = block;},
+                NewBlock::Error => {
+                    return NewTetromino::Error;
+                }
+                NewBlock::Success(block) => {
+                    new_blocks[i] = block;
+                }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
@@ -113,11 +129,15 @@ impl Tetromino {
     }
 
     pub fn turn_counterclockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
-        let mut new_blocks = vec!();
+        let mut new_blocks = vec![];
         for i in 0..4 {
             match self.blocks[i].turn_counterclockwise(&self.center, matrix) {
-                NewBlock::Error => {return NewTetromino::Error;},
-                NewBlock::Success(block) => {new_blocks[i] = block;},
+                NewBlock::Error => {
+                    return NewTetromino::Error;
+                }
+                NewBlock::Success(block) => {
+                    new_blocks[i] = block;
+                }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
