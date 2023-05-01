@@ -49,7 +49,7 @@ impl App {
             clear(BG_COLOR, gl);
 
             self.grid.render(&ctx, gl, &self.assets);
-            self.test_tetromino.render(ctx.transform, gl);
+            self.test_tetromino.render(ctx.transform, &ctx, gl, &self.assets);
         });
     }
 
