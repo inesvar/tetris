@@ -1,7 +1,7 @@
 use graphics::color;
 
 pub static DEFAULT_WINDOW_WIDTH: u32 = 500;
-pub static DEFAULT_WINDOW_HEIGHT: u32 = 600;
+pub static DEFAULT_WINDOW_HEIGHT: u32 = 700;
 
 pub static BLOCK_SIZE: f64 = 25.0;
 pub static GRID_THICKNESS: f64 = 0.2;
