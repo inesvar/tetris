@@ -4,7 +4,7 @@ extern crate opengl_graphics;
 extern crate piston;
 extern crate find_folder;
 
-use tetromino::Tetromino;
+use tetromino::{Tetromino, NewTetromino};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
@@ -62,8 +62,11 @@ impl App<'_> {
         self.clock += args.dt;
         self.frame_counter = self.frame_counter.wrapping_add(1);
 
-        if self.frame_counter % 32 == 0 {
-            self.active_tetromino.go_down();
+        if self.frame_counter % 50 == 0 {
+            if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
+                self.grid.freeze_tetromino(&mut self.active_tetromino);
+                self.active_tetromino = Tetromino::new(TetrisColor::random(), &mut [2, 14, 1, 0, -1, 0, 0, 0, 0, 1]);
+            }
         }
     }
 }
@@ -91,11 +94,15 @@ fn main() {
         grid: TetrisGrid::new(10, 22),
         clock: 0.0,
         frame_counter: 0,
-        active_tetromino: Tetromino::new(TetrisColor::random(), &mut [2, 2, 1, 0, -1, 0, 0, 0, 0, 1]),
+        active_tetromino: Tetromino::new(TetrisColor::random(), &mut [2, 20, 1, 0, -1, 0, 0, 0, 0, 1]),
     };
-
-    app.grid.freeze_tetromino(Tetromino::new(TetrisColor::random(), &mut [5, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
-    app.grid.freeze_tetromino(Tetromino::new(TetrisColor::random(), &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]));
+    /*app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 20, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 17, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 14, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 11, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 8, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
+    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]));*/
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
