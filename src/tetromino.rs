@@ -22,7 +22,11 @@ pub enum Rotation {
 }
 
 impl Tetromino {
-    pub fn new(color: TetrisColor, positions: &[i8]) -> Self {
+    pub fn new(color: TetrisColor, positions: &mut [i8]) -> Self {
+        for i in 1..5 {
+            positions[2*i] += positions[0];
+            positions[2*i + 1] += positions[1];
+        }
         Tetromino {
             color,
             center: Point::new(positions[0], positions[1]),
@@ -76,5 +80,11 @@ impl Tetromino {
         for i in 0..4 {
             self.blocks[i].render(transform, &ctx.draw_state, gl, assets);
         }
+    }
+}
+
+impl Tetromino {
+    pub fn split(self) -> [Block; 4] {
+        self.blocks
     }
 }

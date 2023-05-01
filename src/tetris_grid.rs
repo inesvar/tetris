@@ -6,11 +6,13 @@ use opengl_graphics::GlGraphics;
 use crate::assets::{Assets, TetrisColor};
 use crate::block::Block;
 use crate::settings::{BLOCK_SHRINK, BLOCK_SIZE, WINDOW_WIDTH, WINDOW_HEIGHT};
+use crate::tetromino::Tetromino;
 
 pub struct TetrisGrid {
     pub nb_columns: i8,
     pub nb_rows: i8,
     pub rows: Vec<Vec<Option<Block>>>,
+    pub line_sum : Vec<u8>,
     pub width: f64,
     pub height: f64
 }
@@ -19,18 +21,26 @@ impl TetrisGrid {
     pub fn new(nb_columns: i8, nb_rows: i8) -> TetrisGrid {
         let mut rows = Vec::with_capacity(nb_rows as usize);
         for _ in 0..nb_rows {
-            let mut row = Vec::with_capacity(nb_columns as usize);
-            for _ in 0..nb_columns {
-                row.push(None);
-            }
+            let row = vec![None; nb_rows as usize];
             rows.push(row);
         }
+        
+        let line_sum = vec![0; nb_columns as usize];
         TetrisGrid {
             nb_columns,
             nb_rows,
             rows,
+            line_sum: line_sum,
             width: nb_columns as f64 * BLOCK_SIZE,
             height: nb_rows as f64 * BLOCK_SIZE
+        }
+    }
+
+    pub fn add_tetromino(&mut self, tetromino: Tetromino) {
+        let blocks = tetromino.split();
+        for i in 0..4 {
+            self.rows[blocks[i].position.y as usize][blocks[i].position.x as usize] = Some(blocks[i]);
+            self.line_sum[blocks[i].position.y as usize] += 1;
         }
     }
 
@@ -47,10 +57,12 @@ impl TetrisGrid {
             }
             rows.push(row);
         }
+        let line_sum = vec![0; nb_columns as usize];
         TetrisGrid {
             nb_columns,
             nb_rows,
             rows,
+            line_sum,
             width: nb_columns as f64 * BLOCK_SIZE,
             height: nb_rows as f64 * BLOCK_SIZE
         }

@@ -31,7 +31,6 @@ pub struct App {
     gl: GlGraphics,
     grid: TetrisGrid,
     assets: Assets,
-    test_tetromino: Tetromino,
     counter: u8,
 }
 
@@ -49,7 +48,6 @@ impl App {
             clear(BG_COLOR, gl);
 
             self.grid.render(&ctx, gl, &self.assets);
-            self.test_tetromino.render(ctx.transform, &ctx, gl, &self.assets);
         });
     }
 
@@ -60,8 +58,10 @@ impl App {
             self.counter + 1
         };
         if self.counter == 255 {
-            self.test_tetromino.turn_counterclockwise();
-            //self.test_tetromino.down();
+            self.grid.add_tetromino(Tetromino::new(TetrisColor::PURPLE, &mut [2, 2, 1, 0, -1, 0, 0, 0, 0, 1]));
+            self.grid.add_tetromino(Tetromino::new(TetrisColor::RED, &mut [5, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
+            self.grid.add_tetromino(Tetromino::new(TetrisColor::BLUE, &mut [2, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
+            self.grid.add_tetromino(Tetromino::new(TetrisColor::GREEN, &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]));
         }
     }
 }
@@ -86,7 +86,6 @@ fn main() {
         gl: GlGraphics::new(opengl),
         assets,
         grid: TetrisGrid::new(10, 15),
-        test_tetromino: Tetromino::new(TetrisColor::PURPLE, &[5, 15, 6, 15, 4, 15, 5, 15, 5, 16]),
         counter: 100,
     };
 
