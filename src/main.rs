@@ -65,19 +65,19 @@ impl App<'_> {
         self.clock += args.dt;
         self.frame_counter = self.frame_counter.wrapping_add(1);
 
-        /*if self.frame_counter % 50 == 0 {
+        if self.frame_counter % 50 == 0 {
             if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
                 self.grid.freeze_tetromino(&mut self.active_tetromino);
-                self.active_tetromino = Tetromino::new(TetrisColor::random(), tetromino::TetrominoKind::T, &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]);
+                self.active_tetromino = Tetromino::new_random();
             }
-        }*/
+        }
 
         // Translate tetromino on long key press
         if self.frame_counter % 10 == 0 {
             if self.keyboard.is_any_pressed(&FALL_KEYS) {
                 if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
                     self.grid.freeze_tetromino(&mut self.active_tetromino);
-                    self.active_tetromino = Tetromino::new(TetrisColor::random(), tetromino::TetrominoKind::T, &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]);
+                    self.active_tetromino = Tetromino::new_random();
                 }
             } else if self.keyboard.is_any_pressed(&LEFT_KEYS) {
                 self.active_tetromino.left(&self.grid.rows);
@@ -111,7 +111,7 @@ fn main() {
         grid: TetrisGrid::new(10, 22),
         clock: 0.0,
         frame_counter: 0,
-        active_tetromino: Tetromino::new_O(),
+        active_tetromino: Tetromino::new_random(),
         keyboard: keyboard::Keyboard::new()
     };
 

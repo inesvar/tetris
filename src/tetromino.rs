@@ -33,6 +33,26 @@ pub enum Rotation {
     R3,
 }
 
+impl Rotation {
+    fn clockwise(&mut self) {
+        match self {
+            Rotation::R0 => {*self = Rotation::R1;},
+            Rotation::R1 => {*self = Rotation::R2;},
+            Rotation::R2 => {*self = Rotation::R3;},
+            Rotation::R3 => {*self = Rotation::R0;},
+        }
+    }
+
+    fn counterclockwise(&mut self) {
+        match self {
+            Rotation::R0 => {*self = Rotation::R3;},
+            Rotation::R1 => {*self = Rotation::R0;},
+            Rotation::R2 => {*self = Rotation::R1;},
+            Rotation::R3 => {*self = Rotation::R2;},
+        }
+    }
+}
+
 impl Tetromino {
     pub fn new(color: TetrisColor, kind: TetrominoKind, positions: &mut [i8]) -> Self {
         for i in 1..5 {
@@ -107,6 +127,18 @@ impl Tetromino {
             TetrominoKind::I,
             &mut [5, 2, -2, 0, -1, 0, 0, 0, 1, 0]
         )
+    }
+
+    pub fn new_random() -> Self {
+        match rand::random::<u8>() % 7 {
+            0 => Tetromino::new_I(),
+            1 => Tetromino::new_O(),
+            2 => Tetromino::new_T(),
+            3 => Tetromino::new_S(),
+            4 => Tetromino::new_Z(),
+            5 => Tetromino::new_J(),
+            _ => Tetromino::new_L(),
+        }
     }
 }
 
@@ -200,6 +232,7 @@ impl Tetromino {
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
+        self.rotation_status.clockwise();
         NewTetromino::Success
     }
 
@@ -219,6 +252,7 @@ impl Tetromino {
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
+        self.rotation_status.counterclockwise();
         NewTetromino::Success
     }
 }
