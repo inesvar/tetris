@@ -4,7 +4,7 @@ extern crate opengl_graphics;
 extern crate piston;
 extern crate find_folder;
 
-use piston::{Button, Key, PressEvent};
+use piston::{Button, Key, PressEvent, ButtonEvent, ButtonArgs, ReleaseEvent};
 use tetromino::{Tetromino, NewTetromino};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
@@ -20,8 +20,9 @@ mod assets;
 use crate::assets::{Assets, TetrisColor};
 mod tetris_grid;
 mod tetromino;
+mod keyboard;
 
-use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
+use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
 use tetris_grid::TetrisGrid;
 
 pub struct App<'a> {
@@ -30,7 +31,8 @@ pub struct App<'a> {
     assets: Assets<'a>,
     clock: f64,
     frame_counter: u64,
-    active_tetromino: Tetromino
+    active_tetromino: Tetromino,
+    keyboard: keyboard::Keyboard,
 }
 
 impl App<'_> {
@@ -63,10 +65,24 @@ impl App<'_> {
         self.clock += args.dt;
         self.frame_counter = self.frame_counter.wrapping_add(1);
 
-        if self.frame_counter % 50 == 0 {
+        /*if self.frame_counter % 50 == 0 {
             if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
                 self.grid.freeze_tetromino(&mut self.active_tetromino);
-                self.active_tetromino = Tetromino::new(TetrisColor::random(), &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]);
+                self.active_tetromino = Tetromino::new(TetrisColor::random(), tetromino::TetrominoKind::T, &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]);
+            }
+        }*/
+
+        // Translate tetromino on long key press
+        if self.frame_counter % 10 == 0 {
+            if self.keyboard.is_any_pressed(&FALL_KEYS) {
+                if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
+                    self.grid.freeze_tetromino(&mut self.active_tetromino);
+                    self.active_tetromino = Tetromino::new(TetrisColor::random(), tetromino::TetrominoKind::T, &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]);
+                }
+            } else if self.keyboard.is_any_pressed(&LEFT_KEYS) {
+                self.active_tetromino.left(&self.grid.rows);
+            } else if self.keyboard.is_any_pressed(&RIGHT_KEYS) {
+                self.active_tetromino.right(&self.grid.rows);
             }
         }
     }
@@ -95,15 +111,9 @@ fn main() {
         grid: TetrisGrid::new(10, 22),
         clock: 0.0,
         frame_counter: 0,
-        active_tetromino: Tetromino::new(TetrisColor::random(), &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]),
+        active_tetromino: Tetromino::new_O(),
+        keyboard: keyboard::Keyboard::new()
     };
-    /*app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 20, 1, 0, -1, 0, 0, 0, 0, 1]));
-    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 17, 1, 0, -1, 0, 0, 0, 0, 1]));
-    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 14, 1, 0, -1, 0, 0, 0, 0, 1]));
-    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 11, 1, 0, -1, 0, 0, 0, 0, 1]));
-    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 8, 1, 0, -1, 0, 0, 0, 0, 1]));
-    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 5, 1, 0, -1, 0, 0, 0, 0, 1]));
-    app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]));*/
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
@@ -114,19 +124,22 @@ fn main() {
         if let Some(args) = e.update_args() {
             app.update(&args);
         }
+
         if let Some(Button::Keyboard(key)) = e.press_args() {
-            if key == Key::C {
-                app.active_tetromino.fall(&app.grid.rows);
-            } else if key == Key::X {
-                app.active_tetromino.left(&app.grid.rows);
-            } else if key == Key::V {
-                app.active_tetromino.right(&app.grid.rows);
-            } else if key == Key::D {
+            app.keyboard.set_pressed(key);
+
+            // Pressed once events
+            if app.keyboard.is_any_pressed(&ROTATE_CLOCKWISE_KEYS) {
+                // rotate once the tetromino
                 app.active_tetromino.turn_clockwise(&app.grid.rows);
-            } else if key == Key::F {
+            } else if app.keyboard.is_any_pressed(&ROTATE_COUNTERCLOCKWISE_KEYS) {
+                // rotate once the tetromino
                 app.active_tetromino.turn_counterclockwise(&app.grid.rows);
             }
-            println!("Pressed keyboard key '{:?}'", key);
         };
+        if let Some(Button::Keyboard(key)) = e.release_args() {
+            app.keyboard.set_released(key);
+        };
+        
     }
 }
