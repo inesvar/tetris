@@ -4,6 +4,7 @@ extern crate opengl_graphics;
 extern crate piston;
 extern crate find_folder;
 
+use piston::{Button, Key, PressEvent};
 use tetromino::{Tetromino, NewTetromino};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
@@ -65,7 +66,7 @@ impl App<'_> {
         if self.frame_counter % 50 == 0 {
             if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
                 self.grid.freeze_tetromino(&mut self.active_tetromino);
-                self.active_tetromino = Tetromino::new(TetrisColor::random(), &mut [2, 14, 1, 0, -1, 0, 0, 0, 0, 1]);
+                self.active_tetromino = Tetromino::new(TetrisColor::random(), &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]);
             }
         }
     }
@@ -94,7 +95,7 @@ fn main() {
         grid: TetrisGrid::new(10, 22),
         clock: 0.0,
         frame_counter: 0,
-        active_tetromino: Tetromino::new(TetrisColor::random(), &mut [2, 20, 1, 0, -1, 0, 0, 0, 0, 1]),
+        active_tetromino: Tetromino::new(TetrisColor::random(), &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, 1]),
     };
     /*app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 20, 1, 0, -1, 0, 0, 0, 0, 1]));
     app.grid.freeze_tetromino(&mut Tetromino::new(TetrisColor::random(), &mut [5, 17, 1, 0, -1, 0, 0, 0, 0, 1]));
@@ -113,5 +114,19 @@ fn main() {
         if let Some(args) = e.update_args() {
             app.update(&args);
         }
+        if let Some(Button::Keyboard(key)) = e.press_args() {
+            if key == Key::C {
+                app.active_tetromino.fall(&app.grid.rows);
+            } else if key == Key::X {
+                app.active_tetromino.left(&app.grid.rows);
+            } else if key == Key::V {
+                app.active_tetromino.right(&app.grid.rows);
+            } else if key == Key::D {
+                app.active_tetromino.turn_clockwise(&app.grid.rows);
+            } else if key == Key::F {
+                app.active_tetromino.turn_counterclockwise(&app.grid.rows);
+            }
+            println!("Pressed keyboard key '{:?}'", key);
+        };
     }
 }

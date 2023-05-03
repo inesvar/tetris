@@ -77,6 +77,7 @@ impl Tetromino {
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
+        self.center.go_down();
         NewTetromino::Success
     }
 
@@ -88,11 +89,12 @@ impl Tetromino {
                     return NewTetromino::Error;
                 }
                 NewBlock::Success(block) => {
-                    new_blocks[i] = block;
+                    new_blocks.push(block);
                 }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
+        self.center.go_left();
         NewTetromino::Success
     }
 
@@ -104,11 +106,12 @@ impl Tetromino {
                     return NewTetromino::Error;
                 }
                 NewBlock::Success(block) => {
-                    new_blocks[i] = block;
+                    new_blocks.push(block);
                 }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
+        self.center.go_right();
         NewTetromino::Success
     }
 
@@ -120,7 +123,7 @@ impl Tetromino {
                     return NewTetromino::Error;
                 }
                 NewBlock::Success(block) => {
-                    new_blocks[i] = block;
+                    new_blocks.push(block);
                 }
             }
         }
@@ -136,7 +139,7 @@ impl Tetromino {
                     return NewTetromino::Error;
                 }
                 NewBlock::Success(block) => {
-                    new_blocks[i] = block;
+                    new_blocks.push(block);
                 }
             }
         }

@@ -106,7 +106,7 @@ impl Collision for Block {
 
     fn left(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
         let mut copy = *self;
-        copy.go_down();
+        copy.go_left();
         if copy.position.x < 0 {
             NewBlock::Error
         } else {
@@ -121,7 +121,7 @@ impl Collision for Block {
 
     fn right(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
         let mut copy = *self;
-        copy.go_down();
+        copy.go_right();
         if copy.position.x as usize > matrix[0].len() - 1 {
             NewBlock::Error
         } else {
@@ -135,9 +135,9 @@ impl Collision for Block {
     }
 
     fn turn_clockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
-        let mut copy = self.position;
+        let mut copy = *self;
         copy.rotate_clockwise(other);
-        match (copy.x, copy.y) {
+        match (copy.position.x, copy.position.y) {
             (x, y) if x < 0 || y < 0 => {
                 return NewBlock::Error;
             }
@@ -146,19 +146,18 @@ impl Collision for Block {
             }
             _ => {}
         }
-        match matrix[copy.y as usize][copy.x as usize] {
+        match matrix[copy.position.y as usize][copy.position.x as usize] {
             Some(_) => NewBlock::Error,
             None => {
-                self.set_position(copy);
-                NewBlock::Success(*self)
+                NewBlock::Success(copy)
             }
         }
     }
 
     fn turn_counterclockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
-        let mut copy = self.position;
+        let mut copy = *self;
         copy.rotate_counterclockwise(other);
-        match (copy.x, copy.y) {
+        match (copy.position.x, copy.position.y) {
             (x, y) if x < 0 || y < 0 => {
                 return NewBlock::Error;
             }
@@ -167,11 +166,10 @@ impl Collision for Block {
             }
             _ => {}
         }
-        match matrix[copy.y as usize][copy.x as usize] {
+        match matrix[copy.position.y as usize][copy.position.x as usize] {
             Some(_) => NewBlock::Error,
             None => {
-                self.set_position(copy);
-                NewBlock::Success(*self)
+                NewBlock::Success(copy)
             }
         }
     }
