@@ -22,7 +22,7 @@ mod tetris_grid;
 mod tetromino;
 mod keyboard;
 
-use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
+use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, RESTART_KEYS, FALL_KEYS, HARD_DROP_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
 use tetris_grid::TetrisGrid;
 
 pub struct App<'a> {
@@ -33,6 +33,7 @@ pub struct App<'a> {
     frame_counter: u64,
     active_tetromino: Tetromino,
     keyboard: keyboard::Keyboard,
+    running: bool,
 }
 
 impl App<'_> {
@@ -41,34 +42,48 @@ impl App<'_> {
             // Clear the screen.
             graphics::clear(BG_COLOR, gl);
 
-            let title_transform = ctx.transform.trans(180.0, 50.0);
-            graphics::text::Text::new_color(color::WHITE, 16).draw(
-                "T", &mut self.assets.tetris_font, &ctx.draw_state,
-                title_transform,
-                gl
-            ).unwrap();
+            if self.running {
+                let title_transform = ctx.transform.trans(180.0, 50.0);
+                graphics::text::Text::new_color(color::WHITE, 16).draw(
+                    "T", &mut self.assets.tetris_font, &ctx.draw_state,
+                    title_transform,
+                    gl
+                ).unwrap();
+            } else {
+                let restart_transform = ctx.transform.trans(180.0, 50.0);
+                graphics::text::Text::new_color(color::WHITE, 16).draw(
+                    "Press R to restart", &mut self.assets.main_font, &ctx.draw_state,
+                    restart_transform,
+                    gl
+                ).unwrap();
+            }
 
             let timer_transform = ctx.transform.trans(0.0, 200.0);
             graphics::text::Text::new_color(color::WHITE, 16).draw(
-                format!("Elapsed: {}s", self.clock.to_string()).as_str(), &mut self.assets.main_font, &ctx.draw_state,
+                format!("Elapsed: {}s", self.clock).as_str(), &mut self.assets.main_font, &ctx.draw_state,
                 timer_transform,
                 gl
             ).unwrap();
 
             self.grid.render(args, &ctx, gl, &self.assets);
-
             self.active_tetromino.render(self.grid.transform, &ctx, gl, &self.assets);
         });
     }
 
     fn update(&mut self, args: &UpdateArgs) {
+        if !self.running {
+            return;
+        }
         self.clock += args.dt;
         self.frame_counter = self.frame_counter.wrapping_add(1);
 
         if self.frame_counter % 50 == 0 {
             if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
                 self.grid.freeze_tetromino(&mut self.active_tetromino);
-                self.active_tetromino = Tetromino::new_random();
+                match Tetromino::new_random(&self.grid.rows) {
+                    Some(t) => {self.active_tetromino = t;},
+                    None => {self.game_over()},
+                };
             }
         }
 
@@ -77,7 +92,10 @@ impl App<'_> {
             if self.keyboard.is_any_pressed(&FALL_KEYS) {
                 if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
                     self.grid.freeze_tetromino(&mut self.active_tetromino);
-                    self.active_tetromino = Tetromino::new_random();
+                    match Tetromino::new_random(&self.grid.rows) {
+                        Some(t) => {self.active_tetromino = t;},
+                        None => {self.game_over()},
+                    };
                 }
             } else if self.keyboard.is_any_pressed(&LEFT_KEYS) {
                 self.active_tetromino.left(&self.grid.rows);
@@ -85,6 +103,12 @@ impl App<'_> {
                 self.active_tetromino.right(&self.grid.rows);
             }
         }
+    }
+
+    fn game_over(&mut self) {
+        println!("game over");
+        self.grid.null();
+        self.running = false;
     }
 }
 
@@ -104,15 +128,18 @@ fn main() {
 
     let assets = Assets::new(assets_folder);
 
+    let grid = TetrisGrid::new(10, 22);
+
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
         assets,
-        grid: TetrisGrid::new(10, 22),
+        active_tetromino: Tetromino::new_random(&grid.rows).unwrap(),
+        grid,
         clock: 0.0,
         frame_counter: 0,
-        active_tetromino: Tetromino::new_random(),
-        keyboard: keyboard::Keyboard::new()
+        keyboard: keyboard::Keyboard::new(),
+        running: true,
     };
 
     let mut events = Events::new(EventSettings::new());
@@ -128,6 +155,14 @@ fn main() {
         if let Some(Button::Keyboard(key)) = e.press_args() {
             app.keyboard.set_pressed(key);
 
+            if app.keyboard.is_any_pressed(&RESTART_KEYS) {
+                // rotate once the tetromino
+                app.running = true;
+            }
+
+            if !app.running {
+                continue;
+            }
             // Pressed once events
             if app.keyboard.is_any_pressed(&ROTATE_CLOCKWISE_KEYS) {
                 // rotate once the tetromino
@@ -139,7 +174,10 @@ fn main() {
                 // hard drop the tetromino
                 app.active_tetromino.hard_drop(&app.grid.rows);
                 app.grid.freeze_tetromino(&mut app.active_tetromino);
-                app.active_tetromino = Tetromino::new_random();
+                match Tetromino::new_random(&app.grid.rows) {
+                    Some(t) => {app.active_tetromino = t;},
+                    None => {app.game_over()},
+                };
             }
         };
         if let Some(Button::Keyboard(key)) = e.release_args() {

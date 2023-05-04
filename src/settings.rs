@@ -16,3 +16,4 @@ pub static RIGHT_KEYS: [Key; 2] = [Key::Right, Key::V];
 pub static LEFT_KEYS: [Key; 2] = [Key::Left, Key::X];
 pub static ROTATE_CLOCKWISE_KEYS: [Key; 2] = [Key::Up, Key::F];
 pub static ROTATE_COUNTERCLOCKWISE_KEYS: [Key; 2] = [Key::NumPad3, Key::D];
+pub static RESTART_KEYS: [Key; 1] = [Key::R];
