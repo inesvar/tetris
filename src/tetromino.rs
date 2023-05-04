@@ -2,12 +2,13 @@ use crate::block::{Block, Collision, NewBlock};
 use crate::point::{Point, Transformable};
 use graphics::types::Matrix2d;
 use graphics::{rectangle, Context, Image};
+use graphics::draw_state::Blend;
 use opengl_graphics::GlGraphics;
 
 use crate::assets::Assets;
 use crate::assets::TetrisColor;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum TetrominoKind {
     I,
     O,
@@ -18,14 +19,17 @@ pub enum TetrominoKind {
     L,
 }
 
+#[derive(Clone, Copy)]
 pub struct Tetromino {
     color: TetrisColor,
     kind: TetrominoKind,
     center: Point,
     blocks: [Block; 4],
     rotation_status: Rotation,
+    pub(crate) is_ghost: bool,
 }
 
+#[derive(Clone, Copy)]
 pub enum Rotation {
     R0,
     R1,
@@ -36,19 +40,19 @@ pub enum Rotation {
 impl Rotation {
     fn clockwise(&mut self) {
         match self {
-            Rotation::R0 => {*self = Rotation::R1;},
-            Rotation::R1 => {*self = Rotation::R2;},
-            Rotation::R2 => {*self = Rotation::R3;},
-            Rotation::R3 => {*self = Rotation::R0;},
+            Rotation::R0 => { *self = Rotation::R1; }
+            Rotation::R1 => { *self = Rotation::R2; }
+            Rotation::R2 => { *self = Rotation::R3; }
+            Rotation::R3 => { *self = Rotation::R0; }
         }
     }
 
     fn counterclockwise(&mut self) {
         match self {
-            Rotation::R0 => {*self = Rotation::R3;},
-            Rotation::R1 => {*self = Rotation::R0;},
-            Rotation::R2 => {*self = Rotation::R1;},
-            Rotation::R3 => {*self = Rotation::R2;},
+            Rotation::R0 => { *self = Rotation::R3; }
+            Rotation::R1 => { *self = Rotation::R0; }
+            Rotation::R2 => { *self = Rotation::R1; }
+            Rotation::R3 => { *self = Rotation::R2; }
         }
     }
 }
@@ -70,6 +74,7 @@ impl Tetromino {
                 Block::new(color, positions[8], positions[9]),
             ],
             rotation_status: Rotation::R0,
+            is_ghost: false,
         }
     }
 
@@ -77,7 +82,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::PURPLE,
             TetrominoKind::T,
-            &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, -1]
+            &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, -1],
         )
     }
 
@@ -85,7 +90,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::GREEN,
             TetrominoKind::S,
-            &mut [5, 2, -1, 0, 0, 0, 0, -1, 1, -1]
+            &mut [5, 2, -1, 0, 0, 0, 0, -1, 1, -1],
         )
     }
 
@@ -93,7 +98,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::RED,
             TetrominoKind::Z,
-            &mut [5, 2, -1, -1, 0, -1, 0, 0, 1, 0]
+            &mut [5, 2, -1, -1, 0, -1, 0, 0, 1, 0],
         )
     }
 
@@ -101,7 +106,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::ORANGE,
             TetrominoKind::L,
-            &mut [5, 2, -1, 0, 0, 0, 1, 0, 1, -1]
+            &mut [5, 2, -1, 0, 0, 0, 1, 0, 1, -1],
         )
     }
 
@@ -109,7 +114,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::BLUE,
             TetrominoKind::J,
-            &mut [5, 2, -1, -1, -1, 0, 0, 0, 1, 0]
+            &mut [5, 2, -1, -1, -1, 0, 0, 0, 1, 0],
         )
     }
 
@@ -117,7 +122,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::YELLOW,
             TetrominoKind::O,
-            &mut [5, 2, -1, -1, -1, 0, 0, -1, 0, 0]
+            &mut [5, 2, -1, -1, -1, 0, 0, -1, 0, 0],
         )
     }
 
@@ -125,7 +130,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::CYAN,
             TetrominoKind::I,
-            &mut [5, 2, -2, 0, -1, 0, 0, 0, 1, 0]
+            &mut [5, 2, -2, 0, -1, 0, 0, 0, 1, 0],
         )
     }
 
@@ -146,7 +151,12 @@ impl Tetromino {
 impl Tetromino {
     pub fn render(&self, transform: Matrix2d, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
         for i in 0..4 {
-            self.blocks[i].render(transform, &ctx.draw_state, gl, assets);
+            let draw_state = if self.is_ghost {
+                ctx.draw_state.blend(Blend::Multiply)
+            } else {
+                ctx.draw_state
+            };
+            self.blocks[i].render(transform, &draw_state, gl, assets);
         }
     }
 }
@@ -184,8 +194,8 @@ impl Tetromino {
 
     pub fn hard_drop(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
         match self.fall(matrix) {
-            NewTetromino::Error => {NewTetromino::Error},
-            NewTetromino::Success => {self.hard_drop(matrix)},
+            NewTetromino::Error => { NewTetromino::Error }
+            NewTetromino::Success => { self.hard_drop(matrix) }
         }
     }
 

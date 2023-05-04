@@ -32,6 +32,7 @@ pub struct App<'a> {
     clock: f64,
     frame_counter: u64,
     active_tetromino: Tetromino,
+    ghost_tetromino: Option<Tetromino>,
     keyboard: keyboard::Keyboard,
 }
 
@@ -57,6 +58,10 @@ impl App<'_> {
 
             self.grid.render(args, &ctx, gl, &self.assets);
 
+            if let Some(mut ghost) = self.ghost_tetromino {
+                ghost.render(self.grid.transform, &ctx, gl, &self.assets);
+            }
+
             self.active_tetromino.render(self.grid.transform, &ctx, gl, &self.assets);
         });
     }
@@ -64,6 +69,12 @@ impl App<'_> {
     fn update(&mut self, args: &UpdateArgs) {
         self.clock += args.dt;
         self.frame_counter = self.frame_counter.wrapping_add(1);
+
+        self.ghost_tetromino = Some(self.active_tetromino.clone());
+        if let Some(mut ghost) = self.ghost_tetromino.as_mut() {
+            ghost.is_ghost = true;
+            ghost.hard_drop(&self.grid.rows);
+        }
 
         if self.frame_counter % 50 == 0 {
             if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
@@ -114,17 +125,18 @@ fn main() {
         clock: 0.0,
         frame_counter: 0,
         active_tetromino: Tetromino::new_random(),
+        ghost_tetromino: None,
         keyboard: keyboard::Keyboard::new()
     };
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
-        if let Some(args) = e.render_args() {
-            app.render(&args);
-        }
-
         if let Some(args) = e.update_args() {
             app.update(&args);
+        }
+
+        if let Some(args) = e.render_args() {
+            app.render(&args);
         }
 
         if let Some(Button::Keyboard(key)) = e.press_args() {
