@@ -1,10 +1,10 @@
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Point {
     pub x: i8,
     pub y: i8,
 }
 
-impl Point{
+impl Point {
     pub fn new(x: i8, y: i8) -> Self {
         Point { x, y }
     }
@@ -21,6 +21,14 @@ impl std::ops::Add for Point {
         Point::new(self.x + other.x, self.y + other.y)
     }
 }
+
+impl std::ops::Sub for Point {
+    type Output = Point;
+    fn sub(self, other: Point) -> Self::Output {
+        Point::new(self.x - other.x, self.y - other.y)
+    }
+}
+
 pub trait Transformable {
     fn go_down(&mut self);
     fn go_right(&mut self);

@@ -22,7 +22,7 @@ mod tetris_grid;
 mod tetromino;
 mod keyboard;
 
-use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, RESTART_KEYS, FALL_KEYS, HARD_DROP_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
+use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, RESTART_KEYS, FALL_KEYS, HARD_DROP_KEYS, HOLD_TETROMINO_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
 use tetris_grid::TetrisGrid;
 
 pub struct App<'a> {
@@ -31,7 +31,10 @@ pub struct App<'a> {
     assets: Assets<'a>,
     clock: f64,
     frame_counter: u64,
+    score: u64,
     active_tetromino: Tetromino,
+    ghost_tetromino: Option<Tetromino>,
+    saved_tetromino: Option<Tetromino>,
     keyboard: keyboard::Keyboard,
     running: bool,
 }
@@ -60,13 +63,30 @@ impl App<'_> {
 
             let timer_transform = ctx.transform.trans(0.0, 200.0);
             graphics::text::Text::new_color(color::WHITE, 16).draw(
-                format!("Elapsed: {}s", self.clock).as_str(), &mut self.assets.main_font, &ctx.draw_state,
+                format!("Elapsed: {:.2}s", self.clock).as_str(), &mut self.assets.main_font, &ctx.draw_state,
                 timer_transform,
                 gl
             ).unwrap();
 
+            let score_transform = ctx.transform.trans(0.0, 250.0);
+            graphics::text::Text::new_color(color::WHITE, 16).draw(
+                format!("Score: {}", self.score).as_str(), &mut self.assets.main_font, &ctx.draw_state,
+                score_transform,
+                gl
+            ).unwrap();
+
             self.grid.render(args, &ctx, gl, &self.assets);
+
+            if let Some(mut ghost) = self.ghost_tetromino {
+                ghost.render(self.grid.transform, &ctx, gl, &self.assets);
+            }
+
             self.active_tetromino.render(self.grid.transform, &ctx, gl, &self.assets);
+
+            if let Some(saved) = self.saved_tetromino {
+                let transform = ctx.transform.trans(-70.0, 50.0);
+                saved.render(transform, &ctx, gl, &self.assets);
+            }
         });
     }
 
@@ -76,6 +96,11 @@ impl App<'_> {
         }
         self.clock += args.dt;
         self.frame_counter = self.frame_counter.wrapping_add(1);
+
+        self.ghost_tetromino = Some(self.active_tetromino.make_ghost_copy());
+        if let Some(mut ghost) = self.ghost_tetromino.as_mut() {
+            ghost.hard_drop(&self.grid.rows);
+        }
 
         if self.frame_counter % 50 == 0 {
             if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
@@ -103,6 +128,10 @@ impl App<'_> {
                 self.active_tetromino.right(&self.grid.rows);
             }
         }
+
+        self.grid.update();
+
+        self.score += self.grid.nb_lines_cleared_last_frame as u64;
     }
 
     fn game_over(&mut self) {
@@ -138,18 +167,22 @@ fn main() {
         grid,
         clock: 0.0,
         frame_counter: 0,
-        keyboard: keyboard::Keyboard::new(),
         running: true,
+        score: 0,
+        active_tetromino: Tetromino::new_random(),
+        ghost_tetromino: None,
+        saved_tetromino: None,
+        keyboard: keyboard::Keyboard::new()
     };
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
-        if let Some(args) = e.render_args() {
-            app.render(&args);
-        }
-
         if let Some(args) = e.update_args() {
             app.update(&args);
+        }
+
+        if let Some(args) = e.render_args() {
+            app.render(&args);
         }
 
         if let Some(Button::Keyboard(key)) = e.press_args() {
@@ -178,6 +211,20 @@ fn main() {
                     Some(t) => {app.active_tetromino = t;},
                     None => {app.game_over()},
                 };
+            } else if app.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
+                // hold the tetromino
+                if let Some(mut saved) = app.saved_tetromino {
+                    saved.reset_position();
+                    app.active_tetromino.reset_position();
+
+                    std::mem::swap(&mut saved, &mut app.active_tetromino);
+                    app.saved_tetromino = Some(saved);
+                } else {
+                    app.active_tetromino.reset_position();
+
+                    app.saved_tetromino = Some(app.active_tetromino);
+                    app.active_tetromino = Tetromino::new_random();
+                }
             }
         };
         if let Some(Button::Keyboard(key)) = e.release_args() {
