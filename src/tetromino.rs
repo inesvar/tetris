@@ -182,6 +182,13 @@ impl Tetromino {
         NewTetromino::Success
     }
 
+    pub fn hard_drop(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
+        match self.fall(matrix) {
+            NewTetromino::Error => {NewTetromino::Error},
+            NewTetromino::Success => {self.hard_drop(matrix)},
+        }
+    }
+
     pub fn left(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
         let mut new_blocks = vec![];
         for i in 0..4 {
