@@ -19,7 +19,6 @@ pub enum TetrominoKind {
 }
 
 pub struct Tetromino {
-    color: TetrisColor,
     kind: TetrominoKind,
     center: Point,
     blocks: [Block; 4],
@@ -54,13 +53,15 @@ impl Rotation {
 }
 
 impl Tetromino {
-    pub fn new(color: TetrisColor, kind: TetrominoKind, positions: &mut [i8]) -> Self {
+    pub fn new(color: TetrisColor, kind: TetrominoKind, positions: &mut [i8], matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino> {
         for i in 1..5 {
             positions[2 * i] += positions[0];
             positions[2 * i + 1] += positions[1];
+            if let Some(_) = matrix[positions[2 * i + 1] as usize][positions[2 * i] as usize] {
+                return None;
+            }
         }
-        Tetromino {
-            color,
+        Some(Tetromino {
             kind,
             center: Point::new(positions[0], positions[1]),
             blocks: [
@@ -70,74 +71,81 @@ impl Tetromino {
                 Block::new(color, positions[8], positions[9]),
             ],
             rotation_status: Rotation::R0,
-        }
+        })
     }
 
-    pub fn new_T() -> Self {
+    pub fn new_T(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
         Tetromino::new(
             TetrisColor::PURPLE,
             TetrominoKind::T,
-            &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, -1]
+            &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, -1],
+            matrix,
         )
     }
 
-    pub fn new_S() -> Self {
+    pub fn new_S(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
         Tetromino::new(
             TetrisColor::GREEN,
             TetrominoKind::S,
-            &mut [5, 2, -1, 0, 0, 0, 0, -1, 1, -1]
+            &mut [5, 2, -1, 0, 0, 0, 0, -1, 1, -1],
+            matrix,
         )
     }
 
-    pub fn new_Z() -> Self {
+    pub fn new_Z(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
         Tetromino::new(
             TetrisColor::RED,
             TetrominoKind::Z,
-            &mut [5, 2, -1, -1, 0, -1, 0, 0, 1, 0]
+            &mut [5, 2, -1, -1, 0, -1, 0, 0, 1, 0],
+            matrix,
         )
     }
 
-    pub fn new_L() -> Self {
+    pub fn new_L(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
         Tetromino::new(
             TetrisColor::ORANGE,
             TetrominoKind::L,
-            &mut [5, 2, -1, 0, 0, 0, 1, 0, 1, -1]
+            &mut [5, 2, -1, 0, 0, 0, 1, 0, 1, -1],
+            matrix,
         )
     }
 
-    pub fn new_J() -> Self {
+    pub fn new_J(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
         Tetromino::new(
             TetrisColor::BLUE,
             TetrominoKind::J,
-            &mut [5, 2, -1, -1, -1, 0, 0, 0, 1, 0]
+            &mut [5, 2, -1, -1, -1, 0, 0, 0, 1, 0],
+            matrix,
         )
     }
 
-    pub fn new_O() -> Self {
+    pub fn new_O(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
         Tetromino::new(
             TetrisColor::YELLOW,
             TetrominoKind::O,
-            &mut [5, 2, -1, -1, -1, 0, 0, -1, 0, 0]
+            &mut [5, 2, -1, -1, -1, 0, 0, -1, 0, 0],
+            matrix,
         )
     }
 
-    pub fn new_I() -> Self {
+    pub fn new_I(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
         Tetromino::new(
             TetrisColor::CYAN,
             TetrominoKind::I,
-            &mut [5, 2, -2, 0, -1, 0, 0, 0, 1, 0]
+            &mut [5, 2, -2, 0, -1, 0, 0, 0, 1, 0],
+            matrix,
         )
     }
 
-    pub fn new_random() -> Self {
+    pub fn new_random(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
         match rand::random::<u8>() % 7 {
-            0 => Tetromino::new_I(),
-            1 => Tetromino::new_O(),
-            2 => Tetromino::new_T(),
-            3 => Tetromino::new_S(),
-            4 => Tetromino::new_Z(),
-            5 => Tetromino::new_J(),
-            _ => Tetromino::new_L(),
+            0 => Tetromino::new_I(matrix),
+            1 => Tetromino::new_O(matrix),
+            2 => Tetromino::new_T(matrix),
+            3 => Tetromino::new_S(matrix),
+            4 => Tetromino::new_Z(matrix),
+            5 => Tetromino::new_J(matrix),
+            _ => Tetromino::new_L(matrix),
         }
     }
 }

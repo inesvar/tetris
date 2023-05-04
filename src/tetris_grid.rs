@@ -31,7 +31,7 @@ impl TetrisGrid {
             nb_columns,
             nb_rows,
             rows,
-            line_sum: line_sum,
+            line_sum,
             width: nb_columns as f64 * BLOCK_SIZE,
             height: nb_rows as f64 * BLOCK_SIZE,
             transform: Matrix2d::default()
@@ -39,10 +39,10 @@ impl TetrisGrid {
     }
 
     pub fn freeze_tetromino(&mut self, tetromino: &mut Tetromino) {
-        let blocks = tetromino.split();
-        for i in 0..4 {
-            self.rows[blocks[i].position.y as usize][blocks[i].position.x as usize] = Some(blocks[i]);
-            self.line_sum[blocks[i].position.y as usize] += 1;
+        let mut blocks = tetromino.split();
+        for block in &mut blocks {
+            self.rows[block.position.y as usize][block.position.x as usize] = Some(*block);
+            self.line_sum[block.position.y as usize] += 1;
         }
     }
 
@@ -90,6 +90,26 @@ impl TetrisGrid {
                     Some(block) => block.render(self.transform, &ctx.draw_state, gl, assets),
                     None => {}
                 }
+            }
+        }
+    }
+
+    pub fn print_grid(matrix: &Vec<Vec<Option<Block>>>) {
+        for row in matrix.iter() {
+            for cell in row.iter() {
+                match cell {
+                    Some(_) => print!("X"),
+                    None => print!("_"),
+                };
+            }
+            println!();
+        }
+    }
+
+    pub fn null(&mut self) {
+        for row in self.rows.iter_mut() {
+            for cell in row.iter_mut() {
+                *cell = None;
             }
         }
     }
