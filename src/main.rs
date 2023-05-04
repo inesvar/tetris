@@ -85,6 +85,8 @@ impl App<'_> {
                 self.active_tetromino.right(&self.grid.rows);
             }
         }
+
+        self.grid.update();
     }
 }
 
