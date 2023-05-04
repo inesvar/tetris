@@ -19,6 +19,7 @@ pub struct TetrisGrid {
     pub width: f64,
     pub height: f64,
     pub transform: Matrix2d<f64>,
+    pub nb_lines_cleared_last_frame: u8,
 }
 
 impl TetrisGrid {
@@ -37,6 +38,7 @@ impl TetrisGrid {
             width: nb_columns as f64 * BLOCK_SIZE,
             height: nb_rows as f64 * BLOCK_SIZE,
             transform: Matrix2d::default(),
+            nb_lines_cleared_last_frame: 0,
         }
     }
 
@@ -70,10 +72,13 @@ impl TetrisGrid {
             width: nb_columns as f64 * BLOCK_SIZE,
             height: nb_rows as f64 * BLOCK_SIZE,
             transform: Matrix2d::default(),
+            nb_lines_cleared_last_frame: 0,
         }
     }
 
     pub fn update(&mut self) {
+        self.nb_lines_cleared_last_frame = 0;
+
         for y in 0..self.nb_rows {
             if self.line_sum[y as usize] == self.nb_columns as u8 {
                 self.rows.remove(y as usize);
@@ -90,6 +95,8 @@ impl TetrisGrid {
                         }
                     }
                 }
+
+                self.nb_lines_cleared_last_frame += 1;
             }
         }
     }
