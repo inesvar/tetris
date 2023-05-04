@@ -26,7 +26,7 @@ pub struct Tetromino {
     center: Point,
     blocks: [Block; 4],
     rotation_status: Rotation,
-    pub(crate) is_ghost: bool,
+    is_ghost: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -158,6 +158,14 @@ impl Tetromino {
             };
             self.blocks[i].render(transform, &draw_state, gl, assets);
         }
+    }
+}
+
+impl Tetromino {
+    pub fn make_ghost_copy(&mut self) -> Tetromino {
+        let mut ghost = self.clone();
+        ghost.is_ghost = true;
+        ghost
     }
 }
 

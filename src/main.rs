@@ -70,9 +70,8 @@ impl App<'_> {
         self.clock += args.dt;
         self.frame_counter = self.frame_counter.wrapping_add(1);
 
-        self.ghost_tetromino = Some(self.active_tetromino.clone());
+        self.ghost_tetromino = Some(self.active_tetromino.make_ghost_copy());
         if let Some(mut ghost) = self.ghost_tetromino.as_mut() {
-            ghost.is_ghost = true;
             ghost.hard_drop(&self.grid.rows);
         }
 
