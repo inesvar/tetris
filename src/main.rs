@@ -31,6 +31,7 @@ pub struct App<'a> {
     assets: Assets<'a>,
     clock: f64,
     frame_counter: u64,
+    score: u64,
     active_tetromino: Tetromino,
     ghost_tetromino: Option<Tetromino>,
     keyboard: keyboard::Keyboard,
@@ -51,8 +52,15 @@ impl App<'_> {
 
             let timer_transform = ctx.transform.trans(0.0, 200.0);
             graphics::text::Text::new_color(color::WHITE, 16).draw(
-                format!("Elapsed: {}s", self.clock.to_string()).as_str(), &mut self.assets.main_font, &ctx.draw_state,
+                format!("Elapsed: {:.2}s", self.clock).as_str(), &mut self.assets.main_font, &ctx.draw_state,
                 timer_transform,
+                gl
+            ).unwrap();
+
+            let score_transform = ctx.transform.trans(0.0, 250.0);
+            graphics::text::Text::new_color(color::WHITE, 16).draw(
+                format!("Score: {}", self.score).as_str(), &mut self.assets.main_font, &ctx.draw_state,
+                score_transform,
                 gl
             ).unwrap();
 
@@ -97,6 +105,8 @@ impl App<'_> {
         }
 
         self.grid.update();
+
+        self.score += self.grid.nb_lines_cleared_last_frame as u64;
     }
 }
 
@@ -123,6 +133,7 @@ fn main() {
         grid: TetrisGrid::new(10, 22),
         clock: 0.0,
         frame_counter: 0,
+        score: 0,
         active_tetromino: Tetromino::new_random(),
         ghost_tetromino: None,
         keyboard: keyboard::Keyboard::new()
