@@ -1,3 +1,4 @@
+use std::borrow::BorrowMut;
 use graphics::{Context, rectangle};
 use graphics::math::{Matrix2d};
 use graphics::types::{Rectangle, Scalar};
@@ -6,6 +7,7 @@ use opengl_graphics::GlGraphics;
 use piston_window::RenderArgs;
 use crate::assets::{Assets, TetrisColor};
 use crate::block::Block;
+use crate::point::Transformable;
 use crate::settings::{BLOCK_SIZE, GRID_THICKNESS, GRID_COLOR};
 use crate::tetromino::Tetromino;
 
@@ -13,10 +15,11 @@ pub struct TetrisGrid {
     pub nb_columns: i8,
     pub nb_rows: i8,
     pub rows: Vec<Vec<Option<Block>>>,
-    pub line_sum : Vec<u8>,
+    pub line_sum: Vec<u8>,
     pub width: f64,
     pub height: f64,
-    pub transform: Matrix2d<f64>
+    pub transform: Matrix2d<f64>,
+    pub nb_lines_cleared_last_frame: u8,
 }
 
 impl TetrisGrid {
@@ -25,7 +28,7 @@ impl TetrisGrid {
         for _ in 0..nb_rows {
             rows.push(vec![None; nb_columns as usize]);
         }
-        
+
         let line_sum = vec![0; nb_rows as usize];
         TetrisGrid {
             nb_columns,
@@ -34,7 +37,8 @@ impl TetrisGrid {
             line_sum,
             width: nb_columns as f64 * BLOCK_SIZE,
             height: nb_rows as f64 * BLOCK_SIZE,
-            transform: Matrix2d::default()
+            transform: Matrix2d::default(),
+            nb_lines_cleared_last_frame: 0,
         }
     }
 
@@ -67,14 +71,40 @@ impl TetrisGrid {
             line_sum,
             width: nb_columns as f64 * BLOCK_SIZE,
             height: nb_rows as f64 * BLOCK_SIZE,
-            transform: Matrix2d::default()
+            transform: Matrix2d::default(),
+            nb_lines_cleared_last_frame: 0,
+        }
+    }
+
+    pub fn update(&mut self) {
+        self.nb_lines_cleared_last_frame = 0;
+
+        for y in 0..self.nb_rows {
+            if self.line_sum[y as usize] == self.nb_columns as u8 {
+                self.rows.remove(y as usize);
+                self.rows.insert(0, vec![None; self.nb_columns as usize]);
+
+                self.line_sum.remove(y as usize);
+                self.line_sum.insert(0, 0);
+
+                // move all block above down
+                for y2 in 0..=y {
+                    for elm in self.rows[y2 as usize].iter_mut() {
+                        if let Some(block) = elm {
+                            block.go_down();
+                        }
+                    }
+                }
+
+                self.nb_lines_cleared_last_frame += 1;
+            }
         }
     }
 
     pub fn render(&mut self, args: &RenderArgs, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
         self.transform = ctx.transform.trans(
             args.window_size[0] / 2.0 - self.width / 2.0,
-            args.window_size[1] / 2.0 - self.height / 2.0
+            args.window_size[1] / 2.0 - self.height / 2.0,
         );
 
         let empty_dims: Rectangle = [0.0, 0.0, self.width, self.height];

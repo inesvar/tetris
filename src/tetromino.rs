@@ -2,12 +2,13 @@ use crate::block::{Block, Collision, NewBlock};
 use crate::point::{Point, Transformable};
 use graphics::types::Matrix2d;
 use graphics::{rectangle, Context, Image};
+use graphics::draw_state::Blend;
 use opengl_graphics::GlGraphics;
 
 use crate::assets::Assets;
 use crate::assets::TetrisColor;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum TetrominoKind {
     I,
     O,
@@ -18,13 +19,16 @@ pub enum TetrominoKind {
     L,
 }
 
+#[derive(Clone, Copy)]
 pub struct Tetromino {
     kind: TetrominoKind,
     center: Point,
     blocks: [Block; 4],
     rotation_status: Rotation,
+    is_ghost: bool,
 }
 
+#[derive(Clone, Copy)]
 pub enum Rotation {
     R0,
     R1,
@@ -35,19 +39,19 @@ pub enum Rotation {
 impl Rotation {
     fn clockwise(&mut self) {
         match self {
-            Rotation::R0 => {*self = Rotation::R1;},
-            Rotation::R1 => {*self = Rotation::R2;},
-            Rotation::R2 => {*self = Rotation::R3;},
-            Rotation::R3 => {*self = Rotation::R0;},
+            Rotation::R0 => { *self = Rotation::R1; }
+            Rotation::R1 => { *self = Rotation::R2; }
+            Rotation::R2 => { *self = Rotation::R3; }
+            Rotation::R3 => { *self = Rotation::R0; }
         }
     }
 
     fn counterclockwise(&mut self) {
         match self {
-            Rotation::R0 => {*self = Rotation::R3;},
-            Rotation::R1 => {*self = Rotation::R0;},
-            Rotation::R2 => {*self = Rotation::R1;},
-            Rotation::R3 => {*self = Rotation::R2;},
+            Rotation::R0 => { *self = Rotation::R3; }
+            Rotation::R1 => { *self = Rotation::R0; }
+            Rotation::R2 => { *self = Rotation::R1; }
+            Rotation::R3 => { *self = Rotation::R2; }
         }
     }
 }
@@ -71,6 +75,7 @@ impl Tetromino {
                 Block::new(color, positions[8], positions[9]),
             ],
             rotation_status: Rotation::R0,
+            is_ghost: false,
         })
     }
 
@@ -154,8 +159,21 @@ impl Tetromino {
 impl Tetromino {
     pub fn render(&self, transform: Matrix2d, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
         for i in 0..4 {
-            self.blocks[i].render(transform, &ctx.draw_state, gl, assets);
+            let draw_state = if self.is_ghost {
+                ctx.draw_state.blend(Blend::Multiply)
+            } else {
+                ctx.draw_state
+            };
+            self.blocks[i].render(transform, &draw_state, gl, assets);
         }
+    }
+}
+
+impl Tetromino {
+    pub fn make_ghost_copy(&mut self) -> Tetromino {
+        let mut ghost = self.clone();
+        ghost.is_ghost = true;
+        ghost
     }
 }
 
@@ -173,6 +191,17 @@ pub enum NewTetromino {
 
 /* COLLISION METHODS */
 impl Tetromino {
+    pub fn reset_position(&mut self) {
+        let new_center = Point::new(5, 2);
+        let translation = new_center - self.center;
+
+        for i in 0..4 {
+            self.blocks[i].position.x += translation.x;
+            self.blocks[i].position.y += translation.y;
+        }
+
+        self.center = new_center;
+    }
     pub fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
         let mut new_blocks = vec![];
         for i in 0..4 {
@@ -192,8 +221,8 @@ impl Tetromino {
 
     pub fn hard_drop(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
         match self.fall(matrix) {
-            NewTetromino::Error => {NewTetromino::Error},
-            NewTetromino::Success => {self.hard_drop(matrix)},
+            NewTetromino::Error => { NewTetromino::Error }
+            NewTetromino::Success => { self.hard_drop(matrix) }
         }
     }
 
