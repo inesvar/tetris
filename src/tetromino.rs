@@ -183,6 +183,17 @@ pub enum NewTetromino {
 
 /* COLLISION METHODS */
 impl Tetromino {
+    pub fn reset_position(&mut self) {
+        let new_center = Point::new(5, 2);
+        let translation = new_center - self.center;
+
+        for i in 0..4 {
+            self.blocks[i].position.x += translation.x;
+            self.blocks[i].position.y += translation.y;
+        }
+
+        self.center = new_center;
+    }
     pub fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
         let mut new_blocks = vec![];
         for i in 0..4 {

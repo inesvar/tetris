@@ -22,7 +22,7 @@ mod tetris_grid;
 mod tetromino;
 mod keyboard;
 
-use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
+use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS, HOLD_TETROMINO_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
 use tetris_grid::TetrisGrid;
 
 pub struct App<'a> {
@@ -34,6 +34,7 @@ pub struct App<'a> {
     score: u64,
     active_tetromino: Tetromino,
     ghost_tetromino: Option<Tetromino>,
+    saved_tetromino: Option<Tetromino>,
     keyboard: keyboard::Keyboard,
 }
 
@@ -71,6 +72,11 @@ impl App<'_> {
             }
 
             self.active_tetromino.render(self.grid.transform, &ctx, gl, &self.assets);
+
+            if let Some(saved) = self.saved_tetromino {
+                let transform = ctx.transform.trans(-70.0, 50.0);
+                saved.render(transform, &ctx, gl, &self.assets);
+            }
         });
     }
 
@@ -136,6 +142,7 @@ fn main() {
         score: 0,
         active_tetromino: Tetromino::new_random(),
         ghost_tetromino: None,
+        saved_tetromino: None,
         keyboard: keyboard::Keyboard::new()
     };
 
@@ -164,6 +171,20 @@ fn main() {
                 app.active_tetromino.hard_drop(&app.grid.rows);
                 app.grid.freeze_tetromino(&mut app.active_tetromino);
                 app.active_tetromino = Tetromino::new_random();
+            } else if app.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
+                // hold the tetromino
+                if let Some(mut saved) = app.saved_tetromino {
+                    saved.reset_position();
+                    app.active_tetromino.reset_position();
+
+                    std::mem::swap(&mut saved, &mut app.active_tetromino);
+                    app.saved_tetromino = Some(saved);
+                } else {
+                    app.active_tetromino.reset_position();
+
+                    app.saved_tetromino = Some(app.active_tetromino);
+                    app.active_tetromino = Tetromino::new_random();
+                }
             }
         };
         if let Some(Button::Keyboard(key)) = e.release_args() {
