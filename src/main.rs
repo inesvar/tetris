@@ -169,7 +169,6 @@ fn main() {
         frame_counter: 0,
         running: true,
         score: 0,
-        active_tetromino: Tetromino::new_random(),
         ghost_tetromino: None,
         saved_tetromino: None,
         keyboard: keyboard::Keyboard::new()
@@ -223,7 +222,10 @@ fn main() {
                     app.active_tetromino.reset_position();
 
                     app.saved_tetromino = Some(app.active_tetromino);
-                    app.active_tetromino = Tetromino::new_random();
+                    match Tetromino::new_random(&app.grid.rows) {
+                        Some(t) => app.active_tetromino = t,
+                        None => app.game_over(),
+                    };
                 }
             }
         };
