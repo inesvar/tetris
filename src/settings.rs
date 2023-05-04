@@ -11,6 +11,7 @@ pub static BG_COLOR: graphics::types::Color = color::BLACK;
 pub static GRID_COLOR: graphics::types::Color = color::GRAY;
 
 pub static FALL_KEYS: [Key; 2] = [Key::Down, Key::C];
+pub static HARD_DROP_KEYS: [Key; 1] = [Key::Space];
 pub static RIGHT_KEYS: [Key; 2] = [Key::Right, Key::V];
 pub static LEFT_KEYS: [Key; 2] = [Key::Left, Key::X];
 pub static ROTATE_CLOCKWISE_KEYS: [Key; 2] = [Key::Up, Key::F];

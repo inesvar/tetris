@@ -22,7 +22,7 @@ mod tetris_grid;
 mod tetromino;
 mod keyboard;
 
-use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
+use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
 use tetris_grid::TetrisGrid;
 
 pub struct App<'a> {
@@ -137,6 +137,11 @@ fn main() {
             } else if app.keyboard.is_any_pressed(&ROTATE_COUNTERCLOCKWISE_KEYS) {
                 // rotate once the tetromino
                 app.active_tetromino.turn_counterclockwise(&app.grid.rows);
+            } else if app.keyboard.is_any_pressed(&HARD_DROP_KEYS) {
+                // hard drop the tetromino
+                app.active_tetromino.hard_drop(&app.grid.rows);
+                app.grid.freeze_tetromino(&mut app.active_tetromino);
+                app.active_tetromino = Tetromino::new_random();
             }
         };
         if let Some(Button::Keyboard(key)) = e.release_args() {
