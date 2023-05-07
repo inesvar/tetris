@@ -22,13 +22,25 @@ pub enum TetrominoKind {
 impl TetrominoKind {
     pub fn get_initial_position(&self) -> [i8; 10] {
         match self {
-            TetrominoKind::I => return [5, 2, -2, 0, -1, 0, 0, 0, 1, 0],
-            TetrominoKind::O => return [5, 2, -1, -1, -1, 0, 0, -1, 0, 0],
-            TetrominoKind::Z => return [5, 2, -1, -1, 0, -1, 0, 0, 1, 0],
-            TetrominoKind::J => return [5, 2, -1, -1, -1, 0, 0, 0, 1, 0],
-            TetrominoKind::L => return [5, 2, -1, 0, 0, 0, 1, 0, 1, -1],
-            TetrominoKind::T => return [5, 2, 1, 0, -1, 0, 0, 0, 0, -1],
-            TetrominoKind::S => return [5, 2, -1, 0, 0, 0, 0, -1, 1, -1],
+            TetrominoKind::I => return [5, 2, 3, 2, 4, 2, 5, 2, 6, 2],
+            TetrominoKind::O => return [5, 2, 4, 1, 4, 2, 5, 1, 5, 2],
+            TetrominoKind::Z => return [5, 2, 4, 1, 5, 1, 5, 2, 6, 2],
+            TetrominoKind::J => return [5, 2, 4, 1, 4, 2, 5, 2, 6, 2],
+            TetrominoKind::L => return [5, 2, 4, 2, 5, 2, 6, 2, 6, 1],
+            TetrominoKind::T => return [5, 2, 6, 2, 4, 2, 5, 2, 5, 1],
+            TetrominoKind::S => return [5, 2, 4, 2, 5, 2, 5, 1, 6, 1],
+        }
+    }
+
+    pub fn get_color(&self) -> TetrisColor {
+        match self {
+            TetrominoKind::I => return TetrisColor::CYAN,
+            TetrominoKind::O => return TetrisColor::YELLOW,
+            TetrominoKind::Z => return TetrisColor::RED,
+            TetrominoKind::J => return TetrisColor::BLUE,
+            TetrominoKind::L => return TetrisColor::ORANGE,
+            TetrominoKind::T => return TetrisColor::PURPLE,
+            TetrominoKind::S => return TetrisColor::GREEN,
         }
     }
 }
@@ -71,10 +83,10 @@ impl Rotation {
 }
 
 impl Tetromino {
-    pub fn new(color: TetrisColor, kind: TetrominoKind, positions: &mut [i8], matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino> {
+    pub fn new(kind: TetrominoKind, matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino> {
+        let positions = kind.get_initial_position();
+        let color = kind.get_color();
         for i in 1..5 {
-            positions[2 * i] += positions[0];
-            positions[2 * i + 1] += positions[1];
             if let Some(_) = matrix[positions[2 * i + 1] as usize][positions[2 * i] as usize] {
                 return None;
             }
@@ -93,79 +105,29 @@ impl Tetromino {
         })
     }
 
-    pub fn new_T(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
-        Tetromino::new(
-            TetrisColor::PURPLE,
-            TetrominoKind::T,
-            &mut TetrominoKind::T.get_initial_position(),
-            matrix,
-        )
-    }
-
-    pub fn new_S(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
-        Tetromino::new(
-            TetrisColor::GREEN,
-            TetrominoKind::S,
-            &mut TetrominoKind::S.get_initial_position(),
-            matrix,
-        )
-    }
-
-    pub fn new_Z(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
-        Tetromino::new(
-            TetrisColor::RED,
-            TetrominoKind::Z,
-            &mut TetrominoKind::Z.get_initial_position(),
-            matrix,
-        )
-    }
-
-    pub fn new_L(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
-        Tetromino::new(
-            TetrisColor::ORANGE,
-            TetrominoKind::L,
-            &mut TetrominoKind::L.get_initial_position(),
-            matrix,
-        )
-    }
-
-    pub fn new_J(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
-        Tetromino::new(
-            TetrisColor::BLUE,
-            TetrominoKind::J,
-            &mut TetrominoKind::J.get_initial_position(),
-            matrix,
-        )
-    }
-
-    pub fn new_O(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
-        Tetromino::new(
-            TetrisColor::YELLOW,
-            TetrominoKind::O,
-            &mut TetrominoKind::O.get_initial_position(),
-            matrix,
-        )
-    }
-
-    pub fn new_I(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
-        Tetromino::new(
-            TetrisColor::CYAN,
-            TetrominoKind::I,
-            &mut TetrominoKind::I.get_initial_position(),
-            matrix,
-        )
-    }
 
     pub fn new_random(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
         match rand::random::<u8>() % 7 {
-            0 => Tetromino::new_I(matrix),
-            1 => Tetromino::new_O(matrix),
-            2 => Tetromino::new_T(matrix),
-            3 => Tetromino::new_S(matrix),
-            4 => Tetromino::new_Z(matrix),
-            5 => Tetromino::new_J(matrix),
-            _ => Tetromino::new_L(matrix),
+            0 => Tetromino::new(TetrominoKind::I, matrix),
+            1 => Tetromino::new(TetrominoKind::O, matrix),
+            2 => Tetromino::new(TetrominoKind::T, matrix),
+            3 => Tetromino::new(TetrominoKind::S, matrix),
+            4 => Tetromino::new(TetrominoKind::Z, matrix),
+            5 => Tetromino::new(TetrominoKind::J, matrix),
+            _ => Tetromino::new(TetrominoKind::L, matrix),
         }
+    }
+
+    pub fn reset_position(&mut self) {
+        let positions = self.kind.get_initial_position();
+        let color = self.kind.get_color();
+        self.center = Point::new(positions[0], positions[1]);
+        self.blocks = [
+                Block::new(color, positions[2], positions[3]),
+                Block::new(color, positions[4], positions[5]),
+                Block::new(color, positions[6], positions[7]),
+                Block::new(color, positions[8], positions[9]),
+            ];
     }
 }
 
@@ -199,18 +161,6 @@ impl Tetromino {
 
 /* COLLISION METHODS */
 impl Tetromino {
-    pub fn reset_position(&mut self) {
-        let new_center = Point::new(5, 2);
-        let translation = new_center - self.center;
-
-        for i in 0..4 {
-            self.blocks[i].position.x += translation.x;
-            self.blocks[i].position.y += translation.y;
-        }
-
-        self.center = new_center;
-    }
-
     pub fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> Result<(),()> {
         let mut new_blocks = vec![];
         for i in 0..4 {
