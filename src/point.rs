@@ -9,9 +9,8 @@ impl Point {
         Point { x, y }
     }
 
-    pub fn set(&mut self, x: i8, y: i8) {
-        self.x = x;
-        self.y = y;
+    pub fn translate(mut self, point: Point) {
+        self += point;
     }
 }
 
@@ -19,6 +18,12 @@ impl std::ops::Add for Point {
     type Output = Point;
     fn add(self, other: Point) -> Self::Output {
         Point::new(self.x + other.x, self.y + other.y)
+    }
+}
+
+impl std::ops::AddAssign for Point {
+    fn add_assign(&mut self, other: Point) {
+        *self = *self + other;
     }
 }
 
