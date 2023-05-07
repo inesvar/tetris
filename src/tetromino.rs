@@ -1,7 +1,7 @@
-use crate::block::{Block, Collision, NewBlock};
+use crate::block::{Block, Collision};
 use crate::point::{Point, Transformable};
 use graphics::types::Matrix2d;
-use graphics::{rectangle, Context, Image};
+use graphics::Context;
 use graphics::draw_state::Blend;
 use opengl_graphics::GlGraphics;
 
@@ -183,12 +183,6 @@ impl Tetromino {
     }
 }
 
-pub enum NewTetromino {
-    Error,
-    Success,
-}
-
-
 /* COLLISION METHODS */
 impl Tetromino {
     pub fn reset_position(&mut self) {
@@ -202,101 +196,97 @@ impl Tetromino {
 
         self.center = new_center;
     }
-    pub fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
+    pub fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> Result<(),()> {
         let mut new_blocks = vec![];
         for i in 0..4 {
             match self.blocks[i].fall(matrix) {
-                NewBlock::Error => {
-                    return NewTetromino::Error;
+                Err(()) => {
+                    return Err(());
                 }
-                NewBlock::Success(block) => {
+                Ok(block) => {
                     new_blocks.push(block);
                 }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
         self.center.go_down();
-        NewTetromino::Success
+        Ok(())
     }
 
-    pub fn hard_drop(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
+    pub fn hard_drop(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> () {
         match self.fall(matrix) {
-            NewTetromino::Error => { NewTetromino::Error }
-            NewTetromino::Success => { self.hard_drop(matrix) }
+            Err(()) => { return; }
+            Ok(()) => { self.hard_drop(matrix) }
         }
     }
 
-    pub fn left(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
+    pub fn left(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> () {
         let mut new_blocks = vec![];
         for i in 0..4 {
             match self.blocks[i].left(matrix) {
-                NewBlock::Error => {
-                    return NewTetromino::Error;
+                Err(()) => {
+                    return;
                 }
-                NewBlock::Success(block) => {
+                Ok(block) => {
                     new_blocks.push(block);
                 }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
         self.center.go_left();
-        NewTetromino::Success
     }
 
-    pub fn right(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
+    pub fn right(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> () {
         let mut new_blocks = vec![];
         for i in 0..4 {
             match self.blocks[i].right(matrix) {
-                NewBlock::Error => {
-                    return NewTetromino::Error;
+                Err(()) => {
+                    return;
                 }
-                NewBlock::Success(block) => {
+                Ok(block) => {
                     new_blocks.push(block);
                 }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
         self.center.go_right();
-        NewTetromino::Success
     }
 
-    pub fn turn_clockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
+    pub fn turn_clockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> () {
         if self.kind == TetrominoKind::O {
-            return NewTetromino::Success;
+            return;
         };
         let mut new_blocks = vec![];
         for i in 0..4 {
             match self.blocks[i].turn_clockwise(&self.center, matrix) {
-                NewBlock::Error => {
-                    return NewTetromino::Error;
+                Err(()) => {
+                    return;
                 }
-                NewBlock::Success(block) => {
+                Ok(block) => {
                     new_blocks.push(block);
                 }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
         self.rotation_status.clockwise();
-        NewTetromino::Success
     }
 
-    pub fn turn_counterclockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> NewTetromino {
+    pub fn turn_counterclockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> () {
         if self.kind == TetrominoKind::O {
-            return NewTetromino::Success;
+            return;
         };
         let mut new_blocks = vec![];
         for i in 0..4 {
             match self.blocks[i].turn_counterclockwise(&self.center, matrix) {
-                NewBlock::Error => {
-                    return NewTetromino::Error;
+                Err(()) => {
+                    return;
                 }
-                NewBlock::Success(block) => {
+                Ok(block) => {
                     new_blocks.push(block);
                 }
             }
         }
         self.blocks.copy_from_slice(&new_blocks[0..4]);
         self.rotation_status.counterclockwise();
-        NewTetromino::Success
     }
 }
