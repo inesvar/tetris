@@ -4,8 +4,8 @@ extern crate opengl_graphics;
 extern crate piston;
 extern crate find_folder;
 
-use piston::{Button, Key, PressEvent, ButtonEvent, ButtonArgs, ReleaseEvent};
-use tetromino::{Tetromino, NewTetromino};
+use piston::{Button, PressEvent, ReleaseEvent};
+use tetromino::Tetromino;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
@@ -17,7 +17,7 @@ mod point;
 mod settings;
 mod assets;
 
-use crate::assets::{Assets, TetrisColor};
+use crate::assets::Assets;
 mod tetris_grid;
 mod tetromino;
 mod keyboard;
@@ -77,7 +77,7 @@ impl App<'_> {
 
             self.grid.render(args, &ctx, gl, &self.assets);
 
-            if let Some(mut ghost) = self.ghost_tetromino {
+            if let Some(ghost) = self.ghost_tetromino {
                 ghost.render(self.grid.transform, &ctx, gl, &self.assets);
             }
 
@@ -98,12 +98,12 @@ impl App<'_> {
         self.frame_counter = self.frame_counter.wrapping_add(1);
 
         self.ghost_tetromino = Some(self.active_tetromino.make_ghost_copy());
-        if let Some(mut ghost) = self.ghost_tetromino.as_mut() {
+        if let Some(ghost) = self.ghost_tetromino.as_mut() {
             ghost.hard_drop(&self.grid.rows);
         }
 
         if self.frame_counter % 50 == 0 {
-            if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
+            if self.active_tetromino.fall(&self.grid.rows).is_err() {
                 self.grid.freeze_tetromino(&mut self.active_tetromino);
                 match Tetromino::new_random(&self.grid.rows) {
                     Some(t) => {self.active_tetromino = t;},
@@ -115,7 +115,7 @@ impl App<'_> {
         // Translate tetromino on long key press
         if self.frame_counter % 10 == 0 {
             if self.keyboard.is_any_pressed(&FALL_KEYS) {
-                if let NewTetromino::Error = self.active_tetromino.fall(&self.grid.rows) {
+                if self.active_tetromino.fall(&self.grid.rows).is_err() {
                     self.grid.freeze_tetromino(&mut self.active_tetromino);
                     match Tetromino::new_random(&self.grid.rows) {
                         Some(t) => {self.active_tetromino = t;},

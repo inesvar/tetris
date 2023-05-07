@@ -75,101 +75,96 @@ impl Transformable for Block {
     }
 }
 
-pub enum NewBlock {
-    Error,
-    Success(Block),
-}
-
 pub trait Collision {
-    fn fall(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
-    fn right(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
-    fn left(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
-    fn turn_clockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
-    fn turn_counterclockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock;
+    fn fall(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()>;
+    fn right(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()>;
+    fn left(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()>;
+    fn turn_clockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()>;
+    fn turn_counterclockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()>;
 }
 
 impl Collision for Block {
-    fn fall(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
+    fn fall(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()> {
         let mut copy = *self;
         copy.go_down();
         if copy.position.y as usize > matrix.len() - 1 {
-            NewBlock::Error
+            Err(())
         } else {
             match matrix[copy.position.y as usize][copy.position.x as usize] {
-                Some(_) => NewBlock::Error,
+                Some(_) => Err(()),
                 None => {
-                    NewBlock::Success(copy)
+                    Ok(copy)
                 }
             }
         }
     }
 
-    fn left(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
+    fn left(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()> {
         let mut copy = *self;
         copy.go_left();
         if copy.position.x < 0 {
-            NewBlock::Error
+            Err(())
         } else {
             match matrix[copy.position.y as usize][copy.position.x as usize] {
-                Some(_) => NewBlock::Error,
+                Some(_) => Err(()),
                 None => {
-                    NewBlock::Success(copy)
+                    Ok(copy)
                 }
             }
         }
     }
 
-    fn right(&self, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
+    fn right(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()> {
         let mut copy = *self;
         copy.go_right();
         if copy.position.x as usize > matrix[0].len() - 1 {
-            NewBlock::Error
+            Err(())
         } else {
             match matrix[copy.position.y as usize][copy.position.x as usize] {
-                Some(_) => NewBlock::Error,
+                Some(_) => Err(()),
                 None => {
-                    NewBlock::Success(copy)
+                    Ok(copy)
                 }
             }
         }
     }
 
-    fn turn_clockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
+    fn turn_clockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()> {
         let mut copy = *self;
         copy.rotate_clockwise(other);
         match (copy.position.x, copy.position.y) {
             (x, y) if x < 0 || y < 0 => {
-                return NewBlock::Error;
+                return Err(());
             }
             (x, y) if x as usize >= matrix[0].len() - 1 || y as usize >= matrix.len() - 1 => {
-                return NewBlock::Error;
+                return Err(());
             }
             _ => {}
         }
         match matrix[copy.position.y as usize][copy.position.x as usize] {
-            Some(_) => NewBlock::Error,
+            Some(_) => Err(()),
             None => {
-                NewBlock::Success(copy)
+                Ok(copy)
             }
         }
     }
 
-    fn turn_counterclockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> NewBlock {
+    fn turn_counterclockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()> {
         let mut copy = *self;
         copy.rotate_counterclockwise(other);
         match (copy.position.x, copy.position.y) {
             (x, y) if x < 0 || y < 0 => {
-                return NewBlock::Error;
+                return Err(());
             }
             (x, y) if x as usize >= matrix[0].len() - 1 || y as usize >= matrix.len() - 1 => {
-                return NewBlock::Error;
+                return Err(());
             }
             _ => {}
         }
         match matrix[copy.position.y as usize][copy.position.x as usize] {
-            Some(_) => NewBlock::Error,
+            Some(_) => Err(()),
             None => {
-                NewBlock::Success(copy)
+                Ok(copy)
             }
         }
     }
