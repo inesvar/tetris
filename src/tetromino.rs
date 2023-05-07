@@ -19,6 +19,20 @@ pub enum TetrominoKind {
     L,
 }
 
+impl TetrominoKind {
+    pub fn get_initial_position(&self) -> [i8; 10] {
+        match self {
+            TetrominoKind::I => return [5, 2, -2, 0, -1, 0, 0, 0, 1, 0],
+            TetrominoKind::O => return [5, 2, -1, -1, -1, 0, 0, -1, 0, 0],
+            TetrominoKind::Z => return [5, 2, -1, -1, 0, -1, 0, 0, 1, 0],
+            TetrominoKind::J => return [5, 2, -1, -1, -1, 0, 0, 0, 1, 0],
+            TetrominoKind::L => return [5, 2, -1, 0, 0, 0, 1, 0, 1, -1],
+            TetrominoKind::T => return [5, 2, 1, 0, -1, 0, 0, 0, 0, -1],
+            TetrominoKind::S => return [5, 2, -1, 0, 0, 0, 0, -1, 1, -1],
+        }
+    }
+}
+
 #[derive(Clone, Copy)]
 pub struct Tetromino {
     kind: TetrominoKind,
@@ -83,7 +97,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::PURPLE,
             TetrominoKind::T,
-            &mut [5, 2, 1, 0, -1, 0, 0, 0, 0, -1],
+            &mut TetrominoKind::T.get_initial_position(),
             matrix,
         )
     }
@@ -92,7 +106,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::GREEN,
             TetrominoKind::S,
-            &mut [5, 2, -1, 0, 0, 0, 0, -1, 1, -1],
+            &mut TetrominoKind::S.get_initial_position(),
             matrix,
         )
     }
@@ -101,7 +115,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::RED,
             TetrominoKind::Z,
-            &mut [5, 2, -1, -1, 0, -1, 0, 0, 1, 0],
+            &mut TetrominoKind::Z.get_initial_position(),
             matrix,
         )
     }
@@ -110,7 +124,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::ORANGE,
             TetrominoKind::L,
-            &mut [5, 2, -1, 0, 0, 0, 1, 0, 1, -1],
+            &mut TetrominoKind::L.get_initial_position(),
             matrix,
         )
     }
@@ -119,7 +133,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::BLUE,
             TetrominoKind::J,
-            &mut [5, 2, -1, -1, -1, 0, 0, 0, 1, 0],
+            &mut TetrominoKind::J.get_initial_position(),
             matrix,
         )
     }
@@ -128,7 +142,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::YELLOW,
             TetrominoKind::O,
-            &mut [5, 2, -1, -1, -1, 0, 0, -1, 0, 0],
+            &mut TetrominoKind::O.get_initial_position(),
             matrix,
         )
     }
@@ -137,7 +151,7 @@ impl Tetromino {
         Tetromino::new(
             TetrisColor::CYAN,
             TetrominoKind::I,
-            &mut [5, 2, -2, 0, -1, 0, 0, 0, 1, 0],
+            &mut TetrominoKind::I.get_initial_position(),
             matrix,
         )
     }
@@ -196,6 +210,7 @@ impl Tetromino {
 
         self.center = new_center;
     }
+
     pub fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> Result<(),()> {
         let mut new_blocks = vec![];
         for i in 0..4 {
