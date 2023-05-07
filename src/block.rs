@@ -20,8 +20,8 @@ impl Block {
         }
     }
 
-    pub fn set_position(mut self, point: Point) {
-        self.position = point;
+    pub fn translate(mut self, point: Point) {
+        self.position += point;
     }
 
     pub fn render(
