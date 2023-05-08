@@ -38,6 +38,7 @@ pub struct App<'a> {
     saved_tetromino: Option<Tetromino>,
     keyboard: keyboard::Keyboard,
     running: bool,
+    freeze_frame: u64,
 }
 
 impl App<'_> {
@@ -103,25 +104,27 @@ impl App<'_> {
             ghost.hard_drop(&self.grid.rows);
         }
 
+        // Freeze the tetromino if it reached the bottom previously and can't go down anymore
+        if self.frame_counter == self.freeze_frame && self.active_tetromino.check_possible(&self.grid.rows, 0, 1, 0).is_err() {
+            self.grid.freeze_tetromino(&mut self.active_tetromino);
+            match Tetromino::new_random(&self.grid.rows) {
+                Some(t) => {self.active_tetromino = t;},
+                None => {self.game_over()},
+            };
+        }
+
+        // move the tetromino down to emulate its fall
         if self.frame_counter % 50 == 0 {
             if self.active_tetromino.fall(&self.grid.rows).is_err() {
-                self.grid.freeze_tetromino(&mut self.active_tetromino);
-                match Tetromino::new_random(&self.grid.rows) {
-                    Some(t) => {self.active_tetromino = t;},
-                    None => {self.game_over()},
-                };
+                self.freeze_frame = self.frame_counter + 50;
             }
         }
 
-        // Translate tetromino on long key press
+        // Translate the tetromino on long key press
         if self.frame_counter % 10 == 0 {
             if self.keyboard.is_any_pressed(&FALL_KEYS) {
                 if self.active_tetromino.fall(&self.grid.rows).is_err() {
-                    self.grid.freeze_tetromino(&mut self.active_tetromino);
-                    match Tetromino::new_random(&self.grid.rows) {
-                        Some(t) => {self.active_tetromino = t;},
-                        None => {self.game_over()},
-                    };
+                    self.freeze_frame = self.frame_counter + 50;
                 }
             } else if self.keyboard.is_any_pressed(&LEFT_KEYS) {
                 self.active_tetromino.left(&self.grid.rows);
@@ -172,7 +175,8 @@ fn main() {
         score: 0,
         ghost_tetromino: None,
         saved_tetromino: None,
-        keyboard: keyboard::Keyboard::new()
+        keyboard: keyboard::Keyboard::new(),
+        freeze_frame: u64::MAX,
     };
 
     let mut events = Events::new(EventSettings::new());
@@ -214,7 +218,6 @@ fn main() {
             } else if app.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
                 // hold the tetromino
                 if let Some(mut saved) = app.saved_tetromino {
-                    saved.reset_position();
                     app.active_tetromino.reset_position();
 
                     std::mem::swap(&mut saved, &mut app.active_tetromino);

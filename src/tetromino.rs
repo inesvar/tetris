@@ -1,15 +1,12 @@
-use crate::block::{Block, Collision};
+use crate::block::{Block, Collision, TranslateRotate};
 use crate::point::{Point, Transformable};
 use crate::tetromino_kind::TetrominoKind;
+use graphics::draw_state::Blend;
 use graphics::types::Matrix2d;
 use graphics::Context;
-use graphics::draw_state::Blend;
 use opengl_graphics::GlGraphics;
 
 use crate::assets::Assets;
-use crate::assets::TetrisColor;
-
-
 
 #[derive(Clone, Copy)]
 pub struct Tetromino {
@@ -31,19 +28,35 @@ pub enum Rotation {
 impl Rotation {
     fn clockwise(&mut self) {
         match self {
-            Rotation::R0 => { *self = Rotation::R1; }
-            Rotation::R1 => { *self = Rotation::R2; }
-            Rotation::R2 => { *self = Rotation::R3; }
-            Rotation::R3 => { *self = Rotation::R0; }
+            Rotation::R0 => {
+                *self = Rotation::R1;
+            }
+            Rotation::R1 => {
+                *self = Rotation::R2;
+            }
+            Rotation::R2 => {
+                *self = Rotation::R3;
+            }
+            Rotation::R3 => {
+                *self = Rotation::R0;
+            }
         }
     }
 
     fn counterclockwise(&mut self) {
         match self {
-            Rotation::R0 => { *self = Rotation::R3; }
-            Rotation::R1 => { *self = Rotation::R0; }
-            Rotation::R2 => { *self = Rotation::R1; }
-            Rotation::R3 => { *self = Rotation::R2; }
+            Rotation::R0 => {
+                *self = Rotation::R3;
+            }
+            Rotation::R1 => {
+                *self = Rotation::R0;
+            }
+            Rotation::R2 => {
+                *self = Rotation::R1;
+            }
+            Rotation::R3 => {
+                *self = Rotation::R2;
+            }
         }
     }
 }
@@ -53,7 +66,7 @@ impl Tetromino {
         let positions = kind.get_initial_position();
         let color = kind.get_color();
         for i in 1..5 {
-            if let Some(_) = matrix[positions[2 * i + 1] as usize][positions[2 * i] as usize] {
+            if matrix[positions[2 * i + 1] as usize][positions[2 * i] as usize].is_some() {
                 return None;
             }
         }
@@ -71,8 +84,7 @@ impl Tetromino {
         })
     }
 
-
-    pub fn new_random(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino>{
+    pub fn new_random(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino> {
         match rand::random::<u8>() % 7 {
             0 => Tetromino::new(TetrominoKind::I, matrix),
             1 => Tetromino::new(TetrominoKind::O, matrix),
@@ -89,18 +101,18 @@ impl Tetromino {
         let color = self.kind.get_color();
         self.center = Point::new(positions[0], positions[1]);
         self.blocks = [
-                Block::new(color, positions[2], positions[3]),
-                Block::new(color, positions[4], positions[5]),
-                Block::new(color, positions[6], positions[7]),
-                Block::new(color, positions[8], positions[9]),
-            ];
+            Block::new(color, positions[2], positions[3]),
+            Block::new(color, positions[4], positions[5]),
+            Block::new(color, positions[6], positions[7]),
+            Block::new(color, positions[8], positions[9]),
+        ];
     }
 
     fn translate(&mut self, x: i8, y: i8) {
         let translation = Point::new(x, y);
         self.center.translate(translation);
         for i in 0..4 {
-            self.blocks[i].translate(translation);
+            self.blocks[i].position.translate(translation);
         }
     }
 }
@@ -121,7 +133,7 @@ impl Tetromino {
 
 impl Tetromino {
     pub fn make_ghost_copy(&mut self) -> Tetromino {
-        let mut ghost = self.clone();
+        let mut ghost = *self;
         ghost.is_ghost = true;
         ghost
     }
@@ -135,97 +147,83 @@ impl Tetromino {
 
 /* COLLISION METHODS */
 impl Tetromino {
-    pub fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> Result<(),()> {
-        let mut new_blocks = vec![];
-        for i in 0..4 {
-            match self.blocks[i].fall(matrix) {
-                Err(()) => {
-                    return Err(());
-                }
-                Ok(block) => {
-                    new_blocks.push(block);
-                }
-            }
-        }
-        self.blocks.copy_from_slice(&new_blocks[0..4]);
+    pub fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> Result<(), ()> {
+        self.blocks = self.check_possible(matrix, 0, 1, 0)?;
         self.center.go_down();
         Ok(())
     }
 
-    pub fn hard_drop(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> () {
+    pub fn hard_drop(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
         match self.fall(matrix) {
-            Err(()) => { return; }
-            Ok(()) => { self.hard_drop(matrix) }
+            Err(()) => {},
+            Ok(()) => self.hard_drop(matrix),
         }
     }
 
-    pub fn left(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> () {
-        let mut new_blocks = vec![];
-        for i in 0..4 {
-            match self.blocks[i].left(matrix) {
-                Err(()) => {
-                    return;
-                }
-                Ok(block) => {
-                    new_blocks.push(block);
-                }
+    pub fn left(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
+        match self.check_possible(matrix, -1, 0, 0) {
+            Err(()) => {
+                return;
+            }
+            Ok(new_blocks) => {
+                self.blocks = new_blocks;
+                self.center.go_left();
             }
         }
-        self.blocks.copy_from_slice(&new_blocks[0..4]);
-        self.center.go_left();
     }
 
-    pub fn right(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> () {
-        let mut new_blocks = vec![];
-        for i in 0..4 {
-            match self.blocks[i].right(matrix) {
-                Err(()) => {
-                    return;
-                }
-                Ok(block) => {
-                    new_blocks.push(block);
-                }
+    pub fn right(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
+        match self.check_possible(matrix, 1, 0, 0) {
+            Err(()) => {
+                return;
+            }
+            Ok(new_blocks) => {
+                self.blocks = new_blocks;
+                self.center.go_right();
             }
         }
-        self.blocks.copy_from_slice(&new_blocks[0..4]);
-        self.center.go_right();
     }
 
-    pub fn turn_clockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> () {
+    pub fn turn_clockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let mut new_blocks = vec![];
-        for i in 0..4 {
-            match self.blocks[i].turn_clockwise(&self.center, matrix) {
-                Err(()) => {
-                    return;
-                }
-                Ok(block) => {
-                    new_blocks.push(block);
-                }
+        match self.check_possible(matrix, 0, 0, 1) {
+            Err(()) => {
+                return;
+            }
+            Ok(new_blocks) => {
+                self.blocks = new_blocks;
+                self.rotation_status.clockwise();
             }
         }
-        self.blocks.copy_from_slice(&new_blocks[0..4]);
-        self.rotation_status.clockwise();
     }
 
-    pub fn turn_counterclockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> () {
+    pub fn turn_counterclockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let mut new_blocks = vec![];
-        for i in 0..4 {
-            match self.blocks[i].turn_counterclockwise(&self.center, matrix) {
-                Err(()) => {
-                    return;
-                }
-                Ok(block) => {
-                    new_blocks.push(block);
-                }
+        match self.check_possible(matrix, 0, 0, -1) {
+            Err(()) => {
+                return;
+            }
+            Ok(new_blocks) => {
+                self.blocks = new_blocks;
+                self.rotation_status.counterclockwise();
             }
         }
-        self.blocks.copy_from_slice(&new_blocks[0..4]);
-        self.rotation_status.counterclockwise();
+    }
+
+    pub fn check_possible(&self, matrix: &Vec<Vec<Option<Block>>>, x: i8, y: i8, rotation: i8) -> Result<[Block; 4], ()> {
+        let translation = Point::new(x, y);
+        let movement = TranslateRotate::new(translation, rotation, &self.center);
+        let mut new_blocks = vec![];
+        for i in 0..4 {
+            new_blocks.push(self.blocks[i].move_to(matrix, &movement)?);
+        }
+        let blocks = [new_blocks[0], new_blocks[1], new_blocks[2], new_blocks[3]];
+        Ok(blocks)
     }
 }
+
+
