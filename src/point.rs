@@ -10,26 +10,6 @@ impl Point {
     }
 }
 
-impl std::ops::Add for Point {
-    type Output = Point;
-    fn add(self, other: Point) -> Self::Output {
-        Point::new(self.x + other.x, self.y + other.y)
-    }
-}
-
-impl std::ops::AddAssign for Point {
-    fn add_assign(&mut self, other: Point) {
-        *self = *self + other;
-    }
-}
-
-impl std::ops::Sub for Point {
-    type Output = Point;
-    fn sub(self, other: Point) -> Self::Output {
-        Point::new(self.x - other.x, self.y - other.y)
-    }
-}
-
 pub trait Transformable {
     fn go_down(&mut self);
     fn go_right(&mut self);
@@ -39,12 +19,6 @@ pub trait Transformable {
 }
 
 impl Transformable for Point {
-    /* methode to new
-    
-    fn go_down(self) -> Self {
-        self + Point::new(0, -1)
-    }*/
-
     fn go_down(&mut self) {
         self.y += 1;
     }
@@ -70,4 +44,22 @@ impl Transformable for Point {
     }
 }
 
+impl std::ops::Add for Point {
+    type Output = Point;
+    fn add(self, other: Point) -> Self::Output {
+        Point::new(self.x + other.x, self.y + other.y)
+    }
+}
 
+/* impl std::ops::AddAssign for Point {
+    fn add_assign(&mut self, other: Point) {
+        *self = *self + other;
+    }
+} */
+
+/* impl std::ops::Sub for Point {
+    type Output = Point;
+    fn sub(self, other: Point) -> Self::Output {
+        Point::new(self.x - other.x, self.y - other.y)
+    }
+} */

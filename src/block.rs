@@ -50,13 +50,6 @@ impl Block {
 }
 
 impl Transformable for Block {
-    /* methode to new
-
-    fn go_down(mut self) -> Self {
-        self.position = self.position.go_down();
-        self
-    }*/
-
     fn go_down(&mut self) {
         self.position.go_down();
     }
@@ -79,16 +72,28 @@ impl Transformable for Block {
 }
 
 pub trait Collision {
-    fn move_to(&self, matrix: &Vec<Vec<Option<Block>>>, movement: &TranslateRotate) -> Result<Block, ()>;
+    fn move_to(
+        &self,
+        matrix: &Vec<Vec<Option<Block>>>,
+        movement: &TranslateRotate,
+    ) -> Result<Block, ()>;
 }
 
 impl Collision for Block {
-    fn move_to(&self, matrix: &Vec<Vec<Option<Block>>>, movement: &TranslateRotate) -> Result<Block, ()> {
+    fn move_to(
+        &self,
+        matrix: &Vec<Vec<Option<Block>>>,
+        movement: &TranslateRotate,
+    ) -> Result<Block, ()> {
         let mut copy = self.translation(movement.translation);
         match movement.rotation {
-            1 => {copy.rotate_clockwise(&movement.center.unwrap());},
-            -1 => {copy.rotate_counterclockwise(&movement.center.unwrap());},
-            _ => {},
+            1 => {
+                copy.rotate_clockwise(&movement.center.unwrap());
+            }
+            -1 => {
+                copy.rotate_counterclockwise(&movement.center.unwrap());
+            }
+            _ => {}
         }
         match (copy.position.x, copy.position.y) {
             (x, y) if x < 0 || y < 0 => {
@@ -101,9 +106,7 @@ impl Collision for Block {
         }
         match matrix[copy.position.y as usize][copy.position.x as usize] {
             Some(_) => Err(()),
-            None => {
-                Ok(copy)
-            }
+            None => Ok(copy),
         }
     }
 }
@@ -117,6 +120,10 @@ pub struct TranslateRotate {
 impl TranslateRotate {
     pub fn new(translation: Point, rotation: i8, center: &Point) -> Self {
         let center = *center + translation;
-        TranslateRotate { translation, rotation, center: Some(center) }
+        TranslateRotate {
+            translation,
+            rotation,
+            center: Some(center),
+        }
     }
 }
