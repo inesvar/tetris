@@ -1,29 +1,33 @@
+extern crate find_folder;
 extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
-extern crate find_folder;
 
-use piston::{Button, PressEvent, ReleaseEvent};
-use tetromino::Tetromino;
+use crate::assets::Assets;
+use graphics::{color, Transformed};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
-use graphics::{color, Transformed};
+use piston::{Button, PressEvent, ReleaseEvent};
+use tetromino::Tetromino;
 
-mod block;
-mod point;
-mod settings;
 mod assets;
-
-use crate::assets::Assets;
+mod block;
+mod keyboard;
+mod point;
+mod rotation;
+mod settings;
 mod tetris_grid;
 mod tetromino;
-mod keyboard;
 mod tetromino_kind;
 
-use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, RESTART_KEYS, FALL_KEYS, HARD_DROP_KEYS, HOLD_TETROMINO_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
+use crate::settings::{
+    BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS,
+    HOLD_TETROMINO_KEYS, LEFT_KEYS, RESTART_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS,
+    ROTATE_COUNTERCLOCKWISE_KEYS,
+};
 use tetris_grid::TetrisGrid;
 
 pub struct App<'a> {
@@ -49,33 +53,49 @@ impl App<'_> {
 
             if self.running {
                 let title_transform = ctx.transform.trans(180.0, 50.0);
-                graphics::text::Text::new_color(color::WHITE, 16).draw(
-                    "T", &mut self.assets.tetris_font, &ctx.draw_state,
-                    title_transform,
-                    gl
-                ).unwrap();
+                graphics::text::Text::new_color(color::WHITE, 16)
+                    .draw(
+                        "T",
+                        &mut self.assets.tetris_font,
+                        &ctx.draw_state,
+                        title_transform,
+                        gl,
+                    )
+                    .unwrap();
             } else {
                 let restart_transform = ctx.transform.trans(180.0, 50.0);
-                graphics::text::Text::new_color(color::WHITE, 16).draw(
-                    "Press R to restart", &mut self.assets.main_font, &ctx.draw_state,
-                    restart_transform,
-                    gl
-                ).unwrap();
+                graphics::text::Text::new_color(color::WHITE, 16)
+                    .draw(
+                        "Press R to restart",
+                        &mut self.assets.main_font,
+                        &ctx.draw_state,
+                        restart_transform,
+                        gl,
+                    )
+                    .unwrap();
             }
 
             let timer_transform = ctx.transform.trans(0.0, 200.0);
-            graphics::text::Text::new_color(color::WHITE, 16).draw(
-                format!("Elapsed: {:.2}s", self.clock).as_str(), &mut self.assets.main_font, &ctx.draw_state,
-                timer_transform,
-                gl
-            ).unwrap();
+            graphics::text::Text::new_color(color::WHITE, 16)
+                .draw(
+                    format!("Elapsed: {:.2}s", self.clock).as_str(),
+                    &mut self.assets.main_font,
+                    &ctx.draw_state,
+                    timer_transform,
+                    gl,
+                )
+                .unwrap();
 
             let score_transform = ctx.transform.trans(0.0, 250.0);
-            graphics::text::Text::new_color(color::WHITE, 16).draw(
-                format!("Score: {}", self.score).as_str(), &mut self.assets.main_font, &ctx.draw_state,
-                score_transform,
-                gl
-            ).unwrap();
+            graphics::text::Text::new_color(color::WHITE, 16)
+                .draw(
+                    format!("Score: {}", self.score).as_str(),
+                    &mut self.assets.main_font,
+                    &ctx.draw_state,
+                    score_transform,
+                    gl,
+                )
+                .unwrap();
 
             self.grid.render(args, &ctx, gl, &self.assets);
 
@@ -83,7 +103,8 @@ impl App<'_> {
                 ghost.render(self.grid.transform, &ctx, gl, &self.assets);
             }
 
-            self.active_tetromino.render(self.grid.transform, &ctx, gl, &self.assets);
+            self.active_tetromino
+                .render(self.grid.transform, &ctx, gl, &self.assets);
 
             if let Some(saved) = self.saved_tetromino {
                 let transform = ctx.transform.trans(-70.0, 50.0);
@@ -105,11 +126,18 @@ impl App<'_> {
         }
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
-        if self.frame_counter == self.freeze_frame && self.active_tetromino.check_possible(&self.grid.rows, 0, 1, 0).is_err() {
+        if self.frame_counter == self.freeze_frame
+            && self
+                .active_tetromino
+                .check_possible(&self.grid.rows, 0, 1, 0)
+                .is_err()
+        {
             self.grid.freeze_tetromino(&mut self.active_tetromino);
             match Tetromino::new_random(&self.grid.rows) {
-                Some(t) => {self.active_tetromino = t;},
-                None => {self.game_over()},
+                Some(t) => {
+                    self.active_tetromino = t;
+                }
+                None => self.game_over(),
             };
         }
 
@@ -150,14 +178,17 @@ fn main() {
     let opengl = OpenGL::V4_5;
 
     // Create a Glutin window.
-    let mut window: piston_window::PistonWindow = WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
-        .graphics_api(opengl)
-        .vsync(true)
-        .exit_on_esc(true)
-        .build()
-        .unwrap();
+    let mut window: piston_window::PistonWindow =
+        WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
+            .graphics_api(opengl)
+            .vsync(true)
+            .exit_on_esc(true)
+            .build()
+            .unwrap();
 
-    let assets_folder = find_folder::Search::ParentsThenKids(3, 3).for_folder("assets").unwrap();
+    let assets_folder = find_folder::Search::ParentsThenKids(3, 3)
+        .for_folder("assets")
+        .unwrap();
 
     let assets = Assets::new(assets_folder);
 
@@ -212,8 +243,10 @@ fn main() {
                 app.active_tetromino.hard_drop(&app.grid.rows);
                 app.grid.freeze_tetromino(&mut app.active_tetromino);
                 match Tetromino::new_random(&app.grid.rows) {
-                    Some(t) => {app.active_tetromino = t;},
-                    None => {app.game_over()},
+                    Some(t) => {
+                        app.active_tetromino = t;
+                    }
+                    None => app.game_over(),
                 };
             } else if app.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
                 // hold the tetromino
@@ -236,6 +269,5 @@ fn main() {
         if let Some(Button::Keyboard(key)) = e.release_args() {
             app.keyboard.set_released(key);
         };
-        
     }
 }

@@ -1,12 +1,12 @@
+use crate::assets::Assets;
 use crate::block::{Block, Collision, TranslateRotate};
 use crate::point::{Point, Transformable};
+use crate::rotation::Rotation;
 use crate::tetromino_kind::TetrominoKind;
 use graphics::draw_state::Blend;
 use graphics::types::Matrix2d;
 use graphics::Context;
 use opengl_graphics::GlGraphics;
-
-use crate::assets::Assets;
 
 #[derive(Clone, Copy)]
 pub struct Tetromino {
@@ -15,50 +15,6 @@ pub struct Tetromino {
     blocks: [Block; 4],
     rotation_status: Rotation,
     is_ghost: bool,
-}
-
-#[derive(Clone, Copy)]
-pub enum Rotation {
-    R0,
-    R1,
-    R2,
-    R3,
-}
-
-impl Rotation {
-    fn clockwise(&mut self) {
-        match self {
-            Rotation::R0 => {
-                *self = Rotation::R1;
-            }
-            Rotation::R1 => {
-                *self = Rotation::R2;
-            }
-            Rotation::R2 => {
-                *self = Rotation::R3;
-            }
-            Rotation::R3 => {
-                *self = Rotation::R0;
-            }
-        }
-    }
-
-    fn counterclockwise(&mut self) {
-        match self {
-            Rotation::R0 => {
-                *self = Rotation::R3;
-            }
-            Rotation::R1 => {
-                *self = Rotation::R0;
-            }
-            Rotation::R2 => {
-                *self = Rotation::R1;
-            }
-            Rotation::R3 => {
-                *self = Rotation::R2;
-            }
-        }
-    }
 }
 
 impl Tetromino {
@@ -147,7 +103,7 @@ impl Tetromino {
 
     pub fn hard_drop(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
         match self.fall(matrix) {
-            Err(()) => {},
+            Err(()) => {}
             Ok(()) => self.hard_drop(matrix),
         }
     }
@@ -206,7 +162,13 @@ impl Tetromino {
         }
     }
 
-    pub fn check_possible(&self, matrix: &Vec<Vec<Option<Block>>>, x: i8, y: i8, rotation: i8) -> Result<[Block; 4], ()> {
+    pub fn check_possible(
+        &self,
+        matrix: &Vec<Vec<Option<Block>>>,
+        x: i8,
+        y: i8,
+        rotation: i8,
+    ) -> Result<[Block; 4], ()> {
         let translation = Point::new(x, y);
         let movement = TranslateRotate::new(translation, rotation, &self.center);
         let mut new_blocks = vec![];
@@ -217,5 +179,3 @@ impl Tetromino {
         Ok(blocks)
     }
 }
-
-
