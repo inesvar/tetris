@@ -20,8 +20,11 @@ impl Block {
         }
     }
 
-    pub fn translate(mut self, point: Point) {
-        self.position += point;
+    pub fn translation(self, point: Point) -> Self {
+        Block {
+            color: self.color,
+            position: self.position + point,
+        }
     }
 
     pub fn render(
@@ -76,67 +79,22 @@ impl Transformable for Block {
 }
 
 pub trait Collision {
-    fn fall(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()>;
-    fn right(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()>;
-    fn left(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()>;
-    fn turn_clockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()>;
-    fn turn_counterclockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()>;
+    fn move_to(&self, matrix: &Vec<Vec<Option<Block>>>, movement: &TranslateRotate) -> Result<Block, ()>;
 }
 
 impl Collision for Block {
-    fn fall(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()> {
-        let mut copy = *self;
-        copy.go_down();
-        if copy.position.y as usize > matrix.len() - 1 {
-            Err(())
-        } else {
-            match matrix[copy.position.y as usize][copy.position.x as usize] {
-                Some(_) => Err(()),
-                None => {
-                    Ok(copy)
-                }
-            }
+    fn move_to(&self, matrix: &Vec<Vec<Option<Block>>>, movement: &TranslateRotate) -> Result<Block, ()> {
+        let mut copy = self.translation(movement.translation);
+        match movement.rotation {
+            1 => {copy.rotate_clockwise(&movement.center.unwrap());},
+            -1 => {copy.rotate_counterclockwise(&movement.center.unwrap());},
+            _ => {},
         }
-    }
-
-    fn left(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()> {
-        let mut copy = *self;
-        copy.go_left();
-        if copy.position.x < 0 {
-            Err(())
-        } else {
-            match matrix[copy.position.y as usize][copy.position.x as usize] {
-                Some(_) => Err(()),
-                None => {
-                    Ok(copy)
-                }
-            }
-        }
-    }
-
-    fn right(&self, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()> {
-        let mut copy = *self;
-        copy.go_right();
-        if copy.position.x as usize > matrix[0].len() - 1 {
-            Err(())
-        } else {
-            match matrix[copy.position.y as usize][copy.position.x as usize] {
-                Some(_) => Err(()),
-                None => {
-                    Ok(copy)
-                }
-            }
-        }
-    }
-
-    fn turn_clockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()> {
-        let mut copy = *self;
-        copy.rotate_clockwise(other);
         match (copy.position.x, copy.position.y) {
             (x, y) if x < 0 || y < 0 => {
                 return Err(());
             }
-            (x, y) if x as usize >= matrix[0].len() - 1 || y as usize >= matrix.len() - 1 => {
+            (x, y) if x as usize >= matrix[0].len() || y as usize >= matrix.len() => {
                 return Err(());
             }
             _ => {}
@@ -148,24 +106,17 @@ impl Collision for Block {
             }
         }
     }
+}
 
-    fn turn_counterclockwise(&self, other: &Point, matrix: &Vec<Vec<Option<Block>>>) -> Result<Block, ()> {
-        let mut copy = *self;
-        copy.rotate_counterclockwise(other);
-        match (copy.position.x, copy.position.y) {
-            (x, y) if x < 0 || y < 0 => {
-                return Err(());
-            }
-            (x, y) if x as usize >= matrix[0].len() - 1 || y as usize >= matrix.len() - 1 => {
-                return Err(());
-            }
-            _ => {}
-        }
-        match matrix[copy.position.y as usize][copy.position.x as usize] {
-            Some(_) => Err(()),
-            None => {
-                Ok(copy)
-            }
-        }
+pub struct TranslateRotate {
+    translation: Point,
+    rotation: i8,
+    center: Option<Point>,
+}
+
+impl TranslateRotate {
+    pub fn new(translation: Point, rotation: i8, center: &Point) -> Self {
+        let center = *center + translation;
+        TranslateRotate { translation, rotation, center: Some(center) }
     }
 }
