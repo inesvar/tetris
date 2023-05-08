@@ -21,6 +21,7 @@ use crate::assets::Assets;
 mod tetris_grid;
 mod tetromino;
 mod keyboard;
+mod tetromino_kind;
 
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, RESTART_KEYS, FALL_KEYS, HARD_DROP_KEYS, HOLD_TETROMINO_KEYS, LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
 use tetris_grid::TetrisGrid;
