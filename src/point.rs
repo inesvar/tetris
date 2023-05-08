@@ -8,10 +8,6 @@ impl Point {
     pub fn new(x: i8, y: i8) -> Self {
         Point { x, y }
     }
-
-    pub fn translate(mut self, point: Point) {
-        self += point;
-    }
 }
 
 impl std::ops::Add for Point {

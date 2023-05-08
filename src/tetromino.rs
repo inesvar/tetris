@@ -107,14 +107,6 @@ impl Tetromino {
             Block::new(color, positions[8], positions[9]),
         ];
     }
-
-    fn translate(&mut self, x: i8, y: i8) {
-        let translation = Point::new(x, y);
-        self.center.translate(translation);
-        for i in 0..4 {
-            self.blocks[i].position.translate(translation);
-        }
-    }
 }
 
 /* RENDER METHOD */
