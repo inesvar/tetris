@@ -1,4 +1,4 @@
-use graphics::{Context, rectangle};
+use graphics::{Context, rectangle, color};
 use graphics::math::{Matrix2d};
 use graphics::types::{Rectangle, Scalar};
 use graphics::Transformed;
@@ -111,13 +111,19 @@ impl TetrisGrid {
 
         for (y, row) in self.rows.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
-                let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
-                let outline_dims = rectangle::square(x as Scalar * BLOCK_SIZE, y as Scalar * BLOCK_SIZE, BLOCK_SIZE);
-                outline_rect.draw(outline_dims, &ctx.draw_state, self.transform, gl);
+                if y > 1 {
+                    let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
+                    let outline_dims = rectangle::square(x as Scalar * BLOCK_SIZE, y as Scalar * BLOCK_SIZE, BLOCK_SIZE);
+                    outline_rect.draw(outline_dims, &ctx.draw_state, self.transform, gl);
 
-                match cell {
-                    Some(block) => block.render(self.transform, &ctx.draw_state, gl, assets),
-                    None => {}
+                    match cell {
+                        Some(block) => block.render(self.transform, &ctx.draw_state, gl, assets),
+                        None => {}
+                    }
+                } else if y == 0 {
+                    let outline_rect = graphics::Rectangle::new_border(color::BLACK, BLOCK_SIZE);
+                    let outline_dims = rectangle::square(x as Scalar * BLOCK_SIZE, y as Scalar * BLOCK_SIZE, BLOCK_SIZE);
+                    outline_rect.draw(outline_dims, &ctx.draw_state, self.transform, gl);
                 }
             }
         }

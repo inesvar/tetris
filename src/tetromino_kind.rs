@@ -14,13 +14,13 @@ pub enum TetrominoKind {
 impl TetrominoKind {
     pub fn get_initial_position(&self) -> [i8; 10] {
         match self {
-            TetrominoKind::I => [5, 2, 3, 2, 4, 2, 5, 2, 6, 2],
-            TetrominoKind::O => [5, 2, 4, 1, 4, 2, 5, 1, 5, 2],
-            TetrominoKind::Z => [5, 2, 4, 1, 5, 1, 5, 2, 6, 2],
-            TetrominoKind::J => [5, 2, 4, 1, 4, 2, 5, 2, 6, 2],
-            TetrominoKind::L => [5, 2, 4, 2, 5, 2, 6, 2, 6, 1],
-            TetrominoKind::T => [5, 2, 6, 2, 4, 2, 5, 2, 5, 1],
-            TetrominoKind::S => [5, 2, 4, 2, 5, 2, 5, 1, 6, 1],
+            TetrominoKind::I => [5, 1, 3, 1, 4, 1, 5, 1, 6, 1],
+            TetrominoKind::O => [5, 1, 4, 0, 4, 1, 5, 0, 5, 1],
+            TetrominoKind::Z => [5, 1, 4, 0, 5, 0, 5, 1, 6, 1],
+            TetrominoKind::J => [5, 1, 4, 0, 4, 1, 5, 1, 6, 1],
+            TetrominoKind::L => [5, 1, 4, 1, 5, 1, 6, 1, 6, 0],
+            TetrominoKind::T => [5, 1, 6, 1, 4, 1, 5, 1, 5, 0],
+            TetrominoKind::S => [5, 1, 4, 1, 5, 1, 5, 0, 6, 0],
         }
     }
 
@@ -35,4 +35,6 @@ impl TetrominoKind {
             TetrominoKind::S => TetrisColor::GREEN,
         }
     }
+
+
 }
