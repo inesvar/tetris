@@ -18,7 +18,7 @@ pub struct App<'a> {
     frame_counter: u64,
     score: u64,
     active_tetromino: Tetromino,
-    ghost_tetromino: Option<Tetromino>,
+    ghost_tetromino: Tetromino,
     saved_tetromino: Option<Tetromino>,
     keyboard: Keyboard,
     running: bool,
@@ -43,7 +43,7 @@ impl App<'_> {
             grid,
             bag_of_tetromino,
             active_tetromino: first_tetromino,
-            ghost_tetromino: Some(first_tetromino.clone()),
+            ghost_tetromino: first_tetromino.clone(),
             clock: 0.0,
             frame_counter: 0,
             score: 0,
@@ -106,9 +106,7 @@ impl App<'_> {
 
             self.grid.render(args, &ctx, gl, &self.assets);
 
-            if let Some(ghost) = self.ghost_tetromino {
-                ghost.render(self.grid.transform, &ctx, gl, &self.assets);
-            }
+            self.ghost_tetromino.render(self.grid.transform, &ctx, gl, &self.assets);
 
             self.active_tetromino
                 .render(self.grid.transform, &ctx, gl, &self.assets);
@@ -130,17 +128,15 @@ impl App<'_> {
         self.clock += args.dt;
         self.frame_counter = self.frame_counter.wrapping_add(1);
 
-        self.ghost_tetromino = Some(self.active_tetromino.make_ghost_copy());
-        if let Some(ghost) = self.ghost_tetromino.as_mut() {
-            ghost.hard_drop(&self.grid.rows);
-        }
+        self.ghost_tetromino = self.active_tetromino.make_ghost_copy();
+        self.ghost_tetromino.hard_drop(&self.grid.rows);
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if self.frame_counter == self.freeze_frame
             && self
-                .active_tetromino
-                .check_possible(&self.grid.rows, TranslateRotate::fall())
-                .is_err()
+            .active_tetromino
+            .check_possible(&self.grid.rows, TranslateRotate::fall())
+            .is_err()
         {
             self.grid.freeze_tetromino(&mut self.active_tetromino);
             self.get_new_tetromino();
