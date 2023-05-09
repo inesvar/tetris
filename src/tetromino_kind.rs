@@ -44,6 +44,7 @@ impl TetrominoKind {
         let mut tetromino_bag = vec![];
         let mut list = vec![];
         for i in 0..(size_of_bag + (7 - size_of_bag % 7) % 7) {
+            // the smaller multiple of seven yet higher than size_of_bag
             list.push(i % 7);
         }
         let mut rng = thread_rng();
@@ -51,10 +52,6 @@ impl TetrominoKind {
         for _ in 0..(size_of_bag % 7) {
             list.pop();
         }
-        println!(
-            "bag of BAG_SIZE = {} random tetrominos {:?}",
-            size_of_bag, list
-        );
         for i in 0..size_of_bag {
             match list[i as usize] {
                 0 => tetromino_bag.push(TetrominoKind::I),
