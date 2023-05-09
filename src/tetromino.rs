@@ -153,7 +153,7 @@ impl Tetromino {
                 }
                 Ok(new_blocks) => {
                     self.blocks = new_blocks;
-                    self.rotation_status.clockwise();
+                    self.rotation_status.counterclockwise();
                     self.center.translate(&wall_kick_translations[i]);
                     return;
                 }

@@ -51,7 +51,7 @@ impl TetrominoKind {
         }
         let mut rng = thread_rng();
         list.shuffle(&mut rng);
-        println!("{:?}", list);
+        println!("bag of BAG_SIZE = {} random tetrominos {:?}", size_of_bag, list);
         for i in 0..size_of_bag {
             match list[i as usize] {
                 0 => tetromino_bag.push(TetrominoKind::I),
