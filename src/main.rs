@@ -137,13 +137,13 @@ impl App<'_> {
                 .is_err()
         {
             self.grid.freeze_tetromino(&mut self.active_tetromino);
+            self.get_new_tetromino();
         }
 
         // move the tetromino down to emulate its fall
         if self.frame_counter % 50 == 0 {
             if self.active_tetromino.fall(&self.grid.rows).is_err() {
                 self.freeze_frame = self.frame_counter + 50;
-                self.get_new_tetromino();
             }
         }
 
