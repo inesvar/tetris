@@ -8,6 +8,11 @@ impl Point {
     pub fn new(x: i8, y: i8) -> Self {
         Point { x, y }
     }
+
+    pub fn translate(&mut self, other: &Point) {
+        self.x += other.x;
+        self.y += other.y;
+    }
 }
 
 pub trait Transformable {

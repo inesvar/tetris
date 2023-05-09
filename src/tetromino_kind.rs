@@ -66,7 +66,7 @@ impl TetrominoKind {
         tetromino_bag
     }
 
-    pub fn wall_kicks_translations(&self, rotation_status: Rotation, rotation: i8) -> [Point; 5] {
+    pub fn wall_kicks_translations(&self, rotation: i8, rotation_status: Rotation) -> [Point; 5] {
         match self {
             TetrominoKind::O => unreachable!(),
             TetrominoKind::I => match (rotation_status, rotation) {
