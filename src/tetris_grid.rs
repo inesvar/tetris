@@ -106,7 +106,7 @@ impl TetrisGrid {
             args.window_size[1] / 2.0 - self.height / 2.0,
         );
 
-        let empty_dims: Rectangle = [0.0, 0.0, self.width, self.height];
+        let empty_dims: Rectangle = [0.0, self.height * 2.0 / 22.0, self.width, self.height];
         rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, self.transform, gl);
 
         for (y, row) in self.rows.iter().enumerate() {
@@ -120,10 +120,6 @@ impl TetrisGrid {
                         Some(block) => block.render(self.transform, &ctx.draw_state, gl, assets),
                         None => {}
                     }
-                } else if y == 0 {
-                    let outline_rect = graphics::Rectangle::new_border(color::BLACK, BLOCK_SIZE);
-                    let outline_dims = rectangle::square(x as Scalar * BLOCK_SIZE, y as Scalar * BLOCK_SIZE, BLOCK_SIZE);
-                    outline_rect.draw(outline_dims, &ctx.draw_state, self.transform, gl);
                 }
             }
         }
