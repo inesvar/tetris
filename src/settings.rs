@@ -1,5 +1,9 @@
 use graphics::color;
+use opengl_graphics::OpenGL;
 use piston::Key;
+
+// Change this to OpenGL::V2_1 if not working.
+pub static OPENGL_VERSION: OpenGL = OpenGL::V4_5;
 
 pub static DEFAULT_WINDOW_WIDTH: u32 = 500;
 pub static DEFAULT_WINDOW_HEIGHT: u32 = 700;
@@ -22,4 +26,4 @@ pub static HOLD_TETROMINO_KEYS: [Key; 1] = [Key::C];
 pub static KEY_REPEAT_DELAY: u64 = 30;
 
 pub static BAG_SIZE: u32 = 14; // typical sizes are 7 and 14, 1 is entirely random
-                               // for size 7 * n + k, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
+// for size 7 * n + k, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times

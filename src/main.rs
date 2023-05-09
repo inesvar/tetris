@@ -28,28 +28,21 @@ mod tetromino_kind;
 mod translate_rotate;
 
 use crate::app::App;
-use crate::settings::{
-    BAG_SIZE, BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS,
-    HOLD_TETROMINO_KEYS, LEFT_KEYS, RESTART_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS,
-    ROTATE_COUNTERCLOCKWISE_KEYS,
-};
+use crate::settings::{BAG_SIZE, BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS, HOLD_TETROMINO_KEYS, LEFT_KEYS, OPENGL_VERSION, RESTART_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};
 use tetris_grid::TetrisGrid;
 
 fn main() {
-    // Change this to OpenGL::V2_1 if not working.
-    let opengl = OpenGL::V4_5;
-
     // Create a Glutin window.
     let mut window: piston_window::PistonWindow =
         WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
-            .graphics_api(opengl)
+            .graphics_api(OPENGL_VERSION)
             .vsync(true)
             .exit_on_esc(true)
             .build()
             .unwrap();
 
     // Create a new game and run it.
-    let mut app = App::new(opengl);
+    let mut app = App::new(OPENGL_VERSION);
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
