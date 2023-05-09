@@ -18,3 +18,5 @@ pub static ROTATE_CLOCKWISE_KEYS: [Key; 2] = [Key::Up, Key::E];
 pub static ROTATE_COUNTERCLOCKWISE_KEYS: [Key; 2] = [Key::NumPad3, Key::A];
 pub static RESTART_KEYS: [Key; 1] = [Key::R];
 pub static HOLD_TETROMINO_KEYS: [Key; 1] = [Key::C];
+
+pub static BAG_SIZE: u32 = 14; // SIZE 1 is entirely random, other typical sizes include 7 and 14

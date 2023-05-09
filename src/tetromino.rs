@@ -40,18 +40,6 @@ impl Tetromino {
         })
     }
 
-    pub fn new_random(matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino> {
-        match rand::random::<u8>() % 7 {
-            0 => Tetromino::new(TetrominoKind::I, matrix),
-            1 => Tetromino::new(TetrominoKind::O, matrix),
-            2 => Tetromino::new(TetrominoKind::T, matrix),
-            3 => Tetromino::new(TetrominoKind::S, matrix),
-            4 => Tetromino::new(TetrominoKind::Z, matrix),
-            5 => Tetromino::new(TetrominoKind::J, matrix),
-            _ => Tetromino::new(TetrominoKind::L, matrix),
-        }
-    }
-
     pub fn reset_position(&mut self) {
         let positions = self.kind.get_initial_position();
         let color = self.kind.get_color();
