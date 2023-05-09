@@ -1,7 +1,7 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
-use piston::Key;
 use crate::settings::KEY_REPEAT_DELAY;
+use piston::Key;
 
 pub struct Keyboard {
     pressed: HashMap<Key, bool>,
@@ -20,7 +20,8 @@ impl Keyboard {
 
     pub fn set_pressed(&mut self, key: Key) {
         self.pressed.insert(key, true);
-        self.first_press_repeat_countdown.insert(key, KEY_REPEAT_DELAY);
+        self.first_press_repeat_countdown
+            .insert(key, KEY_REPEAT_DELAY);
     }
 
     pub fn set_released(&mut self, key: Key) {

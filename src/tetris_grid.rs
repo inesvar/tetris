@@ -1,14 +1,14 @@
-use graphics::{Context, rectangle};
-use graphics::math::{Matrix2d};
-use graphics::types::{Rectangle, Scalar};
-use graphics::Transformed;
-use opengl_graphics::GlGraphics;
-use piston_window::RenderArgs;
 use crate::assets::{Assets, TetrisColor};
 use crate::block::Block;
 use crate::point::Transformable;
-use crate::settings::{BLOCK_SIZE, GRID_THICKNESS, GRID_COLOR};
+use crate::settings::{BLOCK_SIZE, GRID_COLOR, GRID_THICKNESS};
 use crate::tetromino::Tetromino;
+use graphics::math::Matrix2d;
+use graphics::types::{Rectangle, Scalar};
+use graphics::Transformed;
+use graphics::{rectangle, Context};
+use opengl_graphics::GlGraphics;
+use piston_window::RenderArgs;
 
 pub struct TetrisGrid {
     pub nb_columns: i8,
@@ -106,20 +106,35 @@ impl TetrisGrid {
         }
     }
 
-    pub fn render(&mut self, args: &RenderArgs, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
+    pub fn render(
+        &mut self,
+        args: &RenderArgs,
+        ctx: &Context,
+        gl: &mut GlGraphics,
+        assets: &Assets,
+    ) {
         self.transform = ctx.transform.trans(
             args.window_size[0] / 2.0 - self.total_width / 2.0,
             args.window_size[1] / 2.0 - self.total_height / 2.0,
         );
 
-        let empty_dims: Rectangle = [0.0, self.total_height - self.visible_height, self.visible_width, self.visible_height];
+        let empty_dims: Rectangle = [
+            0.0,
+            self.total_height - self.visible_height,
+            self.visible_width,
+            self.visible_height,
+        ];
         rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, self.transform, gl);
 
         for (y, row) in self.rows.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
                 if y > 1 {
                     let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
-                    let outline_dims = rectangle::square(x as Scalar * BLOCK_SIZE, y as Scalar * BLOCK_SIZE, BLOCK_SIZE);
+                    let outline_dims = rectangle::square(
+                        x as Scalar * BLOCK_SIZE,
+                        y as Scalar * BLOCK_SIZE,
+                        BLOCK_SIZE,
+                    );
                     outline_rect.draw(outline_dims, &ctx.draw_state, self.transform, gl);
 
                     match cell {

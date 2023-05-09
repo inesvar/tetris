@@ -1,8 +1,8 @@
 use crate::assets::Assets;
 use crate::assets::TetrisColor;
 use crate::point::{Point, Transformable};
-use crate::translate_rotate::TranslateRotate;
 use crate::settings::BLOCK_SIZE;
+use crate::translate_rotate::TranslateRotate;
 use graphics::math::{Matrix2d, Scalar};
 use graphics::{rectangle, DrawState, Image};
 use opengl_graphics::GlGraphics;

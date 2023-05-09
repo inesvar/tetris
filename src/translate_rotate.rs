@@ -16,7 +16,11 @@ impl TranslateRotate {
     }
 
     pub fn translation(translation: Point) -> Self {
-        TranslateRotate { translation, rotation: 0, center: None }
+        TranslateRotate {
+            translation,
+            rotation: 0,
+            center: None,
+        }
     }
 
     pub fn fall() -> Self {
