@@ -1,9 +1,13 @@
+use crate::keyboard::Keyboard;
+use crate::{
+    Assets, TetrisGrid, Tetromino, TetrominoKind, TranslateRotate, BAG_SIZE, BG_COLOR, FALL_KEYS,
+    HARD_DROP_KEYS, HOLD_TETROMINO_KEYS, LEFT_KEYS, RESTART_KEYS, RIGHT_KEYS,
+    ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS,
+};
 use graphics::color;
+use graphics::Transformed;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{RenderArgs, UpdateArgs};
-use crate::keyboard::Keyboard;
-use crate::{Assets, BAG_SIZE, BG_COLOR, FALL_KEYS, HARD_DROP_KEYS, HOLD_TETROMINO_KEYS, LEFT_KEYS, RESTART_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS, TetrisGrid, Tetromino, TetrominoKind, TranslateRotate};
-use graphics::Transformed;
 use piston_window::Key;
 
 pub struct App<'a> {
@@ -22,9 +26,8 @@ pub struct App<'a> {
     bag_of_tetromino: Vec<TetrominoKind>,
 }
 
-
 impl App<'_> {
-    pub fn new(gl_version: OpenGL, ) -> App<'static> {
+    pub fn new(gl_version: OpenGL) -> App<'static> {
         let assets_folder = find_folder::Search::ParentsThenKids(3, 3)
             .for_folder("assets")
             .unwrap();
@@ -135,9 +138,9 @@ impl App<'_> {
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if self.frame_counter == self.freeze_frame
             && self
-            .active_tetromino
-            .check_possible(&self.grid.rows, TranslateRotate::fall())
-            .is_err()
+                .active_tetromino
+                .check_possible(&self.grid.rows, TranslateRotate::fall())
+                .is_err()
         {
             self.grid.freeze_tetromino(&mut self.active_tetromino);
             self.get_new_tetromino();
@@ -185,7 +188,7 @@ impl App<'_> {
             None => self.game_over(),
         };
     }
-    
+
     pub fn handle_key_press(&mut self, key: Key) {
         self.keyboard.set_pressed(key);
 

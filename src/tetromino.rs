@@ -125,9 +125,13 @@ impl Tetromino {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let wall_kick_translations = TetrominoKind::wall_kicks_translations(&self.kind, 1, self.rotation_status);
+        let wall_kick_translations =
+            TetrominoKind::wall_kicks_translations(&self.kind, 1, self.rotation_status);
         for i in 0..5 {
-            match self.check_possible(matrix, TranslateRotate::new(wall_kick_translations[i], 1, &self.center)) {
+            match self.check_possible(
+                matrix,
+                TranslateRotate::new(wall_kick_translations[i], 1, &self.center),
+            ) {
                 Err(()) => {
                     continue;
                 }
@@ -145,9 +149,13 @@ impl Tetromino {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let wall_kick_translations = TetrominoKind::wall_kicks_translations(&self.kind, -1, self.rotation_status);
+        let wall_kick_translations =
+            TetrominoKind::wall_kicks_translations(&self.kind, -1, self.rotation_status);
         for i in 0..5 {
-            match self.check_possible(matrix, TranslateRotate::new(wall_kick_translations[i], -1, &self.center)) {
+            match self.check_possible(
+                matrix,
+                TranslateRotate::new(wall_kick_translations[i], -1, &self.center),
+            ) {
                 Err(()) => {
                     continue;
                 }
@@ -164,7 +172,7 @@ impl Tetromino {
     pub fn check_possible(
         &self,
         matrix: &Vec<Vec<Option<Block>>>,
-        movement: TranslateRotate
+        movement: TranslateRotate,
     ) -> Result<[Block; 4], ()> {
         let mut new_blocks = vec![];
         for i in 0..4 {

@@ -43,15 +43,18 @@ impl TetrominoKind {
     pub fn new_random_bag(size_of_bag: u32) -> Vec<TetrominoKind> {
         let mut tetromino_bag = vec![];
         let mut list = vec![];
-        for i in 0..(size_of_bag + (7 - size_of_bag % 7)%7) {
+        for i in 0..(size_of_bag + (7 - size_of_bag % 7) % 7) {
             list.push(i % 7);
         }
         let mut rng = thread_rng();
         list.shuffle(&mut rng);
-        for _ in 0..(size_of_bag%7) {
+        for _ in 0..(size_of_bag % 7) {
             list.pop();
         }
-        println!("bag of BAG_SIZE = {} random tetrominos {:?}", size_of_bag, list);
+        println!(
+            "bag of BAG_SIZE = {} random tetrominos {:?}",
+            size_of_bag, list
+        );
         for i in 0..size_of_bag {
             match list[i as usize] {
                 0 => tetromino_bag.push(TetrominoKind::I),

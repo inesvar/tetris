@@ -6,7 +6,7 @@ extern crate piston;
 
 use crate::assets::Assets;
 
-use opengl_graphics::{OpenGL};
+use opengl_graphics::OpenGL;
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
@@ -15,6 +15,7 @@ use tetromino::Tetromino;
 use tetromino_kind::TetrominoKind;
 use translate_rotate::TranslateRotate;
 
+mod app;
 mod assets;
 mod block;
 mod keyboard;
@@ -25,15 +26,14 @@ mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;
 mod translate_rotate;
-mod app;
 
+use crate::app::App;
 use crate::settings::{
-    BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS,
+    BAG_SIZE, BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS,
     HOLD_TETROMINO_KEYS, LEFT_KEYS, RESTART_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS,
-    ROTATE_COUNTERCLOCKWISE_KEYS, BAG_SIZE,
+    ROTATE_COUNTERCLOCKWISE_KEYS,
 };
 use tetris_grid::TetrisGrid;
-use crate::app::App;
 
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
@@ -63,9 +63,10 @@ fn main() {
 
         if let Some(Button::Keyboard(key)) = e.press_args() {
             app.handle_key_press(key);
-        };
+        }
+
         if let Some(Button::Keyboard(key)) = e.release_args() {
             app.handle_key_release(key);
-        };
+        }
     }
 }
