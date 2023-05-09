@@ -240,13 +240,13 @@ fn main() {
             app.keyboard.set_pressed(key);
 
             if app.keyboard.is_any_pressed(&RESTART_KEYS) {
-                // rotate once the tetromino
                 app.running = true;
             }
 
             if !app.running {
                 continue;
             }
+
             // Pressed once events
             if app.keyboard.is_any_pressed(&ROTATE_CLOCKWISE_KEYS) {
                 // rotate once the tetromino
@@ -254,12 +254,16 @@ fn main() {
             } else if app.keyboard.is_any_pressed(&ROTATE_COUNTERCLOCKWISE_KEYS) {
                 // rotate once the tetromino
                 app.active_tetromino.turn_counterclockwise(&app.grid.rows);
-            } else if app.keyboard.is_any_pressed(&HARD_DROP_KEYS) {
+            }
+
+            if app.keyboard.is_any_pressed(&HARD_DROP_KEYS) {
                 // hard drop the tetromino
                 app.active_tetromino.hard_drop(&app.grid.rows);
                 app.grid.freeze_tetromino(&mut app.active_tetromino);
                 app.get_new_tetromino();
-            } else if app.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
+            }
+
+            if app.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
                 // hold the tetromino
                 if let Some(mut saved) = app.saved_tetromino {
                     app.active_tetromino.reset_position();
@@ -272,7 +276,9 @@ fn main() {
                     app.saved_tetromino = Some(app.active_tetromino);
                     app.get_new_tetromino();
                 }
-            } else if app.keyboard.is_any_pressed(&LEFT_KEYS) {
+            }
+
+            if app.keyboard.is_any_pressed(&LEFT_KEYS) {
                 app.active_tetromino.left(&app.grid.rows);
             } else if app.keyboard.is_any_pressed(&RIGHT_KEYS) {
                 app.active_tetromino.right(&app.grid.rows);
