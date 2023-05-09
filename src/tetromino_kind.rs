@@ -1,6 +1,8 @@
 use crate::assets::TetrisColor;
-use rand::thread_rng;
+use crate::point::Point;
+use crate::rotation::Rotation;
 use rand::prelude::SliceRandom;
+use rand::thread_rng;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TetrominoKind {
@@ -16,13 +18,13 @@ pub enum TetrominoKind {
 impl TetrominoKind {
     pub fn get_initial_position(&self) -> [i8; 10] {
         match self {
-            TetrominoKind::I => [5, 1, 3, 1, 4, 1, 5, 1, 6, 1],
+            TetrominoKind::I => [4, 1, 3, 1, 4, 1, 5, 1, 6, 1],
             TetrominoKind::O => [5, 1, 4, 0, 4, 1, 5, 0, 5, 1],
-            TetrominoKind::Z => [5, 1, 4, 0, 5, 0, 5, 1, 6, 1],
-            TetrominoKind::J => [5, 1, 4, 0, 4, 1, 5, 1, 6, 1],
-            TetrominoKind::L => [5, 1, 4, 1, 5, 1, 6, 1, 6, 0],
-            TetrominoKind::T => [5, 1, 6, 1, 4, 1, 5, 1, 5, 0],
-            TetrominoKind::S => [5, 1, 4, 1, 5, 1, 5, 0, 6, 0],
+            TetrominoKind::Z => [4, 1, 3, 0, 4, 0, 4, 1, 5, 1],
+            TetrominoKind::J => [4, 1, 3, 0, 3, 1, 4, 1, 5, 1],
+            TetrominoKind::L => [4, 1, 3, 1, 4, 1, 5, 1, 5, 0],
+            TetrominoKind::T => [4, 1, 5, 1, 3, 1, 4, 1, 4, 0],
+            TetrominoKind::S => [4, 1, 3, 1, 4, 1, 4, 0, 5, 0],
         }
     }
 
@@ -39,13 +41,13 @@ impl TetrominoKind {
     }
 
     pub fn new_random_bag(size_of_bag: u32) -> Vec<TetrominoKind> {
-        let mut tetromino_bag = vec!();
-        let mut list = vec!();
-        for i in 0..(size_of_bag - size_of_bag%7) {
+        let mut tetromino_bag = vec![];
+        let mut list = vec![];
+        for i in 0..(size_of_bag - size_of_bag % 7) {
             list.push(i % 7);
         }
-        for _ in 0..(size_of_bag%7) {
-            list.push(rand::random::<u32>()%7);
+        for _ in 0..(size_of_bag % 7) {
+            list.push(rand::random::<u32>() % 7);
         }
         let mut rng = thread_rng();
         list.shuffle(&mut rng);
@@ -62,5 +64,129 @@ impl TetrominoKind {
             }
         }
         tetromino_bag
+    }
+
+    pub fn wall_kicks_translations(&self, rotation_status: Rotation, rotation: i8) -> [Point; 5] {
+        match self {
+            TetrominoKind::O => unreachable!(),
+            TetrominoKind::I => match (rotation_status, rotation) {
+                (Rotation::R0, 1) => [
+                    Point::new(1, 0),
+                    Point::new(-2, 0),
+                    Point::new(1, 0),
+                    Point::new(-2, -1),
+                    Point::new(1, 2),
+                ],
+                (Rotation::R1, -1) => [
+                    Point::new(-1, 0),
+                    Point::new(2, 0),
+                    Point::new(-1, 0),
+                    Point::new(2, 1),
+                    Point::new(-1, -2),
+                ],
+                (Rotation::R1, 1) => [
+                    Point::new(0, 1),
+                    Point::new(-1, 0),
+                    Point::new(2, 0),
+                    Point::new(-1, 2),
+                    Point::new(2, -1),
+                ],
+                (Rotation::R2, -1) => [
+                    Point::new(0, -1),
+                    Point::new(1, 0),
+                    Point::new(-2, 0),
+                    Point::new(1, -2),
+                    Point::new(-2, 1),
+                ],
+                (Rotation::R2, 1) => [
+                    Point::new(-1, 0),
+                    Point::new(2, 0),
+                    Point::new(-1, 0),
+                    Point::new(2, 1),
+                    Point::new(-1, -2),
+                ],
+                (Rotation::R3, -1) => [
+                    Point::new(1, 0),
+                    Point::new(-2, 0),
+                    Point::new(1, 0),
+                    Point::new(-2, -1),
+                    Point::new(1, 2),
+                ],
+                (Rotation::R3, 1) => [
+                    Point::new(0, -1),
+                    Point::new(1, 0),
+                    Point::new(-2, 0),
+                    Point::new(1, -2),
+                    Point::new(-2, 1),
+                ],
+                (Rotation::R0, -1) => [
+                    Point::new(0, 1),
+                    Point::new(-1, 0),
+                    Point::new(2, 0),
+                    Point::new(-1, 2),
+                    Point::new(2, -1),
+                ],
+                _ => unreachable!(),
+            },
+            _ => match (rotation_status, rotation) {
+                (Rotation::R0, 1) => [
+                    Point::new(0, 0),
+                    Point::new(-1, 0),
+                    Point::new(-1, 1),
+                    Point::new(0, -2),
+                    Point::new(-1, -2),
+                ],
+                (Rotation::R1, -1) => [
+                    Point::new(0, 0),
+                    Point::new(1, 0),
+                    Point::new(1, -1),
+                    Point::new(0, 2),
+                    Point::new(1, 2),
+                ],
+                (Rotation::R1, 1) => [
+                    Point::new(0, 0),
+                    Point::new(1, 0),
+                    Point::new(1, -1),
+                    Point::new(0, 2),
+                    Point::new(1, 2),
+                ],
+                (Rotation::R2, -1) => [
+                    Point::new(0, 0),
+                    Point::new(-1, 0),
+                    Point::new(-1, 1),
+                    Point::new(0, -2),
+                    Point::new(-1, -2),
+                ],
+                (Rotation::R2, 1) => [
+                    Point::new(0, 0),
+                    Point::new(1, 0),
+                    Point::new(1, 1),
+                    Point::new(0, -2),
+                    Point::new(1, -2),
+                ],
+                (Rotation::R3, -1) => [
+                    Point::new(0, 0),
+                    Point::new(-1, 0),
+                    Point::new(-1, -1),
+                    Point::new(0, 2),
+                    Point::new(-1, 2),
+                ],
+                (Rotation::R3, 1) => [
+                    Point::new(0, 0),
+                    Point::new(-1, 0),
+                    Point::new(-1, -1),
+                    Point::new(0, 2),
+                    Point::new(-1, 2),
+                ],
+                (Rotation::R0, -1) => [
+                    Point::new(0, 0),
+                    Point::new(1, 0),
+                    Point::new(1, 1),
+                    Point::new(0, -2),
+                    Point::new(1, -2),
+                ],
+                _ => unreachable!(),
+            },
+        }
     }
 }
