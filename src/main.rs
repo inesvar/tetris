@@ -13,6 +13,7 @@ use piston::window::WindowSettings;
 use piston::{Button, PressEvent, ReleaseEvent};
 use tetromino::Tetromino;
 use tetromino_kind::TetrominoKind;
+use translate_rotate::TranslateRotate;
 
 mod assets;
 mod block;
@@ -23,6 +24,7 @@ mod settings;
 mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;
+mod translate_rotate;
 
 use crate::settings::{
     BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS,
@@ -131,7 +133,7 @@ impl App<'_> {
         if self.frame_counter == self.freeze_frame
             && self
                 .active_tetromino
-                .check_possible(&self.grid.rows, 0, 1, 0)
+                .check_possible(&self.grid.rows, TranslateRotate::fall())
                 .is_err()
         {
             self.grid.freeze_tetromino(&mut self.active_tetromino);

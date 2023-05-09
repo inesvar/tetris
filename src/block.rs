@@ -1,6 +1,7 @@
 use crate::assets::Assets;
 use crate::assets::TetrisColor;
 use crate::point::{Point, Transformable};
+use crate::translate_rotate::TranslateRotate;
 use crate::settings::BLOCK_SIZE;
 use graphics::math::{Matrix2d, Scalar};
 use graphics::{rectangle, DrawState, Image};
@@ -107,23 +108,6 @@ impl Collision for Block {
         match matrix[copy.position.y as usize][copy.position.x as usize] {
             Some(_) => Err(()),
             None => Ok(copy),
-        }
-    }
-}
-
-pub struct TranslateRotate {
-    translation: Point,
-    rotation: i8,
-    center: Option<Point>,
-}
-
-impl TranslateRotate {
-    pub fn new(translation: Point, rotation: i8, center: &Point) -> Self {
-        let center = *center + translation;
-        TranslateRotate {
-            translation,
-            rotation,
-            center: Some(center),
         }
     }
 }
