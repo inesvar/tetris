@@ -5,10 +5,10 @@ extern crate opengl_graphics;
 extern crate piston;
 
 use crate::assets::Assets;
-use graphics::{color, Transformed};
-use opengl_graphics::{GlGraphics, OpenGL};
+
+use opengl_graphics::{OpenGL};
 use piston::event_loop::{EventSettings, Events};
-use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
+use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
 use piston::{Button, PressEvent, ReleaseEvent};
 use tetromino::Tetromino;
