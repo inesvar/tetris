@@ -1,4 +1,4 @@
-use graphics::{Context, rectangle, color};
+use graphics::{Context, rectangle};
 use graphics::math::{Matrix2d};
 use graphics::types::{Rectangle, Scalar};
 use graphics::Transformed;
