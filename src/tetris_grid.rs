@@ -15,8 +15,10 @@ pub struct TetrisGrid {
     pub nb_rows: i8,
     pub rows: Vec<Vec<Option<Block>>>,
     pub line_sum: Vec<u8>,
-    pub width: f64,
-    pub height: f64,
+    pub total_width: f64,
+    pub total_height: f64,
+    pub visible_width: f64,
+    pub visible_height: f64,
     pub transform: Matrix2d<f64>,
     pub nb_lines_cleared_last_frame: u8,
 }
@@ -34,8 +36,10 @@ impl TetrisGrid {
             nb_rows,
             rows,
             line_sum,
-            width: nb_columns as f64 * BLOCK_SIZE,
-            height: nb_rows as f64 * BLOCK_SIZE,
+            total_width: nb_columns as f64 * BLOCK_SIZE,
+            total_height: nb_rows as f64 * BLOCK_SIZE,
+            visible_width: nb_columns as f64 * BLOCK_SIZE,
+            visible_height: (nb_rows - 2) as f64 * BLOCK_SIZE,
             transform: Matrix2d::default(),
             nb_lines_cleared_last_frame: 0,
         }
@@ -68,8 +72,10 @@ impl TetrisGrid {
             nb_rows,
             rows,
             line_sum,
-            width: nb_columns as f64 * BLOCK_SIZE,
-            height: nb_rows as f64 * BLOCK_SIZE,
+            total_width: nb_columns as f64 * BLOCK_SIZE,
+            total_height: nb_rows as f64 * BLOCK_SIZE,
+            visible_width: nb_columns as f64 * BLOCK_SIZE,
+            visible_height: (nb_rows - 2) as f64 * BLOCK_SIZE,
             transform: Matrix2d::default(),
             nb_lines_cleared_last_frame: 0,
         }
@@ -102,11 +108,11 @@ impl TetrisGrid {
 
     pub fn render(&mut self, args: &RenderArgs, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
         self.transform = ctx.transform.trans(
-            args.window_size[0] / 2.0 - self.width / 2.0,
-            args.window_size[1] / 2.0 - self.height / 2.0,
+            args.window_size[0] / 2.0 - self.total_width / 2.0,
+            args.window_size[1] / 2.0 - self.total_height / 2.0,
         );
 
-        let empty_dims: Rectangle = [0.0, self.height * 2.0 / 22.0, self.width, self.height];
+        let empty_dims: Rectangle = [0.0, self.total_height - self.visible_height, self.visible_width, self.visible_height];
         rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, self.transform, gl);
 
         for (y, row) in self.rows.iter().enumerate() {
