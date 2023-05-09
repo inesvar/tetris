@@ -1,4 +1,6 @@
 use crate::assets::TetrisColor;
+use rand::thread_rng;
+use rand::prelude::SliceRandom;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TetrominoKind {
@@ -36,5 +38,29 @@ impl TetrominoKind {
         }
     }
 
-
+    pub fn new_random_bag(size_of_bag: u32) -> Vec<TetrominoKind> {
+        let mut tetromino_bag = vec!();
+        let mut list = vec!();
+        for i in 0..(size_of_bag - size_of_bag%7) {
+            list.push(i % 7);
+        }
+        for _ in 0..(size_of_bag%7) {
+            list.push(rand::random::<u32>()%7);
+        }
+        let mut rng = thread_rng();
+        list.shuffle(&mut rng);
+        println!("{:?}", list);
+        for i in 0..size_of_bag {
+            match list[i as usize] {
+                0 => tetromino_bag.push(TetrominoKind::I),
+                1 => tetromino_bag.push(TetrominoKind::O),
+                2 => tetromino_bag.push(TetrominoKind::T),
+                3 => tetromino_bag.push(TetrominoKind::S),
+                4 => tetromino_bag.push(TetrominoKind::Z),
+                5 => tetromino_bag.push(TetrominoKind::J),
+                _ => tetromino_bag.push(TetrominoKind::L),
+            }
+        }
+        tetromino_bag
+    }
 }

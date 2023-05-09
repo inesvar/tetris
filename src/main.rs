@@ -12,6 +12,7 @@ use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
 use piston::{Button, PressEvent, ReleaseEvent};
 use tetromino::Tetromino;
+use tetromino_kind::TetrominoKind;
 
 mod assets;
 mod block;
@@ -26,7 +27,7 @@ mod tetromino_kind;
 use crate::settings::{
     BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS,
     HOLD_TETROMINO_KEYS, LEFT_KEYS, RESTART_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS,
-    ROTATE_COUNTERCLOCKWISE_KEYS,
+    ROTATE_COUNTERCLOCKWISE_KEYS, BAG_SIZE,
 };
 use tetris_grid::TetrisGrid;
 
@@ -43,6 +44,7 @@ pub struct App<'a> {
     keyboard: keyboard::Keyboard,
     running: bool,
     freeze_frame: u64,
+    bag_of_tetromino: Vec<TetrominoKind>,
 }
 
 impl App<'_> {
@@ -133,18 +135,13 @@ impl App<'_> {
                 .is_err()
         {
             self.grid.freeze_tetromino(&mut self.active_tetromino);
-            match Tetromino::new_random(&self.grid.rows) {
-                Some(t) => {
-                    self.active_tetromino = t;
-                }
-                None => self.game_over(),
-            };
         }
 
         // move the tetromino down to emulate its fall
         if self.frame_counter % 50 == 0 {
             if self.active_tetromino.fall(&self.grid.rows).is_err() {
                 self.freeze_frame = self.frame_counter + 50;
+                self.get_new_tetromino();
             }
         }
 
@@ -171,6 +168,18 @@ impl App<'_> {
         self.grid.null();
         self.running = false;
     }
+
+    fn get_new_tetromino(&mut self) {
+        if self.bag_of_tetromino.is_empty() {
+            self.bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
+        }
+        match Tetromino::new(self.bag_of_tetromino.pop().unwrap(), &self.grid.rows) {
+            Some(t) => {
+                self.active_tetromino = t;
+            }
+            None => self.game_over(),
+        };
+    }
 }
 
 fn main() {
@@ -193,12 +202,13 @@ fn main() {
     let assets = Assets::new(assets_folder);
 
     let grid = TetrisGrid::new(10, 22);
+    let mut bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
 
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
         assets,
-        active_tetromino: Tetromino::new_random(&grid.rows).unwrap(),
+        active_tetromino: Tetromino::new(bag_of_tetromino.pop().unwrap(), &grid.rows).unwrap(),
         grid,
         clock: 0.0,
         frame_counter: 0,
@@ -208,6 +218,7 @@ fn main() {
         saved_tetromino: None,
         keyboard: keyboard::Keyboard::new(),
         freeze_frame: u64::MAX,
+        bag_of_tetromino,
     };
 
     let mut events = Events::new(EventSettings::new());
@@ -242,12 +253,7 @@ fn main() {
                 // hard drop the tetromino
                 app.active_tetromino.hard_drop(&app.grid.rows);
                 app.grid.freeze_tetromino(&mut app.active_tetromino);
-                match Tetromino::new_random(&app.grid.rows) {
-                    Some(t) => {
-                        app.active_tetromino = t;
-                    }
-                    None => app.game_over(),
-                };
+                app.get_new_tetromino();
             } else if app.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
                 // hold the tetromino
                 if let Some(mut saved) = app.saved_tetromino {
@@ -259,10 +265,7 @@ fn main() {
                     app.active_tetromino.reset_position();
 
                     app.saved_tetromino = Some(app.active_tetromino);
-                    match Tetromino::new_random(&app.grid.rows) {
-                        Some(t) => app.active_tetromino = t,
-                        None => app.game_over(),
-                    };
+                    app.get_new_tetromino();
                 }
             }
         };
