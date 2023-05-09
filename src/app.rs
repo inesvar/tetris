@@ -50,7 +50,7 @@ impl App<'_> {
             saved_tetromino: None,
             running: true,
             keyboard: Keyboard::new(),
-            freeze_frame: u64::MAX,
+            freeze_frame: u64::MAX, // that's about 10 billion years at 60fps
         }
     }
     pub(crate) fn render(&mut self, args: &RenderArgs) {
