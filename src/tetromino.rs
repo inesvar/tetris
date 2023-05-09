@@ -13,9 +13,9 @@ use opengl_graphics::GlGraphics;
 pub struct Tetromino {
     kind: TetrominoKind,
     center: Point,
-    blocks: [Block; 4],
+    pub(crate) blocks: [Block; 4],
     rotation_status: Rotation,
-    is_ghost: bool,
+    pub(crate) is_ghost: bool,
 }
 
 impl Tetromino {
@@ -51,20 +51,6 @@ impl Tetromino {
             Block::new(color, positions[6], positions[7]),
             Block::new(color, positions[8], positions[9]),
         ];
-    }
-}
-
-/* RENDER METHOD */
-impl Tetromino {
-    pub fn render(&self, transform: Matrix2d, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
-        for i in 0..4 {
-            let draw_state = if self.is_ghost {
-                ctx.draw_state.blend(Blend::Multiply)
-            } else {
-                ctx.draw_state
-            };
-            self.blocks[i].render(transform, &draw_state, gl, assets);
-        }
     }
 }
 
