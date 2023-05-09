@@ -43,12 +43,12 @@ impl TetrominoKind {
     pub fn new_random_bag(size_of_bag: u32) -> Vec<TetrominoKind> {
         let mut tetromino_bag = vec![];
         let mut list = vec![];
-        for i in 0..(size_of_bag - size_of_bag % 7 + 7) {
+        for i in 0..(size_of_bag + (7 - size_of_bag % 7)%7) {
             list.push(i % 7);
         }
         let mut rng = thread_rng();
         list.shuffle(&mut rng);
-        for _ in 0..(7 - size_of_bag % 7) {
+        for _ in 0..(size_of_bag%7) {
             list.pop();
         }
         println!("bag of BAG_SIZE = {} random tetrominos {:?}", size_of_bag, list);
@@ -72,59 +72,59 @@ impl TetrominoKind {
             TetrominoKind::I => match (rotation_status, rotation) {
                 (Rotation::R0, 1) => [
                     Point::new(1, 0),
-                    Point::new(-2, 0),
-                    Point::new(1, 0),
-                    Point::new(-2, -1),
-                    Point::new(1, 2),
+                    Point::new(1, 0) + Point::new(-2, 0),
+                    Point::new(1, 0) + Point::new(1, 0),
+                    Point::new(1, 0) + Point::new(-2, -1),
+                    Point::new(1, 0) + Point::new(1, 2),
                 ],
                 (Rotation::R1, -1) => [
                     Point::new(-1, 0),
-                    Point::new(2, 0),
-                    Point::new(-1, 0),
-                    Point::new(2, 1),
-                    Point::new(-1, -2),
+                    Point::new(-1, 0) + Point::new(2, 0),
+                    Point::new(-1, 0) + Point::new(-1, 0),
+                    Point::new(-1, 0) + Point::new(2, 1),
+                    Point::new(-1, 0) + Point::new(-1, -2),
                 ],
                 (Rotation::R1, 1) => [
                     Point::new(0, 1),
-                    Point::new(-1, 0),
-                    Point::new(2, 0),
-                    Point::new(-1, 2),
-                    Point::new(2, -1),
+                    Point::new(0, 1) + Point::new(-1, 0),
+                    Point::new(0, 1) + Point::new(2, 0),
+                    Point::new(0, 1) + Point::new(-1, 2),
+                    Point::new(0, 1) + Point::new(2, -1),
                 ],
                 (Rotation::R2, -1) => [
                     Point::new(0, -1),
-                    Point::new(1, 0),
-                    Point::new(-2, 0),
-                    Point::new(1, -2),
-                    Point::new(-2, 1),
+                    Point::new(0, -1) + Point::new(1, 0),
+                    Point::new(0, -1) + Point::new(-2, 0),
+                    Point::new(0, -1) + Point::new(1, -2),
+                    Point::new(0, -1) + Point::new(-2, 1),
                 ],
                 (Rotation::R2, 1) => [
                     Point::new(-1, 0),
-                    Point::new(2, 0),
-                    Point::new(-1, 0),
-                    Point::new(2, 1),
-                    Point::new(-1, -2),
+                    Point::new(-1, 0) + Point::new(2, 0),
+                    Point::new(-1, 0) + Point::new(-1, 0),
+                    Point::new(-1, 0) + Point::new(2, 1),
+                    Point::new(-1, 0) + Point::new(-1, -2),
                 ],
                 (Rotation::R3, -1) => [
                     Point::new(1, 0),
-                    Point::new(-2, 0),
-                    Point::new(1, 0),
-                    Point::new(-2, -1),
-                    Point::new(1, 2),
+                    Point::new(1, 0) + Point::new(-2, 0),
+                    Point::new(1, 0) + Point::new(1, 0),
+                    Point::new(1, 0) + Point::new(-2, -1),
+                    Point::new(1, 0) + Point::new(1, 2),
                 ],
                 (Rotation::R3, 1) => [
                     Point::new(0, -1),
-                    Point::new(1, 0),
-                    Point::new(-2, 0),
-                    Point::new(1, -2),
-                    Point::new(-2, 1),
+                    Point::new(0, -1) + Point::new(1, 0),
+                    Point::new(0, -1) + Point::new(-2, 0),
+                    Point::new(0, -1) + Point::new(1, -2),
+                    Point::new(0, -1) + Point::new(-2, 1),
                 ],
                 (Rotation::R0, -1) => [
                     Point::new(0, 1),
-                    Point::new(-1, 0),
-                    Point::new(2, 0),
-                    Point::new(-1, 2),
-                    Point::new(2, -1),
+                    Point::new(0, 1) + Point::new(-1, 0),
+                    Point::new(0, 1) + Point::new(2, 0),
+                    Point::new(0, 1) + Point::new(-1, 2),
+                    Point::new(0, 1) + Point::new(2, -1),
                 ],
                 _ => unreachable!(),
             },
