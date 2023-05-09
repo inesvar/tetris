@@ -26,6 +26,7 @@ mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;
 mod translate_rotate;
+mod render;
 
 use crate::app::App;
 use crate::settings::{BAG_SIZE, BG_COLOR, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS, HOLD_TETROMINO_KEYS, LEFT_KEYS, OPENGL_VERSION, RESTART_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS};

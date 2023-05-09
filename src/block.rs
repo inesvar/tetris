@@ -9,7 +9,7 @@ use opengl_graphics::GlGraphics;
 
 #[derive(Clone, Copy)]
 pub struct Block {
-    color: TetrisColor,
+    pub(crate) color: TetrisColor,
     pub position: Point,
 }
 
@@ -26,27 +26,6 @@ impl Block {
             color: self.color,
             position: self.position + point,
         }
-    }
-
-    pub fn render(
-        &self,
-        transform: Matrix2d,
-        draw_state: &DrawState,
-        gl: &mut GlGraphics,
-        assets: &Assets,
-    ) {
-        let dims = rectangle::square(
-            self.position.x as Scalar * BLOCK_SIZE,
-            self.position.y as Scalar * BLOCK_SIZE,
-            BLOCK_SIZE,
-        );
-
-        Image::new().rect(dims).draw(
-            assets.texture_from_tetris_color(&self.color),
-            draw_state,
-            transform,
-            gl,
-        );
     }
 }
 
