@@ -1,28 +1,55 @@
 use graphics::color;
-use opengl_graphics::GlGraphics;
+use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{RenderArgs, UpdateArgs};
 use crate::keyboard::Keyboard;
-use crate::{Assets, BAG_SIZE, BG_COLOR, FALL_KEYS, LEFT_KEYS, RIGHT_KEYS, TetrisGrid, Tetromino, TetrominoKind, TranslateRotate};
+use crate::{Assets, BAG_SIZE, BG_COLOR, FALL_KEYS, HARD_DROP_KEYS, HOLD_TETROMINO_KEYS, LEFT_KEYS, RESTART_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS, TetrisGrid, Tetromino, TetrominoKind, TranslateRotate};
 use graphics::Transformed;
+use piston_window::Key;
 
 pub struct App<'a> {
-    pub gl: GlGraphics,
-    pub grid: TetrisGrid,
-    pub assets: Assets<'a>,
-    pub clock: f64,
-    pub frame_counter: u64,
-    pub score: u64,
-    pub active_tetromino: Tetromino,
-    pub ghost_tetromino: Option<Tetromino>,
-    pub saved_tetromino: Option<Tetromino>,
-    pub keyboard: Keyboard,
-    pub running: bool,
-    pub freeze_frame: u64,
-    pub bag_of_tetromino: Vec<TetrominoKind>,
+    gl: GlGraphics,
+    grid: TetrisGrid,
+    assets: Assets<'a>,
+    clock: f64,
+    frame_counter: u64,
+    score: u64,
+    active_tetromino: Tetromino,
+    ghost_tetromino: Option<Tetromino>,
+    saved_tetromino: Option<Tetromino>,
+    keyboard: Keyboard,
+    running: bool,
+    freeze_frame: u64,
+    bag_of_tetromino: Vec<TetrominoKind>,
 }
 
 
 impl App<'_> {
+    pub fn new(gl_version: OpenGL, ) -> App<'static> {
+        let assets_folder = find_folder::Search::ParentsThenKids(3, 3)
+            .for_folder("assets")
+            .unwrap();
+
+        let grid = TetrisGrid::new(10, 22);
+
+        let mut bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
+        let first_tetromino = Tetromino::new(bag_of_tetromino.pop().unwrap(), &grid.rows).unwrap();
+
+        App {
+            gl: GlGraphics::new(gl_version),
+            assets: Assets::new(assets_folder),
+            grid,
+            bag_of_tetromino,
+            active_tetromino: first_tetromino,
+            ghost_tetromino: Some(first_tetromino.clone()),
+            clock: 0.0,
+            frame_counter: 0,
+            score: 0,
+            saved_tetromino: None,
+            running: true,
+            keyboard: Keyboard::new(),
+            freeze_frame: u64::MAX,
+        }
+    }
     pub(crate) fn render(&mut self, args: &RenderArgs) {
         self.gl.draw(args.viewport(), |ctx, gl| {
             // Clear the screen.
@@ -124,7 +151,7 @@ impl App<'_> {
         }
 
         // Translate the tetromino on long key press
-        if self.frame_counter % 10 == 0 {
+        if self.frame_counter % 5 == 0 {
             if self.keyboard.is_any_pressed(&FALL_KEYS) {
                 if self.active_tetromino.fall(&self.grid.rows).is_err() {
                     self.freeze_frame = self.frame_counter + 50;
@@ -157,5 +184,58 @@ impl App<'_> {
             }
             None => self.game_over(),
         };
+    }
+    
+    pub fn handle_key_press(&mut self, key: Key) {
+        self.keyboard.set_pressed(key);
+
+        if self.keyboard.is_any_pressed(&RESTART_KEYS) {
+            self.running = true;
+        }
+
+        if !self.running {
+            return;
+        }
+
+        // Pressed once events
+        if self.keyboard.is_any_pressed(&ROTATE_CLOCKWISE_KEYS) {
+            // rotate once the tetromino
+            self.active_tetromino.turn_clockwise(&self.grid.rows);
+        } else if self.keyboard.is_any_pressed(&ROTATE_COUNTERCLOCKWISE_KEYS) {
+            // rotate once the tetromino
+            self.active_tetromino.turn_counterclockwise(&self.grid.rows);
+        }
+
+        if self.keyboard.is_any_pressed(&HARD_DROP_KEYS) {
+            // hard drop the tetromino
+            self.active_tetromino.hard_drop(&self.grid.rows);
+            self.grid.freeze_tetromino(&mut self.active_tetromino);
+            self.get_new_tetromino();
+        }
+
+        if self.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
+            // hold the tetromino
+            if let Some(mut saved) = self.saved_tetromino {
+                self.active_tetromino.reset_position();
+
+                std::mem::swap(&mut saved, &mut self.active_tetromino);
+                self.saved_tetromino = Some(saved);
+            } else {
+                self.active_tetromino.reset_position();
+
+                self.saved_tetromino = Some(self.active_tetromino);
+                self.get_new_tetromino();
+            }
+        }
+
+        if self.keyboard.is_any_pressed(&LEFT_KEYS) {
+            self.active_tetromino.left(&self.grid.rows);
+        } else if self.keyboard.is_any_pressed(&RIGHT_KEYS) {
+            self.active_tetromino.right(&self.grid.rows);
+        }
+    }
+
+    pub fn handle_key_release(&mut self, key: Key) {
+        self.keyboard.set_released(key);
     }
 }

@@ -48,31 +48,8 @@ fn main() {
             .build()
             .unwrap();
 
-    let assets_folder = find_folder::Search::ParentsThenKids(3, 3)
-        .for_folder("assets")
-        .unwrap();
-
-    let assets = Assets::new(assets_folder);
-
-    let grid = TetrisGrid::new(10, 22);
-    let mut bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
-
     // Create a new game and run it.
-    let mut app = App {
-        gl: GlGraphics::new(opengl),
-        assets,
-        active_tetromino: Tetromino::new(bag_of_tetromino.pop().unwrap(), &grid.rows).unwrap(),
-        grid,
-        clock: 0.0,
-        frame_counter: 0,
-        running: true,
-        score: 0,
-        ghost_tetromino: None,
-        saved_tetromino: None,
-        keyboard: keyboard::Keyboard::new(),
-        freeze_frame: u64::MAX,
-        bag_of_tetromino,
-    };
+    let mut app = App::new(opengl);
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
@@ -85,55 +62,10 @@ fn main() {
         }
 
         if let Some(Button::Keyboard(key)) = e.press_args() {
-            app.keyboard.set_pressed(key);
-
-            if app.keyboard.is_any_pressed(&RESTART_KEYS) {
-                app.running = true;
-            }
-
-            if !app.running {
-                continue;
-            }
-
-            // Pressed once events
-            if app.keyboard.is_any_pressed(&ROTATE_CLOCKWISE_KEYS) {
-                // rotate once the tetromino
-                app.active_tetromino.turn_clockwise(&app.grid.rows);
-            } else if app.keyboard.is_any_pressed(&ROTATE_COUNTERCLOCKWISE_KEYS) {
-                // rotate once the tetromino
-                app.active_tetromino.turn_counterclockwise(&app.grid.rows);
-            }
-
-            if app.keyboard.is_any_pressed(&HARD_DROP_KEYS) {
-                // hard drop the tetromino
-                app.active_tetromino.hard_drop(&app.grid.rows);
-                app.grid.freeze_tetromino(&mut app.active_tetromino);
-                app.get_new_tetromino();
-            }
-
-            if app.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
-                // hold the tetromino
-                if let Some(mut saved) = app.saved_tetromino {
-                    app.active_tetromino.reset_position();
-
-                    std::mem::swap(&mut saved, &mut app.active_tetromino);
-                    app.saved_tetromino = Some(saved);
-                } else {
-                    app.active_tetromino.reset_position();
-
-                    app.saved_tetromino = Some(app.active_tetromino);
-                    app.get_new_tetromino();
-                }
-            }
-
-            if app.keyboard.is_any_pressed(&LEFT_KEYS) {
-                app.active_tetromino.left(&app.grid.rows);
-            } else if app.keyboard.is_any_pressed(&RIGHT_KEYS) {
-                app.active_tetromino.right(&app.grid.rows);
-            }
+            app.handle_key_press(key);
         };
         if let Some(Button::Keyboard(key)) = e.release_args() {
-            app.keyboard.set_released(key);
+            app.handle_key_release(key);
         };
     }
 }
