@@ -118,9 +118,12 @@ impl App<'_> {
     }
 
     fn update(&mut self, args: &UpdateArgs) {
+        self.keyboard.update();
+
         if !self.running {
             return;
         }
+
         self.clock += args.dt;
         self.frame_counter = self.frame_counter.wrapping_add(1);
 
@@ -132,9 +135,9 @@ impl App<'_> {
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if self.frame_counter == self.freeze_frame
             && self
-                .active_tetromino
-                .check_possible(&self.grid.rows, TranslateRotate::fall())
-                .is_err()
+            .active_tetromino
+            .check_possible(&self.grid.rows, TranslateRotate::fall())
+            .is_err()
         {
             self.grid.freeze_tetromino(&mut self.active_tetromino);
             self.get_new_tetromino();
@@ -153,9 +156,9 @@ impl App<'_> {
                 if self.active_tetromino.fall(&self.grid.rows).is_err() {
                     self.freeze_frame = self.frame_counter + 50;
                 }
-            } else if self.keyboard.is_any_pressed(&LEFT_KEYS) {
+            } else if self.keyboard.is_any_delay_pressed(&LEFT_KEYS) {
                 self.active_tetromino.left(&self.grid.rows);
-            } else if self.keyboard.is_any_pressed(&RIGHT_KEYS) {
+            } else if self.keyboard.is_any_delay_pressed(&RIGHT_KEYS) {
                 self.active_tetromino.right(&self.grid.rows);
             }
         }
@@ -269,6 +272,10 @@ fn main() {
                     app.saved_tetromino = Some(app.active_tetromino);
                     app.get_new_tetromino();
                 }
+            } else if app.keyboard.is_any_pressed(&LEFT_KEYS) {
+                app.active_tetromino.left(&app.grid.rows);
+            } else if app.keyboard.is_any_pressed(&RIGHT_KEYS) {
+                app.active_tetromino.right(&app.grid.rows);
             }
         };
         if let Some(Button::Keyboard(key)) = e.release_args() {
