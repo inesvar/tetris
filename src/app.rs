@@ -138,8 +138,7 @@ impl App<'_> {
             .check_possible(&self.grid.rows, TranslateRotate::fall())
             .is_err()
         {
-            self.grid.freeze_tetromino(&mut self.active_tetromino);
-            self.get_new_tetromino();
+            self.new_active_tetromino();
         }
 
         // move the tetromino down to emulate its fall
@@ -161,10 +160,6 @@ impl App<'_> {
                 self.active_tetromino.right(&self.grid.rows);
             }
         }
-
-        self.grid.update();
-
-        self.score += self.grid.nb_lines_cleared_last_frame as u64;
     }
 
     fn game_over(&mut self) {
@@ -173,7 +168,8 @@ impl App<'_> {
         self.running = false;
     }
 
-    pub(crate) fn get_new_tetromino(&mut self) {
+    fn new_active_tetromino(&mut self) {
+        self.score += self.grid.freeze_tetromino(&mut self.active_tetromino);
         if self.bag_of_tetromino.is_empty() {
             self.bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
         }
@@ -208,8 +204,7 @@ impl App<'_> {
         if self.keyboard.is_any_pressed(&HARD_DROP_KEYS) {
             // hard drop the tetromino
             self.active_tetromino.hard_drop(&self.grid.rows);
-            self.grid.freeze_tetromino(&mut self.active_tetromino);
-            self.get_new_tetromino();
+            self.new_active_tetromino();
         }
 
         if self.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
@@ -223,7 +218,7 @@ impl App<'_> {
                 self.active_tetromino.reset_position();
 
                 self.saved_tetromino = Some(self.active_tetromino);
-                self.get_new_tetromino();
+                self.new_active_tetromino();
             }
         }
 
