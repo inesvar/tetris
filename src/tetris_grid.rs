@@ -20,6 +20,7 @@ pub struct TetrisGrid {
     pub visible_width: f64,
     pub visible_height: f64,
     pub transform: Matrix2d<f64>,
+    pub nb_lines_cleared_last_frame: u8,
 }
 
 impl TetrisGrid {
@@ -40,16 +41,21 @@ impl TetrisGrid {
             visible_width: nb_columns as f64 * BLOCK_SIZE,
             visible_height: (nb_rows - 2) as f64 * BLOCK_SIZE,
             transform: Matrix2d::default(),
+            nb_lines_cleared_last_frame: 0,
         }
     }
 
-    pub fn freeze_tetromino(&mut self, tetromino: &mut Tetromino) -> u64 {
+    pub fn freeze_tetromino(&mut self, tetromino: &mut Tetromino) {
         let mut blocks = tetromino.split();
         for block in &mut blocks {
             self.rows[block.position.y as usize][block.position.x as usize] = Some(*block);
             self.line_sum[block.position.y as usize] += 1;
         }
-        let mut score = 0;
+    }
+
+    pub fn update(&mut self) {
+        self.nb_lines_cleared_last_frame = 0;
+
         for y in 0..self.nb_rows {
             if self.line_sum[y as usize] == self.nb_columns as u8 {
                 self.rows.remove(y as usize);
@@ -67,10 +73,21 @@ impl TetrisGrid {
                     }
                 }
 
-                score += 1;
+                self.nb_lines_cleared_last_frame += 1;
             }
         }
-        score
+    }
+
+    pub fn print_grid(matrix: &Vec<Vec<Option<Block>>>) {
+        for row in matrix.iter() {
+            for cell in row.iter() {
+                match cell {
+                    Some(_) => print!("X"),
+                    None => print!("_"),
+                };
+            }
+            println!();
+        }
     }
 
     pub fn null(&mut self) {
