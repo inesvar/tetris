@@ -6,7 +6,6 @@ extern crate piston;
 
 use crate::assets::Assets;
 
-use opengl_graphics::OpenGL;
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
@@ -27,6 +26,7 @@ mod tetromino;
 mod tetromino_kind;
 mod translate_rotate;
 mod render;
+mod ui;
 
 use crate::app::App;
 use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION};
