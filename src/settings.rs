@@ -5,7 +5,7 @@ use piston::Key;
 // Change this to OpenGL::V2_1 if not working.
 pub static OPENGL_VERSION: OpenGL = OpenGL::V4_5;
 
-pub static DEFAULT_WINDOW_WIDTH: u32 = 500;
+pub static DEFAULT_WINDOW_WIDTH: u32 = 550;
 pub static DEFAULT_WINDOW_HEIGHT: u32 = 700;
 
 pub static BLOCK_SIZE: f64 = 25.0;
@@ -27,3 +27,5 @@ pub static KEY_REPEAT_DELAY: u64 = 20;
 
 pub static BAG_SIZE: u32 = 14; // typical sizes are 7 and 14, 1 is entirely random
 // for size 7 * n + k, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
+
+pub const NB_NEXT_TETROMINO: usize = 5;

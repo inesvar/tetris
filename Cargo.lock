@@ -159,6 +159,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "circular-buffer"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5887fa83bbf76a5cf15915add06c187cfc9d00f2ae9aa1f33d108a02ba7af345"
+
+[[package]]
 name = "color_quant"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1464,6 +1470,7 @@ dependencies = [
 name = "tetris"
 version = "0.1.0"
 dependencies = [
+ "circular-buffer",
  "find_folder",
  "piston",
  "piston2d-graphics",

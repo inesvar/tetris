@@ -19,7 +19,7 @@ pub struct Tetromino {
 }
 
 impl Tetromino {
-    pub fn new(kind: TetrominoKind, matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino> {
+    pub fn new_collision(kind: TetrominoKind, matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino> {
         let positions = kind.get_initial_position();
         let color = kind.get_color();
         for i in 1..5 {
@@ -39,6 +39,23 @@ impl Tetromino {
             rotation_status: Rotation::R0,
             is_ghost: false,
         })
+    }
+
+    pub fn new(kind: TetrominoKind) -> Tetromino {
+        let positions = kind.get_initial_position();
+        let color = kind.get_color();
+        Tetromino {
+            kind,
+            center: Point::new(positions[0], positions[1]),
+            blocks: [
+                Block::new(color, positions[2], positions[3]),
+                Block::new(color, positions[4], positions[5]),
+                Block::new(color, positions[6], positions[7]),
+                Block::new(color, positions[8], positions[9]),
+            ],
+            rotation_status: Rotation::R0,
+            is_ghost: false,
+        }
     }
 
     pub fn reset_position(&mut self) {
