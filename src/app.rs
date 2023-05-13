@@ -160,6 +160,10 @@ impl App<'_> {
                 self.active_tetromino.right(&self.grid.rows);
             }
         }
+
+        self.grid.update();
+
+        self.score += self.grid.nb_lines_cleared_last_frame as u64;
     }
 
     fn game_over(&mut self) {
