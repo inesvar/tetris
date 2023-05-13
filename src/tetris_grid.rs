@@ -1,14 +1,8 @@
-use crate::assets::{Assets, TetrisColor};
 use crate::block::Block;
 use crate::point::Transformable;
-use crate::settings::{BLOCK_SIZE, GRID_COLOR, GRID_THICKNESS};
+use crate::settings::{BLOCK_SIZE};
 use crate::tetromino::Tetromino;
-use graphics::math::Matrix2d;
-use graphics::types::{Rectangle, Scalar};
-use graphics::Transformed;
-use graphics::{rectangle, Context};
-use opengl_graphics::GlGraphics;
-use piston_window::RenderArgs;
+use graphics::types::Matrix2d;
 
 pub struct TetrisGrid {
     pub nb_columns: i8,

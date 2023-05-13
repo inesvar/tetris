@@ -1,13 +1,8 @@
-use crate::assets::Assets;
 use crate::block::{Block, Collision};
 use crate::point::{Point, Transformable};
 use crate::rotation::Rotation;
 use crate::tetromino_kind::TetrominoKind;
 use crate::translate_rotate::TranslateRotate;
-use graphics::draw_state::Blend;
-use graphics::types::Matrix2d;
-use graphics::Context;
-use opengl_graphics::GlGraphics;
 
 #[derive(Clone, Copy)]
 pub struct Tetromino {
