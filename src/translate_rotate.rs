@@ -15,6 +15,14 @@ impl TranslateRotate {
         }
     }
 
+    pub fn null() -> Self {
+        TranslateRotate {
+            translation: Point::new(0, 0),
+            rotation: 0,
+            center: None,
+        }
+    }
+
     pub fn translation(translation: Point) -> Self {
         TranslateRotate {
             translation,

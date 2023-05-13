@@ -1,14 +1,13 @@
 use crate::keyboard::Keyboard;
 use crate::{
-    Assets, TetrisGrid, Tetromino, TetrominoKind, TranslateRotate, BAG_SIZE, BG_COLOR, FALL_KEYS,
-    HARD_DROP_KEYS, HOLD_TETROMINO_KEYS, LEFT_KEYS, RESTART_KEYS, RIGHT_KEYS,
-    ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS,
-};
+    Assets, TetrisGrid, Tetromino, TetrominoKind, TranslateRotate};
+use crate::settings::*;
 use graphics::color;
 use graphics::Transformed;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{RenderArgs, UpdateArgs};
 use piston_window::Key;
+use circular_buffer::CircularBuffer;
 
 pub struct App<'a> {
     gl: GlGraphics,
@@ -24,6 +23,7 @@ pub struct App<'a> {
     running: bool,
     freeze_frame: u64,
     bag_of_tetromino: Vec<TetrominoKind>,
+    fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>, // push_back / pop_front
 }
 
 impl App<'_> {
@@ -35,7 +35,20 @@ impl App<'_> {
         let grid = TetrisGrid::new(10, 22);
 
         let mut bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
-        let first_tetromino = Tetromino::new(bag_of_tetromino.pop().unwrap(), &grid.rows).unwrap();
+        let first_tetromino = Tetromino::new_collision(bag_of_tetromino.pop().unwrap(), &grid.rows).unwrap();
+        let mut fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
+        for _ in 0..NB_NEXT_TETROMINO {
+            if let Some(t) = bag_of_tetromino.pop() {
+                fifo_next_tetromino.push_back(Tetromino::new(t));
+            } else {
+                bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
+                if let Some(t) = bag_of_tetromino.pop() {
+                    fifo_next_tetromino.push_back(Tetromino::new(t));
+                } else {
+                    unreachable!();
+                }
+            }
+        }
 
         App {
             gl: GlGraphics::new(gl_version),
@@ -51,6 +64,7 @@ impl App<'_> {
             running: true,
             keyboard: Keyboard::new(),
             freeze_frame: u64::MAX, // that's about 10 billion years at 60fps
+            fifo_next_tetromino,
         }
     }
     pub(crate) fn render(&mut self, args: &RenderArgs) {
@@ -115,6 +129,11 @@ impl App<'_> {
                 let transform = ctx.transform.trans(-70.0, 50.0);
                 saved.render(transform, &ctx, gl, &self.assets);
             }
+
+            for i in 0..NB_NEXT_TETROMINO {
+                let transform = ctx.transform.trans(BLOCK_SIZE * 16.0, 5.0 * BLOCK_SIZE + 4.0 * BLOCK_SIZE * i as f64);
+                self.fifo_next_tetromino.get(i).unwrap().render(transform, &ctx, gl, &self.assets);
+            }
         });
     }
 
@@ -173,12 +192,11 @@ impl App<'_> {
         if self.bag_of_tetromino.is_empty() {
             self.bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
         }
-        match Tetromino::new(self.bag_of_tetromino.pop().unwrap(), &self.grid.rows) {
-            Some(t) => {
-                self.active_tetromino = t;
-            }
-            None => self.game_over(),
-        };
+        self.active_tetromino = self.fifo_next_tetromino.pop_front().unwrap();
+        if self.active_tetromino.check_possible(&self.grid.rows, TranslateRotate::null()).is_err() {
+            self.game_over()
+        }
+        self.fifo_next_tetromino.push_back(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
     }
 
     pub fn handle_key_press(&mut self, key: Key) {

@@ -40,7 +40,10 @@ impl TetrominoKind {
         }
     }
 
-    pub fn new_random_bag(size_of_bag: u32) -> Vec<TetrominoKind> {
+    pub fn new_random_bag(mut size_of_bag: u32) -> Vec<TetrominoKind> {
+        if size_of_bag == 0 {
+            size_of_bag = 1;
+        }
         let mut tetromino_bag = vec![];
         let mut list = vec![];
         for i in 0..(size_of_bag + (7 - size_of_bag % 7) % 7) {
