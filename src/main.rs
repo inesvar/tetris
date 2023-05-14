@@ -27,10 +27,11 @@ mod tetromino_kind;
 mod translate_rotate;
 mod render;
 mod ui;
+mod local_player;
+mod remote_player;
 
 use crate::app::App;
 use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION};
-use tetris_grid::TetrisGrid;
 
 fn main() {
     // Create a Glutin window.
