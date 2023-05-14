@@ -32,8 +32,7 @@ impl App<'_> {
             .unwrap();
 
         let player1 = LocalPlayer::new();
-        let mut players: Vec<LocalPlayer> = vec!();
-        players.push(player1);
+        let players: Vec<LocalPlayer> = vec![player1];
         let rem_players: Vec<RemotePlayer> = vec!();
 
         App {
@@ -104,9 +103,7 @@ impl App<'_> {
 
     pub(crate) fn update(&mut self, args: &UpdateArgs) {
         // on ne fait pas d'update quand running == false
-        if !self.running {
-            return;
-        } else {
+        if self.running {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             for player in &mut self.local_players {

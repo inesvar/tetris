@@ -40,7 +40,7 @@ impl LocalPlayer {
 
         let mut bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
         let first_tetromino =
-            Tetromino::new_collision(bag_of_tetromino.pop().unwrap(), &grid.rows).unwrap();
+            Tetromino::new_collision(bag_of_tetromino.pop().unwrap(), &grid.rows[..]).unwrap();
         let mut fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
         for _ in 0..NB_NEXT_TETROMINO {
             if let Some(t) = bag_of_tetromino.pop() {
@@ -59,7 +59,7 @@ impl LocalPlayer {
             grid,
             score: 0,
             active_tetromino: first_tetromino,
-            ghost_tetromino: first_tetromino.clone(),
+            ghost_tetromino: first_tetromino,
             saved_tetromino: None,
             keyboard: Keyboard::new(),
             freeze_frame: u64::MAX, // that's about 10 billion years at 60fps
@@ -107,21 +107,21 @@ impl Player for LocalPlayer {
             )
             .unwrap();
 
-        self.grid.render(args, &ctx, gl, &assets);
+        self.grid.render(args, &ctx, gl, assets);
 
-        self.ghost_tetromino.render(self.grid.transform, &ctx, gl, &assets);
+        self.ghost_tetromino.render(self.grid.transform, &ctx, gl, assets);
 
         self.active_tetromino
-            .render(self.grid.transform, &ctx, gl, &assets);
+            .render(self.grid.transform, &ctx, gl, assets);
 
         if let Some(saved) = self.saved_tetromino {
             let transform = ctx.transform.trans(-70.0, 50.0);
-            saved.render(transform, &ctx, gl, &assets);
+            saved.render(transform, &ctx, gl, assets);
         }
 
         for i in 0..NB_NEXT_TETROMINO {
             let transform = ctx.transform.trans(BLOCK_SIZE * 16.0, 5.0 * BLOCK_SIZE + 4.0 * BLOCK_SIZE * i as f64);
-            self.fifo_next_tetromino.get(i).unwrap().render(transform, &ctx, gl, &assets);
+            self.fifo_next_tetromino.get(i).unwrap().render(transform, &ctx, gl, assets);
         }
     }
 
@@ -143,10 +143,8 @@ impl Player for LocalPlayer {
         }
 
         // move the tetromino down to emulate its fall
-        if frame_counter % 50 == 0 {
-            if self.active_tetromino.fall(&self.grid.rows).is_err() {
-                self.freeze_frame = frame_counter + 50;
-            }
+        if frame_counter % 50 == 0 && self.active_tetromino.fall(&self.grid.rows).is_err() {
+            self.freeze_frame = frame_counter + 50;
         }
 
         // Translate the tetromino on long key press

@@ -62,7 +62,7 @@ impl Keyboard {
     }
 
     /// decrements the press delay countdown for all keys
-    pub fn update(&mut self) -> () {
+    pub fn update(&mut self) {
         for (_, counter) in self.first_press_repeat_countdown.iter_mut() {
             if *counter > 0 {
                 *counter -= 1;

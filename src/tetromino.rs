@@ -14,7 +14,7 @@ pub struct Tetromino {
 }
 
 impl Tetromino {
-    pub fn new_collision(kind: TetrominoKind, matrix: &Vec<Vec<Option<Block>>>) -> Option<Tetromino> {
+    pub fn new_collision(kind: TetrominoKind, matrix: &[Vec<Option<Block>>]) -> Option<Tetromino> {
         let positions = kind.get_initial_position();
         let color = kind.get_color();
         for i in 1..5 {
@@ -82,53 +82,43 @@ impl Tetromino {
 
 /* COLLISION METHODS */
 impl Tetromino {
-    pub fn fall(&mut self, matrix: &Vec<Vec<Option<Block>>>) -> Result<(), ()> {
+    pub fn fall(&mut self, matrix: &[Vec<Option<Block>>]) -> Result<(), ()> {
         self.blocks = self.check_possible(matrix, TranslateRotate::fall())?;
         self.center.go_down();
         Ok(())
     }
 
-    pub fn hard_drop(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
+    pub fn hard_drop(&mut self, matrix: &[Vec<Option<Block>>]) {
         match self.fall(matrix) {
             Err(()) => {}
             Ok(()) => self.hard_drop(matrix),
         }
     }
 
-    pub fn left(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
-        match self.check_possible(matrix, TranslateRotate::left()) {
-            Err(()) => {
-                return;
-            }
-            Ok(new_blocks) => {
-                self.blocks = new_blocks;
-                self.center.go_left();
-            }
+    pub fn left(&mut self, matrix: &[Vec<Option<Block>>]) {
+        if let Ok(new_blocks) = self.check_possible(matrix, TranslateRotate::left()) {
+            self.blocks = new_blocks;
+            self.center.go_left();
         }
     }
 
-    pub fn right(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
-        match self.check_possible(matrix, TranslateRotate::right()) {
-            Err(()) => {
-                return;
-            }
-            Ok(new_blocks) => {
-                self.blocks = new_blocks;
-                self.center.go_right();
-            }
+    pub fn right(&mut self, matrix: &[Vec<Option<Block>>]) {
+        if let Ok(new_blocks) = self.check_possible(matrix, TranslateRotate::right()) {
+            self.blocks = new_blocks;
+            self.center.go_right();
         }
     }
 
-    pub fn turn_clockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
+    pub fn turn_clockwise(&mut self, matrix: &[Vec<Option<Block>>]) {
         if self.kind == TetrominoKind::O {
             return;
         };
         let wall_kick_translations =
             TetrominoKind::wall_kicks_translations(&self.kind, 1, self.rotation_status);
-        for i in 0..5 {
+        for wall_kick in &wall_kick_translations {
             match self.check_possible(
                 matrix,
-                TranslateRotate::new(wall_kick_translations[i], 1, &self.center),
+                TranslateRotate::new(*wall_kick, 1, &self.center),
             ) {
                 Err(()) => {
                     continue;
@@ -136,23 +126,23 @@ impl Tetromino {
                 Ok(new_blocks) => {
                     self.blocks = new_blocks;
                     self.rotation_status.clockwise();
-                    self.center.translate(&wall_kick_translations[i]);
+                    self.center.translate(wall_kick);
                     return;
                 }
             }
         }
     }
 
-    pub fn turn_counterclockwise(&mut self, matrix: &Vec<Vec<Option<Block>>>) {
+    pub fn turn_counterclockwise(&mut self, matrix: &[Vec<Option<Block>>]) {
         if self.kind == TetrominoKind::O {
             return;
         };
         let wall_kick_translations =
             TetrominoKind::wall_kicks_translations(&self.kind, -1, self.rotation_status);
-        for i in 0..5 {
+        for wall_kick in &wall_kick_translations {
             match self.check_possible(
                 matrix,
-                TranslateRotate::new(wall_kick_translations[i], -1, &self.center),
+                TranslateRotate::new(*wall_kick, -1, &self.center),
             ) {
                 Err(()) => {
                     continue;
@@ -160,7 +150,7 @@ impl Tetromino {
                 Ok(new_blocks) => {
                     self.blocks = new_blocks;
                     self.rotation_status.counterclockwise();
-                    self.center.translate(&wall_kick_translations[i]);
+                    self.center.translate(wall_kick);
                     return;
                 }
             }
@@ -169,7 +159,7 @@ impl Tetromino {
 
     pub fn check_possible(
         &self,
-        matrix: &Vec<Vec<Option<Block>>>,
+        matrix: &[Vec<Option<Block>>],
         movement: TranslateRotate,
     ) -> Result<[Block; 4], ()> {
         let mut new_blocks = vec![];

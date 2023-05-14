@@ -1,8 +1,7 @@
 use crate::assets::Assets;
-use crate::local_player::KeyPress;
 use crate::settings::{NB_NEXT_TETROMINO, BLOCK_SIZE};
 use crate::{
-    tetris_grid::TetrisGrid, tetromino::Tetromino, local_player::Player,
+    tetris_grid::TetrisGrid, tetromino::Tetromino,
 };
 use circular_buffer::CircularBuffer;
 use graphics::{Context, color, Transformed};
@@ -15,7 +14,6 @@ pub struct RemotePlayer {
     active_tetromino: Tetromino,
     saved_tetromino: Option<Tetromino>,
     fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>, // push_back / pop_front
-    game_over: bool,
 }
 
 impl RemotePlayer {
@@ -31,19 +29,19 @@ impl RemotePlayer {
             )
             .unwrap();
 
-        self.grid.render(args, &ctx, gl, &assets);
+        self.grid.render(args, &ctx, gl, assets);
 
         self.active_tetromino
-            .render(self.grid.transform, &ctx, gl, &assets);
+            .render(self.grid.transform, &ctx, gl, assets);
 
         if let Some(saved) = self.saved_tetromino {
             let transform = ctx.transform.trans(-70.0, 50.0);
-            saved.render(transform, &ctx, gl, &assets);
+            saved.render(transform, &ctx, gl, assets);
         }
 
         for i in 0..NB_NEXT_TETROMINO {
             let transform = ctx.transform.trans(BLOCK_SIZE * 16.0, 5.0 * BLOCK_SIZE + 4.0 * BLOCK_SIZE * i as f64);
-            self.fifo_next_tetromino.get(i).unwrap().render(transform, &ctx, gl, &assets);
+            self.fifo_next_tetromino.get(i).unwrap().render(transform, &ctx, gl, assets);
         }
     }
 }
