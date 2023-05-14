@@ -1,7 +1,18 @@
-#[derive(Clone, Copy, Debug)]
+use serde::Serialize;
+
+#[derive(Clone, Copy, Debug, Serialize)]
 pub struct Point {
     pub x: i8,
     pub y: i8,
+}
+
+impl Default for Point {
+    fn default() -> Self {
+        Point {
+            x: 0,
+            y: 0,
+        }
+    }
 }
 
 impl Point {

@@ -3,8 +3,9 @@ use crate::point::Point;
 use crate::rotation::Rotation;
 use rand::prelude::SliceRandom;
 use rand::thread_rng;
+use serde::Serialize;
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(PartialEq, Copy, Clone, Serialize)]
 pub enum TetrominoKind {
     I,
     O,

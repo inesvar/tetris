@@ -1,11 +1,22 @@
+use serde::Serialize;
+
 use crate::assets::TetrisColor;
 use crate::point::{Point, Transformable};
 use crate::translate_rotate::TranslateRotate;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize)]
 pub struct Block {
     pub(crate) color: TetrisColor,
     pub position: Point,
+}
+
+impl Default for Block {
+    fn default() -> Self {
+        Block {
+            color: TetrisColor::YELLOW,
+            position: Point::default(),
+        }
+    }
 }
 
 impl Block {
