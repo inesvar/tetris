@@ -73,5 +73,6 @@ impl TetrisGrid {
                 *cell = None;
             }
         }
+        self.line_sum = vec![0; self.nb_rows as usize];
     }
 }
