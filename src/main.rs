@@ -11,8 +11,6 @@ use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
 use piston::{Button, PressEvent, ReleaseEvent};
 use tetromino::Tetromino;
-use tetromino_kind::TetrominoKind;
-use translate_rotate::TranslateRotate;
 
 mod app;
 mod assets;

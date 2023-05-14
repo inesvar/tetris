@@ -49,7 +49,7 @@ impl Transformable for Block {
 pub trait Collision {
     fn move_to(
         &self,
-        matrix: &Vec<Vec<Option<Block>>>,
+        matrix: &[Vec<Option<Block>>],
         movement: &TranslateRotate,
     ) -> Result<Block, ()>;
 }
@@ -57,7 +57,7 @@ pub trait Collision {
 impl Collision for Block {
     fn move_to(
         &self,
-        matrix: &Vec<Vec<Option<Block>>>,
+        matrix: &[Vec<Option<Block>>],
         movement: &TranslateRotate,
     ) -> Result<Block, ()> {
         let mut copy = self.translation(movement.translation);
