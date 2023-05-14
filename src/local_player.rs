@@ -138,7 +138,7 @@ impl Player for LocalPlayer {
             .check_possible(&self.grid.rows, TranslateRotate::fall())
             .is_err()
         {
-            self.grid.freeze_tetromino(&mut self.active_tetromino);
+            self.score += self.grid.freeze_tetromino(&mut self.active_tetromino);
             self.get_new_tetromino();
         }
 
@@ -182,7 +182,7 @@ impl Player for LocalPlayer {
         if self.keyboard.is_any_pressed(&HARD_DROP_KEYS) {
             // hard drop the tetromino
             self.active_tetromino.hard_drop(&self.grid.rows);
-            self.grid.freeze_tetromino(&mut self.active_tetromino);
+            self.score += self.grid.freeze_tetromino(&mut self.active_tetromino);
             self.get_new_tetromino();
         }
 
