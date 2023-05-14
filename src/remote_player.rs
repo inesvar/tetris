@@ -3,7 +3,7 @@ use crate::settings::{NB_NEXT_TETROMINO, BLOCK_SIZE};
 use crate::{
     tetris_grid::TetrisGrid, tetromino::Tetromino,
 };
-use circular_buffer::CircularBuffer;
+use crate::circular_buffer::CircularBuffer;
 use graphics::{Context, color, Transformed};
 use opengl_graphics::GlGraphics;
 use piston::{RenderArgs};
@@ -13,7 +13,7 @@ pub struct RemotePlayer {
     score: u64,
     active_tetromino: Tetromino,
     saved_tetromino: Option<Tetromino>,
-    fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>, // push_back / pop_front
+    fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>,
 }
 
 impl RemotePlayer {

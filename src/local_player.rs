@@ -1,3 +1,5 @@
+use std::net::TcpStream;
+
 use crate::assets::Assets;
 use crate::settings::*;
 use crate::translate_rotate::TranslateRotate;
@@ -5,13 +7,15 @@ use crate::{
     keyboard::Keyboard, tetris_grid::TetrisGrid, tetromino::Tetromino,
     tetromino_kind::TetrominoKind,
 };
-use circular_buffer::CircularBuffer;
+use crate::circular_buffer::CircularBuffer;
 use graphics::{color, Transformed};
 use opengl_graphics::GlGraphics;
 use piston::Key;
 use piston_window::Context;
 use piston_window::RenderArgs;
+use serde::{Serialize};
 
+#[derive(Serialize)]
 pub struct LocalPlayer {
     pub grid: TetrisGrid,
     pub score: u64,
@@ -21,7 +25,7 @@ pub struct LocalPlayer {
     keyboard: Keyboard,
     freeze_frame: u64,
     bag_of_tetromino: Vec<TetrominoKind>,
-    fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>, // push_back / pop_front
+    fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
     pub game_over: bool,
 }
 
@@ -44,11 +48,11 @@ impl LocalPlayer {
         let mut fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
         for _ in 0..NB_NEXT_TETROMINO {
             if let Some(t) = bag_of_tetromino.pop() {
-                fifo_next_tetromino.push_back(Tetromino::new(t));
+                fifo_next_tetromino.push(Tetromino::new(t));
             } else {
                 bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
                 if let Some(t) = bag_of_tetromino.pop() {
-                    fifo_next_tetromino.push_back(Tetromino::new(t));
+                    fifo_next_tetromino.push(Tetromino::new(t));
                 } else {
                     unreachable!();
                 }
@@ -73,13 +77,22 @@ impl LocalPlayer {
         if self.bag_of_tetromino.is_empty() {
             self.bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
         }
-        let possible_active = self.fifo_next_tetromino.pop_front().unwrap();
-        self.fifo_next_tetromino.push_back(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
-        if possible_active.check_possible(&self.grid.rows, TranslateRotate::null()).is_err() {
+        let possible_active = self.fifo_next_tetromino.pop().unwrap();
+        self.fifo_next_tetromino
+            .push(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
+        if possible_active
+            .check_possible(&self.grid.rows, TranslateRotate::null())
+            .is_err()
+        {
             self.game_over = true;
             return;
         }
         self.active_tetromino = possible_active;
+    }
+
+    pub fn send_serialized(&self) {
+        let stream = TcpStream::connect("127.0.0.1:8000").unwrap();
+        //serde_cbor::to_writer::<TcpStream, LocalPlayer>(stream, &self).unwrap();
     }
 }
 
@@ -95,7 +108,13 @@ impl Player for LocalPlayer {
         self.game_over
     }
 
-    fn render(&mut self, ctx: Context, gl: &mut GlGraphics, args: &RenderArgs, assets: &mut Assets) {
+    fn render(
+        &mut self,
+        ctx: Context,
+        gl: &mut GlGraphics,
+        args: &RenderArgs,
+        assets: &mut Assets,
+    ) {
         let score_transform = ctx.transform.trans(0.0, 250.0);
         graphics::text::Text::new_color(color::WHITE, 16)
             .draw(
@@ -109,7 +128,8 @@ impl Player for LocalPlayer {
 
         self.grid.render(args, &ctx, gl, assets);
 
-        self.ghost_tetromino.render(self.grid.transform, &ctx, gl, assets);
+        self.ghost_tetromino
+            .render(self.grid.transform, &ctx, gl, assets);
 
         self.active_tetromino
             .render(self.grid.transform, &ctx, gl, assets);
@@ -120,8 +140,14 @@ impl Player for LocalPlayer {
         }
 
         for i in 0..NB_NEXT_TETROMINO {
-            let transform = ctx.transform.trans(BLOCK_SIZE * 16.0, 5.0 * BLOCK_SIZE + 4.0 * BLOCK_SIZE * i as f64);
-            self.fifo_next_tetromino.get(i).unwrap().render(transform, &ctx, gl, assets);
+            let transform = ctx.transform.trans(
+                BLOCK_SIZE * 16.0,
+                5.0 * BLOCK_SIZE + 4.0 * BLOCK_SIZE * i as f64,
+            );
+            self.fifo_next_tetromino
+                .get(i)
+                .unwrap()
+                .render(transform, &ctx, gl, assets);
         }
     }
 
@@ -134,9 +160,9 @@ impl Player for LocalPlayer {
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
             && self
-            .active_tetromino
-            .check_possible(&self.grid.rows, TranslateRotate::fall())
-            .is_err()
+                .active_tetromino
+                .check_possible(&self.grid.rows, TranslateRotate::fall())
+                .is_err()
         {
             self.score += self.grid.freeze_tetromino(&mut self.active_tetromino);
             self.get_new_tetromino();

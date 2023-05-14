@@ -1,16 +1,30 @@
+use serde::Serialize;
+
 use crate::block::{Block, Collision};
 use crate::point::{Point, Transformable};
 use crate::rotation::Rotation;
 use crate::tetromino_kind::TetrominoKind;
 use crate::translate_rotate::TranslateRotate;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize)]
 pub struct Tetromino {
     kind: TetrominoKind,
     center: Point,
     pub(crate) blocks: [Block; 4],
     rotation_status: Rotation,
     pub(crate) is_ghost: bool,
+}
+
+impl Default for Tetromino {
+    fn default() -> Self {
+        Tetromino {
+            kind: TetrominoKind::O,
+            center: Point::default(),
+            blocks: [Block::default(); 4],
+            rotation_status: Rotation::R0,
+            is_ghost: false,
+        }
+    }
 }
 
 impl Tetromino {

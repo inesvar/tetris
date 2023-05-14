@@ -3,7 +3,9 @@ use crate::point::Transformable;
 use crate::settings::{BLOCK_SIZE};
 use crate::tetromino::Tetromino;
 use graphics::types::Matrix2d;
+use serde::Serialize;
 
+#[derive(Serialize)]
 pub struct TetrisGrid {
     pub nb_columns: i8,
     pub nb_rows: i8,

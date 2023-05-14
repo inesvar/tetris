@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use crate::settings::KEY_REPEAT_DELAY;
 use piston::Key;
+use serde::Serialize;
 
+#[derive(Serialize)]
 pub struct Keyboard {
     pressed: HashMap<Key, bool>,
 
