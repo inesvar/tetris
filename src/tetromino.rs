@@ -1,4 +1,6 @@
 use serde::Serialize;
+use core::fmt::Display;
+use std::fmt::Formatter;
 
 use crate::block::{Block, Collision};
 use crate::point::{Point, Transformable};
@@ -13,6 +15,12 @@ pub struct Tetromino {
     pub(crate) blocks: [Block; 4],
     rotation_status: Rotation,
     pub(crate) is_ghost: bool,
+}
+
+impl Display for Tetromino {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.kind.get())
+    }
 }
 
 impl Default for Tetromino {
