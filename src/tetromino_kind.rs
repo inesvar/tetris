@@ -17,6 +17,18 @@ pub enum TetrominoKind {
 }
 
 impl TetrominoKind {
+    pub fn get(&self) -> String {
+        match self {
+            TetrominoKind::I => "I".to_owned(),
+            TetrominoKind::O => "O".to_owned(),
+            TetrominoKind::Z => "Z".to_owned(),
+            TetrominoKind::J => "J".to_owned(),
+            TetrominoKind::L => "L".to_owned(),
+            TetrominoKind::T => "T".to_owned(),
+            TetrominoKind::S => "S".to_owned(),
+        }
+    }
+
     pub fn get_initial_position(&self) -> [i8; 10] {
         match self {
             TetrominoKind::I => [4, 1, 3, 1, 4, 1, 5, 1, 6, 1],
@@ -56,6 +68,7 @@ impl TetrominoKind {
         for _ in 0..(size_of_bag % 7) {
             list.pop();
         }
+        //println!("list : {:?}", list);
         for i in 0..size_of_bag {
             match list[i as usize] {
                 0 => tetromino_bag.push(TetrominoKind::I),
