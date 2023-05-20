@@ -9,6 +9,7 @@ use crate::settings::{BLOCK_SIZE, GRID_COLOR, GRID_THICKNESS};
 use crate::tetris_grid::TetrisGrid;
 use crate::graphics::Transformed;
 
+// TODO : réfléchir à une façon de la rendre &self au lieu de &mut self
 impl TetrisGrid {
     pub fn render(
         &mut self,

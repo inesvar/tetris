@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use core::fmt::Display;
 use std::fmt::Formatter;
 
@@ -8,7 +8,7 @@ use crate::rotation::Rotation;
 use crate::tetromino_kind::TetrominoKind;
 use crate::translate_rotate::TranslateRotate;
 
-#[derive(Clone, Copy, Serialize)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Tetromino {
     kind: TetrominoKind,
     center: Point,

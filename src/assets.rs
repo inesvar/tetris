@@ -1,8 +1,8 @@
 use opengl_graphics::*;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use std::path::PathBuf;
 
-#[derive(Clone, Copy, Serialize)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 pub enum TetrisColor {
     CYAN,
     YELLOW,

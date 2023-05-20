@@ -1,7 +1,7 @@
-use crate::local_player::{LocalPlayer, Player, KeyPress};
-use crate::remote_player::RemotePlayer;
-use crate::Assets;
+use crate::local_player::{KeyPress, LocalPlayer, Player, self};
+use crate::basic_player::RemotePlayer;
 use crate::settings::*;
+use crate::Assets;
 use graphics::color;
 use graphics::Transformed;
 use opengl_graphics::{GlGraphics, OpenGL};
@@ -12,6 +12,7 @@ pub enum PlayerConfig {
     OneLocal,
     TwoLocal,
     OneLocalOneRemote,
+    OneRemote,
 }
 
 pub struct App<'a> {
@@ -26,20 +27,35 @@ pub struct App<'a> {
 }
 
 impl App<'_> {
-    pub fn new(gl_version: OpenGL) -> App<'static> {
+    pub fn new(gl_version: OpenGL, player_config: PlayerConfig) -> App<'static> {
         let assets_folder = find_folder::Search::ParentsThenKids(3, 3)
             .for_folder("assets")
             .unwrap();
+        
+        let mut local_player: LocalPlayer;
+        let mut remote_player: RemotePlayer;
+        let mut players: Vec<LocalPlayer>;
+        let mut rem_players: Vec<RemotePlayer>;
 
-        let player1 = LocalPlayer::new();
-        let players: Vec<LocalPlayer> = vec![player1];
-        let rem_players: Vec<RemotePlayer> = vec!();
+        match player_config {
+            PlayerConfig::OneLocal => {
+                local_player = LocalPlayer::new();
+                players = vec![local_player];
+                rem_players = vec![];
+            }
+            PlayerConfig::OneRemote => {
+                remote_player = RemotePlayer::new();
+                players = vec![];
+                rem_players = vec![remote_player];
+            }
+            _ => todo!(),
+        }
 
         App {
             gl: GlGraphics::new(gl_version),
             local_players: players,
             remote_players: rem_players,
-            player_config: PlayerConfig::OneLocal,
+            player_config,
             assets: Assets::new(assets_folder),
             clock: 0.0,
             frame_counter: 0,
@@ -91,7 +107,7 @@ impl App<'_> {
                     gl,
                 )
                 .unwrap();
-            
+
             for player in &mut self.local_players {
                 player.render(ctx, gl, args, &mut self.assets);
             }
@@ -116,12 +132,14 @@ impl App<'_> {
         let mut restart = false;
         for player in &mut self.local_players {
             match player.handle_key_press(key, self.running) {
-                KeyPress::Restart => {restart = true;},
-                KeyPress::Other => {},
+                KeyPress::Restart => {
+                    restart = true;
+                }
+                KeyPress::Other => {}
             }
         }
         if restart {
-            self.running = true; 
+            self.running = true;
             self.clock = 0.0;
             for player in &mut self.local_players {
                 player.restart();
@@ -136,6 +154,4 @@ impl App<'_> {
             }
         }
     }
-
-
 }
