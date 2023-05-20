@@ -3,12 +3,12 @@ use crate::point::Transformable;
 use crate::settings::{BLOCK_SIZE};
 use crate::tetromino::Tetromino;
 use graphics::types::Matrix2d;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct TetrisGrid {
-    pub nb_columns: i8,
-    pub nb_rows: i8,
+    pub nb_columns: u32,
+    pub nb_rows: u32,
     pub rows: Vec<Vec<Option<Block>>>,
     pub line_sum: Vec<u8>,
     pub total_width: f64,
@@ -19,7 +19,7 @@ pub struct TetrisGrid {
 }
 
 impl TetrisGrid {
-    pub fn new(nb_columns: i8, nb_rows: i8) -> TetrisGrid {
+    pub fn new(nb_columns: u32, nb_rows: u32) -> TetrisGrid {
         let mut rows = Vec::with_capacity(nb_rows as usize);
         for _ in 0..nb_rows {
             rows.push(vec![None; nb_columns as usize]);

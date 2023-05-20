@@ -13,19 +13,19 @@ use opengl_graphics::GlGraphics;
 use piston::Key;
 use piston_window::Context;
 use piston_window::RenderArgs;
-use serde::{Serialize};
+use serde::{Serialize, Deserialize};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct LocalPlayer {
     pub grid: TetrisGrid,
     pub score: u64,
-    active_tetromino: Tetromino,
+    pub active_tetromino: Tetromino,
     ghost_tetromino: Tetromino,
-    saved_tetromino: Option<Tetromino>,
+    pub saved_tetromino: Option<Tetromino>,
     keyboard: Keyboard,
     freeze_frame: u64,
     bag_of_tetromino: Vec<TetrominoKind>,
-    fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
+    pub fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
     pub game_over: bool,
 }
 
@@ -92,7 +92,7 @@ impl LocalPlayer {
 
     pub fn send_serialized(&self) {
         let stream = TcpStream::connect("127.0.0.1:8000").unwrap();
-        //serde_cbor::to_writer::<TcpStream, LocalPlayer>(stream, &self).unwrap();
+        serde_cbor::to_writer::<TcpStream, LocalPlayer>(stream, &self).unwrap();
     }
 }
 

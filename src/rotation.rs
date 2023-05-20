@@ -1,6 +1,6 @@
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Copy, Serialize)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 pub enum Rotation {
     R0,
     R1,
