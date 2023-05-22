@@ -91,8 +91,12 @@ impl LocalPlayer {
     }
 
     pub fn send_serialized(&self) {
-        let stream = TcpStream::connect("127.0.0.1:8000").unwrap();
-        serde_cbor::to_writer::<TcpStream, LocalPlayer>(stream, &self).unwrap();
+        println!("trying to connect...");
+        if let Ok(stream) = TcpStream::connect("127.0.0.1:16000") {
+            println!("connected");
+            serde_cbor::to_writer::<TcpStream, LocalPlayer>(stream, &self).unwrap();
+            println!("sent");
+        }
     }
 }
 
@@ -185,6 +189,8 @@ impl Player for LocalPlayer {
                 self.active_tetromino.right(&self.grid.rows);
             }
         }
+        println!("got there at least");
+        self.send_serialized();
     }
 
     fn handle_key_press(&mut self, key: Key, running: bool) -> KeyPress {
