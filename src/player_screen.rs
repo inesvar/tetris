@@ -1,13 +1,8 @@
-use crate::assets::Assets;
-use crate::settings::{NB_NEXT_TETROMINO, BLOCK_SIZE, NB_COLUMNS, NB_ROWS};
-use crate::{
-    tetris_grid::TetrisGrid, tetromino::Tetromino,
-};
 use crate::circular_buffer::CircularBuffer;
-use graphics::{Context, color, Transformed};
-use opengl_graphics::GlGraphics;
-use piston::{RenderArgs};
-use serde::{Serialize, Deserialize};
+use crate::settings::{NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS};
+use crate::{tetris_grid::TetrisGrid, tetromino::Tetromino};
+
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct PlayerScreen {
@@ -15,16 +10,21 @@ pub struct PlayerScreen {
     pub score: u64,
     pub active_tetromino: Tetromino,
     pub saved_tetromino: Option<Tetromino>,
-    pub fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>,
+    pub fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
 }
 
 impl PlayerScreen {
     pub fn new() -> Self {
-        let mut player = PlayerScreen { grid:  TetrisGrid::new(NB_COLUMNS, NB_ROWS), score: 0, active_tetromino: Tetromino::default(), saved_tetromino: None, fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new() };
-        player
+        PlayerScreen {
+            grid: TetrisGrid::new(NB_COLUMNS, NB_ROWS),
+            score: 0,
+            active_tetromino: Tetromino::default(),
+            saved_tetromino: None,
+            fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new(),
+        }
     }
 
-    pub fn render(&mut self, ctx: Context, gl: &mut GlGraphics, args: &RenderArgs, assets: &mut Assets) {
+    /* pub fn render(&mut self, ctx: Context, gl: &mut GlGraphics, args: &RenderArgs, assets: &mut Assets) {
         let score_transform = ctx.transform.trans(0.0, 250.0);
         graphics::text::Text::new_color(color::WHITE, 16)
             .draw(
@@ -50,5 +50,5 @@ impl PlayerScreen {
             let transform = ctx.transform.trans(BLOCK_SIZE * 16.0, 5.0 * BLOCK_SIZE + 4.0 * BLOCK_SIZE * i as f64);
             self.fifo_next_tetromino.get(i).unwrap().render(transform, &ctx, gl, assets);
         }
-    }
+    } */
 }

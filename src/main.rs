@@ -59,13 +59,12 @@ fn main() {
     // Check the command line arguments.
     let args = Args::parse();
 
-    let mut config: PlayerConfig;
-    match (args.two_players, args.receive_remote) {
-        (false, false) => { println!("one player"); config = PlayerConfig::OneLocal},
-        (false, true) => { println!("server role"); config = PlayerConfig::OneRemote},
-        (true, false) => { println!("two local players UNIMPLEMENTED YET"); config = PlayerConfig::TwoLocal},
-        _ => config = { println!("one local one remote player UNIMPLEMENTED YET"); PlayerConfig::OneLocalOneRemote},
-    }
+    let config: PlayerConfig = match (args.two_players, args.receive_remote) {
+        (false, false) => { println!("one player"); PlayerConfig::OneLocal},
+        (false, true) => { println!("server role"); PlayerConfig::OneRemote},
+        (true, false) => { println!("two local players UNIMPLEMENTED YET"); PlayerConfig::TwoLocal},
+        _ => { println!("one local one remote player UNIMPLEMENTED YET"); PlayerConfig::OneLocalOneRemote},
+    };
     // Create a new game and run it.
     let mut app = App::new(OPENGL_VERSION, config);
 

@@ -3,12 +3,10 @@ use std::thread;
 use std::sync::{Mutex, Arc};
 
 use crate::assets::Assets;
-use crate::local_player::Player;
-use crate::settings::{NB_NEXT_TETROMINO, BLOCK_SIZE, NB_COLUMNS, NB_ROWS};
+use crate::settings::{NB_NEXT_TETROMINO, BLOCK_SIZE};
 use crate::{
-    tetris_grid::TetrisGrid, tetromino::Tetromino, local_player::LocalPlayer, player_screen::PlayerScreen,
+    player_screen::PlayerScreen,
 };
-use crate::circular_buffer::CircularBuffer;
 use graphics::{Context, color, Transformed};
 use opengl_graphics::GlGraphics;
 use piston::{RenderArgs};
@@ -16,7 +14,6 @@ use piston::{RenderArgs};
 pub struct RemotePlayer {
     update_screen: Arc<Mutex<PlayerScreen>>,
     render_screen: Arc<Mutex<PlayerScreen>>,
-    listener: TcpListener,
     fresh: Arc<Mutex<bool>>,
 }
 
@@ -27,7 +24,6 @@ impl RemotePlayer {
         RemotePlayer {
             update_screen: arc,
             render_screen: arc2,
-            listener: TcpListener::bind("127.0.0.1:8000").unwrap(), // TODO : faire un unwrap or cohérent
             fresh: Arc::new(Mutex::new(false)),
         }
     }
@@ -35,7 +31,7 @@ impl RemotePlayer {
     pub fn listen(&self) {
         let screen = Arc::clone(&self.update_screen);
         let fresh = Arc::clone(&self.fresh);
-        let listener = TcpListener::bind("127.0.0.1:16000").unwrap();
+        let listener = TcpListener::bind("172.16.1.19:16000").unwrap();
         thread::spawn(move || {
             for stream in listener.incoming() {
                 let stream = stream.unwrap();
@@ -77,7 +73,7 @@ impl RemotePlayer {
 
         self.render_screen.lock().unwrap().grid.render(args, &ctx, gl, assets);
         {
-            let mut render = self.render_screen.lock().unwrap();
+            let render = self.render_screen.lock().unwrap();
             render.active_tetromino
             .render(render.grid.transform, &ctx, gl, assets);
         }
