@@ -1,5 +1,6 @@
 use crate::local_player::{KeyPress, LocalPlayer, Player, self};
-use crate::basic_player::RemotePlayer;
+use crate::player_screen::PlayerScreen;
+use crate::remote_player::RemotePlayer;
 use crate::settings::*;
 use crate::Assets;
 use graphics::color;
@@ -51,7 +52,7 @@ impl App<'_> {
             _ => todo!(),
         }
 
-        App {
+        let app = App {
             gl: GlGraphics::new(gl_version),
             local_players: players,
             remote_players: rem_players,
@@ -60,7 +61,12 @@ impl App<'_> {
             clock: 0.0,
             frame_counter: 0,
             running: true,
+        };
+        match app.player_config {
+            PlayerConfig::OneRemote => app.remote_players[0].listen(),
+            _ => {},
         }
+        app
     }
 
     pub(crate) fn render(&mut self, args: &RenderArgs) {

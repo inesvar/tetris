@@ -23,7 +23,7 @@ mod circular_buffer;
 mod keyboard;
 mod local_player;
 mod point;
-mod basic_player;
+mod remote_player;
 mod render;
 mod rotation;
 mod settings;
