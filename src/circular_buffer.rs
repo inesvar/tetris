@@ -47,7 +47,7 @@ impl<const K: usize, T: Default + Copy + Serialize + for <'a> Deserialize<'a> + 
         if self.size != 0 {
             let pop = self.array[self.begin];
             self.begin += 1;
-            self.begin = self.begin%K;
+            self.begin %= K;
             self.size -= 1;
             Some(pop)
         } else {

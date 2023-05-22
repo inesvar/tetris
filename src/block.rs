@@ -13,7 +13,7 @@ pub struct Block {
 impl Default for Block {
     fn default() -> Self {
         Block {
-            color: TetrisColor::YELLOW,
+            color: TetrisColor::Yellow,
             position: Point::default(),
         }
     }
