@@ -42,6 +42,8 @@ pub struct App<'a> {
     restart_text: Text,
     timer_text: Text,
 
+    pub cursor_position: [f64; 2],
+
     main_menu: MainMenu,
 }
 
@@ -85,6 +87,8 @@ impl App<'_> {
             clock: 0.0,
             frame_counter: 0,
             running: true,
+
+            cursor_position: [0.0, 0.0],
 
             main_menu: MainMenu::new(),
         };
@@ -168,10 +172,16 @@ impl App<'_> {
     }
 
     pub fn handle_mouse_press(&self, button: MouseButton) {
-        todo!()
+        match self.view_state {
+            ViewState::Main => self.main_menu.handle_mouse_press(button),
+            _ => {}
+        }
     }
 
     pub fn handle_mouse_release(&self, button: MouseButton) {
-        todo!()
+        match self.view_state {
+            ViewState::Main => self.main_menu.handle_mouse_release(button),
+            _ => {}
+        }
     }
 }

@@ -1,3 +1,4 @@
+use piston::MouseButton;
 use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 use crate::ui::button::Button;
 
@@ -16,5 +17,13 @@ impl MainMenu {
                 String::from("Create new single-player game"),
             )
         }
+    }
+
+    pub fn handle_mouse_press(&self, button: MouseButton) {
+        todo!()
+    }
+
+    pub fn handle_mouse_release(&self, button: MouseButton) {
+        todo!()
     }
 }
