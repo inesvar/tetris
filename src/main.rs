@@ -8,7 +8,7 @@ use app::PlayerConfig;
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
-use piston::{Button, PressEvent, ReleaseEvent};
+use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent};
 use clap::Parser;
 
 use tetromino::Tetromino;
@@ -93,5 +93,9 @@ fn main() {
         if let Some(Button::Mouse(button)) = e.press_args() {
             app.handle_mouse_release(button);
         }
+
+        e.mouse_cursor(|cursor_position| {
+            app.cursor_position = cursor_position;
+        });
     }
 }
