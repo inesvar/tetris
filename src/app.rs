@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::ops::{Deref, DerefMut};
 use crate::local_player::{KeyPress, LocalPlayer, Player};
 
 use crate::remote_player::RemotePlayer;
@@ -33,7 +35,7 @@ pub struct App<'a> {
     local_players: Vec<LocalPlayer>,
     remote_players: Vec<RemotePlayer>,
     player_config: PlayerConfig,
-    view_state: ViewState,
+    view_state: RefCell<ViewState>,
     assets: Assets<'a>,
     clock: f64,
     frame_counter: u64,
@@ -74,12 +76,12 @@ impl App<'_> {
 
         let assets = Assets::new(assets_folder);
 
-        let app = App {
+        let mut app = App {
             gl: GlGraphics::new(gl_version),
             local_players: players,
             remote_players: rem_players,
             player_config,
-            view_state: ViewState::Main, //FIXME: should be ViewState::Main but for now the button is not clickable so we would be stuck in the menu
+            view_state: RefCell::new(ViewState::Main), //FIXME: should be ViewState::Main but for now the button is not clickable so we would be stuck in the menu
             assets,
             title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
             restart_text: Text::new(String::from("Press R to restart"), 16, 180.0, 50.0, color::WHITE),
@@ -92,6 +94,9 @@ impl App<'_> {
 
             main_menu: MainMenu::new(),
         };
+
+        app.main_menu.create_single_player_game_button.press_listeners.push(Box::new(|| println!("bruh")));
+
         if let PlayerConfig::OneRemote = app.player_config {
             app.remote_players[0].listen()
         }
@@ -124,7 +129,7 @@ impl App<'_> {
                 player.render(ctx, gl, &mut self.assets);
             }
 
-            match self.view_state {
+            match *self.view_state.borrow() {
                 ViewState::Main => {
                     self.main_menu.render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
@@ -172,14 +177,14 @@ impl App<'_> {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
-        match self.view_state {
+        match *self.view_state.borrow() {
             ViewState::Main => self.main_menu.handle_mouse_press(button, &self.cursor_position),
             _ => {}
         }
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
-        match self.view_state {
+        match *self.view_state.borrow() {
             ViewState::Main => self.main_menu.handle_mouse_release(button, &self.cursor_position),
             _ => {}
         }
