@@ -1,7 +1,11 @@
+use crate::assets::Assets;
 use crate::circular_buffer::CircularBuffer;
-use crate::settings::{NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS};
+use crate::settings::{NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS, BLOCK_SIZE};
 use crate::{tetris_grid::TetrisGrid, tetromino::Tetromino};
 
+use graphics::{Context, Transformed, color};
+use opengl_graphics::GlGraphics;
+use piston::RenderArgs;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -11,20 +15,22 @@ pub struct PlayerScreen {
     pub active_tetromino: Tetromino,
     pub saved_tetromino: Option<Tetromino>,
     pub fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
+    pub ghost_tetromino: Option<Tetromino>,
 }
 
 impl PlayerScreen {
-    pub fn new() -> Self {
+    pub fn empty() -> Self {
         PlayerScreen {
             grid: TetrisGrid::new(NB_COLUMNS, NB_ROWS),
             score: 0,
             active_tetromino: Tetromino::default(),
             saved_tetromino: None,
             fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new(),
+            ghost_tetromino: None,
         }
     }
 
-    /* pub fn render(&mut self, ctx: Context, gl: &mut GlGraphics, args: &RenderArgs, assets: &mut Assets) {
+    pub fn render(&mut self, ctx: Context, gl: &mut GlGraphics, args: &RenderArgs, assets: &mut Assets) {
         let score_transform = ctx.transform.trans(0.0, 250.0);
         graphics::text::Text::new_color(color::WHITE, 16)
             .draw(
@@ -38,6 +44,10 @@ impl PlayerScreen {
 
         self.grid.render(args, &ctx, gl, assets);
 
+        if let Some(ghost) = self.ghost_tetromino {
+            ghost.render(self.grid.transform, &ctx, gl, assets);
+        }
+
         self.active_tetromino
             .render(self.grid.transform, &ctx, gl, assets);
 
@@ -50,5 +60,5 @@ impl PlayerScreen {
             let transform = ctx.transform.trans(BLOCK_SIZE * 16.0, 5.0 * BLOCK_SIZE + 4.0 * BLOCK_SIZE * i as f64);
             self.fifo_next_tetromino.get(i).unwrap().render(transform, &ctx, gl, assets);
         }
-    } */
+    }
 }
