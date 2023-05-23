@@ -19,11 +19,11 @@ impl MainMenu {
         }
     }
 
-    pub fn handle_mouse_press(&self, button: MouseButton) {
-        todo!()
+    pub fn handle_mouse_press(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
+        self.create_single_player_game_button.handle_mouse_press(button, cursor_position);
     }
 
-    pub fn handle_mouse_release(&self, button: MouseButton) {
-        todo!()
+    pub fn handle_mouse_release(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
+        self.create_single_player_game_button.handle_mouse_release(button, cursor_position);
     }
 }

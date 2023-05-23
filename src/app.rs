@@ -79,7 +79,7 @@ impl App<'_> {
             local_players: players,
             remote_players: rem_players,
             player_config,
-            view_state: ViewState::SinglePlayerGame, //FIXME: should be ViewState::Main but for now the button is not clickable so we would be stuck in the menu
+            view_state: ViewState::Main, //FIXME: should be ViewState::Main but for now the button is not clickable so we would be stuck in the menu
             assets,
             title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
             restart_text: Text::new(String::from("Press R to restart"), 16, 180.0, 50.0, color::WHITE),
@@ -171,16 +171,16 @@ impl App<'_> {
         }
     }
 
-    pub fn handle_mouse_press(&self, button: MouseButton) {
+    pub fn handle_mouse_press(&mut self, button: MouseButton) {
         match self.view_state {
-            ViewState::Main => self.main_menu.handle_mouse_press(button),
+            ViewState::Main => self.main_menu.handle_mouse_press(button, &self.cursor_position),
             _ => {}
         }
     }
 
-    pub fn handle_mouse_release(&self, button: MouseButton) {
+    pub fn handle_mouse_release(&mut self, button: MouseButton) {
         match self.view_state {
-            ViewState::Main => self.main_menu.handle_mouse_release(button),
+            ViewState::Main => self.main_menu.handle_mouse_release(button, &self.cursor_position),
             _ => {}
         }
     }

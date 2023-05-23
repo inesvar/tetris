@@ -27,7 +27,7 @@ impl Button {
             self.width / 2.0,
             self.height / 2.0,
         );
-        let button = graphics::Rectangle::new([0.8, 0.8, 0.8, 1.0]);
+        let button = graphics::Rectangle::new(self.background_color);
 
         let button_transform = transform.trans(self.x, self.y);
 
