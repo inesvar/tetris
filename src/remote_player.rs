@@ -8,7 +8,7 @@ use crate::player_screen::PlayerScreen;
 use crate::settings::STREAMER_IP;
 use graphics::Context;
 use opengl_graphics::GlGraphics;
-use piston::{RenderArgs};
+
 use crate::ui::text::Text;
 
 pub struct RemotePlayer {

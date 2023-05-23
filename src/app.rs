@@ -4,11 +4,22 @@ use crate::remote_player::RemotePlayer;
 use crate::settings::*;
 use crate::Assets;
 use graphics::color;
-use graphics::Transformed;
+
 use opengl_graphics::{GlGraphics, OpenGL};
-use piston::{RenderArgs, UpdateArgs};
+use piston::{MouseButton, RenderArgs, UpdateArgs};
 use piston_window::Key;
+use crate::ui::main_menu::MainMenu;
 use crate::ui::text::Text;
+
+pub enum ViewState {
+    Main,
+    Settings,
+    JoinRoom,
+    CreateRoom,
+    SinglePlayerGame,
+    LocalMultiplayerGame,
+    OnlineMultiplayerGame,
+}
 
 pub enum PlayerConfig {
     Local, 
@@ -23,6 +34,7 @@ pub struct App<'a> {
     local_players: Vec<LocalPlayer>,
     remote_players: Vec<RemotePlayer>,
     player_config: PlayerConfig,
+    view_state: ViewState,
     assets: Assets<'a>,
     pub clock: f64,
     frame_counter: u64,
@@ -30,6 +42,10 @@ pub struct App<'a> {
     title_text: Text,
     restart_text: Text,
     timer_text: Text,
+
+    pub cursor_position: [f64; 2],
+
+    main_menu: MainMenu,
 }
 
 impl App<'_> {
@@ -69,6 +85,7 @@ impl App<'_> {
             local_players: players,
             remote_players: rem_players,
             player_config,
+            view_state: ViewState::Main, //FIXME: should be ViewState::Main but for now the button is not clickable so we would be stuck in the menu
             assets,
             title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
             restart_text: Text::new(String::from("Press R to (re)start"), 16, 180.0, 50.0, color::WHITE),
@@ -76,6 +93,10 @@ impl App<'_> {
             clock: 0.0,
             frame_counter: 0,
             running: false,
+
+            cursor_position: [0.0, 0.0],
+
+            main_menu: MainMenu::new(),
         };
         if let PlayerConfig::Viewer = app.player_config {
             app.remote_players[0].listen()
@@ -107,6 +128,13 @@ impl App<'_> {
             }
             for player in &mut self.remote_players {
                 player.render(ctx, gl, &mut self.assets);
+            }
+
+            match self.view_state {
+                ViewState::Main => {
+                    self.main_menu.render(ctx.transform, &ctx, gl, &mut self.assets)
+                }
+                _ => {}
             }
         });
     }
@@ -146,6 +174,20 @@ impl App<'_> {
             for player in &mut self.local_players {
                 player.handle_key_release(key);
             }
+        }
+    }
+
+    pub fn handle_mouse_press(&mut self, button: MouseButton) {
+        match self.view_state {
+            ViewState::Main => self.main_menu.handle_mouse_press(button, &self.cursor_position),
+            _ => {}
+        }
+    }
+
+    pub fn handle_mouse_release(&mut self, button: MouseButton) {
+        match self.view_state {
+            ViewState::Main => self.main_menu.handle_mouse_release(button, &self.cursor_position),
+            _ => {}
         }
     }
 }
