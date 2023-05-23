@@ -14,6 +14,7 @@ use piston::Key;
 use piston_window::Context;
 use piston_window::RenderArgs;
 use serde::{Serialize, Deserialize};
+use crate::ui::text::Text;
 
 #[derive(Serialize, Deserialize)]
 pub struct LocalPlayer {
@@ -119,16 +120,8 @@ impl Player for LocalPlayer {
         args: &RenderArgs,
         assets: &mut Assets,
     ) {
-        let score_transform = ctx.transform.trans(0.0, 250.0);
-        graphics::text::Text::new_color(color::WHITE, 16)
-            .draw(
-                format!("Score: {}", self.score).as_str(),
-                &mut assets.main_font,
-                &ctx.draw_state,
-                score_transform,
-                gl,
-            )
-            .unwrap();
+        let score_text = Text::new(format!("Score: {}", self.score), 16, 0.0, 250.0, color::WHITE);
+        score_text.render(ctx.transform, &ctx, gl, &mut assets.main_font);
 
         self.grid.render(args, &ctx, gl, assets);
 
@@ -190,6 +183,7 @@ impl Player for LocalPlayer {
             }
         }
         println!("got there at least");
+
         self.send_serialized();
     }
 

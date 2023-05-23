@@ -10,6 +10,7 @@ use crate::{
 use graphics::{Context, color, Transformed};
 use opengl_graphics::GlGraphics;
 use piston::{RenderArgs};
+use crate::ui::text::Text;
 
 pub struct RemotePlayer {
     update_screen: Arc<Mutex<PlayerScreen>>,
@@ -60,16 +61,9 @@ impl RemotePlayer {
             }
         }
         println!("got to render");
-        let score_transform = ctx.transform.trans(0.0, 250.0);
-        graphics::text::Text::new_color(color::WHITE, 16)
-            .draw(
-                format!("Score: {}", self.render_screen.lock().unwrap().score).as_str(),
-                &mut assets.main_font,
-                &ctx.draw_state,
-                score_transform,
-                gl,
-            )
-            .unwrap();
+
+        let score_text = Text::new(format!("Score: {}", self.render_screen.lock().unwrap().score), 16, 0.0, 250.0, color::WHITE);
+        score_text.render(ctx.transform, &ctx, gl, &mut assets.main_font);
 
         self.render_screen.lock().unwrap().grid.render(args, &ctx, gl, assets);
         {
