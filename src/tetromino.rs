@@ -11,7 +11,7 @@ use crate::translate_rotate::TranslateRotate;
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Tetromino {
     kind: TetrominoKind,
-    center: Point,
+    pub center: Point,
     pub(crate) blocks: [Block; 4],
     rotation_status: Rotation,
     pub(crate) is_ghost: bool,

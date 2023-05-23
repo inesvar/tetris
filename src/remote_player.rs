@@ -28,7 +28,7 @@ impl RemotePlayer {
             fresh: Arc::new(Mutex::new(false)),
         }
     }
-    
+
     pub fn listen(&self) {
         let screen = Arc::clone(&self.update_screen);
         let fresh = Arc::clone(&self.fresh);
@@ -38,7 +38,7 @@ impl RemotePlayer {
                 let stream = stream.unwrap();
                 let deserialized = serde_cbor::from_reader::<PlayerScreen, TcpStream>(stream).unwrap();
                 println!("unwrapped!!!");
-                
+
                 {
                     let mut screen = screen.lock().unwrap();
                     *screen = deserialized;
@@ -52,9 +52,9 @@ impl RemotePlayer {
     }
 
     pub fn render(&self, ctx: Context, gl: &mut GlGraphics, args: &RenderArgs, assets: &mut Assets) {
-        if ! *self.fresh.lock().unwrap() {
+        if !*self.fresh.lock().unwrap() {
             return;
-        } else  {
+        } else {
             {
                 let mut fresh = self.fresh.lock().unwrap();
                 *fresh = false;
@@ -62,18 +62,17 @@ impl RemotePlayer {
         }
         println!("got to render");
 
-        let score_text = Text::new(format!("Score: {}", self.render_screen.lock().unwrap().score), 16, 0.0, 250.0, color::WHITE);
+        let mut render_screen = self.render_screen.lock().unwrap();
+
+        let score_text = Text::new(format!("Score: {}", render_screen.score), 16, 0.0, 250.0, color::WHITE);
         score_text.render(ctx.transform, &ctx, gl, &mut assets.main_font);
 
-        self.render_screen.lock().unwrap().grid.render(args, ctx.transform, &ctx, gl, assets);
-        {
-            let render = self.render_screen.lock().unwrap();
-            render.active_tetromino
-            .render(render.grid.transform, &ctx, gl, assets);
-        }
-        
-        if let Some(saved) = self.render_screen.lock().unwrap().saved_tetromino {
-            let transform = ctx.transform.trans(-70.0, 50.0);
+        render_screen.grid.render(ctx.transform, &ctx, gl, assets);
+
+        render_screen.active_tetromino.render(render_screen.grid.transform, &ctx, gl, assets);
+
+        if let Some(saved) = render_screen.saved_tetromino {
+            let transform = render_screen.grid.transform.trans(-100.0 - (saved.center.x as f64 * BLOCK_SIZE), 50.0);
             saved.render(transform, &ctx, gl, assets);
         }
 
