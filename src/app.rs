@@ -1,4 +1,4 @@
-use crate::local_player::{KeyPress, LocalPlayer, Player};
+use crate::local_player::{KeyPress, LocalPlayer};
 
 use crate::remote_player::RemotePlayer;
 use crate::settings::*;
@@ -23,7 +23,7 @@ pub struct App<'a> {
     remote_players: Vec<RemotePlayer>,
     player_config: PlayerConfig,
     assets: Assets<'a>,
-    clock: f64,
+    pub clock: f64,
     frame_counter: u64,
     running: bool,
     title_text: Text,
@@ -65,11 +65,11 @@ impl App<'_> {
             player_config,
             assets,
             title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
-            restart_text: Text::new(String::from("Press R to restart"), 16, 180.0, 50.0, color::WHITE),
+            restart_text: Text::new(String::from("Press R to (re)start"), 16, 180.0, 50.0, color::WHITE),
             timer_text: Text::new(String::from("Elapsed: 0.0s"), 16, 0.0, 200.0, color::WHITE),
             clock: 0.0,
             frame_counter: 0,
-            running: true,
+            running: false,
         };
         if let PlayerConfig::OneRemote = app.player_config {
             app.remote_players[0].listen()
@@ -105,13 +105,13 @@ impl App<'_> {
         });
     }
 
-    pub(crate) fn update(&mut self, args: &UpdateArgs) {
+    pub(crate) fn update(&mut self, args: &UpdateArgs, gravity: u64, freeze: u64) {
         // on ne fait pas d'update quand running == false
         if self.running {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             for player in &mut self.local_players {
-                player.update(self.frame_counter);
+                player.update(self.frame_counter, gravity, freeze);
             }
         }
     }
