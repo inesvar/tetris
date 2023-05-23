@@ -3,7 +3,7 @@ use std::net::TcpStream;
 use crate::assets::Assets;
 use crate::circular_buffer::CircularBuffer;
 use crate::player_screen::PlayerScreen;
-use crate::settings::*;
+use crate::{settings::*, once};
 use crate::translate_rotate::TranslateRotate;
 use crate::{
     keyboard::Keyboard, tetris_grid::TetrisGrid, tetromino::Tetromino,
@@ -85,9 +85,10 @@ impl LocalPlayer {
     }
 
     pub fn send_serialized(&self) {
-        if let Ok(stream) = TcpStream::connect("172.0.0.1:16000") {
+        if let Ok(stream) = TcpStream::connect(VIEWER_IP) {
             serde_cbor::to_writer::<TcpStream, PlayerScreen>(stream, &self.player_screen).unwrap();
         }
+        once!("sent serialized data to {}", VIEWER_IP);
     }
 }
 

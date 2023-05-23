@@ -11,10 +11,11 @@ use piston_window::Key;
 use crate::ui::text::Text;
 
 pub enum PlayerConfig {
-    OneLocal,
-    TwoLocal,
-    OneLocalOneRemote,
-    OneRemote,
+    Local, 
+    Streamer,
+    TwoLocal, 
+    TwoRemote,
+    Viewer,
 }
 
 pub struct App<'a> {
@@ -43,12 +44,17 @@ impl App<'_> {
         let rem_players: Vec<RemotePlayer>;
 
         match player_config {
-            PlayerConfig::OneLocal => {
-                local_player = LocalPlayer::new();
+            PlayerConfig::Local => {
+                local_player = LocalPlayer::new(false);
                 players = vec![local_player];
                 rem_players = vec![];
             }
-            PlayerConfig::OneRemote => {
+            PlayerConfig::Streamer => {
+                local_player = LocalPlayer::new(true);
+                players = vec![local_player];
+                rem_players = vec![];
+            }
+            PlayerConfig::Viewer => {
                 remote_player = RemotePlayer::new();
                 players = vec![];
                 rem_players = vec![remote_player];
@@ -71,7 +77,7 @@ impl App<'_> {
             frame_counter: 0,
             running: false,
         };
-        if let PlayerConfig::OneRemote = app.player_config {
+        if let PlayerConfig::Viewer = app.player_config {
             app.remote_players[0].listen()
         }
         app
