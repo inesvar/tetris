@@ -13,7 +13,6 @@ use crate::graphics::Transformed;
 impl TetrisGrid {
     pub fn render(
         &mut self,
-        args: &RenderArgs,
         transform: Matrix2d,
         ctx: &Context,
         gl: &mut GlGraphics,
