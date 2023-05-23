@@ -41,7 +41,7 @@ pub trait Player {
 
 impl LocalPlayer {
     pub fn new() -> Self {
-        let grid = TetrisGrid::new(10, 22);
+        let grid = TetrisGrid::new(150.0, 70.0, NB_COLUMNS, NB_ROWS);
 
         let mut bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
         let first_tetromino =
@@ -123,13 +123,11 @@ impl Player for LocalPlayer {
         let score_text = Text::new(format!("Score: {}", self.score), 16, 0.0, 250.0, color::WHITE);
         score_text.render(ctx.transform, &ctx, gl, &mut assets.main_font);
 
-        self.grid.render(args, &ctx, gl, assets);
+        self.grid.render(args, ctx.transform, &ctx, gl, assets);
 
-        self.ghost_tetromino
-            .render(self.grid.transform, &ctx, gl, assets);
+        self.ghost_tetromino.render(self.grid.transform, &ctx, gl, assets);
 
-        self.active_tetromino
-            .render(self.grid.transform, &ctx, gl, assets);
+        self.active_tetromino.render(self.grid.transform, &ctx, gl, assets);
 
         if let Some(saved) = self.saved_tetromino {
             let transform = ctx.transform.trans(-70.0, 50.0);
@@ -157,9 +155,9 @@ impl Player for LocalPlayer {
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
             && self
-                .active_tetromino
-                .check_possible(&self.grid.rows, TranslateRotate::fall())
-                .is_err()
+            .active_tetromino
+            .check_possible(&self.grid.rows, TranslateRotate::fall())
+            .is_err()
         {
             self.score += self.grid.freeze_tetromino(&mut self.active_tetromino);
             self.get_new_tetromino();
