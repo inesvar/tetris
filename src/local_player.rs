@@ -31,7 +31,7 @@ pub struct LocalPlayer {
 }
 
 pub trait Player {
-    fn render(&mut self, ctx: Context, gl: &mut GlGraphics, args: &RenderArgs, assets: &mut Assets);
+    fn render(&mut self, ctx: Context, gl: &mut GlGraphics, assets: &mut Assets);
     fn update(&mut self, frame_counter: u64);
     fn handle_key_press(&mut self, key: Key, running: bool) -> KeyPress;
     fn handle_key_release(&mut self, key: Key);
@@ -117,7 +117,6 @@ impl Player for LocalPlayer {
         &mut self,
         ctx: Context,
         gl: &mut GlGraphics,
-        args: &RenderArgs,
         assets: &mut Assets,
     ) {
         let score_text = Text::new(format!("Score: {}", self.score), 16, 0.0, 250.0, color::WHITE);
