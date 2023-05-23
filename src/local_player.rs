@@ -14,6 +14,7 @@ use piston::Key;
 use piston_window::Context;
 use piston_window::RenderArgs;
 use serde::{Serialize, Deserialize};
+use crate::ui::button::Button;
 use crate::ui::text::Text;
 
 #[derive(Serialize, Deserialize)]
@@ -93,7 +94,8 @@ impl LocalPlayer {
 
     pub fn send_serialized(&self) {
         println!("trying to connect...");
-        if let Ok(stream) = TcpStream::connect("172.16.2.48:16000") {
+        if let Ok(stream) = TcpStream::connect("127.0.0.1:16000") {
+
             println!("connected");
             serde_cbor::to_writer::<TcpStream, LocalPlayer>(stream, self).unwrap();
             println!("sent");
@@ -143,6 +145,10 @@ impl Player for LocalPlayer {
                 .unwrap()
                 .render(transform, &ctx, gl, assets);
         }
+
+
+        let mut test_button = Button::new(DEFAULT_WINDOW_WIDTH as f64 / 2.0, DEFAULT_WINDOW_HEIGHT as f64 - 30.0, 100.0, 50.0, String::from("CLICK"));
+        test_button.render(ctx.transform, &ctx, gl, assets);
     }
 
     fn update(&mut self, frame_counter: u64) {

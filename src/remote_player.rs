@@ -32,7 +32,7 @@ impl RemotePlayer {
     pub fn listen(&self) {
         let screen = Arc::clone(&self.update_screen);
         let fresh = Arc::clone(&self.fresh);
-        let listener = TcpListener::bind("172.16.1.19:16000").unwrap();
+        let listener = TcpListener::bind("127.0.0.1:16000").unwrap();
         thread::spawn(move || {
             for stream in listener.incoming() {
                 let stream = stream.unwrap();
