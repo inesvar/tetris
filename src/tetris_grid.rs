@@ -7,6 +7,8 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct TetrisGrid {
+    pub x: f64,
+    pub y: f64,
     pub nb_columns: u32,
     pub nb_rows: u32,
     pub rows: Vec<Vec<Option<Block>>>,
@@ -19,7 +21,7 @@ pub struct TetrisGrid {
 }
 
 impl TetrisGrid {
-    pub fn new(nb_columns: u32, nb_rows: u32) -> TetrisGrid {
+    pub fn new(x: f64, y: f64, nb_columns: u32, nb_rows: u32) -> TetrisGrid {
         let mut rows = Vec::with_capacity(nb_rows as usize);
         for _ in 0..nb_rows {
             rows.push(vec![None; nb_columns as usize]);
@@ -27,6 +29,8 @@ impl TetrisGrid {
 
         let line_sum = vec![0; nb_rows as usize];
         TetrisGrid {
+            x,
+            y,
             nb_columns,
             nb_rows,
             rows,

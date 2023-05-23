@@ -13,15 +13,12 @@ use crate::graphics::Transformed;
 impl TetrisGrid {
     pub fn render(
         &mut self,
-        args: &RenderArgs,
+        transform: Matrix2d,
         ctx: &Context,
         gl: &mut GlGraphics,
         assets: &Assets,
     ) {
-        self.transform = ctx.transform.trans(
-            args.window_size[0] / 2.0 - self.total_width / 2.0,
-            args.window_size[1] / 2.0 - self.total_height / 2.0,
-        );
+        self.transform = transform.trans(self.x, self.y);
 
         let empty_dims: Rectangle = [
             0.0,

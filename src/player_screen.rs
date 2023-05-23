@@ -21,7 +21,7 @@ pub struct PlayerScreen {
 impl PlayerScreen {
     pub fn empty() -> Self {
         PlayerScreen {
-            grid: TetrisGrid::new(NB_COLUMNS, NB_ROWS),
+            grid: TetrisGrid::new(150.0, 70.0, NB_COLUMNS, NB_ROWS), //FIXME: this will not always be the case
             score: 0,
             active_tetromino: Tetromino::default(),
             saved_tetromino: None,

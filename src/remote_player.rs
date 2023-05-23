@@ -6,7 +6,8 @@ use crate::assets::Assets;
 use crate::player_screen::PlayerScreen;
 use graphics::Context;
 use opengl_graphics::GlGraphics;
-use piston::RenderArgs;
+use piston::{RenderArgs};
+use crate::ui::text::Text;
 
 pub struct RemotePlayer {
     update_screen: Arc<Mutex<PlayerScreen>>,
@@ -49,13 +50,7 @@ impl RemotePlayer {
         });
     }
 
-    pub fn render(
-        &self,
-        ctx: Context,
-        gl: &mut GlGraphics,
-        args: &RenderArgs,
-        assets: &mut Assets,
-    ) {
+    pub fn render(&self, ctx: Context, gl: &mut GlGraphics, assets: &mut Assets) {
         if !*self.fresh.lock().unwrap() {
             return;
         } else {
@@ -67,7 +62,7 @@ impl RemotePlayer {
         println!("got to render");
         {
             let mut screen = self.render_screen.lock().unwrap();
-            screen.render(ctx, gl, args, assets);
+            screen.render(ctx, gl, assets);
         }
     }
 }
