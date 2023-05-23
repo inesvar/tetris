@@ -145,7 +145,6 @@ impl Player for LocalPlayer {
                 .unwrap()
                 .render(transform, &ctx, gl, assets);
         }
-
     }
 
     fn update(&mut self, frame_counter: u64) {

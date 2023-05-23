@@ -11,7 +11,9 @@ pub struct Button {
     pub height: f64,
     pub text: Text,
     pub pressed: bool,
-    pub background_color: graphics::types::Color
+    pub background_color: graphics::types::Color,
+
+    pub press_listeners: Vec<Box<dyn FnMut() -> ()>>,
 }
 
 impl Button {
@@ -23,7 +25,9 @@ impl Button {
             height,
             text: Text::new(text, 16, 0.0, 0.0, color::BLACK),
             pressed: false,
-            background_color: [0.8, 0.8, 0.8, 1.0]
+            background_color: [0.8, 0.8, 0.8, 1.0],
+
+            press_listeners: Vec::new(),
         }
     }
 
@@ -40,8 +44,11 @@ impl Button {
             MouseButton::Left => {
                 if self.is_clicked(cursor_position[0], cursor_position[1]) {
                     self.background_color = [0.5, 0.5, 0.5, 1.0];
+                    for press_listener in self.press_listeners.iter_mut() {
+                        (press_listener)();
+                    }
                 }
-            },
+            }
             _ => {}
         };
     }
@@ -52,7 +59,7 @@ impl Button {
                 if self.is_clicked(cursor_position[0], cursor_position[1]) {
                     self.background_color = [0.8, 0.8, 0.8, 1.0];
                 }
-            },
+            }
             _ => {}
         }
     }
