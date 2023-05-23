@@ -8,6 +8,7 @@ use graphics::Transformed;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{RenderArgs, UpdateArgs};
 use piston_window::Key;
+use crate::ui::text::Text;
 
 pub enum PlayerConfig {
     OneLocal,
@@ -80,27 +81,11 @@ impl App<'_> {
                 }
             }
             if self.running {
-                let title_transform = ctx.transform.trans(180.0, 50.0);
-                graphics::text::Text::new_color(color::WHITE, 16)
-                    .draw(
-                        "T",
-                        &mut self.assets.tetris_font,
-                        &ctx.draw_state,
-                        title_transform,
-                        gl,
-                    )
-                    .unwrap();
+                let text = Text::new("T".parse().unwrap(), 16, 180.0, 50.0, color::WHITE);
+                text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
             } else {
-                let restart_transform = ctx.transform.trans(180.0, 50.0);
-                graphics::text::Text::new_color(color::WHITE, 16)
-                    .draw(
-                        "Press R to restart",
-                        &mut self.assets.main_font,
-                        &ctx.draw_state,
-                        restart_transform,
-                        gl,
-                    )
-                    .unwrap();
+                let restart_text = Text::new(String::from("Press R to restart"), 16, 180.0, 50.0, color::WHITE);
+                restart_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
             }
 
             let timer_transform = ctx.transform.trans(0.0, 200.0);
