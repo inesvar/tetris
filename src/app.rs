@@ -8,7 +8,18 @@ use graphics::color;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{MouseButton, RenderArgs, UpdateArgs};
 use piston_window::Key;
+use crate::ui::main_menu::MainMenu;
 use crate::ui::text::Text;
+
+pub enum ViewState {
+    Main,
+    Settings,
+    JoinRoom,
+    CreateRoom,
+    SinglePlayerGame,
+    LocalMultiplayerGame,
+    OnlineMultiplayerGame,
+}
 
 pub enum PlayerConfig {
     OneLocal,
@@ -22,6 +33,7 @@ pub struct App<'a> {
     local_players: Vec<LocalPlayer>,
     remote_players: Vec<RemotePlayer>,
     player_config: PlayerConfig,
+    view_state: ViewState,
     assets: Assets<'a>,
     clock: f64,
     frame_counter: u64,
@@ -29,6 +41,8 @@ pub struct App<'a> {
     title_text: Text,
     restart_text: Text,
     timer_text: Text,
+
+    main_menu: MainMenu,
 }
 
 impl App<'_> {
@@ -63,6 +77,7 @@ impl App<'_> {
             local_players: players,
             remote_players: rem_players,
             player_config,
+            view_state: ViewState::SinglePlayerGame, //FIXME: should be ViewState::Main but for now the button is not clickable so we would be stuck in the menu
             assets,
             title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
             restart_text: Text::new(String::from("Press R to restart"), 16, 180.0, 50.0, color::WHITE),
@@ -70,6 +85,8 @@ impl App<'_> {
             clock: 0.0,
             frame_counter: 0,
             running: true,
+
+            main_menu: MainMenu::new(),
         };
         if let PlayerConfig::OneRemote = app.player_config {
             app.remote_players[0].listen()
@@ -101,6 +118,13 @@ impl App<'_> {
             }
             for player in &mut self.remote_players {
                 player.render(ctx, gl, &mut self.assets);
+            }
+
+            match self.view_state {
+                ViewState::Main => {
+                    self.main_menu.render(ctx.transform, &ctx, gl, &mut self.assets)
+                }
+                _ => {}
             }
         });
     }

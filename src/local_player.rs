@@ -146,9 +146,6 @@ impl Player for LocalPlayer {
                 .render(transform, &ctx, gl, assets);
         }
 
-
-        let mut test_button = Button::new(DEFAULT_WINDOW_WIDTH as f64 / 2.0, DEFAULT_WINDOW_HEIGHT as f64 - 30.0, 100.0, 50.0, String::from("CLICK"));
-        test_button.render(ctx.transform, &ctx, gl, assets);
     }
 
     fn update(&mut self, frame_counter: u64) {

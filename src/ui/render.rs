@@ -3,6 +3,7 @@ use graphics::types::Matrix2d;
 use opengl_graphics::{GlGraphics, GlyphCache};
 use crate::assets::Assets;
 use crate::ui::button::Button;
+use crate::ui::main_menu::MainMenu;
 use crate::ui::text::Text;
 
 impl Text {
@@ -33,5 +34,11 @@ impl Button {
         button.draw(dims, &ctx.draw_state, button_transform, gl);
 
         self.text.render(button_transform, ctx, gl, &mut assets.main_font);
+    }
+}
+
+impl MainMenu {
+    pub fn render(&mut self, transform: Matrix2d, ctx: &Context, gl: &mut GlGraphics, assets: &mut Assets) {
+        self.create_single_player_game_button.render(transform, &ctx, gl, assets);
     }
 }

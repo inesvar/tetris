@@ -21,7 +21,7 @@ impl Button {
             y,
             width,
             height,
-            text: Text::new(text, 16, 0.0, 0.0, color::RED),
+            text: Text::new(text, 16, 0.0, 0.0, color::BLACK),
             pressed: false,
         }
     }
