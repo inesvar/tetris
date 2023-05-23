@@ -67,11 +67,13 @@ fn main() {
     };
     // Create a new game and run it.
     let mut app = App::new(OPENGL_VERSION, config);
+    let mut gravity: u64 = 50;
+    let mut freeze: u64 = 50;
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.update_args() {
-            app.update(&args);
+            app.update(&args, gravity, freeze);
         }
 
         if let Some(args) = e.render_args() {
@@ -84,6 +86,14 @@ fn main() {
 
         if let Some(Button::Keyboard(key)) = e.release_args() {
             app.handle_key_release(key);
+        }
+
+        match app.clock {
+            i if i <= 5.0 => {gravity = 50; freeze = 50},
+            i if i <= 10.0 => {gravity = 40; freeze = 50},
+            i if i <= 15.0 => {gravity = 30; freeze = 50},
+            i if i <= 20.0 => {gravity = 20; freeze = 50},
+            _ => {gravity = 10; freeze = 50},
         }
     }
 }

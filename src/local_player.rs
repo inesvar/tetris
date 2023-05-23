@@ -1,6 +1,7 @@
 use std::net::TcpStream;
 
 use crate::assets::Assets;
+use crate::circular_buffer::CircularBuffer;
 use crate::player_screen::PlayerScreen;
 use crate::settings::*;
 use crate::translate_rotate::TranslateRotate;
@@ -8,12 +9,11 @@ use crate::{
     keyboard::Keyboard, tetris_grid::TetrisGrid, tetromino::Tetromino,
     tetromino_kind::TetrominoKind,
 };
-use crate::circular_buffer::CircularBuffer;
 use opengl_graphics::GlGraphics;
 use piston::Key;
 use piston_window::Context;
 use piston_window::RenderArgs;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct LocalPlayer {
@@ -22,15 +22,6 @@ pub struct LocalPlayer {
     freeze_frame: u64,
     bag_of_tetromino: Vec<TetrominoKind>,
     game_over: bool,
-}
-
-pub trait Player {
-    fn render(&mut self, ctx: Context, gl: &mut GlGraphics, args: &RenderArgs, assets: &mut Assets);
-    fn update(&mut self, frame_counter: u64);
-    fn handle_key_press(&mut self, key: Key, running: bool) -> KeyPress;
-    fn handle_key_release(&mut self, key: Key);
-    fn restart(&mut self);
-    fn game_over(&self) -> bool;
 }
 
 impl LocalPlayer {
@@ -66,7 +57,7 @@ impl LocalPlayer {
         LocalPlayer {
             player_screen,
             keyboard: Keyboard::new(),
-            freeze_frame: u64::MAX, // that's about 10 billion years at 60fps
+            freeze_frame: 0, // that's about 10 billion years at 60fps
             bag_of_tetromino,
             game_over: false,
         }
@@ -77,7 +68,8 @@ impl LocalPlayer {
             self.bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
         }
         let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
-        self.player_screen.fifo_next_tetromino
+        self.player_screen
+            .fifo_next_tetromino
             .push(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
         if possible_active
             .check_possible(&self.player_screen.grid.rows, TranslateRotate::null())
@@ -99,19 +91,19 @@ impl LocalPlayer {
     }
 }
 
-impl Player for LocalPlayer {
-    fn restart(&mut self) {
+impl LocalPlayer {
+    pub fn restart(&mut self) {
         self.game_over = false;
         self.player_screen.score = 0;
         self.keyboard = Keyboard::new();
         self.player_screen.grid.null();
     }
 
-    fn game_over(&self) -> bool {
+    pub fn game_over(&self) -> bool {
         self.game_over
     }
 
-    fn render(
+    pub fn render(
         &mut self,
         ctx: Context,
         gl: &mut GlGraphics,
@@ -121,46 +113,65 @@ impl Player for LocalPlayer {
         self.player_screen.render(ctx, gl, args, assets);
     }
 
-    fn update(&mut self, frame_counter: u64) {
+    pub fn update(&mut self, frame_counter: u64, gravity: u64, freeze: u64) {
         self.keyboard.update();
 
         let mut ghost = self.player_screen.active_tetromino.make_ghost_copy();
         ghost.hard_drop(&self.player_screen.grid.rows);
         self.player_screen.ghost_tetromino = Some(ghost);
-        
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
             && self
-                .player_screen.active_tetromino
+                .player_screen
+                .active_tetromino
                 .check_possible(&self.player_screen.grid.rows, TranslateRotate::fall())
                 .is_err()
         {
-            self.player_screen.score += self.player_screen.grid.freeze_tetromino(&mut self.player_screen.active_tetromino);
+            self.player_screen.score += self
+                .player_screen
+                .grid
+                .freeze_tetromino(&mut self.player_screen.active_tetromino);
             self.get_new_tetromino();
         }
 
         // move the tetromino down to emulate its fall
-        if frame_counter % 50 == 0 && self.player_screen.active_tetromino.fall(&self.player_screen.grid.rows).is_err() {
-            self.freeze_frame = frame_counter + 50;
+        if frame_counter % gravity == 0
+            && self
+                .player_screen
+                .active_tetromino
+                .fall(&self.player_screen.grid.rows)
+                .is_err()
+            && self.freeze_frame < frame_counter
+        {
+            self.freeze_frame = frame_counter + freeze;
         }
 
         // Translate the tetromino on long key press
         if frame_counter % 5 == 0 {
             if self.keyboard.is_any_pressed(&FALL_KEYS) {
-                if self.player_screen.active_tetromino.fall(&self.player_screen.grid.rows).is_err() {
-                    self.freeze_frame = frame_counter + 50;
+                if self
+                    .player_screen
+                    .active_tetromino
+                    .fall(&self.player_screen.grid.rows)
+                    .is_err() && self.freeze_frame < frame_counter
+                {
+                    self.freeze_frame = frame_counter + freeze;
                 }
             } else if self.keyboard.is_any_delay_pressed(&LEFT_KEYS) {
-                self.player_screen.active_tetromino.left(&self.player_screen.grid.rows);
+                self.player_screen
+                    .active_tetromino
+                    .left(&self.player_screen.grid.rows);
             } else if self.keyboard.is_any_delay_pressed(&RIGHT_KEYS) {
-                self.player_screen.active_tetromino.right(&self.player_screen.grid.rows);
+                self.player_screen
+                    .active_tetromino
+                    .right(&self.player_screen.grid.rows);
             }
         }
         self.send_serialized();
     }
 
-    fn handle_key_press(&mut self, key: Key, running: bool) -> KeyPress {
+    pub fn handle_key_press(&mut self, key: Key, running: bool) -> KeyPress {
         self.keyboard.set_pressed(key);
 
         if !running && !self.keyboard.is_any_pressed(&RESTART_KEYS) {
@@ -170,16 +181,25 @@ impl Player for LocalPlayer {
         // Pressed once events
         if self.keyboard.is_any_pressed(&ROTATE_CLOCKWISE_KEYS) {
             // rotate once the tetromino
-            self.player_screen.active_tetromino.turn_clockwise(&self.player_screen.grid.rows);
+            self.player_screen
+                .active_tetromino
+                .turn_clockwise(&self.player_screen.grid.rows);
         } else if self.keyboard.is_any_pressed(&ROTATE_COUNTERCLOCKWISE_KEYS) {
             // rotate once the tetromino
-            self.player_screen.active_tetromino.turn_counterclockwise(&self.player_screen.grid.rows);
+            self.player_screen
+                .active_tetromino
+                .turn_counterclockwise(&self.player_screen.grid.rows);
         }
 
         if self.keyboard.is_any_pressed(&HARD_DROP_KEYS) {
             // hard drop the tetromino
-            self.player_screen.active_tetromino.hard_drop(&self.player_screen.grid.rows);
-            self.player_screen.score += self.player_screen.grid.freeze_tetromino(&mut self.player_screen.active_tetromino);
+            self.player_screen
+                .active_tetromino
+                .hard_drop(&self.player_screen.grid.rows);
+            self.player_screen.score += self
+                .player_screen
+                .grid
+                .freeze_tetromino(&mut self.player_screen.active_tetromino);
             self.get_new_tetromino();
         }
 
@@ -199,9 +219,13 @@ impl Player for LocalPlayer {
         }
 
         if self.keyboard.is_any_pressed(&LEFT_KEYS) {
-            self.player_screen.active_tetromino.left(&self.player_screen.grid.rows);
+            self.player_screen
+                .active_tetromino
+                .left(&self.player_screen.grid.rows);
         } else if self.keyboard.is_any_pressed(&RIGHT_KEYS) {
-            self.player_screen.active_tetromino.right(&self.player_screen.grid.rows);
+            self.player_screen
+                .active_tetromino
+                .right(&self.player_screen.grid.rows);
         }
 
         if self.keyboard.is_any_pressed(&RESTART_KEYS) {
@@ -211,7 +235,7 @@ impl Player for LocalPlayer {
         }
     }
 
-    fn handle_key_release(&mut self, key: Key) {
+    pub fn handle_key_release(&mut self, key: Key) {
         self.keyboard.set_released(key);
     }
 }
