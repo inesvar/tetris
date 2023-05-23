@@ -50,8 +50,14 @@ impl PlayerScreen {
         }
 
         for i in 0..NB_NEXT_TETROMINO {
-            let transform = ctx.transform.trans(BLOCK_SIZE * 16.0, 5.0 * BLOCK_SIZE + 4.0 * BLOCK_SIZE * i as f64);
-            self.fifo_next_tetromino.get(i).unwrap().render(transform, &ctx, gl, assets);
+            let transform = self.grid.transform.trans(
+                self.grid.total_width,
+                4.0 * BLOCK_SIZE * (i as f64 + 0.5),
+            );
+            self.fifo_next_tetromino
+                .get(i)
+                .unwrap()
+                .render(transform, &ctx, gl, assets);
         }
     }
 }

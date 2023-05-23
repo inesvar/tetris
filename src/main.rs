@@ -8,7 +8,7 @@ use app::PlayerConfig;
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
-use piston::{Button, PressEvent, ReleaseEvent};
+use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent};
 use clap::Parser;
 
 use tetromino::Tetromino;
@@ -105,7 +105,18 @@ fn main() {
             i if i <= 10.0 => {gravity = 40; freeze = 50},
             i if i <= 15.0 => {gravity = 30; freeze = 50},
             i if i <= 20.0 => {gravity = 20; freeze = 50},
-            _ => {gravity = 10; freeze = 50},
+            _ => {gravity = 15; freeze = 50},
         }
+        if let Some(Button::Mouse(button)) = e.press_args() {
+            app.handle_mouse_press(button);
+        }
+
+        if let Some(Button::Mouse(button)) = e.release_args() {
+            app.handle_mouse_release(button);
+        }
+
+        e.mouse_cursor(|cursor_position| {
+            app.cursor_position = cursor_position;
+        });
     }
 }
