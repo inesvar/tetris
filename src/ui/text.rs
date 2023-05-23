@@ -12,4 +12,8 @@ impl Text {
     pub fn new(text: String, font_size: u32, x: f64, y: f64, color: Color) -> Text {
         Text { x, y, text, font_size, color }
     }
+
+    pub fn set_text(&mut self, text: String) {
+        self.text = text;
+    }
 }

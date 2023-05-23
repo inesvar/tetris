@@ -26,6 +26,9 @@ pub struct App<'a> {
     clock: f64,
     frame_counter: u64,
     running: bool,
+    title_text: Text,
+    restart_text: Text,
+    timer_text: Text,
 }
 
 impl App<'_> {
@@ -33,7 +36,7 @@ impl App<'_> {
         let assets_folder = find_folder::Search::ParentsThenKids(3, 3)
             .for_folder("assets")
             .unwrap();
-        
+
         let local_player: LocalPlayer;
         let remote_player: RemotePlayer;
         let players: Vec<LocalPlayer>;
@@ -53,12 +56,17 @@ impl App<'_> {
             _ => todo!(),
         }
 
+        let assets = Assets::new(assets_folder);
+
         let app = App {
             gl: GlGraphics::new(gl_version),
             local_players: players,
             remote_players: rem_players,
             player_config,
-            assets: Assets::new(assets_folder),
+            assets,
+            title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
+            restart_text: Text::new(String::from("Press R to restart"), 16, 180.0, 50.0, color::WHITE),
+            timer_text: Text::new(String::from("Elapsed: 0.0s"), 16, 0.0, 200.0, color::WHITE),
             clock: 0.0,
             frame_counter: 0,
             running: true,
@@ -80,23 +88,13 @@ impl App<'_> {
                 }
             }
             if self.running {
-                let text = Text::new("T".parse().unwrap(), 16, 180.0, 50.0, color::WHITE);
-                text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
+                self.title_text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
             } else {
-                let restart_text = Text::new(String::from("Press R to restart"), 16, 180.0, 50.0, color::WHITE);
-                restart_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
+                self.restart_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
             }
 
-            let timer_transform = ctx.transform.trans(0.0, 200.0);
-            graphics::text::Text::new_color(color::WHITE, 16)
-                .draw(
-                    format!("Elapsed: {:.2}s", self.clock).as_str(),
-                    &mut self.assets.main_font,
-                    &ctx.draw_state,
-                    timer_transform,
-                    gl,
-                )
-                .unwrap();
+            self.timer_text.set_text(format!("Elapsed: {:.2}s", self.clock));
+            self.timer_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
 
             for player in &mut self.local_players {
                 player.render(ctx, gl, args, &mut self.assets);
