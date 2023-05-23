@@ -4,9 +4,9 @@ use crate::remote_player::RemotePlayer;
 use crate::settings::*;
 use crate::Assets;
 use graphics::color;
-use graphics::Transformed;
+
 use opengl_graphics::{GlGraphics, OpenGL};
-use piston::{RenderArgs, UpdateArgs};
+use piston::{MouseButton, RenderArgs, UpdateArgs};
 use piston_window::Key;
 use crate::ui::text::Text;
 
@@ -141,5 +141,13 @@ impl App<'_> {
                 player.handle_key_release(key);
             }
         }
+    }
+
+    pub fn handle_mouse_press(&self, button: MouseButton) {
+        todo!()
+    }
+
+    pub fn handle_mouse_release(&self, button: MouseButton) {
+        todo!()
     }
 }

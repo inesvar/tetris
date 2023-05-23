@@ -85,5 +85,13 @@ fn main() {
         if let Some(Button::Keyboard(key)) = e.release_args() {
             app.handle_key_release(key);
         }
+
+        if let Some(Button::Mouse(button)) = e.press_args() {
+            app.handle_mouse_press(button);
+        }
+
+        if let Some(Button::Mouse(button)) = e.press_args() {
+            app.handle_mouse_release(button);
+        }
     }
 }
