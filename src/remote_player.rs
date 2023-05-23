@@ -3,7 +3,9 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 
 use crate::assets::Assets;
+use crate::once;
 use crate::player_screen::PlayerScreen;
+use crate::settings::STREAMER_IP;
 use graphics::Context;
 use opengl_graphics::GlGraphics;
 use piston::{RenderArgs};
@@ -29,14 +31,13 @@ impl RemotePlayer {
     pub fn listen(&self) {
         let screen = Arc::clone(&self.update_screen);
         let fresh = Arc::clone(&self.fresh);
-        let listener = TcpListener::bind("127.0.0.1:16000").unwrap();
+        let listener = TcpListener::bind(STREAMER_IP).unwrap();
         thread::spawn(move || {
             for stream in listener.incoming() {
                 let stream = stream.unwrap();
                 let deserialized =
                     serde_cbor::from_reader::<PlayerScreen, TcpStream>(stream).unwrap();
-                println!("unwrapped!!!");
-
+                once!("unwrapped from {}", STREAMER_IP);
                 {
                     let mut screen = screen.lock().unwrap();
                     *screen = deserialized;
@@ -59,10 +60,10 @@ impl RemotePlayer {
                 *fresh = false;
             }
         }
-        println!("got to render");
         {
             let mut screen = self.render_screen.lock().unwrap();
             screen.render(ctx, gl, assets);
         }
+        once!("render was done");
     }
 }

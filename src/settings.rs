@@ -32,3 +32,6 @@ pub static BAG_SIZE: u32 = 14; // typical sizes are 7 and 14, 1 is entirely rand
 // for size 7 * n + k, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
 
 pub const NB_NEXT_TETROMINO: usize = 6;
+
+pub static STREAMER_IP: &str = "127.0.0.1:16000";
+pub static VIEWER_IP: &str = "127.0.0.1:16000";

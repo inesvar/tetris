@@ -17,6 +17,7 @@ use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSIO
 use crate::assets::Assets;
 
 mod app;
+mod macros;
 mod assets;
 mod block;
 mod circular_buffer;
@@ -36,12 +37,18 @@ mod player_screen;
 
 #[derive(Parser, Debug)]
 struct Args {
-    // two players
+    // two local players
+    #[arg(long)]
+    two_local: bool,
+    // two remote player
+    #[arg(long)]
+    two_remote: bool,
+    // sending screen
     #[arg(short, long)]
-    two_players: bool,
-    // remote playing
+    streamer: bool,
+    // viewing remote screen
     #[arg(short, long)]
-    receive_remote: bool,
+    viewer: bool,
 }
 
 // TO CHECK OUT THE COMMAND LINE OPTIONS use the following template
@@ -59,11 +66,16 @@ fn main() {
     // Check the command line arguments.
     let args = Args::parse();
 
-    let config: PlayerConfig = match (args.two_players, args.receive_remote) {
-        (false, false) => { println!("one player"); PlayerConfig::OneLocal},
-        (false, true) => { println!("server role"); PlayerConfig::OneRemote},
-        (true, false) => { println!("two local players UNIMPLEMENTED YET"); PlayerConfig::TwoLocal},
-        _ => { println!("one local one remote player UNIMPLEMENTED YET"); PlayerConfig::OneLocalOneRemote},
+    let config: PlayerConfig = if args.two_local {
+        PlayerConfig::TwoLocal
+    } else if args.two_remote {
+        PlayerConfig::TwoRemote
+    } else if args.streamer {
+        PlayerConfig::Streamer
+    } else if args.viewer {
+        PlayerConfig::Viewer
+    } else {
+        PlayerConfig::Local
     };
     // Create a new game and run it.
     let mut app = App::new(OPENGL_VERSION, config);
