@@ -13,7 +13,8 @@ use opengl_graphics::GlGraphics;
 use piston::Key;
 use piston_window::Context;
 use piston_window::RenderArgs;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::ui::text::Text;
 
 #[derive(Serialize, Deserialize)]
 pub struct LocalPlayer {
@@ -22,11 +23,12 @@ pub struct LocalPlayer {
     freeze_frame: u64,
     bag_of_tetromino: Vec<TetrominoKind>,
     game_over: bool,
+    sender: bool,
 }
 
 impl LocalPlayer {
-    pub fn new() -> Self {
-        let grid = TetrisGrid::new(10, 22);
+    pub fn new(sender: bool) -> Self {
+        let grid = TetrisGrid::new(150.0, 70.0, NB_COLUMNS, NB_ROWS);
 
         let mut bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
         let first_tetromino =
@@ -60,6 +62,7 @@ impl LocalPlayer {
             freeze_frame: 0, // that's about 10 billion years at 60fps
             bag_of_tetromino,
             game_over: false,
+            sender,
         }
     }
 
@@ -82,11 +85,8 @@ impl LocalPlayer {
     }
 
     pub fn send_serialized(&self) {
-        //println!("trying to connect...");
-        if let Ok(stream) = TcpStream::connect("127.0.0.1:16000") {
-            //println!("connected");
+        if let Ok(stream) = TcpStream::connect("172.0.0.1:16000") {
             serde_cbor::to_writer::<TcpStream, PlayerScreen>(stream, &self.player_screen).unwrap();
-            //println!("sent");
         }
     }
 }
@@ -107,10 +107,9 @@ impl LocalPlayer {
         &mut self,
         ctx: Context,
         gl: &mut GlGraphics,
-        args: &RenderArgs,
         assets: &mut Assets,
     ) {
-        self.player_screen.render(ctx, gl, args, assets);
+        self.player_screen.render(ctx, gl, assets);
     }
 
     pub fn update(&mut self, frame_counter: u64, gravity: u64, freeze: u64) {
@@ -168,7 +167,9 @@ impl LocalPlayer {
                     .right(&self.player_screen.grid.rows);
             }
         }
-        self.send_serialized();
+        if self.sender {
+            self.send_serialized();
+        }
     }
 
     pub fn handle_key_press(&mut self, key: Key, running: bool) -> KeyPress {
