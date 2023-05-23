@@ -2,7 +2,7 @@ use graphics::{Context, DrawState, Image, rectangle};
 use graphics::draw_state::Blend;
 use graphics::types::{Matrix2d, Rectangle, Scalar};
 use opengl_graphics::GlGraphics;
-use piston::RenderArgs;
+
 use crate::{Assets, Tetromino};
 use crate::block::Block;
 use crate::settings::{BLOCK_SIZE, GRID_COLOR, GRID_THICKNESS};

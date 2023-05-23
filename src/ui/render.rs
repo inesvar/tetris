@@ -1,4 +1,4 @@
-use graphics::{color, Context, rectangle, Transformed};
+use graphics::{Context, rectangle, Transformed};
 use graphics::types::Matrix2d;
 use opengl_graphics::{GlGraphics, GlyphCache};
 use crate::assets::Assets;

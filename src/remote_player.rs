@@ -9,7 +9,7 @@ use crate::{
 };
 use graphics::{Context, color, Transformed};
 use opengl_graphics::GlGraphics;
-use piston::{RenderArgs};
+
 use crate::ui::text::Text;
 
 pub struct RemotePlayer {
