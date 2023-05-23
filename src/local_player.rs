@@ -17,16 +17,16 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct LocalPlayer {
-    pub grid: TetrisGrid,
-    pub score: u64,
-    pub active_tetromino: Tetromino,
+    grid: TetrisGrid,
+    score: u64,
+    active_tetromino: Tetromino,
     ghost_tetromino: Tetromino,
-    pub saved_tetromino: Option<Tetromino>,
+    saved_tetromino: Option<Tetromino>,
     keyboard: Keyboard,
     freeze_frame: u64,
     bag_of_tetromino: Vec<TetrominoKind>,
-    pub fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
-    pub game_over: bool,
+    fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
+    game_over: bool,
 }
 
 pub trait Player {
@@ -92,9 +92,9 @@ impl LocalPlayer {
 
     pub fn send_serialized(&self) {
         println!("trying to connect...");
-        if let Ok(stream) = TcpStream::connect("127.0.0.1:16000") {
+        if let Ok(stream) = TcpStream::connect("172.16.2.48:16000") {
             println!("connected");
-            serde_cbor::to_writer::<TcpStream, LocalPlayer>(stream, &self).unwrap();
+            serde_cbor::to_writer::<TcpStream, LocalPlayer>(stream, self).unwrap();
             println!("sent");
         }
     }

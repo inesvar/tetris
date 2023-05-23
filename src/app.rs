@@ -1,5 +1,5 @@
-use crate::local_player::{KeyPress, LocalPlayer, Player, self};
-use crate::player_screen::PlayerScreen;
+use crate::local_player::{KeyPress, LocalPlayer, Player};
+
 use crate::remote_player::RemotePlayer;
 use crate::settings::*;
 use crate::Assets;
@@ -34,10 +34,10 @@ impl App<'_> {
             .for_folder("assets")
             .unwrap();
         
-        let mut local_player: LocalPlayer;
-        let mut remote_player: RemotePlayer;
-        let mut players: Vec<LocalPlayer>;
-        let mut rem_players: Vec<RemotePlayer>;
+        let local_player: LocalPlayer;
+        let remote_player: RemotePlayer;
+        let players: Vec<LocalPlayer>;
+        let rem_players: Vec<RemotePlayer>;
 
         match player_config {
             PlayerConfig::OneLocal => {
@@ -63,9 +63,8 @@ impl App<'_> {
             frame_counter: 0,
             running: true,
         };
-        match app.player_config {
-            PlayerConfig::OneRemote => app.remote_players[0].listen(),
-            _ => {},
+        if let PlayerConfig::OneRemote = app.player_config {
+            app.remote_players[0].listen()
         }
         app
     }
