@@ -4,13 +4,13 @@ use std::path::PathBuf;
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub enum TetrisColor {
-    CYAN,
-    YELLOW,
-    RED,
-    BLUE,
-    ORANGE,
-    PURPLE,
-    GREEN,
+    Cyan,
+    Yellow,
+    Red,
+    Blue,
+    Orange,
+    Purple,
+    Green,
 }
 
 pub struct Assets<'a> {
@@ -75,13 +75,13 @@ impl Assets<'_> {
 
     pub fn texture_from_tetris_color(&self, color: &TetrisColor) -> &Texture {
         match color {
-            TetrisColor::BLUE => &self.blue,
-            TetrisColor::CYAN => &self.cyan,
-            TetrisColor::PURPLE => &self.purple,
-            TetrisColor::GREEN => &self.green,
-            TetrisColor::ORANGE => &self.orange,
-            TetrisColor::RED => &self.red,
-            TetrisColor::YELLOW => &self.yellow,
+            TetrisColor::Blue => &self.blue,
+            TetrisColor::Cyan => &self.cyan,
+            TetrisColor::Purple => &self.purple,
+            TetrisColor::Green => &self.green,
+            TetrisColor::Orange => &self.orange,
+            TetrisColor::Red => &self.red,
+            TetrisColor::Yellow => &self.yellow,
         }
     }
 }

@@ -56,10 +56,8 @@ impl TetrisGrid {
 
                 // move all block above down
                 for y2 in 0..=y {
-                    for elm in self.rows[y2 as usize].iter_mut() {
-                        if let Some(block) = elm {
-                            block.go_down();
-                        }
+                    for block in self.rows[y2 as usize].iter_mut().flatten() {
+                        block.go_down();
                     }
                 }
 

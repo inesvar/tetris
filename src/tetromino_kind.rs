@@ -43,13 +43,13 @@ impl TetrominoKind {
 
     pub fn get_color(&self) -> TetrisColor {
         match self {
-            TetrominoKind::I => TetrisColor::CYAN,
-            TetrominoKind::O => TetrisColor::YELLOW,
-            TetrominoKind::Z => TetrisColor::RED,
-            TetrominoKind::J => TetrisColor::BLUE,
-            TetrominoKind::L => TetrisColor::ORANGE,
-            TetrominoKind::T => TetrisColor::PURPLE,
-            TetrominoKind::S => TetrisColor::GREEN,
+            TetrominoKind::I => TetrisColor::Cyan,
+            TetrominoKind::O => TetrisColor::Yellow,
+            TetrominoKind::Z => TetrisColor::Red,
+            TetrominoKind::J => TetrisColor::Blue,
+            TetrominoKind::L => TetrisColor::Orange,
+            TetrominoKind::T => TetrisColor::Purple,
+            TetrominoKind::S => TetrisColor::Green,
         }
     }
 

@@ -1,8 +1,8 @@
-use graphics::{color, Context, rectangle};
-use opengl_graphics::GlGraphics;
-use piston::RenderArgs;
 use crate::assets::Assets;
 use crate::graphics::Transformed;
+use graphics::{color, rectangle, Context};
+use opengl_graphics::GlGraphics;
+use piston::RenderArgs;
 
 pub struct Button {
     pub x: i8,
@@ -12,7 +12,6 @@ pub struct Button {
     pub text: String,
     pub pressed: bool,
 }
-
 
 impl Button {
     pub fn new(x: i8, y: i8, width: i8, height: i8, text: String) -> Self {
@@ -27,18 +26,20 @@ impl Button {
     }
 
     pub fn is_clicked(&self, x: i8, y: i8) -> bool {
-        if x >= self.x && x <= self.x + self.width && y >= self.y && y <= self.y + self.height {
-            true
-        } else {
-            false
-        }
+        x >= self.x && x <= self.x + self.width && y >= self.y && y <= self.y + self.height
     }
 
     pub fn is_pressed(&self) -> bool {
         self.pressed
     }
 
-    pub fn render(&mut self, args: &RenderArgs, ctx: &Context, gl: &mut GlGraphics, assets: &mut Assets) {
+    pub fn render(
+        &mut self,
+        _args: &RenderArgs,
+        ctx: &Context,
+        gl: &mut GlGraphics,
+        assets: &mut Assets,
+    ) {
         let dims = rectangle::rectangle_by_corners(
             self.x as f64,
             self.y as f64,
