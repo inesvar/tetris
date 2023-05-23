@@ -90,7 +90,7 @@ fn main() {
             app.handle_mouse_press(button);
         }
 
-        if let Some(Button::Mouse(button)) = e.press_args() {
+        if let Some(Button::Mouse(button)) = e.release_args() {
             app.handle_mouse_release(button);
         }
 
