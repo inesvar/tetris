@@ -1,6 +1,15 @@
+use graphics::types::Color;
+
 pub struct Text {
-    pub x: i8,
-    pub y: i8,
+    pub x: f64,
+    pub y: f64,
     pub text: String,
-    pub color: u32,
+    pub font_size: u32,
+    pub color: Color,
+}
+
+impl Text {
+    pub fn new(text: String, font_size: u32, x: f64, y: f64, color: Color) -> Text {
+        Text { x, y, text, font_size, color }
+    }
 }
