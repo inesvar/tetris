@@ -51,7 +51,7 @@ impl RemotePlayer {
         });
     }
 
-    pub fn render(&self, ctx: Context, gl: &mut GlGraphics, args: &RenderArgs, assets: &mut Assets) {
+    pub fn render(&self, ctx: Context, gl: &mut GlGraphics, assets: &mut Assets) {
         if !*self.fresh.lock().unwrap() {
             return;
         } else {
