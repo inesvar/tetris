@@ -65,7 +65,7 @@ impl RemotePlayer {
         let score_text = Text::new(format!("Score: {}", self.render_screen.lock().unwrap().score), 16, 0.0, 250.0, color::WHITE);
         score_text.render(ctx.transform, &ctx, gl, &mut assets.main_font);
 
-        self.render_screen.lock().unwrap().grid.render(args, &ctx, gl, assets);
+        self.render_screen.lock().unwrap().grid.render(args, ctx.transform, &ctx, gl, assets);
         {
             let render = self.render_screen.lock().unwrap();
             render.active_tetromino
