@@ -24,10 +24,11 @@ pub enum ViewState {
 }
 
 pub enum PlayerConfig {
-    OneLocal,
-    TwoLocal,
-    OneLocalOneRemote,
-    OneRemote,
+    Local, 
+    Streamer,
+    TwoLocal, 
+    TwoRemote,
+    Viewer,
 }
 
 pub struct App<'a> {
@@ -37,7 +38,7 @@ pub struct App<'a> {
     player_config: PlayerConfig,
     view_state: RefCell<ViewState>,
     assets: Assets<'a>,
-    clock: f64,
+    pub clock: f64,
     frame_counter: u64,
     running: bool,
     title_text: Text,
@@ -61,12 +62,17 @@ impl App<'_> {
         let rem_players: Vec<RemotePlayer>;
 
         match player_config {
-            PlayerConfig::OneLocal => {
-                local_player = LocalPlayer::new();
+            PlayerConfig::Local => {
+                local_player = LocalPlayer::new(false);
                 players = vec![local_player];
                 rem_players = vec![];
             }
-            PlayerConfig::OneRemote => {
+            PlayerConfig::Streamer => {
+                local_player = LocalPlayer::new(true);
+                players = vec![local_player];
+                rem_players = vec![];
+            }
+            PlayerConfig::Viewer => {
                 remote_player = RemotePlayer::new();
                 players = vec![];
                 rem_players = vec![remote_player];
@@ -84,11 +90,11 @@ impl App<'_> {
             view_state: RefCell::new(ViewState::Main), //FIXME: should be ViewState::Main but for now the button is not clickable so we would be stuck in the menu
             assets,
             title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
-            restart_text: Text::new(String::from("Press R to restart"), 16, 180.0, 50.0, color::WHITE),
+            restart_text: Text::new(String::from("Press R to (re)start"), 16, 180.0, 50.0, color::WHITE),
             timer_text: Text::new(String::from("Elapsed: 0.0s"), 16, 0.0, 200.0, color::WHITE),
             clock: 0.0,
             frame_counter: 0,
-            running: true,
+            running: false,
 
             cursor_position: [0.0, 0.0],
 
@@ -97,7 +103,8 @@ impl App<'_> {
 
         app.main_menu.create_single_player_game_button.press_listeners.push(Box::new(|| println!("bruh")));
 
-        if let PlayerConfig::OneRemote = app.player_config {
+        if let PlayerConfig::Viewer = app.player_config {
+
             app.remote_players[0].listen()
         }
         app
@@ -138,13 +145,13 @@ impl App<'_> {
         });
     }
 
-    pub(crate) fn update(&mut self, args: &UpdateArgs) {
+    pub(crate) fn update(&mut self, args: &UpdateArgs, gravity: u64, freeze: u64) {
         // on ne fait pas d'update quand running == false
         if self.running {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             for player in &mut self.local_players {
-                player.update(self.frame_counter);
+                player.update(self.frame_counter, gravity, freeze);
             }
         }
     }
