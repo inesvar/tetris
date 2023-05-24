@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use std::ops::{Deref, DerefMut};
-use crate::local_player::{KeyPress, LocalPlayer, Player};
+use crate::local_player::{KeyPress, LocalPlayer};
 
 use crate::remote_player::RemotePlayer;
 use crate::settings::*;
