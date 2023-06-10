@@ -40,5 +40,8 @@ impl Button {
 impl MainMenu {
     pub fn render(&mut self, transform: Matrix2d, ctx: &Context, gl: &mut GlGraphics, assets: &mut Assets) {
         self.create_single_player_game_button.render(transform, &ctx, gl, assets);
+        self.create_room_button.render(transform, &ctx, gl, assets);
+        self.join_room_button.render(transform, &ctx, gl, assets);
+        self.settings_button.render(transform, &ctx, gl, assets);
     }
 }

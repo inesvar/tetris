@@ -10,10 +10,9 @@ pub struct Button {
     pub width: f64,
     pub height: f64,
     pub text: Text,
-    pub pressed: bool,
     pub background_color: graphics::types::Color,
 
-    pub press_listeners: Vec<Box<dyn FnMut() -> ()>>,
+    is_pressed: bool,
 }
 
 impl Button {
@@ -24,29 +23,28 @@ impl Button {
             width,
             height,
             text: Text::new(text, 16, 0.0, 0.0, color::BLACK),
-            pressed: false,
             background_color: [0.8, 0.8, 0.8, 1.0],
 
-            press_listeners: Vec::new(),
+            is_pressed: false,
         }
     }
 
-    pub fn is_clicked(&self, x: f64, y: f64) -> bool {
+    pub fn are_coords_inside_button(&self, x: f64, y: f64) -> bool {
         x >= self.x - self.width / 2.0 && x <= self.x + self.width / 2.0 && y >= self.y - self.height / 2.0 && y <= self.y + self.height / 2.0
     }
 
     pub fn is_pressed(&self) -> bool {
-        self.pressed
+        self.is_pressed
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
         match button {
             MouseButton::Left => {
-                if self.is_clicked(cursor_position[0], cursor_position[1]) {
+                if self.are_coords_inside_button(cursor_position[0], cursor_position[1]) {
                     self.background_color = [0.5, 0.5, 0.5, 1.0];
-                    for press_listener in self.press_listeners.iter_mut() {
-                        (press_listener)();
-                    }
+                    self.is_pressed = true;
+                } else {
+                    self.is_pressed = false;
                 }
             }
             _ => {}
@@ -56,9 +54,8 @@ impl Button {
     pub fn handle_mouse_release(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
         match button {
             MouseButton::Left => {
-                if self.is_clicked(cursor_position[0], cursor_position[1]) {
-                    self.background_color = [0.8, 0.8, 0.8, 1.0];
-                }
+                self.background_color = [0.8, 0.8, 0.8, 1.0];
+                self.is_pressed = false;
             }
             _ => {}
         }
