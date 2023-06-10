@@ -45,7 +45,7 @@ impl PlayerScreen {
             .render(self.grid.transform, &ctx, gl, assets);
 
         if let Some(saved) = self.saved_tetromino {
-            let transform = self.grid.transform.trans(-100.0 - (saved.center.x as f64 * BLOCK_SIZE), 50.0);
+            let transform = self.grid.transform.trans(- 4.0 * BLOCK_SIZE - (saved.center.x as f64 * BLOCK_SIZE), 2.0 * BLOCK_SIZE);
             saved.render(transform, &ctx, gl, assets);
         }
 

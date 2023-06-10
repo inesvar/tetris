@@ -77,6 +77,12 @@ impl App<'_> {
                 players = vec![];
                 rem_players = vec![remote_player];
             }
+            PlayerConfig::TwoRemote => {
+                local_player = LocalPlayer::new(true);
+                players = vec![local_player];
+                remote_player = RemotePlayer::new();
+                rem_players = vec![remote_player];
+            }
             _ => todo!(),
         }
 
@@ -104,9 +110,10 @@ impl App<'_> {
         app.main_menu.create_single_player_game_button.press_listeners.push(Box::new(|| println!("bruh")));
 
         if let PlayerConfig::Viewer = app.player_config {
-
             app.remote_players[0].listen()
-        }
+        } else if let PlayerConfig::TwoRemote = app.player_config {
+            app.remote_players[0].listen()
+        } 
         app
     }
 
