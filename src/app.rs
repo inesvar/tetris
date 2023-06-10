@@ -127,6 +127,17 @@ impl App<'_> {
                 }
             }
 
+
+            let mut nb_players = 0;
+            for player in &mut self.local_players {
+                player.render(ctx.transform.trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0), &ctx, gl, &mut self.assets);
+                nb_players += 1;
+            }
+            for player in &mut self.remote_players {
+                player.render(ctx.transform.trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0), &ctx, gl, &mut self.assets);
+                nb_players += 1;
+            }
+
             match self.view_state {
                 ViewState::Main => {
                     self.title_text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
