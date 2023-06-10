@@ -55,14 +55,6 @@ struct Args {
 // cargo run -- -h
 
 fn main() {
-    // Create a Glutin window.
-    let mut window: piston_window::PistonWindow =
-        WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
-            .graphics_api(OPENGL_VERSION)
-            .vsync(true)
-            .exit_on_esc(true)
-            .build()
-            .unwrap();
     // Check the command line arguments.
     let args = Args::parse();
 
@@ -77,6 +69,22 @@ fn main() {
     } else {
         PlayerConfig::Local
     };
+
+    let window_width = match config {
+        PlayerConfig::TwoLocal => DEFAULT_WINDOW_WIDTH * 2,
+        PlayerConfig::TwoRemote => DEFAULT_WINDOW_WIDTH * 2,
+        _ => DEFAULT_WINDOW_WIDTH,
+    };
+
+    // Create a Glutin window.
+    let mut window: piston_window::PistonWindow =
+        WindowSettings::new("TETRIS", [window_width, DEFAULT_WINDOW_HEIGHT])
+            .graphics_api(OPENGL_VERSION)
+            .vsync(true)
+            .exit_on_esc(true)
+            .build()
+            .unwrap();
+
     // Create a new game and run it.
     let mut app = App::new(OPENGL_VERSION, config);
     let mut gravity: u64 = 50;
@@ -101,11 +109,26 @@ fn main() {
         }
 
         match app.clock {
-            i if i <= 5.0 => {gravity = 50; freeze = 50},
-            i if i <= 10.0 => {gravity = 40; freeze = 50},
-            i if i <= 15.0 => {gravity = 30; freeze = 50},
-            i if i <= 20.0 => {gravity = 20; freeze = 50},
-            _ => {gravity = 15; freeze = 50},
+            i if i <= 5.0 => {
+                gravity = 50;
+                freeze = 50
+            }
+            i if i <= 10.0 => {
+                gravity = 40;
+                freeze = 50
+            }
+            i if i <= 15.0 => {
+                gravity = 30;
+                freeze = 50
+            }
+            i if i <= 20.0 => {
+                gravity = 20;
+                freeze = 50
+            }
+            _ => {
+                gravity = 15;
+                freeze = 50
+            }
         }
         if let Some(Button::Mouse(button)) = e.press_args() {
             app.handle_mouse_press(button);

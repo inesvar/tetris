@@ -5,6 +5,7 @@ use crate::ui::text::Text;
 use crate::{tetris_grid::TetrisGrid, tetromino::Tetromino};
 
 use graphics::{Context, Transformed, color};
+use graphics::types::Matrix2d;
 use opengl_graphics::GlGraphics;
 use piston::RenderArgs;
 use serde::{Deserialize, Serialize};
@@ -31,11 +32,11 @@ impl PlayerScreen {
         }
     }
 
-    pub fn render(&mut self, ctx: Context, gl: &mut GlGraphics, assets: &mut Assets) {
+    pub fn render(&mut self, transform: Matrix2d, ctx: &Context, gl: &mut GlGraphics, assets: &mut Assets) {
         let score_text = Text::new(format!("Score: {}", self.score), 16, 0.0, 250.0, color::WHITE);
-        score_text.render(ctx.transform, &ctx, gl, &mut assets.main_font);
+        score_text.render(transform, &ctx, gl, &mut assets.main_font);
 
-        self.grid.render(ctx.transform, &ctx, gl, assets);
+        self.grid.render(transform, &ctx, gl, assets);
 
         if let Some(ghost) = self.ghost_tetromino {
             ghost.render(self.grid.transform, &ctx, gl, assets);
