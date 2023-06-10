@@ -5,6 +5,7 @@ use crate::local_player::{KeyPress, LocalPlayer};
 use crate::remote_player::RemotePlayer;
 use crate::settings::*;
 use crate::Assets;
+use crate::graphics::Transformed;
 use graphics::color;
 
 use opengl_graphics::{GlGraphics, OpenGL};
@@ -77,6 +78,12 @@ impl App<'_> {
                 players = vec![];
                 rem_players = vec![remote_player];
             }
+            PlayerConfig::TwoRemote => {
+                local_player = LocalPlayer::new(true);
+                players = vec![local_player];
+                remote_player = RemotePlayer::new();
+                rem_players = vec![remote_player];
+            }
             _ => todo!(),
         }
 
@@ -102,6 +109,8 @@ impl App<'_> {
         };
 
         if let PlayerConfig::Viewer = app.player_config {
+            app.remote_players[0].listen()
+        } else if let PlayerConfig::TwoRemote = app.player_config {
             app.remote_players[0].listen()
         }
         app
@@ -138,7 +147,7 @@ impl App<'_> {
                         player.render(ctx.transform, &ctx, gl, &mut self.assets);
                     }
                     for player in &mut self.remote_players {
-                        player.render(ctx.transform, &ctx, gl, &mut self.assets);
+                        player.render(ctx.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0), &ctx, gl, &mut self.assets);
                     }
                 }
             }
