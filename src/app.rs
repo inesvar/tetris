@@ -127,17 +127,6 @@ impl App<'_> {
                 }
             }
 
-
-            let mut nb_players = 0;
-            for player in &mut self.local_players {
-                player.render(ctx.transform.trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0), &ctx, gl, &mut self.assets);
-                nb_players += 1;
-            }
-            for player in &mut self.remote_players {
-                player.render(ctx.transform.trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0), &ctx, gl, &mut self.assets);
-                nb_players += 1;
-            }
-
             match self.view_state {
                 ViewState::MainMenu => {
                     self.title_text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
@@ -154,11 +143,14 @@ impl App<'_> {
                     self.timer_text.set_text(format!("Elapsed: {:.2}s", self.clock));
                     self.timer_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
 
+                    let mut nb_players = 0;
                     for player in &mut self.local_players {
-                        player.render(ctx.transform, &ctx, gl, &mut self.assets);
+                        player.render(ctx.transform.trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0), &ctx, gl, &mut self.assets);
+                        nb_players += 1;
                     }
                     for player in &mut self.remote_players {
-                        player.render(ctx.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0), &ctx, gl, &mut self.assets);
+                        player.render(ctx.transform.trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0), &ctx, gl, &mut self.assets);
+                        nb_players += 1;
                     }
                 }
             }
