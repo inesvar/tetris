@@ -24,9 +24,9 @@ pub enum ViewState {
 }
 
 pub enum PlayerConfig {
-    Local, 
+    Local,
     Streamer,
-    TwoLocal, 
+    TwoLocal,
     TwoRemote,
     Viewer,
 }
@@ -104,7 +104,6 @@ impl App<'_> {
         app.main_menu.create_single_player_game_button.press_listeners.push(Box::new(|| println!("bruh")));
 
         if let PlayerConfig::Viewer = app.player_config {
-
             app.remote_players[0].listen()
         }
         app
@@ -130,10 +129,10 @@ impl App<'_> {
             self.timer_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
 
             for player in &mut self.local_players {
-                player.render(ctx, gl, &mut self.assets);
+                player.render(ctx.transform, &ctx, gl, &mut self.assets);
             }
             for player in &mut self.remote_players {
-                player.render(ctx, gl, &mut self.assets);
+                player.render(ctx.transform, &ctx, gl, &mut self.assets);
             }
 
             match *self.view_state.borrow() {
