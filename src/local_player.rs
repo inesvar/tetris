@@ -1,4 +1,5 @@
 use std::net::TcpStream;
+use graphics::types::Matrix2d;
 
 use crate::assets::Assets;
 use crate::circular_buffer::CircularBuffer;
@@ -107,12 +108,12 @@ impl LocalPlayer {
 
     pub fn render(
         &mut self,
-        ctx: Context,
+        transform: Matrix2d,
+        ctx: &Context,
         gl: &mut GlGraphics,
         assets: &mut Assets,
     ) {
-
-        self.player_screen.render(ctx, gl, assets);
+        self.player_screen.render(transform, ctx, gl, assets);
     }
 
     pub fn update(&mut self, frame_counter: u64, gravity: u64, freeze: u64) {
@@ -125,10 +126,10 @@ impl LocalPlayer {
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
             && self
-                .player_screen
-                .active_tetromino
-                .check_possible(&self.player_screen.grid.rows, TranslateRotate::fall())
-                .is_err()
+            .player_screen
+            .active_tetromino
+            .check_possible(&self.player_screen.grid.rows, TranslateRotate::fall())
+            .is_err()
         {
             self.player_screen.score += self
                 .player_screen
@@ -140,10 +141,10 @@ impl LocalPlayer {
         // move the tetromino down to emulate its fall
         if frame_counter % gravity == 0
             && self
-                .player_screen
-                .active_tetromino
-                .fall(&self.player_screen.grid.rows)
-                .is_err()
+            .player_screen
+            .active_tetromino
+            .fall(&self.player_screen.grid.rows)
+            .is_err()
             && self.freeze_frame < frame_counter
         {
             self.freeze_frame = frame_counter + freeze;

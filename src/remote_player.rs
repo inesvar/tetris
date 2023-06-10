@@ -7,6 +7,7 @@ use crate::once;
 use crate::player_screen::PlayerScreen;
 use crate::settings::SERVER_IP;
 use graphics::Context;
+use graphics::math::Matrix2d;
 use opengl_graphics::GlGraphics;
 
 use crate::ui::text::Text;
@@ -51,14 +52,14 @@ impl RemotePlayer {
             }
         });
     }
-
-    pub fn render(&self, ctx: Context, gl: &mut GlGraphics, assets: &mut Assets) {
+        
+    pub fn render(&self, transform: Matrix2d, ctx: &Context, gl: &mut GlGraphics, assets: &mut Assets) {
         if !*self.initialized.lock().unwrap() {
             return;
         }
         {
             let mut screen = self.render_screen.lock().unwrap();
-            screen.render(ctx, gl, assets);
+            screen.render(transform, ctx, gl, assets);
         }
         once!("render was done");
     }
