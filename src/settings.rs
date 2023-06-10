@@ -33,5 +33,5 @@ pub static BAG_SIZE: u32 = 14; // typical sizes are 7 and 14, 1 is entirely rand
 
 pub const NB_NEXT_TETROMINO: usize = 6;
 
-pub static STREAMER_IP: &str = "127.0.0.1:16000";
+pub static SERVER_IP: &str = "127.0.0.1:16000";
 pub static VIEWER_IP: &str = "127.0.0.1:16000";
