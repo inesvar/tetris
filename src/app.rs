@@ -36,7 +36,7 @@ pub struct App<'a> {
     local_players: Vec<LocalPlayer>,
     remote_players: Vec<RemotePlayer>,
     player_config: PlayerConfig,
-    view_state: RefCell<ViewState>,
+    view_state: ViewState,
     assets: Assets<'a>,
     pub clock: f64,
     frame_counter: u64,
@@ -87,7 +87,7 @@ impl App<'_> {
             local_players: players,
             remote_players: rem_players,
             player_config,
-            view_state: RefCell::new(ViewState::Main), //FIXME: should be ViewState::Main but for now the button is not clickable so we would be stuck in the menu
+            view_state: ViewState::Main, //FIXME: should be ViewState::Main but for now the button is not clickable so we would be stuck in the menu
             assets,
             title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
             restart_text: Text::new(String::from("Press R to (re)start"), 16, 180.0, 50.0, color::WHITE),
@@ -100,8 +100,6 @@ impl App<'_> {
 
             main_menu: MainMenu::new(),
         };
-
-        app.main_menu.create_single_player_game_button.press_listeners.push(Box::new(|| println!("bruh")));
 
         if let PlayerConfig::Viewer = app.player_config {
             app.remote_players[0].listen()
@@ -119,27 +117,30 @@ impl App<'_> {
                     self.running = false;
                 }
             }
-            if self.running {
-                self.title_text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-            } else {
-                self.restart_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
-            }
 
-            self.timer_text.set_text(format!("Elapsed: {:.2}s", self.clock));
-            self.timer_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
-
-            for player in &mut self.local_players {
-                player.render(ctx.transform, &ctx, gl, &mut self.assets);
-            }
-            for player in &mut self.remote_players {
-                player.render(ctx.transform, &ctx, gl, &mut self.assets);
-            }
-
-            match *self.view_state.borrow() {
+            match self.view_state {
                 ViewState::Main => {
+                    self.title_text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
                     self.main_menu.render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
-                _ => {}
+                ViewState::Settings => {}
+                _ => {
+                    if self.running {
+                        self.title_text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
+                    } else {
+                        self.restart_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
+                    }
+
+                    self.timer_text.set_text(format!("Elapsed: {:.2}s", self.clock));
+                    self.timer_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
+
+                    for player in &mut self.local_players {
+                        player.render(ctx.transform, &ctx, gl, &mut self.assets);
+                    }
+                    for player in &mut self.remote_players {
+                        player.render(ctx.transform, &ctx, gl, &mut self.assets);
+                    }
+                }
             }
         });
     }
@@ -183,14 +184,22 @@ impl App<'_> {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
-        match *self.view_state.borrow() {
+        match self.view_state {
             ViewState::Main => self.main_menu.handle_mouse_press(button, &self.cursor_position),
             _ => {}
+        }
+
+        if self.main_menu.create_single_player_game_button.is_pressed() {
+            self.view_state = ViewState::SinglePlayerGame;
+        }
+
+        if self.main_menu.settings_button.is_pressed() {
+            self.view_state = ViewState::Settings;
         }
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
-        match *self.view_state.borrow() {
+        match self.view_state {
             ViewState::Main => self.main_menu.handle_mouse_release(button, &self.cursor_position),
             _ => {}
         }
