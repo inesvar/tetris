@@ -15,7 +15,7 @@ use crate::ui::main_menu::MainMenu;
 use crate::ui::text::Text;
 
 pub enum ViewState {
-    Main,
+    MainMenu,
     Settings,
     JoinRoom,
     CreateRoom,
@@ -94,7 +94,7 @@ impl App<'_> {
             local_players: players,
             remote_players: rem_players,
             player_config,
-            view_state: ViewState::Main, //FIXME: should be ViewState::Main but for now the button is not clickable so we would be stuck in the menu
+            view_state: ViewState::MainMenu,
             assets,
             title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
             restart_text: Text::new(String::from("Press R to (re)start"), 16, 180.0, 50.0, color::WHITE),
@@ -128,7 +128,7 @@ impl App<'_> {
             }
 
             match self.view_state {
-                ViewState::Main => {
+                ViewState::MainMenu => {
                     self.title_text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
                     self.main_menu.render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
@@ -194,7 +194,7 @@ impl App<'_> {
 
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
         match self.view_state {
-            ViewState::Main => self.main_menu.handle_mouse_press(button, &self.cursor_position),
+            ViewState::MainMenu => self.main_menu.handle_mouse_press(button, &self.cursor_position),
             _ => {}
         }
 
@@ -209,7 +209,7 @@ impl App<'_> {
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
         match self.view_state {
-            ViewState::Main => self.main_menu.handle_mouse_release(button, &self.cursor_position),
+            ViewState::MainMenu => self.main_menu.handle_mouse_release(button, &self.cursor_position),
             _ => {}
         }
     }
