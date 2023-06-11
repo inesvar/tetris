@@ -13,24 +13,21 @@ use opengl_graphics::GlGraphics;
 use crate::ui::text::Text;
 
 pub struct RemotePlayer {
-    update_screen: Arc<Mutex<PlayerScreen>>,
-    render_screen: Arc<Mutex<PlayerScreen>>,
+    screen: Arc<Mutex<PlayerScreen>>,
     initialized: Arc<Mutex<bool>>,
 }
 
 impl RemotePlayer {
     pub fn new() -> Self {
         let arc = Arc::new(Mutex::new(PlayerScreen::empty()));
-        let arc2 = Arc::clone(&arc);
         RemotePlayer {
-            update_screen: arc,
-            render_screen: arc2,
+            screen: arc,
             initialized: Arc::new(Mutex::new(false)),
         }
     }
 
     pub fn listen(&self) {
-        let screen = Arc::clone(&self.update_screen);
+        let screen = Arc::clone(&self.screen);
         let initialized = Arc::clone(&self.initialized);
         let listener = TcpListener::bind(SERVER_IP).unwrap();
         thread::spawn(move || {
@@ -58,9 +55,16 @@ impl RemotePlayer {
             return;
         }
         {
-            let mut screen = self.render_screen.lock().unwrap();
+            let mut screen = self.screen.lock().unwrap();
             screen.render(transform, ctx, gl, assets);
         }
         once!("render was done");
+    }
+
+    pub fn get_lines_completed(&self) -> u64 {
+        {
+            let screen = self.screen.lock().unwrap();
+            return screen.new_completed_lines;
+        }
     }
 }

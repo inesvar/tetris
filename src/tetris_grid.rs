@@ -1,8 +1,10 @@
+use crate::assets::TetrisColor;
 use crate::block::Block;
 use crate::point::Transformable;
 use crate::settings::{BLOCK_SIZE};
 use crate::tetromino::Tetromino;
 use graphics::types::Matrix2d;
+use rand::Rng;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
@@ -69,6 +71,52 @@ impl TetrisGrid {
             }
         }
         score
+    }
+
+    pub fn add_garbage(&mut self, completed_lines: u64) -> Result<(),()> {
+        if completed_lines < 2 {
+            Ok(())
+        } else if self.line_sum[(completed_lines - 2) as usize] > 0 {
+
+            let mut rng = rand::thread_rng();
+            let empty = rng.gen::<u32>()%self.nb_columns;
+
+            for _ in 0..=(completed_lines - 2) {
+                self.line_sum.insert(self.nb_rows as usize, 7);
+                self.line_sum.remove(0);
+                 
+                self.rows.insert(self.nb_rows as usize, vec![None; self.nb_columns as usize]);
+                for x in 0..self.nb_columns {
+                    if x != empty {
+                        self.rows[self.nb_rows as usize][x as usize] = Some(Block::new(TetrisColor::Grey, x as i8, self.nb_rows as i8));
+                    } else {
+                        self.rows[self.nb_rows as usize][x as usize] = None;
+                    }
+                }
+                self.rows.remove(0);
+            }
+            Err(())
+        } else {
+
+            let mut rng = rand::thread_rng();
+            let empty = rng.gen::<u32>()%self.nb_columns;
+
+            for _ in 0..=(completed_lines - 2) {
+                self.line_sum.insert(self.nb_rows as usize, 7);
+                self.line_sum.remove(0);
+                 
+                self.rows.insert(self.nb_rows as usize, vec![None; self.nb_columns as usize]);
+                for x in 0..self.nb_columns {
+                    if x != empty {
+                        self.rows[self.nb_rows as usize][x as usize] = Some(Block::new(TetrisColor::Grey, x as i8, self.nb_rows as i8));
+                    } else {
+                        self.rows[self.nb_rows as usize][x as usize] = None;
+                    }
+                }
+                self.rows.remove(0);
+            }
+            Ok(())
+        }
     }
 
     pub fn null(&mut self) {

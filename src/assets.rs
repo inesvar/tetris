@@ -11,6 +11,7 @@ pub enum TetrisColor {
     Orange,
     Purple,
     Green,
+    Grey,
 }
 
 pub struct Assets<'a> {
@@ -21,6 +22,7 @@ pub struct Assets<'a> {
     pub blue: Texture,
     pub green: Texture,
     pub yellow: Texture,
+    pub grey: Texture,
 
     pub tetris_font: GlyphCache<'a>,
     pub main_font: GlyphCache<'a>,
@@ -36,6 +38,7 @@ impl Assets<'_> {
         let yellow_file = texture_folder.join("yellow.jpg");
         let purple_file = texture_folder.join("purple.jpg");
         let orange_file = texture_folder.join("orange.jpg");
+        let grey_file = texture_folder.join("grey.jpg");
 
         let cyan_texture = Texture::from_path(cyan_file, &TextureSettings::new()).unwrap();
 
@@ -50,6 +53,8 @@ impl Assets<'_> {
         let purple_texture = Texture::from_path(purple_file, &TextureSettings::new()).unwrap();
 
         let orange_texture = Texture::from_path(orange_file, &TextureSettings::new()).unwrap();
+
+        let grey_texture = Texture::from_path(grey_file, &TextureSettings::new()).unwrap();
 
         let font_folder = assets_folder.join("fonts");
 
@@ -67,6 +72,7 @@ impl Assets<'_> {
             yellow: yellow_texture,
             purple: purple_texture,
             orange: orange_texture,
+            grey: grey_texture,
 
             tetris_font,
             main_font,
@@ -82,6 +88,7 @@ impl Assets<'_> {
             TetrisColor::Orange => &self.orange,
             TetrisColor::Red => &self.red,
             TetrisColor::Yellow => &self.yellow,
+            TetrisColor::Grey => &self.grey,
         }
     }
 }
