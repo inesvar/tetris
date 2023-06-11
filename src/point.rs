@@ -19,6 +19,7 @@ impl Point {
 
 pub trait Transformable {
     fn go_down(&mut self);
+    fn go_up(&mut self);
     fn go_right(&mut self);
     fn go_left(&mut self);
     fn rotate_clockwise(&mut self, other: &Point);
@@ -28,6 +29,10 @@ pub trait Transformable {
 impl Transformable for Point {
     fn go_down(&mut self) {
         self.y += 1;
+    }
+
+    fn go_up(&mut self) {
+        self.y -= 1;
     }
 
     fn go_left(&mut self) {

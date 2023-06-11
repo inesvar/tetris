@@ -134,6 +134,7 @@ impl LocalPlayer {
         if self.player_screen.grid.add_garbage(self.garbage_to_be_added).is_err() {
             self.game_over = true;
         }
+        self.garbage_to_be_added = 0;
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
