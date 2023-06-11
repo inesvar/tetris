@@ -136,6 +136,9 @@ impl LocalPlayer {
         }
         self.garbage_to_be_added = 0;
 
+        // Set the number of completed lines to 0
+        self.player_screen.new_completed_lines = 0;
+
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
             && self
