@@ -26,6 +26,7 @@ pub struct LocalPlayer {
     bag_of_tetromino: Vec<TetrominoKind>,
     game_over: bool,
     sender: bool,
+    garbage_to_be_added: u64,
 }
 
 impl LocalPlayer {
@@ -52,6 +53,7 @@ impl LocalPlayer {
         let player_screen = PlayerScreen {
             grid,
             score: 0,
+            new_completed_lines: 0,
             active_tetromino: first_tetromino,
             saved_tetromino: None,
             fifo_next_tetromino,
@@ -65,6 +67,7 @@ impl LocalPlayer {
             bag_of_tetromino,
             game_over: false,
             sender,
+            garbage_to_be_added: 0,
         }
     }
 
@@ -84,6 +87,10 @@ impl LocalPlayer {
             return;
         }
         self.player_screen.active_tetromino = possible_active;
+    }
+
+    pub fn add_garbage(&mut self, completed_lines: u64) {
+        self.garbage_to_be_added = completed_lines;
     }
 
     pub fn send_serialized(&self) {
@@ -123,6 +130,11 @@ impl LocalPlayer {
         ghost.hard_drop(&self.player_screen.grid.rows);
         self.player_screen.ghost_tetromino = Some(ghost);
 
+        // Add the garbage
+        if self.player_screen.grid.add_garbage(self.garbage_to_be_added).is_err() {
+            self.game_over = true;
+        }
+
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
             && self
@@ -131,10 +143,11 @@ impl LocalPlayer {
             .check_possible(&self.player_screen.grid.rows, TranslateRotate::fall())
             .is_err()
         {
-            self.player_screen.score += self
+            self.player_screen.new_completed_lines = self
                 .player_screen
                 .grid
                 .freeze_tetromino(&mut self.player_screen.active_tetromino);
+            self.player_screen.score += self.player_screen.new_completed_lines;
             self.get_new_tetromino();
         }
 
@@ -171,6 +184,7 @@ impl LocalPlayer {
                     .right(&self.player_screen.grid.rows);
             }
         }
+        // Send the player_screen data if necessary
         if self.sender {
             self.send_serialized();
         }

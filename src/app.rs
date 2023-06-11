@@ -89,7 +89,7 @@ impl App<'_> {
 
         let assets = Assets::new(assets_folder);
 
-        let mut app = App {
+        let app = App {
             gl: GlGraphics::new(gl_version),
             local_players: players,
             remote_players: rem_players,
@@ -162,6 +162,12 @@ impl App<'_> {
         if self.running {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
+            if let PlayerConfig::TwoRemote = self.player_config {
+                for player in &mut self.local_players {
+                    let completed_lines = self.remote_players[0].get_lines_completed();
+                    player.add_garbage(completed_lines);
+                }
+            }
             for player in &mut self.local_players {
                 player.update(self.frame_counter, gravity, freeze);
             }

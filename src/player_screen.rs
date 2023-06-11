@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 pub struct PlayerScreen {
     pub grid: TetrisGrid,
     pub score: u64,
+    pub new_completed_lines: u64,
     pub active_tetromino: Tetromino,
     pub saved_tetromino: Option<Tetromino>,
     pub fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
@@ -25,6 +26,7 @@ impl PlayerScreen {
         PlayerScreen {
             grid: TetrisGrid::new(150.0, 70.0, NB_COLUMNS, NB_ROWS), //FIXME: this will not always be the case
             score: 0,
+            new_completed_lines: 0,
             active_tetromino: Tetromino::default(),
             saved_tetromino: None,
             fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new(),
