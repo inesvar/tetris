@@ -40,6 +40,10 @@ impl Transformable for Block {
         self.position.go_down();
     }
 
+    fn go_up(&mut self) {
+        self.position.go_up();
+    }
+
     fn go_left(&mut self) {
         self.position.go_left();
     }

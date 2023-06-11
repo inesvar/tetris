@@ -74,6 +74,7 @@ impl TetrisGrid {
     }
 
     pub fn add_garbage(&mut self, completed_lines: u64) -> Result<(),()> {
+        println!("the garbage creating function was called");
         if completed_lines < 2 {
             Ok(())
         } else if self.line_sum[(completed_lines - 2) as usize] > 0 {
@@ -95,6 +96,13 @@ impl TetrisGrid {
                 }
                 self.rows.remove(0);
             }
+            println!("{} lines were removed", completed_lines - 2);
+            // move all block up
+            for y in 0..self.nb_rows {
+                for block in self.rows[y as usize].iter_mut().flatten() {
+                    block.go_up();
+                }
+            }
             Err(())
         } else {
 
@@ -114,6 +122,13 @@ impl TetrisGrid {
                     }
                 }
                 self.rows.remove(0);
+            }
+            println!("{} lines were removed", completed_lines - 2);
+            // move all block up
+            for y in 0..self.nb_rows {
+                for block in self.rows[y as usize].iter_mut().flatten() {
+                    block.go_up();
+                }
             }
             Ok(())
         }

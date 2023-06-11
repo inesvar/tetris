@@ -165,6 +165,7 @@ impl App<'_> {
             if let PlayerConfig::TwoRemote = self.player_config {
                 for player in &mut self.local_players {
                     let completed_lines = self.remote_players[0].get_lines_completed();
+                    println!("adversary completed {} lines", completed_lines);
                     player.add_garbage(completed_lines);
                 }
             }
