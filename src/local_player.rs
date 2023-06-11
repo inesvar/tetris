@@ -194,8 +194,10 @@ impl LocalPlayer {
         }
 
         // Set the number of completed lines to 0
-        println!("the {} completed lines were sent to the adversary and they were reset to 0", self.player_screen.new_completed_lines);
-        self.player_screen.new_completed_lines = 0;
+        if self.player_screen.new_completed_lines != 0 {
+            println!("the {} completed lines were sent to the adversary and they were reset to 0", self.player_screen.new_completed_lines);
+            self.player_screen.new_completed_lines = 0;
+        }
     }
 
     pub fn handle_key_press(&mut self, key: Key, running: bool) -> KeyPress {

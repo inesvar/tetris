@@ -38,7 +38,13 @@ impl RemotePlayer {
                 once!("unwrapped from {}", SERVER_IP);
                 {
                     let mut screen = screen.lock().unwrap();
-                    *screen = deserialized;
+                    if screen.new_completed_lines != 0 {
+                        let a = screen.new_completed_lines;
+                        *screen = deserialized;
+                        screen.new_completed_lines = a;
+                    } else {
+                        *screen = deserialized;
+                    }
                     screen.ghost_tetromino = None;
                 }
                 {
