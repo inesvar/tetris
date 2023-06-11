@@ -95,14 +95,14 @@ impl TetrisGrid {
                     }
                 }
                 self.rows.remove(0);
-            }
-            println!("{} lines were removed", completed_lines - 2);
-            // move all block up
-            for y in 0..self.nb_rows {
-                for block in self.rows[y as usize].iter_mut().flatten() {
-                    block.go_up();
+                // move all block up
+                for y in 0..self.nb_rows {
+                    for block in self.rows[y as usize].iter_mut().flatten() {
+                        block.go_up();
+                    }
                 }
             }
+            println!("{} lines were removed", completed_lines - 2);
             Err(())
         } else {
 
@@ -122,14 +122,14 @@ impl TetrisGrid {
                     }
                 }
                 self.rows.remove(0);
-            }
-            println!("{} lines were removed", completed_lines - 2);
-            // move all block up
-            for y in 0..self.nb_rows {
-                for block in self.rows[y as usize].iter_mut().flatten() {
-                    block.go_up();
+                // move all block up
+                for y in 0..self.nb_rows {
+                    for block in self.rows[y as usize].iter_mut().flatten() {
+                        block.go_up();
+                    }
                 }
             }
+            println!("{} lines were removed", completed_lines - 2);
             Ok(())
         }
     }
