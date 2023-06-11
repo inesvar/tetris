@@ -83,7 +83,7 @@ impl TetrisGrid {
             let empty = rng.gen::<u32>()%self.nb_columns;
 
             for _ in 0..=(completed_lines - 2) {
-                self.line_sum.insert(self.nb_rows as usize, 7);
+                self.line_sum.insert(self.nb_rows as usize, (self.nb_columns - 1) as u8);
                 self.line_sum.remove(0);
                  
                 self.rows.insert(self.nb_rows as usize, vec![None; self.nb_columns as usize]);
@@ -110,7 +110,7 @@ impl TetrisGrid {
             let empty = rng.gen::<u32>()%self.nb_columns;
 
             for _ in 0..=(completed_lines - 2) {
-                self.line_sum.insert(self.nb_rows as usize, 7);
+                self.line_sum.insert(self.nb_rows as usize, (self.nb_columns - 1) as u8);
                 self.line_sum.remove(0);
                  
                 self.rows.insert(self.nb_rows as usize, vec![None; self.nb_columns as usize]);
