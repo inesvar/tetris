@@ -91,6 +91,7 @@ impl LocalPlayer {
 
     pub fn add_garbage(&mut self, completed_lines: u64) {
         self.garbage_to_be_added = completed_lines;
+        println!("garbage from adversary added");
     }
 
     pub fn send_serialized(&self) {
@@ -134,7 +135,6 @@ impl LocalPlayer {
         if self.garbage_to_be_added != 0 && self.player_screen.grid.add_garbage(self.garbage_to_be_added).is_err() {
             self.game_over = true;
         }
-        self.garbage_to_be_added = 0;
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
@@ -194,6 +194,7 @@ impl LocalPlayer {
         }
 
         // Set the number of completed lines to 0
+        println!("reset of completed lines");
         self.player_screen.new_completed_lines = 0;
     }
 

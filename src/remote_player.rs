@@ -61,10 +61,12 @@ impl RemotePlayer {
         once!("render was done");
     }
 
-    pub fn get_lines_completed(&self) -> u64 {
+    pub fn get_lines_completed(&mut self) -> u64 {
         {
-            let screen = self.screen.lock().unwrap();
-            return screen.new_completed_lines;
+            let mut screen = self.screen.lock().unwrap();
+            let lines = screen.new_completed_lines;
+            screen.new_completed_lines = 0;
+            return lines;
         }
     }
 }
