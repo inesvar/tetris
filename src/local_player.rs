@@ -131,7 +131,7 @@ impl LocalPlayer {
         self.player_screen.ghost_tetromino = Some(ghost);
 
         // Add the garbage
-        if self.player_screen.grid.add_garbage(self.garbage_to_be_added).is_err() {
+        if self.garbage_to_be_added != 0 && self.player_screen.grid.add_garbage(self.garbage_to_be_added).is_err() {
             self.game_over = true;
         }
         self.garbage_to_be_added = 0;
@@ -148,6 +148,9 @@ impl LocalPlayer {
                 .player_screen
                 .grid
                 .freeze_tetromino(&mut self.player_screen.active_tetromino);
+            if self.player_screen.new_completed_lines != 0 {
+                println!("{} lines were completed", self.player_screen.new_completed_lines);
+            }
             self.player_screen.score += self.player_screen.new_completed_lines;
             self.get_new_tetromino();
         }
@@ -216,10 +219,14 @@ impl LocalPlayer {
             self.player_screen
                 .active_tetromino
                 .hard_drop(&self.player_screen.grid.rows);
-            self.player_screen.score += self
+            self.player_screen.new_completed_lines = self
                 .player_screen
                 .grid
                 .freeze_tetromino(&mut self.player_screen.active_tetromino);
+            if self.player_screen.new_completed_lines != 0 {
+                println!("{} lines were completed", self.player_screen.new_completed_lines);
+            }
+            self.player_screen.score += self.player_screen.new_completed_lines;
             self.get_new_tetromino();
         }
 
