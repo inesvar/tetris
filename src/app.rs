@@ -61,15 +61,16 @@ impl App<'_> {
         let remote_player: RemotePlayer;
         let players: Vec<LocalPlayer>;
         let rem_players: Vec<RemotePlayer>;
+        let seed: u64 = SEED;
 
         match player_config {
             PlayerConfig::Local => {
-                local_player = LocalPlayer::new(false);
+                local_player = LocalPlayer::new(seed, false);
                 players = vec![local_player];
                 rem_players = vec![];
             }
             PlayerConfig::Streamer => {
-                local_player = LocalPlayer::new(true);
+                local_player = LocalPlayer::new(seed, true);
                 players = vec![local_player];
                 rem_players = vec![];
             }
@@ -79,7 +80,7 @@ impl App<'_> {
                 rem_players = vec![remote_player];
             }
             PlayerConfig::TwoRemote => {
-                local_player = LocalPlayer::new(true);
+                local_player = LocalPlayer::new(seed, true);
                 players = vec![local_player];
                 remote_player = RemotePlayer::new();
                 rem_players = vec![remote_player];

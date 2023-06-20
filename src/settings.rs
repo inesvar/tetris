@@ -36,3 +36,5 @@ pub const NB_NEXT_TETROMINO: usize = 6;
 pub static SERVER_IP: &str = "127.0.0.1:16000";
 pub static VIEWER_IP: &str = "127.0.0.1:16000";
 //IMPORTANT: do not use localhost, only use the result of hostname -I
+
+pub static SEED: u64 = 64;

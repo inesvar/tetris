@@ -1,3 +1,5 @@
+use rand_pcg::Pcg32;
+use rand::{SeedableRng};
 use std::net::TcpStream;
 use graphics::types::Matrix2d;
 
@@ -10,6 +12,7 @@ use crate::{
     keyboard::Keyboard, tetris_grid::TetrisGrid, tetromino::Tetromino,
     tetromino_kind::TetrominoKind,
 };
+use crate::tetromino_bag::new_random_bag;
 use opengl_graphics::GlGraphics;
 use piston::Key;
 use piston_window::Context;
@@ -27,13 +30,20 @@ pub struct LocalPlayer {
     game_over: bool,
     sender: bool,
     garbage_to_be_added: u64,
+    #[serde(skip, default = "new_pcg")]
+    rng: Pcg32,
+}
+
+fn new_pcg() -> Pcg32 {
+    Pcg32::seed_from_u64(0)
 }
 
 impl LocalPlayer {
-    pub fn new(sender: bool) -> Self {
+    pub fn new(seed: u64, sender: bool) -> Self {
         let grid = TetrisGrid::new(150.0, 70.0, NB_COLUMNS, NB_ROWS);
-
-        let mut bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
+        let mut rng = Pcg32::seed_from_u64(seed);
+        let mut bag_of_tetromino = 
+            new_random_bag(BAG_SIZE, &mut rng);
         let first_tetromino =
             Tetromino::new_collision(bag_of_tetromino.pop().unwrap(), &grid.rows[..]).unwrap();
         let mut fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
@@ -41,7 +51,8 @@ impl LocalPlayer {
             if let Some(t) = bag_of_tetromino.pop() {
                 fifo_next_tetromino.push(Tetromino::new(t));
             } else {
-                bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
+                bag_of_tetromino = 
+                    new_random_bag(BAG_SIZE, &mut rng);
                 if let Some(t) = bag_of_tetromino.pop() {
                     fifo_next_tetromino.push(Tetromino::new(t));
                 } else {
@@ -68,19 +79,23 @@ impl LocalPlayer {
             game_over: false,
             sender,
             garbage_to_be_added: 0,
+            rng,
         }
     }
 
     fn get_new_tetromino(&mut self) {
         if self.bag_of_tetromino.is_empty() {
-            self.bag_of_tetromino = TetrominoKind::new_random_bag(BAG_SIZE);
+            self.bag_of_tetromino = 
+                new_random_bag(BAG_SIZE, &mut self.rng);
         }
-        let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
+        let possible_active = 
+            self.player_screen.fifo_next_tetromino.pop().unwrap();
         self.player_screen
             .fifo_next_tetromino
             .push(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
         if possible_active
-            .check_possible(&self.player_screen.grid.rows, TranslateRotate::null())
+            .check_possible(&self.player_screen.grid.rows, 
+                TranslateRotate::null())
             .is_err()
         {
             self.game_over = true;
