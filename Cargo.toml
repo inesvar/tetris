@@ -11,8 +11,9 @@ piston = "0.53.0"
 piston2d-graphics = "0.43.0"
 pistoncore-glutin_window = "0.71.0"
 piston2d-opengl_graphics = "0.82.0"
-rand = "0.8.5"
+rand = { version = "0.8.5", features = ["serde"] }
 find_folder = "0.3.0"
 serde = { version = "1.0.163", features = ["derive"] }
 serde_cbor = "0.11.2"
 clap = { version = "4.3.0", features = ["derive"] }
+rand_pcg = "0.3.1"

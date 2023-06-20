@@ -31,6 +31,7 @@ mod settings;
 mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;
+mod tetromino_bag;
 mod translate_rotate;
 mod ui;
 mod player_screen;
