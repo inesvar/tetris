@@ -1,6 +1,6 @@
 # Tetris in Rust
 
-Currently our Tetris looks something like this.
+Currently our Tetris looks something like this. 
 
 ![](tetris.png)
 
@@ -27,3 +27,8 @@ Well the menu, the buttons and all the parameters will get our attention soon. A
 ## I can't have any fun because wtf is cargo doesn't work on my machine
 
 Then you can refer to the Great Rust Documentation : https://doc.rust-lang.org/cargo/getting-started/installation.html.
+
+
+## You're somewhat familiar with Rust and also somehow distressed by the hazardous speed at which pieces are falling?
+
+Then you're interested by the variable *gravity* in main.rs, set it how it fits you.
