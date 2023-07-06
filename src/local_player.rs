@@ -1,25 +1,25 @@
-use rand_pcg::Pcg32;
-use rand::{SeedableRng};
-use std::net::TcpStream;
 use graphics::types::Matrix2d;
+use rand::SeedableRng;
+use rand_pcg::Pcg32;
+use std::net::TcpStream;
 
 use crate::assets::Assets;
 use crate::circular_buffer::CircularBuffer;
 use crate::player_screen::PlayerScreen;
-use crate::{settings::*, once};
+use crate::tetromino_bag::new_random_bag;
 use crate::translate_rotate::TranslateRotate;
 use crate::{
     keyboard::Keyboard, tetris_grid::TetrisGrid, tetromino::Tetromino,
     tetromino_kind::TetrominoKind,
 };
-use crate::tetromino_bag::new_random_bag;
+use crate::{once, settings::*};
 use opengl_graphics::GlGraphics;
 use piston::Key;
 use piston_window::Context;
 
-use serde::{Serialize, Deserialize};
 use crate::ui::button::Button;
 use crate::ui::text::Text;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct LocalPlayer {
@@ -42,8 +42,7 @@ impl LocalPlayer {
     pub fn new(seed: u64, sender: bool) -> Self {
         let grid = TetrisGrid::new(150.0, 70.0, NB_COLUMNS, NB_ROWS);
         let mut rng = Pcg32::seed_from_u64(seed);
-        let mut bag_of_tetromino = 
-            new_random_bag(BAG_SIZE, &mut rng);
+        let mut bag_of_tetromino = new_random_bag(BAG_SIZE, &mut rng);
         let first_tetromino =
             Tetromino::new_collision(bag_of_tetromino.pop().unwrap(), &grid.rows[..]).unwrap();
         let mut fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
@@ -51,8 +50,7 @@ impl LocalPlayer {
             if let Some(t) = bag_of_tetromino.pop() {
                 fifo_next_tetromino.push(Tetromino::new(t));
             } else {
-                bag_of_tetromino = 
-                    new_random_bag(BAG_SIZE, &mut rng);
+                bag_of_tetromino = new_random_bag(BAG_SIZE, &mut rng);
                 if let Some(t) = bag_of_tetromino.pop() {
                     fifo_next_tetromino.push(Tetromino::new(t));
                 } else {
@@ -85,17 +83,14 @@ impl LocalPlayer {
 
     fn get_new_tetromino(&mut self) {
         if self.bag_of_tetromino.is_empty() {
-            self.bag_of_tetromino = 
-                new_random_bag(BAG_SIZE, &mut self.rng);
+            self.bag_of_tetromino = new_random_bag(BAG_SIZE, &mut self.rng);
         }
-        let possible_active = 
-            self.player_screen.fifo_next_tetromino.pop().unwrap();
+        let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
         self.player_screen
             .fifo_next_tetromino
             .push(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
         if possible_active
-            .check_possible(&self.player_screen.grid.rows, 
-                TranslateRotate::null())
+            .check_possible(&self.player_screen.grid.rows, TranslateRotate::null())
             .is_err()
         {
             self.game_over = true;
@@ -146,7 +141,13 @@ impl LocalPlayer {
         self.player_screen.ghost_tetromino = Some(ghost);
 
         // Add the garbage
-        if self.garbage_to_be_added != 0 && self.player_screen.grid.add_garbage(self.garbage_to_be_added).is_err() {
+        if self.garbage_to_be_added != 0
+            && self
+                .player_screen
+                .grid
+                .add_garbage(self.garbage_to_be_added)
+                .is_err()
+        {
             self.game_over = true;
         }
         self.garbage_to_be_added = 0;
@@ -154,17 +155,20 @@ impl LocalPlayer {
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
             && self
-            .player_screen
-            .active_tetromino
-            .check_possible(&self.player_screen.grid.rows, TranslateRotate::fall())
-            .is_err()
+                .player_screen
+                .active_tetromino
+                .check_possible(&self.player_screen.grid.rows, TranslateRotate::fall())
+                .is_err()
         {
             self.player_screen.new_completed_lines = self
                 .player_screen
                 .grid
                 .freeze_tetromino(&mut self.player_screen.active_tetromino);
             if self.player_screen.new_completed_lines != 0 {
-                println!("{} lines were completed", self.player_screen.new_completed_lines);
+                println!(
+                    "{} lines were completed",
+                    self.player_screen.new_completed_lines
+                );
             }
             self.player_screen.score += self.player_screen.new_completed_lines;
             self.get_new_tetromino();
@@ -173,10 +177,10 @@ impl LocalPlayer {
         // move the tetromino down to emulate its fall
         if frame_counter % gravity == 0
             && self
-            .player_screen
-            .active_tetromino
-            .fall(&self.player_screen.grid.rows)
-            .is_err()
+                .player_screen
+                .active_tetromino
+                .fall(&self.player_screen.grid.rows)
+                .is_err()
             && self.freeze_frame < frame_counter
         {
             self.freeze_frame = frame_counter + freeze;
@@ -189,7 +193,8 @@ impl LocalPlayer {
                     .player_screen
                     .active_tetromino
                     .fall(&self.player_screen.grid.rows)
-                    .is_err() && self.freeze_frame < frame_counter
+                    .is_err()
+                    && self.freeze_frame < frame_counter
                 {
                     self.freeze_frame = frame_counter + freeze;
                 }
@@ -210,7 +215,10 @@ impl LocalPlayer {
 
         // Set the number of completed lines to 0
         if self.player_screen.new_completed_lines != 0 {
-            println!("the {} completed lines were sent to the adversary and they were reset to 0", self.player_screen.new_completed_lines);
+            println!(
+                "the {} completed lines were sent to the adversary and they were reset to 0",
+                self.player_screen.new_completed_lines
+            );
             self.player_screen.new_completed_lines = 0;
         }
     }
@@ -245,7 +253,10 @@ impl LocalPlayer {
                 .grid
                 .freeze_tetromino(&mut self.player_screen.active_tetromino);
             if self.player_screen.new_completed_lines != 0 {
-                println!("{} lines were completed", self.player_screen.new_completed_lines);
+                println!(
+                    "{} lines were completed",
+                    self.player_screen.new_completed_lines
+                );
             }
             self.player_screen.score += self.player_screen.new_completed_lines;
             self.get_new_tetromino();

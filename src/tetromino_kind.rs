@@ -1,7 +1,7 @@
 use crate::assets::TetrisColor;
 use crate::point::Point;
 use crate::rotation::Rotation;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
 pub enum TetrominoKind {

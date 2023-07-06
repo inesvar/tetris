@@ -1,13 +1,13 @@
-use graphics::{Context, DrawState, Image, rectangle};
 use graphics::draw_state::Blend;
 use graphics::types::{Matrix2d, Rectangle, Scalar};
+use graphics::{rectangle, Context, DrawState, Image};
 use opengl_graphics::GlGraphics;
 
-use crate::{Assets, Tetromino};
 use crate::block::Block;
+use crate::graphics::Transformed;
 use crate::settings::{BLOCK_SIZE, GRID_COLOR, GRID_THICKNESS};
 use crate::tetris_grid::TetrisGrid;
-use crate::graphics::Transformed;
+use crate::{Assets, Tetromino};
 
 // TODO : réfléchir à une façon de la rendre &self au lieu de &mut self
 impl TetrisGrid {

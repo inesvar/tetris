@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::assets::TetrisColor;
 use crate::point::{Point, Transformable};

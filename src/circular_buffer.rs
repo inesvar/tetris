@@ -1,22 +1,43 @@
-use serde::{Serialize, Deserialize};
 use core::fmt::Display;
+use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 
 /* push back pop front circular buffer */
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CircularBuffer<const K: usize, T : Default + Copy + Serialize + Display> where [T; K] : Serialize + for<'a> Deserialize<'a> {
+pub struct CircularBuffer<const K: usize, T: Default + Copy + Serialize + Display>
+where
+    [T; K]: Serialize + for<'a> Deserialize<'a>,
+{
     array: [T; K],
     begin: usize,
     size: usize,
 }
 
-impl<const K: usize, T: Default + Copy + Serialize + for <'a> Deserialize<'a> + Display> Display for CircularBuffer<K, T> where [T; K] : Serialize + for <'a> Deserialize<'a> {
+impl<const K: usize, T: Default + Copy + Serialize + for<'a> Deserialize<'a> + Display> Display
+    for CircularBuffer<K, T>
+where
+    [T; K]: Serialize + for<'a> Deserialize<'a>,
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "begin {}, size {}, content {}{}{}{}{}", self.begin, self.size, self.array[0], self.array[1], self.array[2], self.array[3], self.array[4])
+        write!(
+            f,
+            "begin {}, size {}, content {}{}{}{}{}",
+            self.begin,
+            self.size,
+            self.array[0],
+            self.array[1],
+            self.array[2],
+            self.array[3],
+            self.array[4]
+        )
     }
 }
 
-impl<const K: usize, T: Default + Copy + Serialize + for <'a> Deserialize<'a> + Display> CircularBuffer<K, T> where [T; K] : Serialize + for <'a> Deserialize<'a> {
+impl<const K: usize, T: Default + Copy + Serialize + for<'a> Deserialize<'a> + Display>
+    CircularBuffer<K, T>
+where
+    [T; K]: Serialize + for<'a> Deserialize<'a>,
+{
     pub fn new() -> Self {
         CircularBuffer::<K, T> {
             array: [T::default(); K],
@@ -28,7 +49,7 @@ impl<const K: usize, T: Default + Copy + Serialize + for <'a> Deserialize<'a> + 
     pub fn get(&self, i: usize) -> Option<T> {
         //println!("getting {i} from {}", self);
         if i < self.size {
-            Some(self.array[(self.begin + i)%K])
+            Some(self.array[(self.begin + i) % K])
         } else {
             None
         }
@@ -36,7 +57,7 @@ impl<const K: usize, T: Default + Copy + Serialize + for <'a> Deserialize<'a> + 
 
     pub fn push(&mut self, t: T) {
         if self.size != K {
-            self.array[(self.begin + self.size)%K] = t;
+            self.array[(self.begin + self.size) % K] = t;
             self.size += 1;
         }
         //println!("pushed {t}, now {}", self);
@@ -55,4 +76,3 @@ impl<const K: usize, T: Default + Copy + Serialize + for <'a> Deserialize<'a> + 
         }
     }
 }
-
