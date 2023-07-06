@@ -5,24 +5,25 @@ extern crate opengl_graphics;
 extern crate piston;
 
 use app::PlayerConfig;
+use clap::Parser;
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
 use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent};
-use clap::Parser;
 
-use tetromino::Tetromino;
 use crate::app::App;
-use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION};
 use crate::assets::Assets;
+use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION};
+use tetromino::Tetromino;
 
 mod app;
-mod macros;
 mod assets;
 mod block;
 mod circular_buffer;
 mod keyboard;
 mod local_player;
+mod macros;
+mod player_screen;
 mod point;
 mod remote_player;
 mod render;
@@ -30,11 +31,10 @@ mod rotation;
 mod settings;
 mod tetris_grid;
 mod tetromino;
-mod tetromino_kind;
 mod tetromino_bag;
+mod tetromino_kind;
 mod translate_rotate;
 mod ui;
-mod player_screen;
 
 #[derive(Parser, Debug)]
 struct Args {

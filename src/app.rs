@@ -1,18 +1,18 @@
+use crate::local_player::{KeyPress, LocalPlayer};
 use std::cell::RefCell;
 use std::ops::{Deref, DerefMut};
-use crate::local_player::{KeyPress, LocalPlayer};
 
+use crate::graphics::Transformed;
 use crate::remote_player::RemotePlayer;
 use crate::settings::*;
 use crate::Assets;
-use crate::graphics::Transformed;
 use graphics::color;
 
+use crate::ui::main_menu::MainMenu;
+use crate::ui::text::Text;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{MouseButton, RenderArgs, UpdateArgs};
 use piston_window::Key;
-use crate::ui::main_menu::MainMenu;
-use crate::ui::text::Text;
 
 pub enum ViewState {
     MainMenu,
@@ -98,7 +98,13 @@ impl App<'_> {
             view_state: ViewState::MainMenu,
             assets,
             title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
-            restart_text: Text::new(String::from("Press R to (re)start"), 16, 180.0, 50.0, color::WHITE),
+            restart_text: Text::new(
+                String::from("Press R to (re)start"),
+                16,
+                180.0,
+                50.0,
+                color::WHITE,
+            ),
             timer_text: Text::new(String::from("Elapsed: 0.0s"), 16, 0.0, 200.0, color::WHITE),
             clock: 0.0,
             frame_counter: 0,
@@ -130,27 +136,53 @@ impl App<'_> {
 
             match self.view_state {
                 ViewState::MainMenu => {
-                    self.title_text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.main_menu.render(ctx.transform, &ctx, gl, &mut self.assets)
+                    self.title_text
+                        .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
+                    self.main_menu
+                        .render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
                 ViewState::Settings => {}
                 _ => {
                     if self.running {
-                        self.title_text.render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
+                        self.title_text.render(
+                            ctx.transform,
+                            &ctx,
+                            gl,
+                            &mut self.assets.tetris_font,
+                        );
                     } else {
-                        self.restart_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
+                        self.restart_text.render(
+                            ctx.transform,
+                            &ctx,
+                            gl,
+                            &mut self.assets.main_font,
+                        );
                     }
 
-                    self.timer_text.set_text(format!("Elapsed: {:.2}s", self.clock));
-                    self.timer_text.render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
+                    self.timer_text
+                        .set_text(format!("Elapsed: {:.2}s", self.clock));
+                    self.timer_text
+                        .render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
 
                     let mut nb_players = 0;
                     for player in &mut self.local_players {
-                        player.render(ctx.transform.trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0), &ctx, gl, &mut self.assets);
+                        player.render(
+                            ctx.transform
+                                .trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0),
+                            &ctx,
+                            gl,
+                            &mut self.assets,
+                        );
                         nb_players += 1;
                     }
                     for player in &mut self.remote_players {
-                        player.render(ctx.transform.trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0), &ctx, gl, &mut self.assets);
+                        player.render(
+                            ctx.transform
+                                .trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0),
+                            &ctx,
+                            gl,
+                            &mut self.assets,
+                        );
                         nb_players += 1;
                     }
                 }
@@ -207,7 +239,9 @@ impl App<'_> {
 
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
         match self.view_state {
-            ViewState::MainMenu => self.main_menu.handle_mouse_press(button, &self.cursor_position),
+            ViewState::MainMenu => self
+                .main_menu
+                .handle_mouse_press(button, &self.cursor_position),
             _ => {}
         }
 
@@ -222,7 +256,9 @@ impl App<'_> {
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
         match self.view_state {
-            ViewState::MainMenu => self.main_menu.handle_mouse_release(button, &self.cursor_position),
+            ViewState::MainMenu => self
+                .main_menu
+                .handle_mouse_release(button, &self.cursor_position),
             _ => {}
         }
     }

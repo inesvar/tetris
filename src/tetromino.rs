@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
 use core::fmt::Display;
+use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 
 use crate::block::{Block, Collision};
@@ -138,10 +138,7 @@ impl Tetromino {
         let wall_kick_translations =
             TetrominoKind::wall_kicks_translations(&self.kind, 1, self.rotation_status);
         for wall_kick in &wall_kick_translations {
-            match self.check_possible(
-                matrix,
-                TranslateRotate::new(*wall_kick, 1, &self.center),
-            ) {
+            match self.check_possible(matrix, TranslateRotate::new(*wall_kick, 1, &self.center)) {
                 Err(()) => {
                     continue;
                 }
@@ -162,10 +159,7 @@ impl Tetromino {
         let wall_kick_translations =
             TetrominoKind::wall_kicks_translations(&self.kind, -1, self.rotation_status);
         for wall_kick in &wall_kick_translations {
-            match self.check_possible(
-                matrix,
-                TranslateRotate::new(*wall_kick, -1, &self.center),
-            ) {
+            match self.check_possible(matrix, TranslateRotate::new(*wall_kick, -1, &self.center)) {
                 Err(()) => {
                     continue;
                 }

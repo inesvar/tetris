@@ -1,5 +1,5 @@
 use opengl_graphics::*;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 #[derive(Clone, Copy, Serialize, Deserialize)]

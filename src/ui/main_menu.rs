@@ -1,6 +1,6 @@
-use piston::MouseButton;
 use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 use crate::ui::button::Button;
+use piston::MouseButton;
 
 pub struct MainMenu {
     pub create_single_player_game_button: Button,
@@ -44,16 +44,24 @@ impl MainMenu {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
-        self.create_single_player_game_button.handle_mouse_press(button, cursor_position);
-        self.create_room_button.handle_mouse_press(button, cursor_position);
-        self.join_room_button.handle_mouse_press(button, cursor_position);
-        self.settings_button.handle_mouse_press(button, cursor_position);
+        self.create_single_player_game_button
+            .handle_mouse_press(button, cursor_position);
+        self.create_room_button
+            .handle_mouse_press(button, cursor_position);
+        self.join_room_button
+            .handle_mouse_press(button, cursor_position);
+        self.settings_button
+            .handle_mouse_press(button, cursor_position);
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
-        self.create_single_player_game_button.handle_mouse_release(button, cursor_position);
-        self.create_room_button.handle_mouse_release(button, cursor_position);
-        self.join_room_button.handle_mouse_release(button, cursor_position);
-        self.settings_button.handle_mouse_release(button, cursor_position);
+        self.create_single_player_game_button
+            .handle_mouse_release(button, cursor_position);
+        self.create_room_button
+            .handle_mouse_release(button, cursor_position);
+        self.join_room_button
+            .handle_mouse_release(button, cursor_position);
+        self.settings_button
+            .handle_mouse_release(button, cursor_position);
     }
 }

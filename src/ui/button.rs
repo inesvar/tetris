@@ -1,6 +1,5 @@
-use graphics::{color};
+use graphics::color;
 use piston::MouseButton;
-
 
 use crate::ui::text::Text;
 
@@ -30,7 +29,10 @@ impl Button {
     }
 
     pub fn are_coords_inside_button(&self, x: f64, y: f64) -> bool {
-        x >= self.x - self.width / 2.0 && x <= self.x + self.width / 2.0 && y >= self.y - self.height / 2.0 && y <= self.y + self.height / 2.0
+        x >= self.x - self.width / 2.0
+            && x <= self.x + self.width / 2.0
+            && y >= self.y - self.height / 2.0
+            && y <= self.y + self.height / 2.0
     }
 
     pub fn is_pressed(&self) -> bool {
