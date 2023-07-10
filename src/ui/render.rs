@@ -1,4 +1,5 @@
 use crate::assets::Assets;
+use crate::once;
 use crate::ui::button::Button;
 use crate::ui::main_menu::MainMenu;
 use crate::ui::text::Text;
@@ -15,8 +16,8 @@ impl Text {
         font: &mut GlyphCache,
     ) {
         let text_transform = transform.trans(
-            self.x - self.text.len() as f64 * self.font_size as f64 / 4.0,
-            self.y + self.font_size as f64 / 2.0,
+            self.x - self.text.len() as f64 * self.font_size as f64 * 0.3045,
+            self.y + self.font_size as f64 * 0.42,
         );
         self.view
             .draw(
