@@ -195,6 +195,18 @@ impl App<'_> {
         if self.running {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
+            if let PlayerConfig::TwoRemote = self.player_config {
+                for player in &mut self.local_players {
+                    let completed_lines = self.remote_players[0].get_lines_completed();
+                    if completed_lines != 0 {
+                        println!("the adversary completed {} lines", completed_lines);
+                        player.add_garbage(completed_lines);
+                    }
+                }
+            }
+            for player in &mut self.local_players {
+                player.update(self.frame_counter, gravity, freeze);
+            }
         }
     }
 
