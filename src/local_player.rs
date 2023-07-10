@@ -40,7 +40,7 @@ fn new_pcg() -> Pcg32 {
 
 impl LocalPlayer {
     pub fn new(seed: u64, sender: bool) -> Self {
-        let grid = TetrisGrid::new(150.0, 70.0, NB_COLUMNS, NB_ROWS);
+        let grid = TetrisGrid::new(200.0, 70.0, NB_COLUMNS, NB_ROWS);
         let mut rng = Pcg32::seed_from_u64(seed);
         let mut bag_of_tetromino = new_random_bag(BAG_SIZE, &mut rng);
         let first_tetromino =

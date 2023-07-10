@@ -105,7 +105,7 @@ impl App<'_> {
                 50.0,
                 color::WHITE,
             ),
-            timer_text: Text::new(String::from("Elapsed: 0.0s"), 16, 0.0, 200.0, color::WHITE),
+            timer_text: Text::new(String::from("Elapsed: 0.0s"), 16, 100.0, 200.0, color::WHITE),
             clock: 0.0,
             frame_counter: 0,
             running: false,
