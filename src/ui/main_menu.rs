@@ -17,7 +17,7 @@ impl MainMenu {
                 DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
                 300.0,
                 50.0,
-                String::from("Create new single-player game"),
+                String::from("New single-player game"),
             ),
             create_room_button: Button::new(
                 DEFAULT_WINDOW_WIDTH as f64 / 2.0,
