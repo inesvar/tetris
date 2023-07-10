@@ -135,9 +135,9 @@ impl Tetromino {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let wall_kick_translations =
+        let wall_kicks_translations =
             TetrominoKind::wall_kicks_translations(&self.kind, 1, self.rotation_status);
-        for wall_kick in &wall_kick_translations {
+        for wall_kick in &wall_kicks_translations {
             match self.check_possible(matrix, TranslateRotate::new(*wall_kick, 1, &self.center)) {
                 Err(()) => {
                     continue;
@@ -156,9 +156,9 @@ impl Tetromino {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let wall_kick_translations =
+        let wall_kicks_translations =
             TetrominoKind::wall_kicks_translations(&self.kind, -1, self.rotation_status);
-        for wall_kick in &wall_kick_translations {
+        for wall_kick in &wall_kicks_translations {
             match self.check_possible(matrix, TranslateRotate::new(*wall_kick, -1, &self.center)) {
                 Err(()) => {
                     continue;
