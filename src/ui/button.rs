@@ -53,7 +53,7 @@ impl Button {
         };
     }
 
-    pub fn handle_mouse_release(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
+    pub fn handle_mouse_release(&mut self, button: MouseButton, _cursor_position: &[f64; 2]) {
         match button {
             MouseButton::Left => {
                 self.background_color = [0.8, 0.8, 0.8, 1.0];
