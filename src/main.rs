@@ -110,19 +110,19 @@ fn main() {
         }
 
         match app.clock {
-            i if i <= 5.0 => {
+            i if i <= 30.0 => {
                 gravity = 50;
                 freeze = 50
             }
-            i if i <= 10.0 => {
+            i if i <= 60.0 => {
                 gravity = 40;
                 freeze = 50
             }
-            i if i <= 15.0 => {
+            i if i <= 90.0 => {
                 gravity = 30;
                 freeze = 50
             }
-            i if i <= 20.0 => {
+            i if i <= 120.0 => {
                 gravity = 20;
                 freeze = 50
             }
