@@ -6,6 +6,8 @@ Currently our Tetris looks something like this.
 
 But it will get a lot, lot better.
 
+Our implementation satisfies the *Super Rotation System*.
+
 ## What fun can be had as of now
 
 Currently you can play tetris alone locally just with :
