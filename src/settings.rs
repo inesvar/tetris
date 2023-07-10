@@ -8,13 +8,14 @@ pub static OPENGL_VERSION: OpenGL = OpenGL::V4_5;
 pub static NB_COLUMNS: u32 = 10;
 pub static NB_ROWS: u32 = 22;
 
-pub static DEFAULT_WINDOW_WIDTH: u32 = 550;
+pub static DEFAULT_WINDOW_WIDTH: u32 = 650;
 pub static DEFAULT_WINDOW_HEIGHT: u32 = 700;
 
 pub static BLOCK_SIZE: f64 = 25.0;
 pub static GRID_THICKNESS: f64 = 0.5;
 
-pub static BG_COLOR: graphics::types::Color = color::BLACK;
+pub static BG_COLOR: graphics::types::Color = [0.0, 0.0, 0.2, 1.0];
+pub static GRID_BG_COLOR: graphics::types::Color = [0.1, 0.1, 0.1, 1.0];
 pub static GRID_COLOR: graphics::types::Color = color::GRAY;
 
 pub static FALL_KEYS: [Key; 2] = [Key::Down, Key::S];

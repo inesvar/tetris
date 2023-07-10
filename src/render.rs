@@ -5,7 +5,7 @@ use opengl_graphics::GlGraphics;
 
 use crate::block::Block;
 use crate::graphics::Transformed;
-use crate::settings::{BLOCK_SIZE, GRID_COLOR, GRID_THICKNESS};
+use crate::settings::{BLOCK_SIZE, GRID_COLOR, GRID_THICKNESS, GRID_BG_COLOR};
 use crate::tetris_grid::TetrisGrid;
 use crate::{Assets, Tetromino};
 
@@ -26,7 +26,9 @@ impl TetrisGrid {
             self.visible_width,
             self.visible_height,
         ];
-        rectangle([0.1, 0.1, 0.1, 1.0], empty_dims, self.transform, gl);
+        rectangle(GRID_BG_COLOR, empty_dims, self.transform, gl);
+        let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
+        outline_rect.draw(empty_dims, &ctx.draw_state, self.transform, gl);
 
         for (y, row) in self.rows.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {

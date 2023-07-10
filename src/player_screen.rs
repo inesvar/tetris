@@ -1,11 +1,13 @@
 use crate::assets::Assets;
 use crate::circular_buffer::CircularBuffer;
-use crate::settings::{BLOCK_SIZE, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS};
+use crate::settings::{
+    BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS,
+};
 use crate::ui::text::Text;
 use crate::{tetris_grid::TetrisGrid, tetromino::Tetromino};
 
-use graphics::types::Matrix2d;
-use graphics::{color, Context, Transformed};
+use graphics::types::{Matrix2d, Rectangle};
+use graphics::{color, rectangle, Context, Transformed};
 use opengl_graphics::GlGraphics;
 use piston::RenderArgs;
 use serde::{Deserialize, Serialize};
@@ -24,7 +26,7 @@ pub struct PlayerScreen {
 impl PlayerScreen {
     pub fn empty() -> Self {
         PlayerScreen {
-            grid: TetrisGrid::new(150.0, 70.0, NB_COLUMNS, NB_ROWS), //FIXME: this will not always be the case
+            grid: TetrisGrid::new(140.0, 70.0, NB_COLUMNS, NB_ROWS), //FIXME: this will not always be the case
             score: 0,
             new_completed_lines: 0,
             active_tetromino: Tetromino::default(),
@@ -44,7 +46,7 @@ impl PlayerScreen {
         let score_text = Text::new(
             format!("Score: {}", self.score),
             16,
-            0.0,
+            100.0,
             250.0,
             color::WHITE,
         );
@@ -67,11 +69,21 @@ impl PlayerScreen {
             saved.render(transform, &ctx, gl, assets);
         }
 
+        let transform = self.grid.transform.trans(
+            self.grid.total_width * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
+            2.0 * BLOCK_SIZE,
+        );
+        let height = (1.0 + 3.0 * NB_NEXT_TETROMINO as f64) * BLOCK_SIZE;
+        let dims: Rectangle = [2.0 * BLOCK_SIZE, 0.0, 6.0 * BLOCK_SIZE, height];
+        rectangle(GRID_BG_COLOR, dims, transform, gl);
+        let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
+        outline_rect.draw(dims, &ctx.draw_state, transform, gl);
+
         for i in 0..NB_NEXT_TETROMINO {
-            let transform = self
-                .grid
-                .transform
-                .trans(self.grid.total_width, 4.0 * BLOCK_SIZE * (i as f64 + 0.5));
+            let transform = self.grid.transform.trans(
+                self.grid.total_width * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
+                3.0 * BLOCK_SIZE * (i as f64 + 1.0),
+            );
             self.fifo_next_tetromino
                 .get(i)
                 .unwrap()
