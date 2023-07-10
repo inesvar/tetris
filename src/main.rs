@@ -14,12 +14,26 @@ use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent};
 use crate::app::App;
 use crate::assets::Assets;
 use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION};
+use tetromino::Tetromino;
 
 mod app;
 mod assets;
+mod block;
+mod circular_buffer;
+mod keyboard;
+mod local_player;
 mod macros;
+mod player_screen;
+mod point;
+mod remote_player;
+mod render;
+mod rotation;
 mod settings;
 mod tetris_grid;
+mod tetromino;
+mod tetromino_bag;
+mod tetromino_kind;
+mod translate_rotate;
 mod ui;
 
 #[derive(Parser, Debug)]
@@ -74,11 +88,13 @@ fn main() {
 
     // Create a new game and run it.
     let mut app = App::new(OPENGL_VERSION, config);
+    let mut gravity: u64 = 50;
+    let mut freeze: u64 = 50;
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.update_args() {
-            app.update(&args);
+            app.update(&args, gravity, freeze);
         }
 
         if let Some(args) = e.render_args() {
@@ -93,6 +109,28 @@ fn main() {
             app.handle_key_release(key);
         }
 
+        match app.clock {
+            i if i <= 5.0 => {
+                gravity = 50;
+                freeze = 50
+            }
+            i if i <= 10.0 => {
+                gravity = 40;
+                freeze = 50
+            }
+            i if i <= 15.0 => {
+                gravity = 30;
+                freeze = 50
+            }
+            i if i <= 20.0 => {
+                gravity = 20;
+                freeze = 50
+            }
+            _ => {
+                gravity = 15;
+                freeze = 50
+            }
+        }
         if let Some(Button::Mouse(button)) = e.press_args() {
             app.handle_mouse_press(button);
         }
