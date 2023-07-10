@@ -16,8 +16,8 @@ impl Text {
         font: &mut GlyphCache,
     ) {
         let text_transform = transform.trans(
-            self.x - self.text.len() as f64 * self.font_size as f64 * 0.3045,
-            self.y + self.font_size as f64 * 0.42,
+            self.x - self.text.len() as f64 * self.font_size as f64 * 0.315,
+            self.y + self.font_size as f64 * 0.41,
         );
         self.view
             .draw(
