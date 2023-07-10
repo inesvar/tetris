@@ -8,7 +8,7 @@ pub static OPENGL_VERSION: OpenGL = OpenGL::V4_5;
 pub static NB_COLUMNS: u32 = 10;
 pub static NB_ROWS: u32 = 22;
 
-pub static DEFAULT_WINDOW_WIDTH: u32 = 650;
+pub static DEFAULT_WINDOW_WIDTH: u32 = 550;
 pub static DEFAULT_WINDOW_HEIGHT: u32 = 700;
 
 pub static BLOCK_SIZE: f64 = 25.0;
