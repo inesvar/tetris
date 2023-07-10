@@ -163,7 +163,7 @@ impl LocalPlayer {
             self.player_screen.new_completed_lines = self
                 .player_screen
                 .grid
-                .freeze_tetromino();
+                .freeze_tetromino(&mut self.player_screen.active_tetromino);
             if self.player_screen.new_completed_lines != 0 {
                 println!(
                     "{} lines were completed",
@@ -251,7 +251,7 @@ impl LocalPlayer {
             self.player_screen.new_completed_lines = self
                 .player_screen
                 .grid
-                .freeze_tetromino();
+                .freeze_tetromino(&mut self.player_screen.active_tetromino);
             if self.player_screen.new_completed_lines != 0 {
                 println!(
                     "{} lines were completed",
