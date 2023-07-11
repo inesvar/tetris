@@ -6,6 +6,7 @@ use crate::ui::text::Text;
 use graphics::types::Matrix2d;
 use graphics::{rectangle, Context, Transformed};
 use opengl_graphics::{GlGraphics, GlyphCache};
+use crate::ui::text_input::TextInput;
 
 impl Text {
     pub fn render(
@@ -28,6 +29,19 @@ impl Text {
                 gl,
             )
             .unwrap();
+    }
+}
+
+impl TextInput {
+    pub fn render(
+        &self,
+        transform: Matrix2d,
+        ctx: &Context,
+        gl: &mut GlGraphics,
+        font: &mut GlyphCache,
+    ) {
+        self.text
+            .render(transform, ctx, gl, font);
     }
 }
 
