@@ -1,6 +1,6 @@
+use crate::{settings::TEXT_COLOR, ui::text::Text};
 use graphics::color;
 use piston::{Key, MouseButton};
-use crate::ui::text::Text;
 
 pub struct TextInput {
     pub(crate) x: f64,
@@ -10,7 +10,7 @@ pub struct TextInput {
     pub(in crate::ui) text: Text,
     placeholder: String,
     is_focused: bool,
-    pub(in crate::ui) animation_counter: u64
+    pub(in crate::ui) animation_counter: u64,
 }
 
 impl TextInput {
@@ -20,10 +20,10 @@ impl TextInput {
             y,
             width,
             height,
-            text: Text::new(placeholder, 16, x, y, color::WHITE),
+            text: Text::new(placeholder, 16, x, y, TEXT_COLOR),
             placeholder: String::from(placeholder),
             is_focused: false,
-            animation_counter: 0
+            animation_counter: 0,
         }
     }
 

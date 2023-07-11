@@ -9,14 +9,16 @@ use crate::Assets;
 use graphics::color;
 use piston::event_id::TEXT;
 
+use crate::ui::interactive_widget_manager::ButtonType::{
+    BackToMainMenu, NewSinglePlayerGame, Pause, Settings, self,
+};
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
 use crate::ui::text_input::TextInput;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{MouseButton, RenderArgs, UpdateArgs};
 use piston_window::Key;
-use crate::ui::interactive_widget_manager::ButtonType::{CreateSinglePlayerGameButton, SettingsButton};
-
+#[derive(Debug)]
 pub enum ViewState {
     MainMenu,
     Settings,
@@ -51,7 +53,7 @@ pub struct App<'a> {
 
     pub cursor_position: [f64; 2],
 
-    main_menu: InteractiveWidgetManager,
+    widget_manager: InteractiveWidgetManager,
 }
 
 impl App<'_> {
@@ -127,7 +129,7 @@ impl App<'_> {
 
             cursor_position: [0.0, 0.0],
 
-            main_menu: InteractiveWidgetManager::new(),
+            widget_manager: InteractiveWidgetManager::new_main_menu(),
         };
 
         if let PlayerConfig::Viewer = app.player_config {
@@ -153,7 +155,7 @@ impl App<'_> {
                 ViewState::MainMenu => {
                     self.title_text
                         .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.main_menu
+                    self.widget_manager
                         .render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
                 ViewState::Settings => {}
@@ -200,6 +202,9 @@ impl App<'_> {
                         );
                         nb_players += 1;
                     }
+
+                    self.widget_manager
+                    .render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
             }
         });
@@ -227,7 +232,7 @@ impl App<'_> {
 
     pub fn handle_text_input(&mut self, input: &String) {
         match self.view_state {
-            ViewState::MainMenu => self.main_menu.handle_text_input(input),
+            ViewState::MainMenu => self.widget_manager.handle_text_input(input),
             _ => {}
         }
     }
@@ -251,7 +256,7 @@ impl App<'_> {
         }
 
         match self.view_state {
-            ViewState::MainMenu => self.main_menu.handle_key_press(key),
+            ViewState::MainMenu => self.widget_manager.handle_key_press(key),
             _ => {}
         }
     }
@@ -265,28 +270,39 @@ impl App<'_> {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
-        match self.view_state {
-            ViewState::MainMenu => self
-                .main_menu
-                .handle_mouse_press(button, &self.cursor_position),
-            _ => {}
-        }
-
-        if self.main_menu.get_button(CreateSinglePlayerGameButton).is_pressed() {
-            self.view_state = ViewState::SinglePlayerGame;
-        }
-
-        if self.main_menu.get_button(SettingsButton).is_pressed() {
-            self.view_state = ViewState::Settings;
+        let mut result;
+        result = self
+            .widget_manager
+            .handle_mouse_press(button, &self.cursor_position);
+        println!("result is {:?}", result);
+        match result {
+            ButtonType::Pause => {}
+            ButtonType::Nothing => {}
+            ButtonType::BackToMainMenu => self.set_view(ViewState::MainMenu),
+            ButtonType::Settings => self.set_view(ViewState::Settings),
+            ButtonType::NewSinglePlayerGame => self.set_view(ViewState::SinglePlayerGame),
+            _ => {},
         }
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
         match self.view_state {
             ViewState::MainMenu => self
-                .main_menu
+                .widget_manager
                 .handle_mouse_release(button, &self.cursor_position),
             _ => {}
+        }
+    }
+
+    fn set_view(&mut self, view_state: ViewState) {
+        println!("set view was called {:?}", view_state);
+        self.view_state = view_state;
+        match self.view_state {
+            ViewState::MainMenu => self.widget_manager = InteractiveWidgetManager::new_main_menu(),
+            ViewState::SinglePlayerGame => {
+                self.widget_manager = InteractiveWidgetManager::new_single_player_game()
+            }
+            _ => self.widget_manager = InteractiveWidgetManager::new_empty(),
         }
     }
 }

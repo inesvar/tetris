@@ -3,6 +3,7 @@ use piston::MouseButton;
 
 use crate::ui::text::Text;
 
+#[derive(Clone)]
 pub struct Button {
     pub x: f64,
     pub y: f64,
@@ -24,6 +25,18 @@ impl Button {
             text: Text::new(text, 16, 0.0, 0.0, color::BLACK),
             background_color: [0.8, 0.8, 0.8, 1.0],
 
+            is_pressed: false,
+        }
+    }
+
+    pub fn default() -> Button {
+        Button {
+            x: 0.0,
+            y: 0.0,
+            width: 0.0,
+            height: 0.0,
+            text: Text::default(),
+            background_color: [0.0, 0.0, 0.0, 0.0],
             is_pressed: false,
         }
     }
