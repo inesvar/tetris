@@ -14,6 +14,7 @@ use crate::ui::text::Text;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{MouseButton, RenderArgs, UpdateArgs};
 use piston_window::Key;
+use crate::ui::text_input::TextInput;
 
 pub enum ViewState {
     MainMenu,
@@ -98,15 +99,15 @@ impl App<'_> {
             player_config,
             view_state: ViewState::MainMenu,
             assets,
-            title_text: Text::new(String::from("T"), 16, DEFAULT_WINDOW_WIDTH as f64 * 27.0 / 65.0, DEFAULT_TITLE_Y, TEXT_COLOR),
+            title_text: Text::new(&String::from("T"), 16, DEFAULT_WINDOW_WIDTH as f64 * 27.0 / 65.0, DEFAULT_TITLE_Y, TEXT_COLOR),
             restart_text: Text::new(
-                String::from("Press R to (re)start"),
+                &String::from("Press R to (re)start"),
                 22,
                 DEFAULT_WINDOW_WIDTH as f64 / 2.0,
                 DEFAULT_TITLE_Y,
                 TEXT_COLOR,
             ),
-            timer_text: Text::new(String::from("Elapsed: 0.0s"), 16, DEFAULT_GRID_X - 4.0 * BLOCK_SIZE, DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE, TEXT_COLOR),
+            timer_text: Text::new(&String::from("Elapsed: 0.0s"), 16, DEFAULT_GRID_X - 4.0 * BLOCK_SIZE, DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE, TEXT_COLOR),
             clock: 0.0,
             frame_counter: 0,
             running: false,
