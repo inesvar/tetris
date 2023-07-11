@@ -1,14 +1,15 @@
 use crate::assets::Assets;
 use crate::once;
+use crate::settings::TEXT_COLOR;
 use crate::ui::button::Button;
+use crate::ui::interactive_widget_manager::ButtonType::NewSinglePlayerGame;
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
+use crate::ui::text_input::TextInput;
 use graphics::types::Matrix2d;
-use graphics::{rectangle, Context, Transformed, color};
+use graphics::{color, rectangle, Context, Transformed};
 use opengl_graphics::{GlGraphics, GlyphCache};
 use serde::de::Unexpected::Str;
-use crate::ui::interactive_widget_manager::ButtonType::CreateSinglePlayerGameButton;
-use crate::ui::text_input::TextInput;
 
 impl Text {
     pub fn render(
@@ -55,7 +56,7 @@ impl TextInput {
         let color = if self.get_focused() {
             color::RED
         } else {
-            color::WHITE
+            TEXT_COLOR
         };
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
@@ -76,8 +77,7 @@ impl TextInput {
             }
         }
 
-        self.text
-            .render(transform, ctx, gl, font);
+        self.text.render(transform, ctx, gl, font);
     }
 }
 

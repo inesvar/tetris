@@ -1,5 +1,6 @@
 use graphics::types::Color;
 
+#[derive(Clone)]
 pub struct Text {
     pub x: f64,
     pub y: f64,
@@ -18,6 +19,17 @@ impl Text {
             font_size,
             color,
             view: graphics::text::Text::new_color(color, font_size),
+        }
+    }
+
+    pub fn default() -> Text {
+        Text {
+            x: 0.0,
+            y: 0.0,
+            content: String::from(""),
+            font_size: 16,
+            color: [0.0, 0.0, 0.0, 0.0],
+            view: graphics::text::Text::new_color([0.0, 0.0, 0.0, 0.0], 16),
         }
     }
 
