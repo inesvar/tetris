@@ -9,11 +9,12 @@ use crate::Assets;
 use graphics::color;
 use piston::event_id::TEXT;
 
-use crate::ui::main_menu::MainMenu;
+use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{MouseButton, RenderArgs, UpdateArgs};
 use piston_window::Key;
+use crate::ui::interactive_widget_manager::ButtonType::{CreateSinglePlayerGameButton, SettingsButton};
 use crate::ui::text_input::TextInput;
 
 pub enum ViewState {
@@ -50,7 +51,7 @@ pub struct App<'a> {
 
     pub cursor_position: [f64; 2],
 
-    main_menu: MainMenu,
+    main_menu: InteractiveWidgetManager,
 }
 
 impl App<'_> {
@@ -114,7 +115,7 @@ impl App<'_> {
 
             cursor_position: [0.0, 0.0],
 
-            main_menu: MainMenu::new(),
+            main_menu: InteractiveWidgetManager::new(),
         };
 
         if let PlayerConfig::Viewer = app.player_config {
@@ -247,11 +248,11 @@ impl App<'_> {
             _ => {}
         }
 
-        if self.main_menu.create_single_player_game_button.is_pressed() {
+        if self.main_menu.get_button(CreateSinglePlayerGameButton).is_pressed() {
             self.view_state = ViewState::SinglePlayerGame;
         }
 
-        if self.main_menu.settings_button.is_pressed() {
+        if self.main_menu.get_button(SettingsButton).is_pressed() {
             self.view_state = ViewState::Settings;
         }
     }

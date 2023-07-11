@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 pub mod button;
-pub mod main_menu;
+pub mod interactive_widget_manager;
 pub mod render;
 pub mod text;
 pub mod text_input;
