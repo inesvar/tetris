@@ -87,16 +87,17 @@ impl LocalPlayer {
             self.bag_of_tetromino = new_random_bag(BAG_SIZE, &mut self.rng);
         }
         let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
-        self.player_screen
-            .fifo_next_tetromino
-            .push(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
         if possible_active
             .check_possible(&self.player_screen.grid.rows, TranslateRotate::null())
             .is_err()
         {
-            self.game_over = true;
+            self.declare_game_over();
+            self.player_screen.fifo_next_tetromino.push_front(possible_active);
             return;
         }
+        self.player_screen
+        .fifo_next_tetromino
+        .push(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
         self.player_screen.active_tetromino = possible_active;
     }
 
@@ -132,6 +133,11 @@ impl LocalPlayer {
         self.game_over
     }
 
+    pub fn declare_game_over(&mut self) {
+        self.game_over = true;
+        self.player_screen.saved_tetromino = None;
+    }
+
     pub fn render(
         &mut self,
         transform: Matrix2d,
@@ -157,7 +163,7 @@ impl LocalPlayer {
                 .add_garbage(self.garbage_to_be_added)
                 .is_err()
         {
-            self.game_over = true;
+            self.declare_game_over();
         }
         self.garbage_to_be_added = 0;
 
