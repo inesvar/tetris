@@ -96,7 +96,23 @@ impl InteractiveWidgetManager {
         }
     }
 
+    pub fn handle_key_press(&mut self, key: piston::Key) {
+        for text_input in self.text_inputs.values_mut() {
+            text_input.handle_key_press(key);
+        }
+    }
+
+    pub fn handle_text_input(&mut self, text: &String) {
+        for text_input in self.text_inputs.values_mut() {
+            text_input.handle_text_input(text);
+        }
+    }
+
     pub fn get_button(&self, button_type: ButtonType) -> &Button {
         self.buttons.get(&button_type).unwrap_or_else(|| panic!("Button {:?} not found", button_type))
+    }
+
+    pub fn get_input(&self, input_type: TextInputType) -> &TextInput {
+        self.text_inputs.get(&input_type).unwrap_or_else(|| panic!("Input {:?} not found", input_type))
     }
 }

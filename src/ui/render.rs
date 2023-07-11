@@ -55,7 +55,7 @@ impl TextInput {
             color::WHITE
         };
 
-        let outline_rect = graphics::Rectangle::new_border(color, 2.0);
+        let outline_rect = graphics::Rectangle::new_border(color, 1.0);
         outline_rect.draw(dims, &ctx.draw_state, button_transform, gl);
 
         self.text

@@ -1,5 +1,5 @@
 use graphics::color;
-use piston::MouseButton;
+use piston::{Key, MouseButton};
 use crate::ui::text::Text;
 
 pub struct TextInput {
@@ -38,17 +38,42 @@ impl TextInput {
                 if self.are_coords_inside_input(cursor_position[0], cursor_position[1]) {
                     self.is_focused = true;
                     if self.text.text == self.placeholder {
-                        self.text.set_text(String::from("|"));
+                        self.text.set_text(String::from(""));
                     }
                 } else {
                     self.is_focused = false;
-                    if self.text.text == "|" {
+                    if self.text.text == "" {
                         self.text.set_text(String::from(&self.placeholder));
                     }
                 }
             }
             _ => {}
         };
+    }
+
+    pub fn handle_key_press(&mut self, key: Key) {
+        if self.is_focused {
+            match key {
+                Key::Backspace => {
+                    if self.text.text.len() > 0 {
+                        self.text.text.pop();
+                    }
+                }
+                Key::Return => {
+                    self.is_focused = false;
+                    if self.text.text == "" {
+                        self.text.set_text(String::from(&self.placeholder));
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    pub fn handle_text_input(&mut self, text: &String) {
+        if self.is_focused {
+            self.text.text.push_str(text);
+        }
     }
 
     pub fn get_focused(&self) -> bool {

@@ -225,6 +225,13 @@ impl App<'_> {
         }
     }
 
+    pub fn handle_text_input(&mut self, input: &String) {
+        match self.view_state {
+            ViewState::MainMenu => self.main_menu.handle_text_input(input),
+            _ => {}
+        }
+    }
+
     pub fn handle_key_press(&mut self, key: Key) {
         let mut restart = false;
         for player in &mut self.local_players {
@@ -241,6 +248,11 @@ impl App<'_> {
             for player in &mut self.local_players {
                 player.restart();
             }
+        }
+
+        match self.view_state {
+            ViewState::MainMenu => self.main_menu.handle_key_press(key),
+            _ => {}
         }
     }
 
