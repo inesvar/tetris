@@ -1,7 +1,8 @@
 use crate::local_player::{KeyPress, LocalPlayer};
+use rand::Rng;
+use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::ops::{Deref, DerefMut};
-use rand::Rng;
 
 use crate::graphics::Transformed;
 use crate::remote_player::RemotePlayer;
@@ -33,6 +34,13 @@ pub enum PlayerConfig {
     Viewer,
 }
 
+#[derive(PartialEq, Serialize, Deserialize, Clone, Copy)]
+pub enum RunningState {
+    Running,
+    Paused,
+    NotRunning,
+}
+
 pub struct App<'a> {
     gl: GlGraphics,
     local_players: Vec<LocalPlayer>,
@@ -42,9 +50,10 @@ pub struct App<'a> {
     assets: Assets<'a>,
     pub clock: f64,
     frame_counter: u64,
-    running: bool,
+    running: RunningState,
     title_text: Text,
     restart_text: Text,
+    pause_text: Text,
     timer_text: Text,
 
     pub cursor_position: [f64; 2],
@@ -107,10 +116,17 @@ impl App<'_> {
                 50.0,
                 color::WHITE,
             ),
+            pause_text: Text::new(
+                String::from("Press P to resume"),
+                16,
+                180.0,
+                50.0,
+                color::WHITE,
+            ),
             timer_text: Text::new(String::from("Elapsed: 0.0s"), 16, 0.0, 200.0, color::WHITE),
             clock: 0.0,
             frame_counter: 0,
-            running: false,
+            running: RunningState::NotRunning,
 
             cursor_position: [0.0, 0.0],
 
@@ -130,9 +146,13 @@ impl App<'_> {
             // Clear the screen.
             graphics::clear(BG_COLOR, gl);
 
+            // taking into account the player states after a new piece was added
+            // two options :
+            // either the player didn't lose => nothing to do
+            // there was a game over => the running must be set to NotRunning
             for player in &self.local_players {
-                if player.game_over() {
-                    self.running = false;
+                if player.get_game_over() == true {
+                    self.running = RunningState::NotRunning;
                 }
             }
 
@@ -145,20 +165,23 @@ impl App<'_> {
                 }
                 ViewState::Settings => {}
                 _ => {
-                    if self.running {
+                    if self.running == RunningState::Running {
                         self.title_text.render(
                             ctx.transform,
                             &ctx,
                             gl,
                             &mut self.assets.tetris_font,
                         );
-                    } else {
+                    } else if self.running == RunningState::NotRunning {
                         self.restart_text.render(
                             ctx.transform,
                             &ctx,
                             gl,
                             &mut self.assets.main_font,
                         );
+                    } else {
+                        self.pause_text
+                            .render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
                     }
 
                     self.timer_text
@@ -194,7 +217,7 @@ impl App<'_> {
 
     pub(crate) fn update(&mut self, args: &UpdateArgs, gravity: u64, freeze: u64) {
         // on ne fait pas d'update quand running == false
-        if self.running {
+        if self.running == RunningState::Running {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             if let PlayerConfig::TwoRemote = self.player_config {
@@ -213,29 +236,37 @@ impl App<'_> {
     }
 
     pub fn handle_key_press(&mut self, key: Key) {
-        let mut restart = false;
+        let mut key_press = KeyPress::Other;
         for player in &mut self.local_players {
-            match player.handle_key_press(key, self.running) {
-                KeyPress::Restart => {
-                    restart = true;
-                }
-                KeyPress::Other => {}
-            }
+            key_press = player.handle_key_press(key, self.running)
         }
-        if restart {
-            self.running = true;
-            self.clock = 0.0;
-            for player in &mut self.local_players {
-                player.restart();
+        match key_press {
+            KeyPress::Restart => {
+                self.running = RunningState::Running;
+                self.clock = 0.0;
+                for player in &mut self.local_players {
+                    player.restart();
+                }
             }
+            KeyPress::Resume => {
+                self.running = RunningState::Running;
+                for player in &mut self.local_players {
+                    player.resume();
+                }
+            }
+            KeyPress::Pause => {
+                self.running = RunningState::Paused;
+                for player in &mut self.local_players {
+                    player.pause();
+                }
+            }
+            _ => {}
         }
     }
 
     pub fn handle_key_release(&mut self, key: Key) {
-        if self.running {
-            for player in &mut self.local_players {
-                player.handle_key_release(key);
-            }
+        for player in &mut self.local_players {
+            player.handle_key_release(key);
         }
     }
 
