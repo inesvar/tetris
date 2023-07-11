@@ -1,11 +1,12 @@
 use crate::assets::Assets;
 use crate::once;
 use crate::ui::button::Button;
-use crate::ui::main_menu::MainMenu;
+use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
 use graphics::types::Matrix2d;
 use graphics::{rectangle, Context, Transformed};
 use opengl_graphics::{GlGraphics, GlyphCache};
+use crate::ui::interactive_widget_manager::ButtonType::CreateSinglePlayerGameButton;
 use crate::ui::text_input::TextInput;
 
 impl Text {
@@ -70,7 +71,7 @@ impl Button {
     }
 }
 
-impl MainMenu {
+impl InteractiveWidgetManager {
     pub fn render(
         &mut self,
         transform: Matrix2d,
@@ -78,10 +79,12 @@ impl MainMenu {
         gl: &mut GlGraphics,
         assets: &mut Assets,
     ) {
-        self.create_single_player_game_button
-            .render(transform, &ctx, gl, assets);
-        self.create_room_button.render(transform, &ctx, gl, assets);
-        self.join_room_button.render(transform, &ctx, gl, assets);
-        self.settings_button.render(transform, &ctx, gl, assets);
+        for button in self.buttons.values_mut() {
+            button.render(transform, ctx, gl, assets);
+        }
+
+        for text_input in self.text_inputs.values_mut() {
+            text_input.render(transform, ctx, gl, &mut assets.main_font);
+        }
     }
 }
