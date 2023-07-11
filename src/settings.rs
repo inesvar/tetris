@@ -63,11 +63,14 @@ pub static HOLD_TETROMINO_KEYS: [Key; 1] = [Key::C];
 /****************************************/
 /*           GAME PARAMETERS            */
 /****************************************/
+pub static PAUSE_KEYS: [Key; 1] = [Key::P];
+pub static EMPTY_GRID_KEYS: [Key; 1] = [Key::M];
 
 pub static KEY_REPEAT_DELAY: u64 = 20;
 
 pub static BAG_SIZE: u32 = 14; // typical sizes are 7 and 14, 1 is entirely random
-                               // for size 7 * n + k, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
+                               // for size 7 * n + k, k < 7, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
+
 pub const NB_NEXT_TETROMINO: usize = 6;
 
 /****************************************/
@@ -77,5 +80,3 @@ pub const NB_NEXT_TETROMINO: usize = 6;
 pub static SERVER_IP: &str = "127.0.0.1:16000";
 pub static VIEWER_IP: &str = "127.0.0.1:16001";
 //IMPORTANT: do not use localhost, only use the result of hostname -I
-
-pub static SEED: u64 = 64;

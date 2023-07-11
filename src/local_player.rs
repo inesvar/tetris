@@ -3,6 +3,7 @@ use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
 
+use crate::app::RunningState;
 use crate::assets::Assets;
 use crate::circular_buffer::CircularBuffer;
 use crate::player_screen::PlayerScreen;
@@ -119,7 +120,15 @@ impl LocalPlayer {
         self.player_screen.grid.null();
     }
 
-    pub fn game_over(&self) -> bool {
+    pub fn resume(&mut self) {
+        self.keyboard = Keyboard::new();
+    }
+
+    pub fn pause(&mut self) {
+        self.keyboard = Keyboard::new();
+    }
+
+    pub fn get_game_over(&self) -> bool {
         self.game_over
     }
 
@@ -223,11 +232,25 @@ impl LocalPlayer {
         }
     }
 
-    pub fn handle_key_press(&mut self, key: Key, running: bool) -> KeyPress {
+    pub fn handle_key_press(&mut self, key: Key, running: RunningState) -> KeyPress {
         self.keyboard.set_pressed(key);
 
-        if !running && !self.keyboard.is_any_pressed(&RESTART_KEYS) {
+        // the unactive game only listens to the RESTART_KEYS
+        if running == RunningState::NotRunning && !self.keyboard.is_any_pressed(&RESTART_KEYS) {
             return KeyPress::Other;
+        } else if running == RunningState::NotRunning && self.keyboard.is_any_pressed(&RESTART_KEYS)
+        {
+            return KeyPress::Restart;
+        }
+
+        // the paused game only listens to the PAUSE_KEYS
+        if running == RunningState::Paused && !self.keyboard.is_any_pressed(&PAUSE_KEYS) {
+            return KeyPress::Other;
+        } else if running == RunningState::Paused && self.keyboard.is_any_pressed(&PAUSE_KEYS) {
+            return KeyPress::Resume;
+        // the game pauses if PAUSE_KEYS are pressed
+        } else if running == RunningState::Running && self.keyboard.is_any_pressed(&PAUSE_KEYS) {
+            return KeyPress::Pause;
         }
 
         // Pressed once events
@@ -287,11 +310,10 @@ impl LocalPlayer {
                 .right(&self.player_screen.grid.rows);
         }
 
-        if self.keyboard.is_any_pressed(&RESTART_KEYS) {
-            KeyPress::Restart
-        } else {
-            KeyPress::Other
+        if self.keyboard.is_any_pressed(&EMPTY_GRID_KEYS) {
+            self.player_screen.grid.null();
         }
+        KeyPress::Other
     }
 
     pub fn handle_key_release(&mut self, key: Key) {
@@ -301,5 +323,7 @@ impl LocalPlayer {
 
 pub enum KeyPress {
     Restart,
+    Resume,
+    Pause,
     Other,
 }
