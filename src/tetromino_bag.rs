@@ -9,11 +9,17 @@ pub fn new_random_bag(mut size_of_bag: u32, rng: &mut Pcg32) -> Vec<TetrominoKin
     }
     let mut tetromino_bag = vec![];
     let mut list = vec![];
-    for _ in 0..=(size_of_bag / 7) {
-        for i in 0..=6 {
-            list.push(i); // the list has k elements, where k is the lower multiple of 7 higher than size_of_bag
+    for _ in 0..(size_of_bag / 7) {
+        for i in 0..7 {
+            list.push(i); 
         }
     }
+    if size_of_bag%7 != 0 {
+        for i in 0..7 {
+            list.push(i);
+        }
+    }
+    // the list now has k elements, where k is the lower multiple of 7 higher or equal to size_of_bag
     list.shuffle(rng);
 
     for i in 0..size_of_bag {
