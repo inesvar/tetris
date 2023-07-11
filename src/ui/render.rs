@@ -19,12 +19,12 @@ impl Text {
         font: &mut GlyphCache,
     ) {
         let text_transform = transform.trans(
-            self.x - self.text.len() as f64 * self.font_size as f64 * 0.315,
+            self.x - self.content.len() as f64 * self.font_size as f64 * 0.315,
             self.y + self.font_size as f64 * 0.41,
         );
         self.view
             .draw(
-                self.text.as_str(),
+                self.content.as_str(),
                 font,
                 &ctx.draw_state,
                 text_transform,
@@ -63,15 +63,15 @@ impl TextInput {
 
         if self.get_focused() {
             if self.animation_counter % 60 == 0 {
-                if self.text.text.contains("|") {
-                    self.text.text = self.text.text.replace("|", "");
+                if self.text.content.contains("|") {
+                    self.text.content = self.text.content.replace("|", "");
                 } else {
-                    self.text.text.push('|');
+                    self.text.content.push('|');
                 }
             } else {
-                if self.text.text.contains("|") {
-                    self.text.text = self.text.text.replace("|", "");
-                    self.text.text.push('|');
+                if self.text.content.contains("|") {
+                    self.text.content = self.text.content.replace("|", "");
+                    self.text.content.push('|');
                 }
             }
         }

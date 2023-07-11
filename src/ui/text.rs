@@ -3,7 +3,7 @@ use graphics::types::Color;
 pub struct Text {
     pub x: f64,
     pub y: f64,
-    pub text: String,
+    pub content: String,
     pub font_size: u32,
     pub color: Color,
     pub(crate) view: graphics::Text,
@@ -14,7 +14,7 @@ impl Text {
         Text {
             x,
             y,
-            text: String::from(text),
+            content: String::from(text),
             font_size,
             color,
             view: graphics::text::Text::new_color(color, font_size),
@@ -22,6 +22,6 @@ impl Text {
     }
 
     pub fn set_text(&mut self, text: String) {
-        self.text = text;
+        self.content = text;
     }
 }

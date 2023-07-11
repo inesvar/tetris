@@ -39,12 +39,12 @@ impl TextInput {
             MouseButton::Left => {
                 if self.are_coords_inside_input(cursor_position[0], cursor_position[1]) {
                     self.is_focused = true;
-                    if self.text.text == self.placeholder {
+                    if self.text.content == self.placeholder {
                         self.text.set_text(String::from(""));
                     }
                 } else {
                     self.is_focused = false;
-                    if self.text.text == "" {
+                    if self.text.content == "" {
                         self.text.set_text(String::from(&self.placeholder));
                     }
                 }
@@ -57,13 +57,13 @@ impl TextInput {
         if self.is_focused {
             match key {
                 Key::Backspace => {
-                    if self.text.text.len() > 0 {
-                        self.text.text.pop();
+                    if self.text.content.len() > 0 {
+                        self.text.content.pop();
                     }
                 }
                 Key::Return => {
                     self.is_focused = false;
-                    if self.text.text == "" {
+                    if self.text.content == "" {
                         self.text.set_text(String::from(&self.placeholder));
                     }
                 }
@@ -74,7 +74,7 @@ impl TextInput {
 
     pub fn handle_text_input(&mut self, text: &String) {
         if self.is_focused {
-            self.text.text.push_str(text);
+            self.text.content.push_str(text);
         }
     }
 
