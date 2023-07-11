@@ -17,28 +17,28 @@ impl MainMenu {
                 DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
                 300.0,
                 50.0,
-                String::from("New single-player game"),
+                "New single-player game",
             ),
             create_room_button: Button::new(
                 DEFAULT_WINDOW_WIDTH as f64 / 2.0,
                 DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 100.0,
                 300.0,
                 50.0,
-                String::from("Create new room"),
+                "Create new room",
             ),
             join_room_button: Button::new(
                 DEFAULT_WINDOW_WIDTH as f64 / 2.0,
                 DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 200.0,
                 300.0,
                 50.0,
-                String::from("Join room"),
+                "Join room",
             ),
             settings_button: Button::new(
                 DEFAULT_WINDOW_WIDTH as f64 / 2.0,
                 DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 300.0,
                 300.0,
                 50.0,
-                String::from("Settings"),
+                "Settings",
             ),
         }
     }

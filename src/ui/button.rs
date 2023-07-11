@@ -15,7 +15,7 @@ pub struct Button {
 }
 
 impl Button {
-    pub fn new(x: f64, y: f64, width: f64, height: f64, text: String) -> Self {
+    pub fn new(x: f64, y: f64, width: f64, height: f64, text: &str) -> Self {
         Button {
             x,
             y,

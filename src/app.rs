@@ -13,6 +13,7 @@ use crate::ui::text::Text;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{MouseButton, RenderArgs, UpdateArgs};
 use piston_window::Key;
+use crate::ui::text_input::TextInput;
 
 pub enum ViewState {
     MainMenu,
@@ -97,15 +98,15 @@ impl App<'_> {
             player_config,
             view_state: ViewState::MainMenu,
             assets,
-            title_text: Text::new(String::from("T"), 16, 180.0, 50.0, color::WHITE),
+            title_text: Text::new("T", 16, 180.0, 50.0, color::WHITE),
             restart_text: Text::new(
-                String::from("Press R to (re)start"),
+                "Press R to (re)start",
                 16,
                 180.0,
                 50.0,
                 color::WHITE,
             ),
-            timer_text: Text::new(String::from("Elapsed: 0.0s"), 16, 100.0, 200.0, color::WHITE),
+            timer_text: Text::new("Elapsed: 0.0s", 16, 100.0, 200.0, color::WHITE),
             clock: 0.0,
             frame_counter: 0,
             running: false,

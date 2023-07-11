@@ -44,7 +44,7 @@ impl PlayerScreen {
         assets: &mut Assets,
     ) {
         let score_text = Text::new(
-            format!("Score: {}", self.score),
+            format!("Score: {}", self.score).as_str(),
             16,
             100.0,
             250.0,
