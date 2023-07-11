@@ -10,6 +10,7 @@ pub struct TextInput {
     pub(in crate::ui) text: Text,
     placeholder: String,
     is_focused: bool,
+    pub(in crate::ui) animation_counter: u64
 }
 
 impl TextInput {
@@ -22,6 +23,7 @@ impl TextInput {
             text: Text::new(placeholder, 16, x, y, color::WHITE),
             placeholder: String::from(placeholder),
             is_focused: false,
+            animation_counter: 0
         }
     }
 

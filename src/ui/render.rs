@@ -6,6 +6,7 @@ use crate::ui::text::Text;
 use graphics::types::Matrix2d;
 use graphics::{rectangle, Context, Transformed, color};
 use opengl_graphics::{GlGraphics, GlyphCache};
+use serde::de::Unexpected::Str;
 use crate::ui::interactive_widget_manager::ButtonType::CreateSinglePlayerGameButton;
 use crate::ui::text_input::TextInput;
 
@@ -35,12 +36,14 @@ impl Text {
 
 impl TextInput {
     pub fn render(
-        &self,
+        &mut self,
         transform: Matrix2d,
         ctx: &Context,
         gl: &mut GlGraphics,
         font: &mut GlyphCache,
     ) {
+        self.animation_counter += 1;
+
         let dims = rectangle::rectangle_by_corners(
             -self.width / 2.0,
             -self.height / 2.0,
@@ -57,6 +60,21 @@ impl TextInput {
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
         outline_rect.draw(dims, &ctx.draw_state, button_transform, gl);
+
+        if self.get_focused() {
+            if self.animation_counter % 60 == 0 {
+                if self.text.text.contains("|") {
+                    self.text.text = self.text.text.replace("|", "");
+                } else {
+                    self.text.text.push('|');
+                }
+            } else {
+                if self.text.text.contains("|") {
+                    self.text.text = self.text.text.replace("|", "");
+                    self.text.text.push('|');
+                }
+            }
+        }
 
         self.text
             .render(transform, ctx, gl, font);
