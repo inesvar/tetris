@@ -9,7 +9,7 @@ use clap::Parser;
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
-use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent};
+use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent};
 
 use crate::app::App;
 use crate::assets::Assets;
@@ -103,6 +103,10 @@ fn main() {
 
         if let Some(Button::Keyboard(key)) = e.press_args() {
             app.handle_key_press(key);
+        }
+
+        if let Some(text) = e.text_args() {
+            app.handle_text_input(&text);
         }
 
         if let Some(Button::Keyboard(key)) = e.release_args() {
