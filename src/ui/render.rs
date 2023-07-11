@@ -4,7 +4,7 @@ use crate::ui::button::Button;
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
 use graphics::types::Matrix2d;
-use graphics::{rectangle, Context, Transformed};
+use graphics::{rectangle, Context, Transformed, color};
 use opengl_graphics::{GlGraphics, GlyphCache};
 use crate::ui::interactive_widget_manager::ButtonType::CreateSinglePlayerGameButton;
 use crate::ui::text_input::TextInput;
@@ -41,6 +41,23 @@ impl TextInput {
         gl: &mut GlGraphics,
         font: &mut GlyphCache,
     ) {
+        let dims = rectangle::rectangle_by_corners(
+            -self.width / 2.0,
+            -self.height / 2.0,
+            self.width / 2.0,
+            self.height / 2.0,
+        );
+        let button_transform = transform.trans(self.x, self.y);
+
+        let color = if self.get_focused() {
+            color::RED
+        } else {
+            color::WHITE
+        };
+
+        let outline_rect = graphics::Rectangle::new_border(color, 2.0);
+        outline_rect.draw(dims, &ctx.draw_state, button_transform, gl);
+
         self.text
             .render(transform, ctx, gl, font);
     }
