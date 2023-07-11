@@ -44,7 +44,7 @@ impl PlayerScreen {
         assets: &mut Assets,
     ) {
         let score_text = Text::new(
-            format!("Score: {}", self.score),
+            format!("Score: {}", self.score).as_str(),
             16,
             // the score is centered under the hold piece rectangle
             self.grid.x - 4.0 * BLOCK_SIZE, // 4.0 = 1.0 (margin between borders) + 1.0 (margin inside) + 2.0 (half TETROMINO_MAX_WIDTH)

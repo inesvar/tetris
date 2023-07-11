@@ -10,11 +10,11 @@ pub struct Text {
 }
 
 impl Text {
-    pub fn new(text: String, font_size: u32, x: f64, y: f64, color: Color) -> Text {
+    pub fn new(text: &str, font_size: u32, x: f64, y: f64, color: Color) -> Text {
         Text {
             x,
             y,
-            text,
+            text: String::from(text),
             font_size,
             color,
             view: graphics::text::Text::new_color(color, font_size),
