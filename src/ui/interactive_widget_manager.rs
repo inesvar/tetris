@@ -69,6 +69,8 @@ impl InteractiveWidgetManager {
         text_inputs.insert(TextInputType::DebugTextInput, TextInput::new(
             100.0,
             50.0,
+            200.0,
+            50.0,
             "Type here...",
         ));
 
@@ -81,6 +83,10 @@ impl InteractiveWidgetManager {
     pub fn handle_mouse_press(&mut self, mouse_button: MouseButton, cursor_position: &[f64; 2]) {
         for button in self.buttons.values_mut() {
             button.handle_mouse_press(mouse_button, cursor_position);
+        }
+
+        for text_input in self.text_inputs.values_mut() {
+            text_input.handle_mouse_press(mouse_button, cursor_position);
         }
     }
 
