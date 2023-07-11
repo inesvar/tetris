@@ -1,6 +1,7 @@
 use crate::local_player::{KeyPress, LocalPlayer};
 use std::cell::RefCell;
 use std::ops::{Deref, DerefMut};
+use rand::Rng;
 
 use crate::graphics::Transformed;
 use crate::remote_player::RemotePlayer;
@@ -61,7 +62,8 @@ impl App<'_> {
         let remote_player: RemotePlayer;
         let players: Vec<LocalPlayer>;
         let rem_players: Vec<RemotePlayer>;
-        let seed: u64 = SEED;
+        let mut rng = rand::thread_rng();
+        let seed: u64 = rng.gen();
 
         match player_config {
             PlayerConfig::Local => {
