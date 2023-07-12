@@ -210,7 +210,7 @@ impl App<'_> {
                     for player in &mut self.local_players {
                         player.render(
                             ctx.transform
-                                .trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0),
+                                .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0),
                             &ctx,
                             gl,
                             &mut self.assets,
@@ -220,7 +220,7 @@ impl App<'_> {
                     for player in &mut self.remote_players {
                         player.render(
                             ctx.transform
-                                .trans((DEFAULT_WINDOW_HEIGHT * nb_players) as f64, 0.0),
+                                .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0),
                             &ctx,
                             gl,
                             &mut self.assets,
