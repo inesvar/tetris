@@ -8,6 +8,7 @@ pub struct TextInput {
     pub(crate) width: f64,
     pub(crate) height: f64,
     pub(in crate::ui) text: Text,
+    pub(in crate::ui) info_text: Text,
     placeholder: String,
     is_focused: bool,
     pub(in crate::ui) animation_counter: u64,
@@ -20,6 +21,21 @@ impl TextInput {
             y,
             width,
             height,
+            info_text: Text::new("", 16, x, y, TEXT_COLOR),
+            text: Text::new(placeholder, 16, x, y, TEXT_COLOR),
+            placeholder: String::from(placeholder),
+            is_focused: false,
+            animation_counter: 0,
+        }
+    }
+
+    pub fn new_with_info(x: f64, y: f64, width: f64, height: f64, placeholder: &str, info_text: &str) -> Self {
+        TextInput {
+            x,
+            y,
+            width,
+            height,
+            info_text: Text::new(info_text, 16, x, y, TEXT_COLOR),
             text: Text::new(placeholder, 16, x, y, TEXT_COLOR),
             placeholder: String::from(placeholder),
             is_focused: false,
