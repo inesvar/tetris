@@ -78,6 +78,8 @@ impl TextInput {
         }
 
         self.text.render(transform, ctx, gl, font);
+        let info_transform = transform.trans(0.0, -50.0);
+        self.info_text.render(info_transform, ctx, gl, font);
     }
 }
 

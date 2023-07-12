@@ -3,10 +3,10 @@ use crate::settings::{
 };
 use crate::ui::button::Button;
 use crate::ui::text_input::TextInput;
-use piston::MouseButton;
+use piston::{MouseButton, Key};
 use std::collections::HashMap;
 
-#[derive(Hash, Eq, PartialEq, Copy, Clone, Debug)]
+#[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum ButtonType {
     NewSinglePlayerGame,
     CreateRoom,
@@ -17,9 +17,11 @@ pub enum ButtonType {
     Nothing,
 }
 
-#[derive(Hash, Eq, PartialEq, Copy, Clone, Debug)]
+#[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum TextInputType {
     DebugTextInput,
+    FallKey(Vec<Key>),
+    HardDropKey(Vec<Key>),
 }
 
 pub struct InteractiveWidgetManager {
@@ -73,7 +75,53 @@ impl InteractiveWidgetManager {
         let mut text_inputs = HashMap::new();
         text_inputs.insert(
             TextInputType::DebugTextInput,
-            TextInput::new(100.0, 50.0, 200.0, 50.0, "Type here..."),
+            TextInput::new_with_info(100.0, 100.0, 200.0, 50.0, "Type here...", "try this pls"),
+        );
+
+        InteractiveWidgetManager {
+            buttons,
+            text_inputs,
+        }
+    }
+
+    pub fn new_settings() -> InteractiveWidgetManager {
+        let fall_keys_text_input = TextInput::new_with_info(
+            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+            DEFAULT_BUTTON_WIDTH,
+            DEFAULT_BUTTON_HEIGHT,
+            "S, Down",
+            "Fall Keys :"
+        );
+
+        let hard_drop_text_input = TextInput::new_with_info(
+            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 100.0,
+            DEFAULT_BUTTON_WIDTH,
+            DEFAULT_BUTTON_HEIGHT,
+            "Space",
+            "Hard Drop Keys :",
+        );
+
+        let back_to_main_menu_button = Button::new(
+            50.0,
+            50.0,
+            DEFAULT_BUTTON_WIDTH / 6.0,
+            DEFAULT_BUTTON_HEIGHT / 2.0,
+            "Back",
+        );
+
+        let mut buttons = HashMap::new();
+        buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+
+        let mut text_inputs = HashMap::new();
+        text_inputs.insert(
+            TextInputType::FallKey(vec![Key::S, Key::Down]),
+            fall_keys_text_input,
+        );
+        text_inputs.insert(
+            TextInputType::HardDropKey(vec![Key::S, Key::Down]),
+            hard_drop_text_input,
         );
 
         InteractiveWidgetManager {
@@ -134,7 +182,7 @@ impl InteractiveWidgetManager {
             button.handle_mouse_press(mouse_button, cursor_position);
             if button.is_pressed() {
                 println!("a button was pressed");
-                return *button_type;
+                return button_type.clone();
             }
         }
         ButtonType::Nothing

@@ -180,7 +180,12 @@ impl App<'_> {
                     self.widget_manager
                         .render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
-                ViewState::Settings => {}
+                ViewState::Settings => {
+                    self.title_text
+                        .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
+                    self.widget_manager
+                        .render(ctx.transform, &ctx, gl, &mut self.assets)
+                }
                 _ => {
                     if self.running == RunningState::Running {
                         self.title_text.render(
@@ -258,6 +263,7 @@ impl App<'_> {
     pub fn handle_text_input(&mut self, input: &String) {
         match self.view_state {
             ViewState::MainMenu => self.widget_manager.handle_text_input(input),
+            ViewState::Settings => self.widget_manager.handle_text_input(input),
             _ => {}
         }
     }
@@ -292,6 +298,7 @@ impl App<'_> {
 
         match self.view_state {
             ViewState::MainMenu => self.widget_manager.handle_key_press(key),
+            ViewState::Settings => self.widget_manager.handle_key_press(key),
             _ => {}
         }
     }
@@ -328,6 +335,7 @@ impl App<'_> {
         self.view_state = view_state;
         match self.view_state {
             ViewState::MainMenu => self.widget_manager = InteractiveWidgetManager::new_main_menu(),
+            ViewState::Settings => self.widget_manager = InteractiveWidgetManager::new_settings(),
             ViewState::SinglePlayerGame => {
                 self.widget_manager = InteractiveWidgetManager::new_single_player_game()
             }
