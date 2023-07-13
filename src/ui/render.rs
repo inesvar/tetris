@@ -64,20 +64,21 @@ impl TextInput {
 
         if self.get_focused() {
             if self.animation_counter % 60 == 0 {
-                if self.text.content.contains("|") {
-                    self.text.content = self.text.content.replace("|", "");
+                if self.cursor.len() == 0 {
+                    self.cursor.push('|');
                 } else {
-                    self.text.content.push('|');
-                }
-            } else {
-                if self.text.content.contains("|") {
-                    self.text.content = self.text.content.replace("|", "");
-                    self.text.content.push('|');
+                    self.cursor.pop();
                 }
             }
+        } else {
+            self.cursor.clear();
         }
 
+        self.text.content.push_str(&self.cursor);
         self.text.render(transform, ctx, gl, font);
+        if self.cursor.len() > 0 {
+            self.text.content.pop();       
+        }
         let info_transform = transform.trans(0.0, -50.0);
         self.info_text.render(info_transform, ctx, gl, font);
     }
