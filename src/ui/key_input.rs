@@ -2,13 +2,16 @@ use crate::{settings::TEXT_COLOR, ui::text::Text};
 use graphics::color;
 use piston::{Key, MouseButton};
 
+use super::keybindings::keys_to_string;
+
 pub struct KeyInput {
     pub(crate) x: f64,
     pub(crate) y: f64,
     pub(crate) width: f64,
     pub(crate) height: f64,
+    pub(crate) keys: Vec<Key>,
     pub(in crate::ui) text: Text,
-    pub(in crate::ui) cursor: String,  
+    pub(in crate::ui) cursor: String,
     pub(in crate::ui) info_text: Text,
     placeholder: String,
     is_focused: bool,
@@ -16,27 +19,25 @@ pub struct KeyInput {
 }
 
 impl KeyInput {
-    pub fn new(x: f64, y: f64, width: f64, height: f64, placeholder: &str) -> Self {
-        KeyInput {
-            x,
-            y,
-            width,
-            height,
-            text: Text::new(placeholder, 16, x, y, TEXT_COLOR),
-            cursor: String::from(""),
-            info_text: Text::new("", 16, x, y, TEXT_COLOR),
-            placeholder: String::from(placeholder),
-            is_focused: false,
-            animation_counter: 0,
+    pub fn new_with_info(
+        x: f64,
+        y: f64,
+        width: f64,
+        height: f64,
+        keys: &[Key],
+        info_text: &str,
+    ) -> Self {
+        let placeholder = &keys_to_string(keys);
+        let mut vec_keys = vec![];
+        for key in keys {
+            vec_keys.push(*key);
         }
-    }
-
-    pub fn new_with_info(x: f64, y: f64, width: f64, height: f64, placeholder: &str, info_text: &str) -> Self {
         KeyInput {
             x,
             y,
             width,
             height,
+            keys: vec_keys,
             cursor: String::from(""),
             info_text: Text::new(info_text, 16, x, y, TEXT_COLOR),
             text: Text::new(placeholder, 16, x, y, TEXT_COLOR),
@@ -81,9 +82,16 @@ impl KeyInput {
                     let mut last_word = true;
                     while self.text.content.len() > 0 && last_word {
                         println!("entered deleting loop, text is : {}.", self.text.content);
-                        match self.text.content.get((self.text.content.len() - 1)..=(self.text.content.len() - 1)) {
-                            Some(" ") => {last_word = false; break;},
-                            _ => {},
+                        match self
+                            .text
+                            .content
+                            .get((self.text.content.len() - 1)..=(self.text.content.len() - 1))
+                        {
+                            Some(" ") => {
+                                last_word = false;
+                                break;
+                            }
+                            _ => {}
                         }
                         self.text.content.pop();
                     }
