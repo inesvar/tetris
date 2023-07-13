@@ -5,6 +5,7 @@ use crate::ui::button::Button;
 use crate::ui::text_input::TextInput;
 use piston::{MouseButton, Key};
 use std::collections::HashMap;
+use crate::ui::key_input::KeyInput;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum ButtonType {
@@ -20,6 +21,11 @@ pub enum ButtonType {
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum TextInputType {
     DebugTextInput,
+    IpAddressInput
+}
+
+#[derive(Hash, PartialEq, Eq)]
+pub enum KeyInputType {
     FallKey(Vec<Key>),
     HardDropKey(Vec<Key>),
 }
@@ -27,6 +33,7 @@ pub enum TextInputType {
 pub struct InteractiveWidgetManager {
     pub(in crate::ui) buttons: HashMap<ButtonType, Button>,
     pub(in crate::ui) text_inputs: HashMap<TextInputType, TextInput>,
+    pub(in crate::ui) key_inputs: HashMap<KeyInputType, KeyInput>,
 }
 
 impl InteractiveWidgetManager {
@@ -78,14 +85,17 @@ impl InteractiveWidgetManager {
             TextInput::new_with_info(100.0, 100.0, 200.0, 50.0, "Type here...", "try this pls"),
         );
 
+        let key_inputs = HashMap::new();
+
         InteractiveWidgetManager {
             buttons,
             text_inputs,
+            key_inputs,
         }
     }
 
     pub fn new_settings() -> InteractiveWidgetManager {
-        let fall_keys_text_input = TextInput::new_with_info(
+        let fall_keys_text_input = KeyInput::new_with_info(
             DEFAULT_WINDOW_WIDTH as f64 / 2.0,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
             DEFAULT_BUTTON_WIDTH,
@@ -94,7 +104,7 @@ impl InteractiveWidgetManager {
             "Fall Keys :"
         );
 
-        let hard_drop_text_input = TextInput::new_with_info(
+        let hard_drop_text_input = KeyInput::new_with_info(
             DEFAULT_WINDOW_WIDTH as f64 / 2.0,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 100.0,
             DEFAULT_BUTTON_WIDTH,
@@ -113,20 +123,22 @@ impl InteractiveWidgetManager {
 
         let mut buttons = HashMap::new();
         buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+        let text_inputs = HashMap::new();
 
-        let mut text_inputs = HashMap::new();
-        text_inputs.insert(
-            TextInputType::FallKey(vec![Key::S, Key::Down]),
+        let mut key_inputs = HashMap::new();
+        key_inputs.insert(
+            KeyInputType::FallKey(vec![Key::S, Key::Down]),
             fall_keys_text_input,
         );
-        text_inputs.insert(
-            TextInputType::HardDropKey(vec![Key::S, Key::Down]),
+        key_inputs.insert(
+            KeyInputType::HardDropKey(vec![Key::S, Key::Down]),
             hard_drop_text_input,
         );
 
         InteractiveWidgetManager {
             buttons,
             text_inputs,
+            key_inputs,
         }
     }
 
@@ -152,20 +164,24 @@ impl InteractiveWidgetManager {
         buttons.insert(ButtonType::Pause, pause_button);
 
         let text_inputs = HashMap::new();
+        let key_inputs = HashMap::new();
 
         InteractiveWidgetManager {
             buttons,
             text_inputs,
+            key_inputs,
         }
     }
 
     pub fn new_empty() -> InteractiveWidgetManager {
         let buttons = HashMap::new();
         let text_inputs = HashMap::new();
+        let key_inputs = HashMap::new();
 
         InteractiveWidgetManager {
             buttons,
             text_inputs,
+            key_inputs,
         }
     }
 
@@ -176,6 +192,9 @@ impl InteractiveWidgetManager {
     ) -> ButtonType {
         for text_input in self.text_inputs.values_mut() {
             text_input.handle_mouse_press(mouse_button, cursor_position);
+        }
+        for key_input in self.key_inputs.values_mut() {
+            key_input.handle_mouse_press(mouse_button, cursor_position);
         }
 
         for (button_type, button) in self.buttons.iter_mut() {
@@ -198,11 +217,17 @@ impl InteractiveWidgetManager {
         for text_input in self.text_inputs.values_mut() {
             text_input.handle_key_press(key);
         }
+        for key_input in self.key_inputs.values_mut() {
+            key_input.handle_key_press(key);
+        }
     }
 
     pub fn handle_text_input(&mut self, text: &String) {
         for text_input in self.text_inputs.values_mut() {
             text_input.handle_text_input(text);
+        }
+        for key_input in self.key_inputs.values_mut() {
+            key_input.handle_text_input(text);
         }
     }
 
