@@ -6,6 +6,7 @@ use crate::ui::interactive_widget_manager::ButtonType::NewSinglePlayerGame;
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
 use crate::ui::text_input::TextInput;
+use crate::ui::key_input::KeyInput;
 use graphics::types::Matrix2d;
 use graphics::{color, rectangle, Context, Transformed};
 use opengl_graphics::{GlGraphics, GlyphCache};
@@ -36,6 +37,55 @@ impl Text {
 }
 
 impl TextInput {
+    pub fn render(
+        &mut self,
+        transform: Matrix2d,
+        ctx: &Context,
+        gl: &mut GlGraphics,
+        font: &mut GlyphCache,
+    ) {
+        self.animation_counter += 1;
+
+        let dims = rectangle::rectangle_by_corners(
+            -self.width / 2.0,
+            -self.height / 2.0,
+            self.width / 2.0,
+            self.height / 2.0,
+        );
+        let button_transform = transform.trans(self.x, self.y);
+
+        let color = if self.get_focused() {
+            color::RED
+        } else {
+            TEXT_COLOR
+        };
+
+        let outline_rect = graphics::Rectangle::new_border(color, 1.0);
+        outline_rect.draw(dims, &ctx.draw_state, button_transform, gl);
+
+        if self.get_focused() {
+            if self.animation_counter % 60 == 0 {
+                if self.cursor.len() == 0 {
+                    self.cursor.push('|');
+                } else {
+                    self.cursor.pop();
+                }
+            }
+        } else {
+            self.cursor.clear();
+        }
+
+        self.text.content.push_str(&self.cursor);
+        self.text.render(transform, ctx, gl, font);
+        if self.cursor.len() > 0 {
+            self.text.content.pop();       
+        }
+        let info_transform = transform.trans(0.0, -50.0);
+        self.info_text.render(info_transform, ctx, gl, font);
+    }
+}
+
+impl KeyInput {
     pub fn render(
         &mut self,
         transform: Matrix2d,
@@ -123,6 +173,9 @@ impl InteractiveWidgetManager {
 
         for text_input in self.text_inputs.values_mut() {
             text_input.render(transform, ctx, gl, &mut assets.main_font);
+        }
+        for key_input in self.key_inputs.values_mut() {
+            key_input.render(transform, ctx, gl, &mut assets.main_font);
         }
     }
 }
