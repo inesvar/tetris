@@ -1,11 +1,13 @@
 use crate::settings::{
-    DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
+    DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH,
+    DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS, HOLD_TETROMINO_KEYS,
+    LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS,
 };
 use crate::ui::button::Button;
-use crate::ui::text_input::TextInput;
-use piston::{MouseButton, Key};
-use std::collections::HashMap;
 use crate::ui::key_input::KeyInput;
+use crate::ui::text_input::TextInput;
+use piston::{Key, MouseButton};
+use std::collections::HashMap;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum ButtonType {
@@ -21,13 +23,18 @@ pub enum ButtonType {
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum TextInputType {
     DebugTextInput,
-    IpAddressInput
+    IpAddressInput,
 }
 
 #[derive(Hash, PartialEq, Eq)]
 pub enum KeyInputType {
     FallKey(Vec<Key>),
     HardDropKey(Vec<Key>),
+    RightKey(Vec<Key>),
+    LeftKey(Vec<Key>),
+    RotateClockwiseKey(Vec<Key>),
+    RotateCounterclockwiseKey(Vec<Key>),
+    HoldTetrominoKey(Vec<Key>),
 }
 
 pub struct InteractiveWidgetManager {
@@ -95,24 +102,68 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_settings() -> InteractiveWidgetManager {
-        let fall_keys_text_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+        let fall_keys_input = KeyInput::new_with_info(
+            DEFAULT_WINDOW_WIDTH as f64 / 4.0,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
-            "S, Down",
-            "Fall Keys :"
+            DEFAULT_KEY_INPUT_WIDTH,
+            DEFAULT_KEY_INPUT_HEIGHT,
+            &FALL_KEYS,
+            "Fall Keys :",
         );
 
-        let hard_drop_text_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+        let hard_drop_keys_input = KeyInput::new_with_info(
+            DEFAULT_WINDOW_WIDTH as f64 / 4.0,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 100.0,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
-            "Space",
+            DEFAULT_KEY_INPUT_WIDTH,
+            DEFAULT_KEY_INPUT_HEIGHT,
+            &HARD_DROP_KEYS,
             "Hard Drop Keys :",
         );
 
+        let right_keys_input = KeyInput::new_with_info(
+            DEFAULT_WINDOW_WIDTH as f64 / 4.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 200.0,
+            DEFAULT_KEY_INPUT_WIDTH,
+            DEFAULT_KEY_INPUT_HEIGHT,
+            &RIGHT_KEYS,
+            "Right Keys :",
+        );
+
+        let left_keys_input = KeyInput::new_with_info(
+            DEFAULT_WINDOW_WIDTH as f64 / 4.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 300.0,
+            DEFAULT_KEY_INPUT_WIDTH,
+            DEFAULT_KEY_INPUT_HEIGHT,
+            &LEFT_KEYS,
+            "Left Keys :",
+        );
+
+        let rotate_clockwise_keys_input = KeyInput::new_with_info(
+            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+            DEFAULT_KEY_INPUT_WIDTH,
+            DEFAULT_KEY_INPUT_HEIGHT,
+            &ROTATE_CLOCKWISE_KEYS,
+            "Rotate Clockwise Keys :",
+        );
+
+        let rotate_counterclockwise_keys_input = KeyInput::new_with_info(
+            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 100.0,
+            DEFAULT_KEY_INPUT_WIDTH,
+            DEFAULT_KEY_INPUT_HEIGHT,
+            &ROTATE_COUNTERCLOCKWISE_KEYS,
+            "Rotate Counterclockwise Keys :",
+        );
+
+        let hold_tetromino_keys_input = KeyInput::new_with_info(
+            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 200.0,
+            DEFAULT_KEY_INPUT_WIDTH,
+            DEFAULT_KEY_INPUT_HEIGHT,
+            &HOLD_TETROMINO_KEYS,
+            "Hold Tetromino Keys :",
+        );
         let back_to_main_menu_button = Button::new(
             50.0,
             50.0,
@@ -127,12 +178,34 @@ impl InteractiveWidgetManager {
 
         let mut key_inputs = HashMap::new();
         key_inputs.insert(
-            KeyInputType::FallKey(vec![Key::S, Key::Down]),
-            fall_keys_text_input,
+            KeyInputType::FallKey(fall_keys_input.keys.clone()),
+            fall_keys_input,
         );
         key_inputs.insert(
-            KeyInputType::HardDropKey(vec![Key::S, Key::Down]),
-            hard_drop_text_input,
+            KeyInputType::HardDropKey(hard_drop_keys_input.keys.clone()),
+            hard_drop_keys_input,
+        );
+        key_inputs.insert(
+            KeyInputType::RightKey(right_keys_input.keys.clone()),
+            right_keys_input,
+        );
+        key_inputs.insert(
+            KeyInputType::LeftKey(left_keys_input.keys.clone()),
+            left_keys_input,
+        );
+        key_inputs.insert(
+            KeyInputType::RotateClockwiseKey(rotate_clockwise_keys_input.keys.clone()),
+            rotate_clockwise_keys_input,
+        );
+        key_inputs.insert(
+            KeyInputType::RotateCounterclockwiseKey(
+                rotate_counterclockwise_keys_input.keys.clone(),
+            ),
+            rotate_counterclockwise_keys_input,
+        );
+        key_inputs.insert(
+            KeyInputType::HoldTetrominoKey(hold_tetromino_keys_input.keys.clone()),
+            hold_tetromino_keys_input,
         );
 
         InteractiveWidgetManager {

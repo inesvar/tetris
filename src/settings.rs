@@ -39,6 +39,14 @@ pub static DEFAULT_BUTTON_WIDTH: f64 = 300.0;
 pub static DEFAULT_BUTTON_HEIGHT: f64 = 50.0;
 
 /****************************************/
+/*      POSITIONS IN SETTINGS VIEW      */
+/****************************************/
+
+// size of the buttons
+pub static DEFAULT_KEY_INPUT_WIDTH: f64 = 200.0;
+pub static DEFAULT_KEY_INPUT_HEIGHT: f64 = 50.0;
+
+/****************************************/
 /*               COLORS                 */
 /****************************************/
 
@@ -48,7 +56,7 @@ pub static GRID_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
 pub static TEXT_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
 
 /****************************************/
-/*            KEYBINDINGS               */
+/*          GAME KEYBINDINGS            */
 /****************************************/
 
 pub static FALL_KEYS: [Key; 2] = [Key::Down, Key::S];
@@ -57,12 +65,13 @@ pub static RIGHT_KEYS: [Key; 2] = [Key::Right, Key::D];
 pub static LEFT_KEYS: [Key; 2] = [Key::Left, Key::Q];
 pub static ROTATE_CLOCKWISE_KEYS: [Key; 2] = [Key::Up, Key::E];
 pub static ROTATE_COUNTERCLOCKWISE_KEYS: [Key; 2] = [Key::NumPad3, Key::A];
-pub static RESTART_KEYS: [Key; 1] = [Key::R];
 pub static HOLD_TETROMINO_KEYS: [Key; 1] = [Key::C];
 
 /****************************************/
 /*           GAME PARAMETERS            */
 /****************************************/
+
+pub static RESTART_KEYS: [Key; 1] = [Key::R];
 pub static PAUSE_KEYS: [Key; 1] = [Key::P];
 pub static EMPTY_GRID_KEYS: [Key; 1] = [Key::M];
 
