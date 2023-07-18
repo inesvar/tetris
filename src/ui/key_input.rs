@@ -81,20 +81,7 @@ impl KeyInput {
         }
         match key {
             Key::Backspace => {
-                self.text.content.pop();
-                while self.text.content.chars().count() > 0 {
-                    match self
-                        .text
-                        .content
-                        .get((self.text.content.len() - 1)..=(self.text.content.len() - 1))
-                    {
-                        Some(" ") => {
-                            break;
-                        }
-                        _ => {}
-                    }
-                    self.text.content.pop();
-                }
+                self.pop_key();
             }
             Key::Return => {
                 self.is_focused = false;
@@ -103,12 +90,36 @@ impl KeyInput {
                 }
             }
             _ => {
-                self.text.content.push_str(&key_to_string(key));
+                self.push_key(key);
             }
         }
     }
 
     pub fn get_focused(&self) -> bool {
         self.is_focused
+    }
+
+    fn push_key(&mut self, key: Key) {
+        self.text.content.push_str(&key_to_string(key));
+        self.keys.push(key);
+    }
+
+    fn pop_key(&mut self) {
+        self.text.content.pop();
+        while self.text.content.chars().count() > 0 {
+            // TODO change this syntax
+            match self
+                .text
+                .content
+                .get((self.text.content.len() - 1)..=(self.text.content.len() - 1))
+            {
+                Some(" ") => {
+                    break;
+                }
+                _ => {}
+            }
+            self.text.content.pop();
+        }
+        self.keys.pop();
     }
 }
