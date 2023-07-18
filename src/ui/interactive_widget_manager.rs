@@ -299,9 +299,6 @@ impl InteractiveWidgetManager {
         for text_input in self.text_inputs.values_mut() {
             text_input.handle_text_input(text);
         }
-        for key_input in self.key_inputs.values_mut() {
-            key_input.handle_text_input(text);
-        }
     }
 
     pub fn get_button(&self, button_type: ButtonType) -> &Button {

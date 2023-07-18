@@ -1,8 +1,10 @@
-use crate::{settings::TEXT_COLOR, ui::text::Text};
+use crate::{
+    keyboard::{key_to_string, keys_to_string},
+    settings::TEXT_COLOR,
+    ui::text::Text,
+};
 use graphics::color;
 use piston::{Key, MouseButton};
-
-use super::keybindings::keys_to_string;
 
 pub struct KeyInput {
     pub(crate) x: f64,
@@ -74,125 +76,34 @@ impl KeyInput {
     }
 
     pub fn handle_key_press(&mut self, key: Key) {
-        if self.is_focused {
-            match key {
-                Key::Backspace => {
-                    println!("before first pop, text is : {}.", self.text.content);
-                    self.text.content.pop();
-                    let mut last_word = true;
-                    while self.text.content.len() > 0 && last_word {
-                        println!("entered deleting loop, text is : {}.", self.text.content);
-                        match self
-                            .text
-                            .content
-                            .get((self.text.content.len() - 1)..=(self.text.content.len() - 1))
-                        {
-                            Some(" ") => {
-                                last_word = false;
-                                break;
-                            }
-                            _ => {}
-                        }
-                        self.text.content.pop();
-                    }
-                }
-                Key::Return => {
-                    self.is_focused = false;
-                    if self.text.content == "" {
-                        self.text.set_text(String::from(&self.placeholder));
-                    }
-                }
-                Key::Down => {
-                    if self.is_focused {
-                        self.text.content.push_str("Down, ");
-                    }
-                }
-                Key::Space => {
-                    if self.is_focused {
-                        self.text.content.push_str("Space, ");
-                    }
-                }
-                Key::Right => {
-                    if self.is_focused {
-                        self.text.content.push_str("Right, ");
-                    }
-                }
-                Key::Left => {
-                    if self.is_focused {
-                        self.text.content.push_str("Left, ");
-                    }
-                }
-                Key::Up => {
-                    if self.is_focused {
-                        self.text.content.push_str("Up, ");
-                    }
-                }
-                Key::NumPad0 => {
-                    if self.is_focused {
-                        self.text.content.push_str("Numpad0, ");
-                    }
-                }
-                Key::NumPad1 => {
-                    if self.is_focused {
-                        self.text.content.push_str("Numpad1, ");
-                    }
-                }
-                Key::NumPad2 => {
-                    if self.is_focused {
-                        self.text.content.push_str("Numpad2, ");
-                    }
-                }
-                Key::NumPad3 => {
-                    if self.is_focused {
-                        self.text.content.push_str("Numpad3, ");
-                    }
-                }
-                Key::NumPad4 => {
-                    if self.is_focused {
-                        self.text.content.push_str("Numpad4, ");
-                    }
-                }
-                Key::NumPad5 => {
-                    if self.is_focused {
-                        self.text.content.push_str("Numpad5, ");
-                    }
-                }
-                Key::NumPad6 => {
-                    if self.is_focused {
-                        self.text.content.push_str("Numpad6, ");
-                    }
-                }
-                Key::NumPad7 => {
-                    if self.is_focused {
-                        self.text.content.push_str("Numpad7, ");
-                    }
-                }
-                Key::NumPad8 => {
-                    if self.is_focused {
-                        self.text.content.push_str("Numpad8, ");
-                    }
-                }
-                Key::NumPad9 => {
-                    if self.is_focused {
-                        self.text.content.push_str("Numpad9, ");
-                    }
-                }
-                _ => {}
-            }
+        if !self.is_focused {
+            return;
         }
-    }
-
-    pub fn handle_text_input(&mut self, text: &String) {
-        if self.is_focused {
-            if text == "" {
-                println!("nothing");
-                return;
+        match key {
+            Key::Backspace => {
+                self.text.content.pop();
+                while self.text.content.chars().count() > 0 {
+                    match self
+                        .text
+                        .content
+                        .get((self.text.content.len() - 1)..=(self.text.content.len() - 1))
+                    {
+                        Some(" ") => {
+                            break;
+                        }
+                        _ => {}
+                    }
+                    self.text.content.pop();
+                }
             }
-            if text == "," {
-                self.text.content.push_str(&(text.to_owned() + " "));
-            } else if text != " " && !text.chars().any(char::is_numeric) && text != "" {
-                println!("normal text : {}.", text);
-                self.text.content.push_str(&(text.to_owned() + ", "));
+            Key::Return => {
+                self.is_focused = false;
+                if self.text.content == "" {
+                    self.text.set_text(String::from(&self.placeholder));
+                }
+            }
+            _ => {
+                self.text.content.push_str(&key_to_string(key));
             }
         }
     }
