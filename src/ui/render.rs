@@ -51,16 +51,12 @@ impl TextInput {
         );
         let button_transform = transform.trans(self.x, self.y);
 
-        let color = if self.get_focused() {
-            color::RED
-        } else {
-            TEXT_COLOR
-        };
+        let color = if self.focused { color::RED } else { TEXT_COLOR };
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
         outline_rect.draw(dims, &ctx.draw_state, button_transform, gl);
 
-        if self.get_focused() {
+        if self.focused {
             if self.animation_counter % 60 == 0 {
                 if self.cursor.len() == 0 {
                     self.cursor.push('|');
