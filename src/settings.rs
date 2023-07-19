@@ -59,7 +59,7 @@ pub static TEXT_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
 /*          GAME KEYBINDINGS            */
 /****************************************/
 
-pub struct Settings {
+pub struct Keybindings {
     pub fall_keys: Vec<Key>,
     pub hard_drop_keys: Vec<Key>,
     pub right_keys: Vec<Key>,
@@ -69,8 +69,8 @@ pub struct Settings {
     pub hold_tetromino_keys: Vec<Key>,
 }
 
-impl Settings {
-    pub fn new() -> Settings {
+impl Keybindings {
+    pub fn new() -> Keybindings {
         let fall_keys = FALL_KEYS.to_vec();
         let hard_drop_keys = HARD_DROP_KEYS.to_vec();
         let right_keys = RIGHT_KEYS.to_vec();
@@ -79,7 +79,7 @@ impl Settings {
         let rotate_counterclockwise_keys = ROTATE_COUNTERCLOCKWISE_KEYS.to_vec();
         let hold_tetromino_keys = HOLD_TETROMINO_KEYS.to_vec();
 
-        Settings {
+        Keybindings {
             fall_keys,
             hard_drop_keys,
             right_keys,
@@ -135,14 +135,32 @@ static HOLD_TETROMINO_KEYS: [Key; 1] = [Key::C];
 /*           APP PARAMETERS             */
 /****************************************/
 
+// not setable in the UI
 pub static RESTART_KEYS: [Key; 1] = [Key::R];
 pub static PAUSE_KEYS: [Key; 1] = [Key::P];
-
 pub static KEY_REPEAT_DELAY: u64 = 20;
+
+pub struct Settings {
+    pub seed: u64,
+    pub bag_size: u32,
+    pub nb_next_tetromino: usize,
+}
+
+impl Settings {
+    pub fn new(seed: u64) -> Settings {
+        let bag_size = BAG_SIZE;
+        let nb_next_tetromino = NB_NEXT_TETROMINO;
+
+        Settings {
+            seed,
+            bag_size,
+            nb_next_tetromino,
+        }
+    }
+}
 
 pub static BAG_SIZE: u32 = 14; // typical sizes are 7 and 14, 1 is entirely random
                                // for size 7 * n + k, k < 7, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
-
 pub const NB_NEXT_TETROMINO: usize = 6;
 
 /****************************************/
