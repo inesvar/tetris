@@ -1,7 +1,7 @@
+use crate::app::ViewState;
 use crate::settings::{
-    DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH,
-    DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, FALL_KEYS, HARD_DROP_KEYS, HOLD_TETROMINO_KEYS,
-    LEFT_KEYS, RIGHT_KEYS, ROTATE_CLOCKWISE_KEYS, ROTATE_COUNTERCLOCKWISE_KEYS,
+    self, Settings, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_KEY_INPUT_HEIGHT,
+    DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
 };
 use crate::ui::button::Button;
 use crate::ui::key_input::KeyInput;
@@ -11,12 +11,12 @@ use std::collections::HashMap;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum ButtonType {
-    NewSinglePlayerGame,
-    CreateRoom,
-    JoinRoom,
-    Settings,
+    ToSinglePlayerGame,
+    ToCreateRoom,
+    ToJoinRoom,
+    ToSettings,
     BackToMainMenu,
-    Pause,
+    ToPause,
     Nothing,
 }
 
@@ -79,12 +79,12 @@ impl InteractiveWidgetManager {
 
         let mut buttons = HashMap::new();
         buttons.insert(
-            ButtonType::NewSinglePlayerGame,
+            ButtonType::ToSinglePlayerGame,
             create_single_player_game_button,
         );
-        buttons.insert(ButtonType::CreateRoom, create_room_button);
-        buttons.insert(ButtonType::JoinRoom, join_room_button);
-        buttons.insert(ButtonType::Settings, settings_button);
+        buttons.insert(ButtonType::ToCreateRoom, create_room_button);
+        buttons.insert(ButtonType::ToJoinRoom, join_room_button);
+        buttons.insert(ButtonType::ToSettings, settings_button);
 
         let mut text_inputs = HashMap::new();
         text_inputs.insert(
@@ -101,13 +101,13 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub fn new_settings() -> InteractiveWidgetManager {
+    pub fn new_settings(settings: &Settings) -> InteractiveWidgetManager {
         let fall_keys_input = KeyInput::new_with_info(
             DEFAULT_WINDOW_WIDTH as f64 / 4.0,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &FALL_KEYS,
+            &settings.fall_keys,
             "Fall Keys :",
         );
 
@@ -116,7 +116,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 100.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &HARD_DROP_KEYS,
+            &settings.hard_drop_keys,
             "Hard Drop Keys :",
         );
 
@@ -125,7 +125,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 200.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &RIGHT_KEYS,
+            &settings.right_keys,
             "Right Keys :",
         );
 
@@ -134,7 +134,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 300.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &LEFT_KEYS,
+            &settings.left_keys,
             "Left Keys :",
         );
 
@@ -143,7 +143,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &ROTATE_CLOCKWISE_KEYS,
+            &settings.rotate_clockwise_keys,
             "Rotate Clockwise Keys :",
         );
 
@@ -152,7 +152,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 100.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &ROTATE_COUNTERCLOCKWISE_KEYS,
+            &settings.rotate_counterclockwise_keys,
             "Rotate Counterclockwise Keys :",
         );
 
@@ -161,7 +161,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + 200.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &HOLD_TETROMINO_KEYS,
+            &settings.hold_tetromino_keys,
             "Hold Tetromino Keys :",
         );
         let back_to_main_menu_button = Button::new(
@@ -234,7 +234,7 @@ impl InteractiveWidgetManager {
 
         let mut buttons = HashMap::new();
         buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
-        buttons.insert(ButtonType::Pause, pause_button);
+        buttons.insert(ButtonType::ToPause, pause_button);
 
         let text_inputs = HashMap::new();
         let key_inputs = HashMap::new();
@@ -258,11 +258,7 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub fn handle_mouse_press(
-        &mut self,
-        mouse_button: MouseButton,
-        cursor_position: &[f64; 2],
-    ) -> ButtonType {
+    pub fn handle_mouse_press(&mut self, mouse_button: MouseButton, cursor_position: &[f64; 2]) {
         for text_input in self.text_inputs.values_mut() {
             text_input.handle_mouse_press(mouse_button, cursor_position);
         }
@@ -270,14 +266,9 @@ impl InteractiveWidgetManager {
             key_input.handle_mouse_press(mouse_button, cursor_position);
         }
 
-        for (button_type, button) in self.buttons.iter_mut() {
+        for button in self.buttons.values_mut() {
             button.handle_mouse_press(mouse_button, cursor_position);
-            if button.is_pressed() {
-                println!("a button was pressed");
-                return button_type.clone();
-            }
         }
-        ButtonType::Nothing
     }
 
     pub fn handle_mouse_release(&mut self, mouse_button: MouseButton, cursor_position: &[f64; 2]) {
@@ -311,5 +302,23 @@ impl InteractiveWidgetManager {
         self.text_inputs
             .get(&input_type)
             .unwrap_or_else(|| panic!("Input {:?} not found", input_type))
+    }
+
+    pub fn update_settings(&mut self, settings_manager: &mut Settings) {
+        for (key_type, key_input) in self.key_inputs.iter_mut() {
+            if key_input.commit() {
+                settings_manager.set_keys(key_type, key_input.keys.clone());
+                settings_manager.print();
+            }
+        }
+    }
+
+    pub fn update_view(&mut self) -> ButtonType {
+        for (button_type, button) in self.buttons.iter_mut() {
+            if button.commit() {
+                return button_type.clone();
+            }
+        }
+        ButtonType::Nothing
     }
 }
