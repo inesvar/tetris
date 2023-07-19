@@ -343,10 +343,6 @@ impl LocalPlayer {
                 .active_tetromino
                 .right(&self.player_screen.grid.rows);
         }
-
-        if self.keyboard.is_any_pressed(&EMPTY_GRID_KEYS) {
-            self.player_screen.grid.null();
-        }
         KeyPress::Other
     }
 
