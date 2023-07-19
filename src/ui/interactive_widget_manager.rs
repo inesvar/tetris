@@ -1,6 +1,6 @@
 use crate::app::ViewState;
 use crate::settings::{
-    self, Settings, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_KEY_INPUT_HEIGHT,
+    self, Keybindings, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_KEY_INPUT_HEIGHT,
     DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
 };
 use crate::ui::button::Button;
@@ -101,7 +101,7 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub fn new_settings(settings: &Settings) -> InteractiveWidgetManager {
+    pub fn new_settings(settings: &Keybindings) -> InteractiveWidgetManager {
         let fall_keys_input = KeyInput::new_with_info(
             DEFAULT_WINDOW_WIDTH as f64 / 4.0,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
@@ -304,11 +304,11 @@ impl InteractiveWidgetManager {
             .unwrap_or_else(|| panic!("Input {:?} not found", input_type))
     }
 
-    pub fn update_settings(&mut self, settings_manager: &mut Settings) {
+    pub fn update_settings(&mut self, keybindings_manager: &mut Keybindings) {
         for (key_type, key_input) in self.key_inputs.iter_mut() {
             if key_input.commit() {
-                settings_manager.set_keys(key_type, key_input.keys.clone());
-                settings_manager.print();
+                keybindings_manager.set_keys(key_type, key_input.keys.clone());
+                keybindings_manager.print();
             }
         }
     }

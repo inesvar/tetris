@@ -16,6 +16,7 @@ use serde::{Deserialize, Serialize};
 pub struct PlayerScreen {
     pub grid: TetrisGrid,
     pub score: u64,
+    pub game_over: bool,
     pub new_completed_lines: u64,
     pub active_tetromino: Tetromino,
     pub saved_tetromino: Option<Tetromino>,
@@ -28,6 +29,7 @@ impl PlayerScreen {
         PlayerScreen {
             grid: TetrisGrid::new(DEFAULT_GRID_X, DEFAULT_GRID_Y, NB_COLUMNS, NB_ROWS), //FIXME: this will not always be the case
             score: 0,
+            game_over: false,
             new_completed_lines: 0,
             active_tetromino: Tetromino::default(),
             saved_tetromino: None,
@@ -64,11 +66,11 @@ impl PlayerScreen {
 
         // drawing a border for the hold piece
         let transform = self.grid.transform.trans(
-            - (BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
+            -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
             self.grid.total_height - self.grid.visible_height,
         );
-        let rectangle_width = BLOCK_SIZE +  TETROMINO_MAX_WIDTH + BLOCK_SIZE;
-        let rectangle_height = BLOCK_SIZE +  TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
+        let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
+        let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
         let dims: Rectangle = [0.0, 0.0, rectangle_width, rectangle_height];
         rectangle(GRID_BG_COLOR, dims, transform, gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
@@ -77,7 +79,7 @@ impl PlayerScreen {
         // drawing the hold piece
         if let Some(saved) = self.saved_tetromino {
             let transform = self.grid.transform.trans(
-                - self.grid.total_width * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
+                -self.grid.total_width * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
                 TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
             );
             saved.render(transform, &ctx, gl, assets);
@@ -90,7 +92,7 @@ impl PlayerScreen {
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;
-        let dims: Rectangle = [0.0, 0.0,  width, height];
+        let dims: Rectangle = [0.0, 0.0, width, height];
         rectangle(GRID_BG_COLOR, dims, transform, gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
         outline_rect.draw(dims, &ctx.draw_state, transform, gl);

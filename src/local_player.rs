@@ -25,7 +25,6 @@ pub struct LocalPlayer {
     keyboard: Keyboard,
     freeze_frame: u64,
     bag_of_tetromino: Vec<TetrominoKind>,
-    game_over: bool,
     sender: bool,
     garbage_to_be_added: u64,
     #[serde(skip, default = "new_pcg")]
@@ -60,6 +59,7 @@ impl LocalPlayer {
         let player_screen = PlayerScreen {
             grid,
             score: 0,
+            game_over: false,
             new_completed_lines: 0,
             active_tetromino: first_tetromino,
             saved_tetromino: None,
@@ -72,7 +72,6 @@ impl LocalPlayer {
             keyboard: Keyboard::new(),
             freeze_frame: 0, // that's about 10 billion years at 60fps
             bag_of_tetromino,
-            game_over: false,
             sender,
             garbage_to_be_added: 0,
             rng,
@@ -114,26 +113,17 @@ impl LocalPlayer {
 
 impl LocalPlayer {
     pub fn restart(&mut self) {
-        self.game_over = false;
+        self.player_screen.game_over = false;
         self.player_screen.score = 0;
-        self.keyboard = Keyboard::new();
         self.player_screen.grid.null();
     }
 
-    pub fn resume(&mut self) {
-        self.keyboard = Keyboard::new();
-    }
-
-    pub fn pause(&mut self) {
-        self.keyboard = Keyboard::new();
-    }
-
     pub fn get_game_over(&self) -> bool {
-        self.game_over
+        self.player_screen.game_over
     }
 
     pub fn declare_game_over(&mut self) {
-        self.game_over = true;
+        self.player_screen.game_over = true;
         self.player_screen.saved_tetromino = None;
     }
 
@@ -149,7 +139,7 @@ impl LocalPlayer {
 
     pub fn update(
         &mut self,
-        settings_manager: &Settings,
+        keybindings_manager: &Keybindings,
         frame_counter: u64,
         gravity: u64,
         freeze: u64,
@@ -208,7 +198,7 @@ impl LocalPlayer {
 
         // Translate the tetromino on long key press
         if frame_counter % 5 == 0 {
-            if self.keyboard.is_any_pressed(&settings_manager.fall_keys) {
+            if self.keyboard.is_any_pressed(&keybindings_manager.fall_keys) {
                 if self
                     .player_screen
                     .active_tetromino
@@ -220,14 +210,14 @@ impl LocalPlayer {
                 }
             } else if self
                 .keyboard
-                .is_any_delay_pressed(&settings_manager.left_keys)
+                .is_any_delay_pressed(&keybindings_manager.left_keys)
             {
                 self.player_screen
                     .active_tetromino
                     .left(&self.player_screen.grid.rows);
             } else if self
                 .keyboard
-                .is_any_delay_pressed(&settings_manager.right_keys)
+                .is_any_delay_pressed(&keybindings_manager.right_keys)
             {
                 self.player_screen
                     .active_tetromino
@@ -251,7 +241,7 @@ impl LocalPlayer {
 
     pub fn handle_key_press(
         &mut self,
-        settings_manager: &Settings,
+        keybindings_manager: &Keybindings,
         key: Key,
         running: RunningState,
     ) -> KeyPress {
@@ -278,7 +268,7 @@ impl LocalPlayer {
         // Pressed once events
         if self
             .keyboard
-            .is_any_pressed(&settings_manager.rotate_clockwise_keys)
+            .is_any_pressed(&keybindings_manager.rotate_clockwise_keys)
         {
             // rotate once the tetromino
             self.player_screen
@@ -286,7 +276,7 @@ impl LocalPlayer {
                 .turn_clockwise(&self.player_screen.grid.rows);
         } else if self
             .keyboard
-            .is_any_pressed(&settings_manager.rotate_counterclockwise_keys)
+            .is_any_pressed(&keybindings_manager.rotate_counterclockwise_keys)
         {
             // rotate once the tetromino
             self.player_screen
@@ -296,7 +286,7 @@ impl LocalPlayer {
 
         if self
             .keyboard
-            .is_any_pressed(&settings_manager.hard_drop_keys)
+            .is_any_pressed(&keybindings_manager.hard_drop_keys)
         {
             // hard drop the tetromino
             self.player_screen
@@ -318,7 +308,7 @@ impl LocalPlayer {
 
         if self
             .keyboard
-            .is_any_pressed(&settings_manager.hold_tetromino_keys)
+            .is_any_pressed(&keybindings_manager.hold_tetromino_keys)
         {
             // hold the tetromino
             if let Some(mut saved) = self.player_screen.saved_tetromino {
@@ -334,11 +324,11 @@ impl LocalPlayer {
             }
         }
 
-        if self.keyboard.is_any_pressed(&settings_manager.left_keys) {
+        if self.keyboard.is_any_pressed(&keybindings_manager.left_keys) {
             self.player_screen
                 .active_tetromino
                 .left(&self.player_screen.grid.rows);
-        } else if self.keyboard.is_any_pressed(&settings_manager.right_keys) {
+        } else if self.keyboard.is_any_pressed(&keybindings_manager.right_keys) {
             self.player_screen
                 .active_tetromino
                 .right(&self.player_screen.grid.rows);

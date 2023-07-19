@@ -58,6 +58,7 @@ pub struct App<'a> {
     pub cursor_position: [f64; 2],
 
     widget_manager: InteractiveWidgetManager,
+    keybindings_manager: Keybindings,
     settings_manager: Settings,
 }
 
@@ -73,7 +74,6 @@ impl App<'_> {
         let rem_players: Vec<RemotePlayer>;
         let mut rng = rand::thread_rng();
         let seed: u64 = rng.gen();
-        let settings_manager = settings::Settings::new();
 
         match player_config {
             PlayerConfig::Local => {
@@ -144,7 +144,8 @@ impl App<'_> {
             cursor_position: [0.0, 0.0],
 
             widget_manager: InteractiveWidgetManager::new_main_menu(),
-            settings_manager,
+            keybindings_manager: Keybindings::new(),
+            settings_manager: Settings::new(seed),
         };
 
         if let PlayerConfig::Viewer = app.player_config {
@@ -159,16 +160,6 @@ impl App<'_> {
         self.gl.draw(args.viewport(), |ctx, gl| {
             // Clear the screen.
             graphics::clear(BG_COLOR, gl);
-
-            // taking into account the player states after a new piece was added
-            // two options :
-            // either the player didn't lose => nothing to do
-            // there was a game over => the running must be set to NotRunning
-            for player in &self.local_players {
-                if player.get_game_over() == true {
-                    self.running = RunningState::NotRunning;
-                }
-            }
 
             match self.view_state {
                 ViewState::MainMenu => {
@@ -241,7 +232,7 @@ impl App<'_> {
         // first apply the changes inside the views
         if self.view_state == ViewState::Settings {
             self.widget_manager
-                .update_settings(&mut self.settings_manager);
+                .update_settings(&mut self.keybindings_manager);
         } else if self.running == RunningState::Running {
             // on ne fait pas d'update quand running == false
             self.clock += args.dt;
@@ -256,9 +247,28 @@ impl App<'_> {
                 }
             }
             for player in &mut self.local_players {
-                player.update(&self.settings_manager, self.frame_counter, gravity, freeze);
+                player.update(
+                    &self.keybindings_manager,
+                    self.frame_counter,
+                    gravity,
+                    freeze,
+                );
             }
         }
+        // taking into account the player states after a new piece was added
+        // two options :
+        // either the player didn't lose => nothing to do
+        // there was a game over => the running must be set to NotRunning
+        for player in &self.local_players {
+            if player.get_game_over() == true {
+                self.running = RunningState::NotRunning;
+            }
+        }
+        /* for player in &self.remote_players {
+            if player.get_game_over() == true {
+                self.running = RunningState::NotRunning;
+            }
+        } */
         // then eventually change the view
         let result = self.widget_manager.update_view();
         match result {
@@ -294,27 +304,17 @@ impl App<'_> {
     pub fn handle_key_press(&mut self, key: Key) {
         let mut key_press = KeyPress::Other;
         for player in &mut self.local_players {
-            key_press = player.handle_key_press(&self.settings_manager, key, self.running)
+            key_press = player.handle_key_press(&self.keybindings_manager, key, self.running)
         }
         match key_press {
             KeyPress::Restart => {
-                self.running = RunningState::Running;
-                self.clock = 0.0;
-                for player in &mut self.local_players {
-                    player.restart();
-                }
+                    self.restart();
             }
             KeyPress::Resume => {
                 self.running = RunningState::Running;
-                for player in &mut self.local_players {
-                    player.resume();
-                }
             }
             KeyPress::Pause => {
                 self.running = RunningState::Paused;
-                for player in &mut self.local_players {
-                    player.pause();
-                }
             }
             _ => {}
         }
@@ -348,7 +348,8 @@ impl App<'_> {
         match self.view_state {
             ViewState::MainMenu => self.widget_manager = InteractiveWidgetManager::new_main_menu(),
             ViewState::Settings => {
-                self.widget_manager = InteractiveWidgetManager::new_settings(&self.settings_manager)
+                self.widget_manager =
+                    InteractiveWidgetManager::new_settings(&self.keybindings_manager)
             }
             ViewState::SinglePlayerGame => {
                 self.widget_manager = InteractiveWidgetManager::new_single_player_game()
@@ -360,14 +361,16 @@ impl App<'_> {
     fn pause(&mut self) {
         if self.running == RunningState::Paused {
             self.running = RunningState::Running;
-            for player in &mut self.local_players {
-                player.resume();
-            }
         } else if self.running == RunningState::Running {
             self.running = RunningState::Paused;
-            for player in &mut self.local_players {
-                player.pause();
-            }
+        }
+    }
+
+    fn restart(&mut self) {
+        self.running = RunningState::Running;
+        self.clock = 0.0;
+        for player in &mut self.local_players {
+            player.restart();
         }
     }
 }
