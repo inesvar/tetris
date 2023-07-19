@@ -3,7 +3,6 @@ use crate::{
     settings::TEXT_COLOR,
     ui::text::Text,
 };
-use graphics::color;
 use piston::{Key, MouseButton};
 
 pub struct KeyInput {
@@ -11,12 +10,15 @@ pub struct KeyInput {
     pub(crate) y: f64,
     pub(crate) width: f64,
     pub(crate) height: f64,
-    pub(crate) keys: Vec<Key>,
-    pub(in crate::ui) text: Text,
+    pub(in crate::ui) focused: bool, // true : display custom_text and cursor, false : depends on custom
+    pub(in crate::ui) custom: bool, // when unfocused, true : display custom_text, false : display keys_to_string(init_keys)
+    pub(in crate::ui) custom_text: Text,
     pub(in crate::ui) cursor: String,
+    pub(in crate::ui) keys: Vec<Key>,
+    pub(in crate::ui) init_keys: Vec<Key>, // initial values from settings.rs
+    pub(in crate::ui) placeholder: Text,   // initial text
+    pub(in crate::ui) commit: bool,        // true : update app's settings
     pub(in crate::ui) info_text: Text,
-    placeholder: String,
-    is_focused: bool,
     pub(in crate::ui) animation_counter: u64,
 }
 
@@ -29,22 +31,22 @@ impl KeyInput {
         keys: &[Key],
         info_text: &str,
     ) -> Self {
-        let placeholder = &keys_to_string(keys);
-        let mut vec_keys = vec![];
-        for key in keys {
-            vec_keys.push(*key);
-        }
+        let placeholder: &str = &*keys_to_string(&keys);
+        let vec_keys = keys.to_vec();
         KeyInput {
             x,
             y,
             width,
             height,
-            keys: vec_keys,
+            focused: false,
+            custom: false,
+            custom_text: Text::new("", 16, x, y, TEXT_COLOR),
             cursor: String::from(""),
+            keys: vec![],
+            init_keys: vec_keys,
+            placeholder: Text::new(placeholder, 16, x, y, TEXT_COLOR),
+            commit: false,
             info_text: Text::new(info_text, 16, x, y, TEXT_COLOR),
-            text: Text::new(placeholder, 16, x, y, TEXT_COLOR),
-            placeholder: String::from(placeholder),
-            is_focused: false,
             animation_counter: 0,
         }
     }
@@ -56,19 +58,22 @@ impl KeyInput {
             && y <= self.y + self.height / 2.0
     }
 
+    pub fn commit(&mut self) -> bool {
+        if self.commit {
+            self.commit = false;
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn handle_mouse_press(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
         match button {
             MouseButton::Left => {
                 if self.are_coords_inside_input(cursor_position[0], cursor_position[1]) {
-                    self.is_focused = true;
-                    if self.text.content == self.placeholder {
-                        self.text.set_text(String::from(""));
-                    }
-                } else {
-                    self.is_focused = false;
-                    if self.text.content == "" {
-                        self.text.set_text(String::from(&self.placeholder));
-                    }
+                    self.focus();
+                } else if self.focused {
+                    self.unfocus();
                 }
             }
             _ => {}
@@ -76,7 +81,7 @@ impl KeyInput {
     }
 
     pub fn handle_key_press(&mut self, key: Key) {
-        if !self.is_focused {
+        if !self.focused {
             return;
         }
         match key {
@@ -84,10 +89,7 @@ impl KeyInput {
                 self.pop_key();
             }
             Key::Return => {
-                self.is_focused = false;
-                if self.text.content == "" {
-                    self.text.set_text(String::from(&self.placeholder));
-                }
+                self.unfocus();
             }
             _ => {
                 self.push_key(key);
@@ -95,31 +97,47 @@ impl KeyInput {
         }
     }
 
-    pub fn get_focused(&self) -> bool {
-        self.is_focused
-    }
-
     fn push_key(&mut self, key: Key) {
-        self.text.content.push_str(&key_to_string(key));
+        self.custom_text.content.push_str(&key_to_string(key));
         self.keys.push(key);
     }
 
     fn pop_key(&mut self) {
-        self.text.content.pop();
-        while self.text.content.chars().count() > 0 {
+        self.custom_text.content.pop();
+        while self.custom_text.content.chars().count() > 0 {
             // TODO change this syntax
             match self
-                .text
+                .custom_text
                 .content
-                .get((self.text.content.len() - 1)..=(self.text.content.len() - 1))
+                .get((self.custom_text.content.len() - 1)..=(self.custom_text.content.len() - 1))
             {
                 Some(" ") => {
                     break;
                 }
                 _ => {}
             }
-            self.text.content.pop();
+            self.custom_text.content.pop();
         }
         self.keys.pop();
+    }
+
+    fn unfocus(&mut self) {
+        self.focused = false;
+        if self.custom_text.content == "" {
+            self.custom = false;
+            self.custom_text.set_text(keys_to_string(&self.init_keys));
+            self.keys = self.init_keys.clone();
+        } else {
+            self.custom = true;
+        }
+        self.commit = true;
+    }
+
+    fn focus(&mut self) {
+        self.focused = true;
+        if !self.custom {
+            self.custom_text.set_text("".to_string());
+            self.keys = vec![];
+        }
     }
 }

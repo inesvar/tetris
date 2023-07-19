@@ -1,26 +1,20 @@
 use crate::local_player::{KeyPress, LocalPlayer};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use std::cell::RefCell;
-use std::ops::{Deref, DerefMut};
 
 use crate::graphics::Transformed;
 use crate::remote_player::RemotePlayer;
-use crate::settings::*;
+use crate::settings::{self, *};
 use crate::Assets;
-use graphics::color;
-use piston::event_id::TEXT;
 
-use crate::ui::interactive_widget_manager::ButtonType::{
-    self, BackToMainMenu, NewSinglePlayerGame, Pause, Settings,
-};
+use crate::ui::interactive_widget_manager::ButtonType::{self};
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
-use crate::ui::text_input::TextInput;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{MouseButton, RenderArgs, UpdateArgs};
 use piston_window::Key;
-#[derive(Debug)]
+
+#[derive(Debug, PartialEq)]
 pub enum ViewState {
     MainMenu,
     Settings,
@@ -64,6 +58,7 @@ pub struct App<'a> {
     pub cursor_position: [f64; 2],
 
     widget_manager: InteractiveWidgetManager,
+    settings_manager: Settings,
 }
 
 impl App<'_> {
@@ -78,6 +73,7 @@ impl App<'_> {
         let rem_players: Vec<RemotePlayer>;
         let mut rng = rand::thread_rng();
         let seed: u64 = rng.gen();
+        let settings_manager = settings::Settings::new();
 
         match player_config {
             PlayerConfig::Local => {
@@ -148,6 +144,7 @@ impl App<'_> {
             cursor_position: [0.0, 0.0],
 
             widget_manager: InteractiveWidgetManager::new_main_menu(),
+            settings_manager,
         };
 
         if let PlayerConfig::Viewer = app.player_config {
@@ -241,8 +238,12 @@ impl App<'_> {
     }
 
     pub(crate) fn update(&mut self, args: &UpdateArgs, gravity: u64, freeze: u64) {
-        // on ne fait pas d'update quand running == false
-        if self.running == RunningState::Running {
+        // first apply the changes inside the views
+        if self.view_state == ViewState::Settings {
+            self.widget_manager
+                .update_settings(&mut self.settings_manager);
+        } else if self.running == RunningState::Running {
+            // on ne fait pas d'update quand running == false
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             if let PlayerConfig::TwoRemote = self.player_config {
@@ -255,8 +256,30 @@ impl App<'_> {
                 }
             }
             for player in &mut self.local_players {
-                player.update(self.frame_counter, gravity, freeze);
+                player.update(&self.settings_manager, self.frame_counter, gravity, freeze);
             }
+        }
+        // then eventually change the view
+        let result = self.widget_manager.update_view();
+        match result {
+            ButtonType::ToPause => self.pause(),
+            ButtonType::Nothing => {}
+            ButtonType::BackToMainMenu => {
+                if self.view_state == ViewState::SinglePlayerGame
+                    && self.running == RunningState::Running
+                {
+                    self.pause()
+                };
+                self.set_view(ViewState::MainMenu)
+            }
+            ButtonType::ToSettings => self.set_view(ViewState::Settings),
+            ButtonType::ToSinglePlayerGame => {
+                if self.view_state == ViewState::MainMenu && self.running == RunningState::Paused {
+                    self.pause()
+                };
+                self.set_view(ViewState::SinglePlayerGame)
+            }
+            _ => {}
         }
     }
 
@@ -271,7 +294,7 @@ impl App<'_> {
     pub fn handle_key_press(&mut self, key: Key) {
         let mut key_press = KeyPress::Other;
         for player in &mut self.local_players {
-            key_press = player.handle_key_press(key, self.running)
+            key_press = player.handle_key_press(&self.settings_manager, key, self.running)
         }
         match key_press {
             KeyPress::Restart => {
@@ -310,19 +333,8 @@ impl App<'_> {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
-        let mut result;
-        result = self
-            .widget_manager
+        self.widget_manager
             .handle_mouse_press(button, &self.cursor_position);
-        println!("result is {:?}", result);
-        match result {
-            ButtonType::Pause => self.pause(),
-            ButtonType::Nothing => {}
-            ButtonType::BackToMainMenu => self.set_view(ViewState::MainMenu),
-            ButtonType::Settings => self.set_view(ViewState::Settings),
-            ButtonType::NewSinglePlayerGame => self.set_view(ViewState::SinglePlayerGame),
-            _ => {}
-        }
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
@@ -331,11 +343,13 @@ impl App<'_> {
     }
 
     fn set_view(&mut self, view_state: ViewState) {
-        println!("set view was called {:?}", view_state);
+        println!("setting view to {:?}", view_state);
         self.view_state = view_state;
         match self.view_state {
             ViewState::MainMenu => self.widget_manager = InteractiveWidgetManager::new_main_menu(),
-            ViewState::Settings => self.widget_manager = InteractiveWidgetManager::new_settings(),
+            ViewState::Settings => {
+                self.widget_manager = InteractiveWidgetManager::new_settings(&self.settings_manager)
+            }
             ViewState::SinglePlayerGame => {
                 self.widget_manager = InteractiveWidgetManager::new_single_player_game()
             }

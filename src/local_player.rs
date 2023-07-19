@@ -17,9 +17,6 @@ use crate::{once, settings::*};
 use opengl_graphics::GlGraphics;
 use piston::Key;
 use piston_window::Context;
-
-use crate::ui::button::Button;
-use crate::ui::text::Text;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -92,12 +89,14 @@ impl LocalPlayer {
             .is_err()
         {
             self.declare_game_over();
-            self.player_screen.fifo_next_tetromino.push_front(possible_active);
+            self.player_screen
+                .fifo_next_tetromino
+                .push_front(possible_active);
             return;
         }
         self.player_screen
-        .fifo_next_tetromino
-        .push(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
+            .fifo_next_tetromino
+            .push(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
         self.player_screen.active_tetromino = possible_active;
     }
 
@@ -148,7 +147,13 @@ impl LocalPlayer {
         self.player_screen.render(transform, ctx, gl, assets);
     }
 
-    pub fn update(&mut self, frame_counter: u64, gravity: u64, freeze: u64) {
+    pub fn update(
+        &mut self,
+        settings_manager: &Settings,
+        frame_counter: u64,
+        gravity: u64,
+        freeze: u64,
+    ) {
         self.keyboard.update();
 
         let mut ghost = self.player_screen.active_tetromino.make_ghost_copy();
@@ -203,7 +208,7 @@ impl LocalPlayer {
 
         // Translate the tetromino on long key press
         if frame_counter % 5 == 0 {
-            if self.keyboard.is_any_pressed(&FALL_KEYS) {
+            if self.keyboard.is_any_pressed(&settings_manager.fall_keys) {
                 if self
                     .player_screen
                     .active_tetromino
@@ -213,11 +218,17 @@ impl LocalPlayer {
                 {
                     self.freeze_frame = frame_counter + freeze;
                 }
-            } else if self.keyboard.is_any_delay_pressed(&LEFT_KEYS) {
+            } else if self
+                .keyboard
+                .is_any_delay_pressed(&settings_manager.left_keys)
+            {
                 self.player_screen
                     .active_tetromino
                     .left(&self.player_screen.grid.rows);
-            } else if self.keyboard.is_any_delay_pressed(&RIGHT_KEYS) {
+            } else if self
+                .keyboard
+                .is_any_delay_pressed(&settings_manager.right_keys)
+            {
                 self.player_screen
                     .active_tetromino
                     .right(&self.player_screen.grid.rows);
@@ -238,7 +249,12 @@ impl LocalPlayer {
         }
     }
 
-    pub fn handle_key_press(&mut self, key: Key, running: RunningState) -> KeyPress {
+    pub fn handle_key_press(
+        &mut self,
+        settings_manager: &Settings,
+        key: Key,
+        running: RunningState,
+    ) -> KeyPress {
         self.keyboard.set_pressed(key);
 
         // the unactive game only listens to the RESTART_KEYS
@@ -260,19 +276,28 @@ impl LocalPlayer {
         }
 
         // Pressed once events
-        if self.keyboard.is_any_pressed(&ROTATE_CLOCKWISE_KEYS) {
+        if self
+            .keyboard
+            .is_any_pressed(&settings_manager.rotate_clockwise_keys)
+        {
             // rotate once the tetromino
             self.player_screen
                 .active_tetromino
                 .turn_clockwise(&self.player_screen.grid.rows);
-        } else if self.keyboard.is_any_pressed(&ROTATE_COUNTERCLOCKWISE_KEYS) {
+        } else if self
+            .keyboard
+            .is_any_pressed(&settings_manager.rotate_counterclockwise_keys)
+        {
             // rotate once the tetromino
             self.player_screen
                 .active_tetromino
                 .turn_counterclockwise(&self.player_screen.grid.rows);
         }
 
-        if self.keyboard.is_any_pressed(&HARD_DROP_KEYS) {
+        if self
+            .keyboard
+            .is_any_pressed(&settings_manager.hard_drop_keys)
+        {
             // hard drop the tetromino
             self.player_screen
                 .active_tetromino
@@ -291,7 +316,10 @@ impl LocalPlayer {
             self.get_new_tetromino();
         }
 
-        if self.keyboard.is_any_pressed(&HOLD_TETROMINO_KEYS) {
+        if self
+            .keyboard
+            .is_any_pressed(&settings_manager.hold_tetromino_keys)
+        {
             // hold the tetromino
             if let Some(mut saved) = self.player_screen.saved_tetromino {
                 self.player_screen.active_tetromino.reset_position();
@@ -306,11 +334,11 @@ impl LocalPlayer {
             }
         }
 
-        if self.keyboard.is_any_pressed(&LEFT_KEYS) {
+        if self.keyboard.is_any_pressed(&settings_manager.left_keys) {
             self.player_screen
                 .active_tetromino
                 .left(&self.player_screen.grid.rows);
-        } else if self.keyboard.is_any_pressed(&RIGHT_KEYS) {
+        } else if self.keyboard.is_any_pressed(&settings_manager.right_keys) {
             self.player_screen
                 .active_tetromino
                 .right(&self.player_screen.grid.rows);

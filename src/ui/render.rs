@@ -1,16 +1,13 @@
 use crate::assets::Assets;
-use crate::once;
 use crate::settings::TEXT_COLOR;
 use crate::ui::button::Button;
-use crate::ui::interactive_widget_manager::ButtonType::NewSinglePlayerGame;
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
+use crate::ui::key_input::KeyInput;
 use crate::ui::text::Text;
 use crate::ui::text_input::TextInput;
-use crate::ui::key_input::KeyInput;
 use graphics::types::Matrix2d;
 use graphics::{color, rectangle, Context, Transformed};
 use opengl_graphics::{GlGraphics, GlyphCache};
-use serde::de::Unexpected::Str;
 
 impl Text {
     pub fn render(
@@ -78,7 +75,7 @@ impl TextInput {
         self.text.content.push_str(&self.cursor);
         self.text.render(transform, ctx, gl, font);
         if self.cursor.len() > 0 {
-            self.text.content.pop();       
+            self.text.content.pop();
         }
         let info_transform = transform.trans(0.0, -50.0);
         self.info_text.render(info_transform, ctx, gl, font);
@@ -103,16 +100,13 @@ impl KeyInput {
         );
         let button_transform = transform.trans(self.x, self.y);
 
-        let color = if self.get_focused() {
-            color::RED
-        } else {
-            TEXT_COLOR
-        };
+        let color = if self.focused { color::RED } else { TEXT_COLOR };
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
         outline_rect.draw(dims, &ctx.draw_state, button_transform, gl);
 
-        if self.get_focused() {
+        if self.focused {
+            // update the cursor so it appears to be blinking
             if self.animation_counter % 60 == 0 {
                 if self.cursor.len() == 0 {
                     self.cursor.push('|');
@@ -120,15 +114,23 @@ impl KeyInput {
                     self.cursor.pop();
                 }
             }
+            // render the text temporarily with the cursor
+            self.custom_text.content.push_str(&self.cursor);
+            self.custom_text.render(transform, ctx, gl, font);
+            if self.cursor.len() > 0 {
+                self.custom_text.content.pop();
+            }
         } else {
             self.cursor.clear();
+            // if it's not focused, render the placeholder or custom text
+            if self.custom {
+                self.custom_text.render(transform, ctx, gl, font);
+            } else {
+                self.placeholder.render(transform, ctx, gl, font);
+            }
         }
 
-        self.text.content.push_str(&self.cursor);
-        self.text.render(transform, ctx, gl, font);
-        if self.cursor.len() > 0 {
-            self.text.content.pop();       
-        }
+        // render the info_text
         let info_transform = transform.trans(0.0, -50.0);
         self.info_text.render(info_transform, ctx, gl, font);
     }
