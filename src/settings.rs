@@ -137,7 +137,6 @@ static HOLD_TETROMINO_KEYS: [Key; 1] = [Key::C];
 
 pub static RESTART_KEYS: [Key; 1] = [Key::R];
 pub static PAUSE_KEYS: [Key; 1] = [Key::P];
-pub static EMPTY_GRID_KEYS: [Key; 1] = [Key::M];
 
 pub static KEY_REPEAT_DELAY: u64 = 20;
 
