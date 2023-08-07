@@ -4,7 +4,7 @@ use crate::settings::{
     BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS, TETROMINO_MAX_WIDTH, TETROMINO_MAX_HEIGHT, TEXT_COLOR, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
 };
 use crate::ui::text::Text;
-use crate::{tetris_grid::TetrisGrid, tetromino::Tetromino};
+use crate::{game_back_end::tetris_grid::TetrisGrid, game_back_end::tetromino::Tetromino};
 
 use graphics::types::{Matrix2d, Rectangle};
 use graphics::{color, rectangle, Context, Transformed};

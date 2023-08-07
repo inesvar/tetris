@@ -7,11 +7,11 @@ use crate::app::RunningState;
 use crate::assets::Assets;
 use crate::circular_buffer::CircularBuffer;
 use crate::player_screen::PlayerScreen;
-use crate::tetromino_bag::new_random_bag;
-use crate::translate_rotate::TranslateRotate;
+use crate::game_back_end::tetromino_bag::new_random_bag;
+use crate::game_back_end::translation_rotation::TranslationRotation;
 use crate::{
-    keyboard::Keyboard, tetris_grid::TetrisGrid, tetromino::Tetromino,
-    tetromino_kind::TetrominoKind,
+    keyboard::Keyboard, game_back_end::tetris_grid::TetrisGrid, game_back_end::tetromino::Tetromino,
+    game_back_end::tetromino_kind::TetrominoKind,
 };
 use crate::{once, settings::*};
 use opengl_graphics::GlGraphics;
@@ -84,7 +84,7 @@ impl LocalPlayer {
         }
         let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
         if possible_active
-            .check_possible(&self.player_screen.grid.rows, TranslateRotate::null())
+            .check_possible(&self.player_screen.grid.rows, TranslationRotation::null())
             .is_err()
         {
             self.declare_game_over();
@@ -167,7 +167,7 @@ impl LocalPlayer {
             && self
                 .player_screen
                 .active_tetromino
-                .check_possible(&self.player_screen.grid.rows, TranslateRotate::fall())
+                .check_possible(&self.player_screen.grid.rows, TranslationRotation::fall())
                 .is_err()
         {
             self.player_screen.new_completed_lines = self

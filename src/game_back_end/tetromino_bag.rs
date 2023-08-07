@@ -1,7 +1,6 @@
+use super::tetromino_kind::TetrominoKind;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
-
-use crate::tetromino_kind::TetrominoKind;
 
 pub fn new_random_bag(mut size_of_bag: u32, rng: &mut Pcg32) -> Vec<TetrominoKind> {
     if size_of_bag == 0 {
@@ -11,10 +10,10 @@ pub fn new_random_bag(mut size_of_bag: u32, rng: &mut Pcg32) -> Vec<TetrominoKin
     let mut list = vec![];
     for _ in 0..(size_of_bag / 7) {
         for i in 0..7 {
-            list.push(i); 
+            list.push(i);
         }
     }
-    if size_of_bag%7 != 0 {
+    if size_of_bag % 7 != 0 {
         for i in 0..7 {
             list.push(i);
         }
