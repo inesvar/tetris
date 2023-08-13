@@ -1,7 +1,3 @@
-use std::net::{TcpListener, TcpStream};
-use std::sync::{Arc, Mutex};
-use std::thread;
-
 use crate::assets::Assets;
 use crate::once;
 use crate::player_screen::PlayerScreen;
@@ -9,8 +5,9 @@ use crate::settings::SERVER_IP;
 use graphics::math::Matrix2d;
 use graphics::Context;
 use opengl_graphics::GlGraphics;
-
-use crate::ui::text::Text;
+use std::net::{TcpListener, TcpStream};
+use std::sync::{Arc, Mutex};
+use std::thread;
 
 pub struct RemotePlayer {
     screen: Arc<Mutex<PlayerScreen>>,

@@ -65,7 +65,11 @@ where
 
     pub fn push_front(&mut self, t: T) {
         if self.size != K {
-            let begin :usize = if self.begin > 0 { self.begin - 1 } else { K - 1 };
+            let begin: usize = if self.begin > 0 {
+                self.begin - 1
+            } else {
+                K - 1
+            };
             self.array[begin] = t;
             self.begin = begin;
             self.size += 1;

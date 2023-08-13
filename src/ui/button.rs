@@ -1,7 +1,6 @@
+use crate::ui::text::Text;
 use graphics::color;
 use piston::MouseButton;
-
-use crate::ui::text::Text;
 
 #[derive(Clone)]
 pub struct Button {
