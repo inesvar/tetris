@@ -1,18 +1,18 @@
-//! Defines the basics to move on a grid
+//! Allows to move an abstract point on a grid.
 use serde::{Deserialize, Serialize};
 
 /// Point on a finite wrap-around 2D grid.
 ///
-/// Notably implements **Transform** trait and std::ops::Add.
+/// Notably implements **Transform** trait and std::ops::Add and std::ops::AddAssign.
 ///
 /// A point by itself is abstract and doesn't implement collisions
 /// (it moves without any knownledge of its surroundings).
 #[derive(Clone, Copy, Serialize, Deserialize, Default)]
-pub struct Point {
+pub(in crate::tetris_back_end) struct Point {
     /// horizontal coordinate, from left to right
-    pub x: i8,
+    pub(in crate::tetris_back_end) x: i8,
     /// vertical coordinate, *from top to bottom*
-    pub y: i8,
+    pub(in crate::tetris_back_end) y: i8,
 }
 
 /// Unhindered moves on a grid (used when collisions aren't necessary)
@@ -30,7 +30,7 @@ pub struct Point {
 /// - **rotate_clockwise**(origin: Point), **rotate_counterclockwise**(origin: Point)
 ///
 /// rotate 90° around the origin
-pub trait Transform {
+pub(in crate::tetris_back_end) trait Transform {
     /// Move down one cell without checking if it's empty
     fn go_down(&mut self);
     /// Move up one cell without checking if it's empty
@@ -46,14 +46,24 @@ pub trait Transform {
 }
 
 impl Point {
-    pub fn new(x: i8, y: i8) -> Self {
+    pub(in crate::tetris_back_end) fn new(x: i8, y: i8) -> Self {
         Point { x, y }
     }
+}
 
-    pub fn translate_by(&mut self, other: &Point) {
-        *self = *self + *other;
+impl std::ops::Add for Point {
+    type Output = Point;
+    fn add(self, other: Point) -> Self::Output {
+        Point::new(self.x + other.x, self.y + other.y)
     }
 }
+
+impl std::ops::AddAssign for Point {
+    fn add_assign(&mut self, other: Point) {
+        *self = *self + other;
+    }
+}
+
 impl Transform for Point {
     fn go_down(&mut self) {
         self.y += 1;
@@ -81,12 +91,5 @@ impl Transform for Point {
         let temp = self.x - other.x;
         self.x = other.x + self.y - other.y;
         self.y = other.y - temp;
-    }
-}
-
-impl std::ops::Add for Point {
-    type Output = Point;
-    fn add(self, other: Point) -> Self::Output {
-        Point::new(self.x + other.x, self.y + other.y)
     }
 }

@@ -1,23 +1,24 @@
-use graphics::types::Matrix2d;
-use rand::SeedableRng;
-use rand_pcg::Pcg32;
-use std::net::TcpStream;
-
 use crate::app::RunningState;
 use crate::assets::Assets;
 use crate::circular_buffer::CircularBuffer;
+use crate::keyboard::Keyboard;
 use crate::player_screen::PlayerScreen;
-use crate::game_back_end::tetromino_bag::new_random_bag;
-use crate::game_back_end::translation_rotation::TranslationRotation;
-use crate::{
-    keyboard::Keyboard, game_back_end::tetris_grid::TetrisGrid, game_back_end::tetromino::Tetromino,
-    game_back_end::tetromino_kind::TetrominoKind,
+use crate::tetris_back_end::{
+    tetris_grid::TetrisGrid,
+    tetromino::{PlayerTetromino, Tetromino},
+    tetromino_bag::new_random_bag,
+    tetromino_kind::TetrominoKind,
+    translation_rotation::TranslationRotation,
 };
 use crate::{once, settings::*};
+use graphics::types::Matrix2d;
 use opengl_graphics::GlGraphics;
 use piston::Key;
 use piston_window::Context;
+use rand::SeedableRng;
+use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
+use std::net::TcpStream;
 
 #[derive(Serialize, Deserialize)]
 pub struct LocalPlayer {
@@ -41,15 +42,15 @@ impl LocalPlayer {
         let mut rng = Pcg32::seed_from_u64(seed);
         let mut bag_of_tetromino = new_random_bag(BAG_SIZE, &mut rng);
         let first_tetromino =
-            Tetromino::new_collision(bag_of_tetromino.pop().unwrap(), &grid.rows[..]).unwrap();
+            Tetromino::new(bag_of_tetromino.pop().unwrap(), &grid.rows[..]).unwrap();
         let mut fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
         for _ in 0..NB_NEXT_TETROMINO {
             if let Some(t) = bag_of_tetromino.pop() {
-                fifo_next_tetromino.push(Tetromino::new(t));
+                fifo_next_tetromino.push(Tetromino::new_unchecked(t));
             } else {
                 bag_of_tetromino = new_random_bag(BAG_SIZE, &mut rng);
                 if let Some(t) = bag_of_tetromino.pop() {
-                    fifo_next_tetromino.push(Tetromino::new(t));
+                    fifo_next_tetromino.push(Tetromino::new_unchecked(t));
                 } else {
                     unreachable!();
                 }
@@ -95,7 +96,9 @@ impl LocalPlayer {
         }
         self.player_screen
             .fifo_next_tetromino
-            .push(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
+            .push(Tetromino::new_unchecked(
+                self.bag_of_tetromino.pop().unwrap(),
+            ));
         self.player_screen.active_tetromino = possible_active;
     }
 
@@ -328,7 +331,10 @@ impl LocalPlayer {
             self.player_screen
                 .active_tetromino
                 .left(&self.player_screen.grid.rows);
-        } else if self.keyboard.is_any_pressed(&keybindings_manager.right_keys) {
+        } else if self
+            .keyboard
+            .is_any_pressed(&keybindings_manager.right_keys)
+        {
             self.player_screen
                 .active_tetromino
                 .right(&self.player_screen.grid.rows);

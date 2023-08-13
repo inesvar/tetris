@@ -2,6 +2,7 @@ use super::tetromino_kind::TetrominoKind;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
 
+/// Returns a random bag of TetrominoKind of the specified size using the given rng.
 pub fn new_random_bag(mut size_of_bag: u32, rng: &mut Pcg32) -> Vec<TetrominoKind> {
     if size_of_bag == 0 {
         size_of_bag = 1;

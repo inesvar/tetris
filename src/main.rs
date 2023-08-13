@@ -18,13 +18,13 @@ use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSIO
 mod app;
 mod assets;
 mod circular_buffer;
-mod game_back_end;
 mod keyboard;
 mod local_player;
 mod macros;
 mod player_screen;
 mod remote_player;
 mod settings;
+mod tetris_back_end;
 mod ui;
 
 #[derive(Parser, Debug)]
