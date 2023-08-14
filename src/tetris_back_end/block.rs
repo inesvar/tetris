@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 use crate::assets::TetrisColor;
-use crate::point::{Point, Transformable};
-use crate::translate_rotate::TranslateRotate;
+use super::point::{Point, Transformable};
+use super::translation_rotation::TranslationRotation;
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Block {
@@ -65,7 +65,7 @@ pub trait Collision {
     fn move_to(
         &self,
         matrix: &[Vec<Option<Block>>],
-        movement: &TranslateRotate,
+        movement: &TranslationRotation,
     ) -> Result<Block, ()>;
 }
 
@@ -73,7 +73,7 @@ impl Collision for Block {
     fn move_to(
         &self,
         matrix: &[Vec<Option<Block>>],
-        movement: &TranslateRotate,
+        movement: &TranslationRotation,
     ) -> Result<Block, ()> {
         let mut copy = self.translation(movement.translation);
         match movement.rotation {

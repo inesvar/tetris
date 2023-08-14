@@ -14,26 +14,17 @@ use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent};
 use crate::app::App;
 use crate::assets::Assets;
 use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION};
-use tetromino::Tetromino;
 
 mod app;
 mod assets;
-mod block;
 mod circular_buffer;
 mod keyboard;
 mod local_player;
 mod macros;
 mod player_screen;
-mod point;
 mod remote_player;
-mod render;
-mod rotation;
 mod settings;
-mod tetris_grid;
-mod tetromino;
-mod tetromino_bag;
-mod tetromino_kind;
-mod translate_rotate;
+mod tetris_back_end;
 mod ui;
 
 #[derive(Parser, Debug)]
