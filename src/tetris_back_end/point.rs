@@ -10,11 +10,6 @@ impl Point {
     pub fn new(x: i8, y: i8) -> Self {
         Point { x, y }
     }
-
-    pub fn translate(&mut self, other: &Point) {
-        self.x += other.x;
-        self.y += other.y;
-    }
 }
 
 pub trait Transformable {
@@ -63,11 +58,11 @@ impl std::ops::Add for Point {
     }
 }
 
-/* impl std::ops::AddAssign for Point {
+impl std::ops::AddAssign for Point {
     fn add_assign(&mut self, other: Point) {
         *self = *self + other;
     }
-} */
+}
 
 /* impl std::ops::Sub for Point {
     type Output = Point;
