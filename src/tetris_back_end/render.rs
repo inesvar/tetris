@@ -1,3 +1,4 @@
+//! Defines the render of types Block, Tetromino and TetrisGrid.
 use super::block::Block;
 use super::tetris_grid::TetrisGrid;
 use super::tetromino::Tetromino;
@@ -10,6 +11,7 @@ use graphics::{rectangle, Context, DrawState, Image};
 use opengl_graphics::GlGraphics;
 
 impl TetrisGrid {
+    /// Render the TetrisGrid and its contents.
     pub fn render(
         &mut self,
         transform: Matrix2d,
@@ -51,19 +53,21 @@ impl TetrisGrid {
 }
 
 impl Tetromino {
+    /// Render the Tetromino, and eventually the ghost Tetromino.
     pub fn render(&self, transform: Matrix2d, ctx: &Context, gl: &mut GlGraphics, assets: &Assets) {
+        let draw_state = if self.is_ghost {
+            ctx.draw_state.blend(Blend::Multiply)
+        } else {
+            ctx.draw_state
+        };
         for i in 0..4 {
-            let draw_state = if self.is_ghost {
-                ctx.draw_state.blend(Blend::Multiply)
-            } else {
-                ctx.draw_state
-            };
             self.blocks[i].render(transform, &draw_state, gl, assets);
         }
     }
 }
 
 impl Block {
+    /// Render the Block using the texture from assets.
     pub fn render(
         &self,
         transform: Matrix2d,

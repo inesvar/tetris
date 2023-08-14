@@ -4,8 +4,11 @@ use crate::circular_buffer::CircularBuffer;
 use crate::keyboard::Keyboard;
 use crate::player_screen::PlayerScreen;
 use crate::tetris_back_end::{
-    tetris_grid::TetrisGrid, tetromino::Tetromino, tetromino_bag::new_random_bag,
-    tetromino_kind::TetrominoKind, translation_rotation::TranslationRotation,
+    tetris_grid::TetrisGrid,
+    tetromino::{PlayerTetromino, Tetromino},
+    tetromino_bag::new_random_bag,
+    tetromino_kind::TetrominoKind,
+    translation_rotation::TranslationRotation,
 };
 use crate::{once, settings::*};
 use graphics::types::Matrix2d;

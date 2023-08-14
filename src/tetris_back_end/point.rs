@@ -7,10 +7,12 @@ use serde::{Deserialize, Serialize};
 ///
 /// A point by itself is abstract and doesn't implement collisions
 /// (it moves without any knownledge of its surroundings).
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, Default)]
-pub struct Point {
-    pub x: i8,
-    pub y: i8,
+#[derive(Clone, Copy, Serialize, Deserialize, Default)]
+pub(in crate::tetris_back_end) struct Point {
+    /// horizontal coordinate, from left to right
+    pub(in crate::tetris_back_end) x: i8,
+    /// vertical coordinate, *from top to bottom*
+    pub(in crate::tetris_back_end) y: i8,
 }
 
 /// Unhindered moves on a grid (used when collisions aren't necessary)
@@ -28,17 +30,23 @@ pub struct Point {
 /// - **rotate_clockwise**(origin: Point), **rotate_counterclockwise**(origin: Point)
 ///
 /// rotate 90° around the origin
-pub trait Transformable {
+pub(in crate::tetris_back_end) trait Transform {
+    /// Move down one cell without checking if it's empty
     fn go_down(&mut self);
+    /// Move up one cell without checking if it's empty
     fn go_up(&mut self);
-    fn go_right(&mut self);
+    /// Move one cell left without checking if it's empty
     fn go_left(&mut self);
+    /// Move one cell right without checking if it's empty
+    fn go_right(&mut self);
+    /// Rotate 90° clockwise around the given origin without checking if the destination is empty
     fn rotate_clockwise(&mut self, other: &Point);
+    /// Rotate 90° counterclockwise around the given origin without checking if the destination is empty
     fn rotate_counterclockwise(&mut self, other: &Point);
 }
 
 impl Point {
-    pub fn new(x: i8, y: i8) -> Self {
+    pub(in crate::tetris_back_end) fn new(x: i8, y: i8) -> Self {
         Point { x, y }
     }
 }
@@ -56,7 +64,7 @@ impl std::ops::AddAssign for Point {
     }
 }
 
-impl Transformable for Point {
+impl Transform for Point {
     fn go_down(&mut self) {
         self.y += 1;
     }
@@ -66,7 +74,7 @@ impl Transformable for Point {
     }
 
     fn go_left(&mut self) {
-        self.x = self.x.saturating_sub(1);
+        self.x -= 1;
     }
 
     fn go_right(&mut self) {
