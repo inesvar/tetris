@@ -4,16 +4,15 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 
+use crate::app::App;
+use crate::assets::Assets;
+use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION};
 use app::PlayerConfig;
 use clap::Parser;
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
 use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent};
-
-use crate::app::App;
-use crate::assets::Assets;
-use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION};
 
 mod app;
 mod assets;
@@ -79,13 +78,13 @@ fn main() {
 
     // Create a new game and run it.
     let mut app = App::new(OPENGL_VERSION, config);
-    let mut gravity: u64 = 50;
+    let mut fall_speed_divide: u64 = 50;
     let mut freeze: u64 = 50;
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.update_args() {
-            app.update(&args, gravity, freeze);
+            app.update(&args, fall_speed_divide, freeze);
         }
 
         if let Some(args) = e.render_args() {
@@ -104,25 +103,26 @@ fn main() {
             app.handle_key_release(key);
         }
 
+        // TODO : think about this, move this and make it less painful
         match app.clock {
             i if i <= 30.0 => {
-                gravity = 50;
+                fall_speed_divide = 50;
                 freeze = 50
             }
             i if i <= 60.0 => {
-                gravity = 40;
+                fall_speed_divide = 40;
                 freeze = 50
             }
             i if i <= 90.0 => {
-                gravity = 30;
+                fall_speed_divide = 30;
                 freeze = 50
             }
             i if i <= 120.0 => {
-                gravity = 20;
+                fall_speed_divide = 20;
                 freeze = 50
             }
             _ => {
-                gravity = 15;
+                fall_speed_divide = 15;
                 freeze = 50
             }
         }
