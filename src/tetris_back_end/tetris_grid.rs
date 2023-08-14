@@ -1,5 +1,5 @@
 use super::block::Block;
-use super::point::Transformable;
+use super::point::Transform;
 use super::tetromino::Tetromino;
 use crate::assets::TetrisColor;
 use crate::settings::BLOCK_SIZE;
@@ -7,13 +7,16 @@ use graphics::types::Matrix2d;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
+pub type GridLine = Vec<Option<Block>>;
+
+/// Tetris grid containing Blocks.
 #[derive(Serialize, Deserialize)]
 pub struct TetrisGrid {
     pub x: f64,
     pub y: f64,
     pub nb_columns: u32,
     pub nb_rows: u32,
-    pub rows: Vec<Vec<Option<Block>>>,
+    pub rows: Vec<GridLine>,
     pub line_sum: Vec<u8>,
     pub total_width: f64,
     pub total_height: f64,
@@ -45,6 +48,7 @@ impl TetrisGrid {
         }
     }
 
+    /// Push the Tetromino into the grid and return the number of lines completed.
     pub fn freeze_tetromino(&mut self, tetromino: &mut Tetromino) -> u64 {
         let mut blocks = tetromino.split();
         for block in &mut blocks {
@@ -73,6 +77,7 @@ impl TetrisGrid {
         score
     }
 
+    /// Add the specified number of lines at the bottom of the grid.
     pub fn add_garbage(&mut self, mut completed_lines: u64) -> Result<(), ()> {
         println!(
             "the garbage creating function was called for {} lines",
@@ -144,6 +149,7 @@ impl TetrisGrid {
         }
     }
 
+    /// Empty the grid.
     pub fn null(&mut self) {
         for row in self.rows.iter_mut() {
             for cell in row.iter_mut() {

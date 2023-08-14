@@ -1,59 +1,105 @@
+//! Defines a Tetromino piece and functions used by all 7 types of Tetromino.
 use super::block::{Block, Collision};
-use super::point::{Point, Transformable};
-use super::rotation_state::RotationState;
-use super::tetromino_kind::TetrominoKind;
-use super::translation_rotation::TranslationRotation;
+use super::point::{Point, Transform};
+use super::rotation_state::{RotationState, RotationStateImplementation};
+use super::tetris_grid::GridLine;
+use super::tetromino_kind::{TetrominoKind, TetrominoKindImplementation};
+use super::translation_rotation::{RotationType, TranslationRotation};
 use core::fmt::Display;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 
+/// Tetromino piece among the 7 kinds in the game positioned on the grid.
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Tetromino {
     kind: TetrominoKind,
-    pub center: Point,
-    pub(crate) blocks: [Block; 4],
+    center: Point,
+    pub blocks: [Block; 4],
     rotation_status: RotationState,
-    pub(crate) is_ghost: bool,
+    pub is_ghost: bool,
 }
 
-impl Tetromino {
-    pub fn fall(&mut self, matrix: &[Vec<Option<Block>>]) -> Result<(), ()> {
+/// Uses of a Tetromino by a Player : includes creating and moving pieces.
+pub trait PlayerTetromino {
+    /// Moves the Tetromino down one cell if it's possible.
+    fn fall(&mut self, matrix: &[GridLine]) -> Result<(), ()>;
+
+    /// Moves the Tetromino as far down as possible.
+    fn hard_drop(&mut self, matrix: &[GridLine]);
+
+    /// Moves the Tetromino one cell to the left if it's possible.
+    fn left(&mut self, matrix: &[GridLine]);
+
+    /// Moves the Tetromino one cell to the right if it's possible.
+    fn right(&mut self, matrix: &[GridLine]);
+
+    /// Turns the Tetromino clockwise if it's possible, eventually using wall-kicks.
+    fn turn_clockwise(&mut self, matrix: &[GridLine]);
+
+    /// Turns the Tetromino counterclockwise if it's possible, eventually using wall-kicks.
+    fn turn_counterclockwise(&mut self, matrix: &[GridLine]);
+
+    /// Returns the resulting position of the Tetromino Blocks if the movement is possible.
+    fn check_possible(
+        &self,
+        matrix: &[GridLine],
+        movement: TranslationRotation,
+    ) -> Result<[Block; 4], ()>;
+
+    /// Returns an Option eventually containing a Tetromino if its starting position is empty.
+    fn new(kind: TetrominoKind, matrix: &[GridLine]) -> Option<Tetromino>;
+
+    /// Returns a Tetromino at its starting position without checking that this place is empty.
+    fn new_unchecked(kind: TetrominoKind) -> Tetromino;
+
+    /// Resets the Tetromino at its starting position.
+    fn reset_position(&mut self);
+
+    /// Returns a ghost copy of the Tetromino.
+    fn make_ghost_copy(&mut self) -> Tetromino;
+}
+
+impl PlayerTetromino for Tetromino {
+    fn fall(&mut self, matrix: &[Vec<Option<Block>>]) -> Result<(), ()> {
         self.blocks = self.check_possible(matrix, TranslationRotation::fall())?;
         self.center.go_down();
         Ok(())
     }
 
-    pub fn hard_drop(&mut self, matrix: &[Vec<Option<Block>>]) {
+    fn hard_drop(&mut self, matrix: &[GridLine]) {
         match self.fall(matrix) {
             Err(()) => {}
             Ok(()) => self.hard_drop(matrix),
         }
     }
 
-    pub fn left(&mut self, matrix: &[Vec<Option<Block>>]) {
+    fn left(&mut self, matrix: &[GridLine]) {
         if let Ok(new_blocks) = self.check_possible(matrix, TranslationRotation::left()) {
             self.blocks = new_blocks;
             self.center.go_left();
         }
     }
 
-    pub fn right(&mut self, matrix: &[Vec<Option<Block>>]) {
+    fn right(&mut self, matrix: &[GridLine]) {
         if let Ok(new_blocks) = self.check_possible(matrix, TranslationRotation::right()) {
             self.blocks = new_blocks;
             self.center.go_right();
         }
     }
 
-    pub fn turn_clockwise(&mut self, matrix: &[Vec<Option<Block>>]) {
+    fn turn_clockwise(&mut self, matrix: &[GridLine]) {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let wall_kicks_translations =
-            TetrominoKind::wall_kicks_translations(&self.kind, 1, self.rotation_status);
+        let wall_kicks_translations = TetrominoKind::wall_kicks_translations(
+            &self.kind,
+            RotationType::Clockwise,
+            self.rotation_status,
+        );
         for wall_kick in &wall_kicks_translations {
             match self.check_possible(
                 matrix,
-                TranslationRotation::new(*wall_kick, 1, &self.center),
+                TranslationRotation::new(*wall_kick, RotationType::Clockwise, &self.center),
             ) {
                 Err(()) => {
                     continue;
@@ -68,16 +114,19 @@ impl Tetromino {
         }
     }
 
-    pub fn turn_counterclockwise(&mut self, matrix: &[Vec<Option<Block>>]) {
+    fn turn_counterclockwise(&mut self, matrix: &[GridLine]) {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let wall_kicks_translations =
-            TetrominoKind::wall_kicks_translations(&self.kind, -1, self.rotation_status);
+        let wall_kicks_translations = TetrominoKind::wall_kicks_translations(
+            &self.kind,
+            RotationType::Counterclockwise,
+            self.rotation_status,
+        );
         for wall_kick in &wall_kicks_translations {
             match self.check_possible(
                 matrix,
-                TranslationRotation::new(*wall_kick, -1, &self.center),
+                TranslationRotation::new(*wall_kick, RotationType::Counterclockwise, &self.center),
             ) {
                 Err(()) => {
                     continue;
@@ -92,9 +141,9 @@ impl Tetromino {
         }
     }
 
-    pub fn check_possible(
+    fn check_possible(
         &self,
-        matrix: &[Vec<Option<Block>>],
+        matrix: &[GridLine],
         movement: TranslationRotation,
     ) -> Result<[Block; 4], ()> {
         let mut new_blocks = vec![];
@@ -104,10 +153,8 @@ impl Tetromino {
         let blocks = [new_blocks[0], new_blocks[1], new_blocks[2], new_blocks[3]];
         Ok(blocks)
     }
-}
 
-impl Tetromino {
-    pub fn new(kind: TetrominoKind, matrix: &[Vec<Option<Block>>]) -> Option<Tetromino> {
+    fn new(kind: TetrominoKind, matrix: &[GridLine]) -> Option<Tetromino> {
         let positions = kind.get_initial_position();
         let color = kind.get_color();
         for i in 1..5 {
@@ -129,7 +176,7 @@ impl Tetromino {
         })
     }
 
-    pub fn new_unchecked(kind: TetrominoKind) -> Tetromino {
+    fn new_unchecked(kind: TetrominoKind) -> Tetromino {
         let positions = kind.get_initial_position();
         let color = kind.get_color();
         Tetromino {
@@ -146,7 +193,7 @@ impl Tetromino {
         }
     }
 
-    pub fn reset_position(&mut self) {
+    fn reset_position(&mut self) {
         let positions = self.kind.get_initial_position();
         let color = self.kind.get_color();
         self.center = Point::new(positions[0], positions[1]);
@@ -158,7 +205,7 @@ impl Tetromino {
         ];
     }
 
-    pub fn make_ghost_copy(&mut self) -> Tetromino {
+    fn make_ghost_copy(&mut self) -> Tetromino {
         let mut ghost = *self;
         ghost.is_ghost = true;
         ghost
@@ -184,7 +231,8 @@ impl Display for Tetromino {
 }
 
 impl Tetromino {
-    pub fn split(&mut self) -> [Block; 4] {
+    /// Returns the 4 Blocks of the Tetromino.
+    pub(in crate::tetris_back_end) fn split(&mut self) -> [Block; 4] {
         self.blocks
     }
 }
