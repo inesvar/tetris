@@ -1,8 +1,8 @@
-use crate::assets::TetrisColor;
 use super::block::Block;
 use super::point::Transformable;
-use crate::settings::BLOCK_SIZE;
 use super::tetromino::Tetromino;
+use crate::assets::TetrisColor;
+use crate::settings::BLOCK_SIZE;
 use graphics::types::Matrix2d;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
