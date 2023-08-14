@@ -228,7 +228,10 @@ impl App<'_> {
         });
     }
 
-    pub(crate) fn update(&mut self, args: &UpdateArgs, gravity: u64, freeze: u64) {
+    ///
+    /// 
+    /// The higher fall_speed_divide is, the slower the pieces fall.
+    pub(crate) fn update(&mut self, args: &UpdateArgs, fall_speed_divide: u64, freeze: u64) {
         // first apply the changes inside the views
         if self.view_state == ViewState::Settings {
             self.widget_manager
@@ -250,7 +253,7 @@ impl App<'_> {
                 player.update(
                     &self.keybindings_manager,
                     self.frame_counter,
-                    gravity,
+                    fall_speed_divide,
                     freeze,
                 );
             }

@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Keyboard {
+    // TODO : is it necessary to store the boolean ?
     pressed: HashMap<Key, bool>,
 
     /// This is initialized on the key press then is decremented until it reaches 0 and long press is triggered
@@ -48,6 +49,8 @@ impl Keyboard {
     pub fn is_any_pressed(&self, keys: &[Key]) -> bool {
         for key in keys {
             if self.is_pressed(*key) {
+                println!("pressed : true");
+                println!("delay pressed : {}", self.is_any_delay_pressed(keys));
                 return true;
             }
         }
@@ -65,7 +68,7 @@ impl Keyboard {
 
     /// decrements the press delay countdown for all keys
     pub fn update(&mut self) {
-        for (_, counter) in self.first_press_repeat_countdown.iter_mut() {
+        for counter in self.first_press_repeat_countdown.values_mut() {
             if *counter > 0 {
                 *counter -= 1;
             }

@@ -22,8 +22,16 @@ use std::net::TcpStream;
 
 #[derive(Serialize, Deserialize)]
 pub struct LocalPlayer {
+    /// player_screen contains all attributes visible on the screen
+    /// like the TetrisGrid, the active Tetromino, the file of next Tetromino, etc.
+    ///
+    /// PlayerScreen, not LocalPlayer, is rendered.
+    /// PlayerScreen, not LocalPlayer, will be sent to the remote.
     player_screen: PlayerScreen,
     keyboard: Keyboard,
+    /// freeze_frame indicates when to freeze the active_tetromino and get a new one.
+    ///
+    /// freeze_frame is updated when a tetromino reaches the bottom of the grid.
     freeze_frame: u64,
     bag_of_tetromino: Vec<TetrominoKind>,
     sender: bool,
@@ -79,21 +87,26 @@ impl LocalPlayer {
         }
     }
 
+    // Sets a new active_tetromino when the precedent one is frozen
     fn get_new_tetromino(&mut self) {
+        // Refill the bag if necessary
         if self.bag_of_tetromino.is_empty() {
             self.bag_of_tetromino = new_random_bag(BAG_SIZE, &mut self.rng);
         }
+        // Check if there's enough place on the grid for a new tetromino
         let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
         if possible_active
             .check_possible(&self.player_screen.grid.rows, TranslationRotation::null())
             .is_err()
         {
+            // If not, set the game_over flag and return the tetromino to the bag
             self.declare_game_over();
             self.player_screen
                 .fifo_next_tetromino
                 .push_front(possible_active);
             return;
         }
+        // Add a new tetromino to the file to replace the one that was taken
         self.player_screen
             .fifo_next_tetromino
             .push(Tetromino::new_unchecked(
@@ -142,18 +155,24 @@ impl LocalPlayer {
 
     pub fn update(
         &mut self,
-        keybindings_manager: &Keybindings,
+        keybindings: &Keybindings,
         frame_counter: u64,
-        gravity: u64,
+        fall_speed_divide: u64,
         freeze: u64,
     ) {
+        /**********************************
+         *          AT EVERY TICK         *
+         **********************************/
+
+        // Updates the time for the keyboard
         self.keyboard.update();
 
+        // Updates the ghost_tetromino
         let mut ghost = self.player_screen.active_tetromino.make_ghost_copy();
         ghost.hard_drop(&self.player_screen.grid.rows);
         self.player_screen.ghost_tetromino = Some(ghost);
 
-        // Add the garbage
+        // Adds garbage to the grid
         if self.garbage_to_be_added != 0
             && self
                 .player_screen
@@ -164,6 +183,76 @@ impl LocalPlayer {
             self.declare_game_over();
         }
         self.garbage_to_be_added = 0;
+
+        // Send the player_screen data if necessary
+        if self.sender {
+            self.send_serialized();
+        }
+
+        // Set the number of completed lines to 0
+        if self.player_screen.new_completed_lines != 0 {
+            println!(
+                "the {} completed lines were sent to the adversary and they were reset to 0",
+                self.player_screen.new_completed_lines
+            );
+            self.player_screen.new_completed_lines = 0;
+        }
+
+        /**********************************
+         *         EVERY 5 TICKS          *
+         *              ---               *
+         *     "continuous" actions       *
+         **********************************/
+
+        // Translate the tetromino down on a key press
+        if frame_counter % 5 == 0 {
+            if self.keyboard.is_any_pressed(&keybindings.fall_keys) {
+                if self
+                    .player_screen
+                    .active_tetromino
+                    .fall(&self.player_screen.grid.rows)
+                    .is_err()
+                    && self.freeze_frame < frame_counter
+                {
+                    // if the tetromino reaches the bottom, set the freeze_frame
+                    self.freeze_frame = frame_counter + freeze;
+                }
+        // Translate the tetromino right or left on a long key press
+            } else if self.keyboard.is_any_delay_pressed(&keybindings.left_keys) {
+                self.player_screen
+                    .active_tetromino
+                    .left(&self.player_screen.grid.rows);
+            } else if self.keyboard.is_any_delay_pressed(&keybindings.right_keys) {
+                self.player_screen
+                    .active_tetromino
+                    .right(&self.player_screen.grid.rows);
+            }
+        }
+
+        /**********************************
+         *    EVERY FALL_SPEED_DIVIDE     *
+         *              ---               *
+         * "continuous" but slow actions  *
+         **********************************/
+
+        // move the tetromino down to emulate its fall
+        if frame_counter % fall_speed_divide == 0
+            && self
+                .player_screen
+                .active_tetromino
+                .fall(&self.player_screen.grid.rows)
+                .is_err()
+            && self.freeze_frame < frame_counter
+        {
+            // if the tetromino reaches the bottom, set the freeze_frame
+            self.freeze_frame = frame_counter + freeze;
+        }
+
+        /**********************************
+         *        AT FREEZE_FRAME         *
+         *              ---               *
+         *       only occasionally        *
+         **********************************/
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
@@ -185,60 +274,6 @@ impl LocalPlayer {
             }
             self.player_screen.score += self.player_screen.new_completed_lines;
             self.get_new_tetromino();
-        }
-
-        // move the tetromino down to emulate its fall
-        if frame_counter % gravity == 0
-            && self
-                .player_screen
-                .active_tetromino
-                .fall(&self.player_screen.grid.rows)
-                .is_err()
-            && self.freeze_frame < frame_counter
-        {
-            self.freeze_frame = frame_counter + freeze;
-        }
-
-        // Translate the tetromino on long key press
-        if frame_counter % 5 == 0 {
-            if self.keyboard.is_any_pressed(&keybindings_manager.fall_keys) {
-                if self
-                    .player_screen
-                    .active_tetromino
-                    .fall(&self.player_screen.grid.rows)
-                    .is_err()
-                    && self.freeze_frame < frame_counter
-                {
-                    self.freeze_frame = frame_counter + freeze;
-                }
-            } else if self
-                .keyboard
-                .is_any_delay_pressed(&keybindings_manager.left_keys)
-            {
-                self.player_screen
-                    .active_tetromino
-                    .left(&self.player_screen.grid.rows);
-            } else if self
-                .keyboard
-                .is_any_delay_pressed(&keybindings_manager.right_keys)
-            {
-                self.player_screen
-                    .active_tetromino
-                    .right(&self.player_screen.grid.rows);
-            }
-        }
-        // Send the player_screen data if necessary
-        if self.sender {
-            self.send_serialized();
-        }
-
-        // Set the number of completed lines to 0
-        if self.player_screen.new_completed_lines != 0 {
-            println!(
-                "the {} completed lines were sent to the adversary and they were reset to 0",
-                self.player_screen.new_completed_lines
-            );
-            self.player_screen.new_completed_lines = 0;
         }
     }
 
@@ -263,7 +298,7 @@ impl LocalPlayer {
             return KeyPress::Other;
         } else if running == RunningState::Paused && self.keyboard.is_any_pressed(&PAUSE_KEYS) {
             return KeyPress::Resume;
-        // the game pauses if PAUSE_KEYS are pressed
+            // the game pauses if PAUSE_KEYS are pressed
         } else if running == RunningState::Running && self.keyboard.is_any_pressed(&PAUSE_KEYS) {
             return KeyPress::Pause;
         }
