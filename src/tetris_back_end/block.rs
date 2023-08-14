@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
-
-use crate::assets::TetrisColor;
+//! Allows collisions of renderable blocks in the grid.
 use super::point::{Point, Transformable};
 use super::translation_rotation::TranslationRotation;
+use crate::assets::TetrisColor;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Block {
@@ -10,13 +10,12 @@ pub struct Block {
     pub position: Point,
 }
 
-impl Default for Block {
-    fn default() -> Self {
-        Block {
-            color: TetrisColor::Yellow,
-            position: Point::default(),
-        }
-    }
+pub trait Collision {
+    fn move_to(
+        &self,
+        matrix: &[Vec<Option<Block>>],
+        movement: &TranslationRotation,
+    ) -> Result<Block, ()>;
 }
 
 impl Block {
@@ -35,38 +34,13 @@ impl Block {
     }
 }
 
-impl Transformable for Block {
-    fn go_down(&mut self) {
-        self.position.go_down();
+impl Default for Block {
+    fn default() -> Self {
+        Block {
+            color: TetrisColor::Yellow,
+            position: Point::default(),
+        }
     }
-
-    fn go_up(&mut self) {
-        self.position.go_up();
-    }
-
-    fn go_left(&mut self) {
-        self.position.go_left();
-    }
-
-    fn go_right(&mut self) {
-        self.position.go_right();
-    }
-
-    fn rotate_clockwise(&mut self, other: &Point) {
-        self.position.rotate_clockwise(other);
-    }
-
-    fn rotate_counterclockwise(&mut self, other: &Point) {
-        self.position.rotate_counterclockwise(other);
-    }
-}
-
-pub trait Collision {
-    fn move_to(
-        &self,
-        matrix: &[Vec<Option<Block>>],
-        movement: &TranslationRotation,
-    ) -> Result<Block, ()>;
 }
 
 impl Collision for Block {
@@ -98,5 +72,31 @@ impl Collision for Block {
             Some(_) => Err(()),
             None => Ok(copy),
         }
+    }
+}
+
+impl Transformable for Block {
+    fn go_down(&mut self) {
+        self.position.go_down();
+    }
+
+    fn go_up(&mut self) {
+        self.position.go_up();
+    }
+
+    fn go_left(&mut self) {
+        self.position.go_left();
+    }
+
+    fn go_right(&mut self) {
+        self.position.go_right();
+    }
+
+    fn rotate_clockwise(&mut self, other: &Point) {
+        self.position.rotate_clockwise(other);
+    }
+
+    fn rotate_counterclockwise(&mut self, other: &Point) {
+        self.position.rotate_counterclockwise(other);
     }
 }
