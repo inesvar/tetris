@@ -14,9 +14,9 @@ use std::fmt::Formatter;
 pub struct Tetromino {
     kind: TetrominoKind,
     center: Point,
-    pub blocks: [Block; 4],
+    pub(in crate::tetris_back_end) blocks: [Block; 4],
     rotation_status: RotationState,
-    pub is_ghost: bool,
+    pub(in crate::tetris_back_end) is_ghost: bool,
 }
 
 /// Uses of a Tetromino by a Player : includes creating and moving pieces.

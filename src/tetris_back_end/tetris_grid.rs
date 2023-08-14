@@ -14,10 +14,10 @@ pub type GridLine = Vec<Option<Block>>;
 pub struct TetrisGrid {
     pub x: f64,
     pub y: f64,
-    pub nb_columns: u32,
-    pub nb_rows: u32,
+    nb_columns: u32,
+    nb_rows: u32,
     pub rows: Vec<GridLine>,
-    pub line_sum: Vec<u8>,
+    line_sum: Vec<u8>,
     pub total_width: f64,
     pub total_height: f64,
     pub visible_width: f64,
