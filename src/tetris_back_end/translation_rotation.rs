@@ -7,11 +7,27 @@ pub struct TranslationRotation {
     pub(in crate::tetris_back_end) rotation: Rotation,
 }
 
-/// Rotation types of a Tetromino.
+/// Rotation movement.
 pub(in crate::tetris_back_end) enum Rotation {
     Clockwise(Point),
     Counterclockwise(Point),
     None,
+}
+
+/// Rotation types.
+pub(in crate::tetris_back_end) enum RotationType {
+    Clockwise,
+    Counterclockwise,
+}
+
+impl Rotation {
+    /// Constructor for non-null rotation movements.
+    fn new(rtype: RotationType, center: Point) -> Self {
+        match rtype {
+            RotationType::Clockwise => Rotation::Clockwise(center),
+            RotationType::Counterclockwise => Rotation::Counterclockwise(center),
+        }
+    }
 }
 
 impl TranslationRotation {
@@ -28,11 +44,17 @@ impl TranslationRotation {
         TranslationRotation::translation(Point::new(0, 1))
     }
 
-    /// Returns a composite movement, translation then rotation.
-    pub(in crate::tetris_back_end) fn new(translation: Point, rotation: Rotation) -> Self {
+    /// Returns a composite movement, translation then rotation (around the translated center).
+    /// For a pure translation, use translation method.
+    pub(in crate::tetris_back_end) fn new(
+        translation: Point,
+        rtype: RotationType,
+        center: &Point,
+    ) -> Self {
         TranslationRotation {
             translation,
-            rotation,
+            // the rotation center is the center of the struct translated by translation
+            rotation: Rotation::new(rtype, *center + translation),
         }
     }
 
