@@ -4,7 +4,7 @@ use super::point::{Point, Transform};
 use super::rotation_state::{RotationState, RotationStateImplementation};
 use super::tetris_grid::GridLine;
 use super::tetromino_kind::{TetrominoKind, TetrominoKindImplementation};
-use super::translation_rotation::{Rotation, TranslationRotation};
+use super::translation_rotation::{RotationType, TranslationRotation};
 use core::fmt::Display;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
@@ -91,12 +91,15 @@ impl PlayerTetromino for Tetromino {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let wall_kicks_translations =
-            TetrominoKind::wall_kicks_translations(&self.kind, 1, self.rotation_status);
+        let wall_kicks_translations = TetrominoKind::wall_kicks_translations(
+            &self.kind,
+            RotationType::Clockwise,
+            self.rotation_status,
+        );
         for wall_kick in &wall_kicks_translations {
             match self.check_possible(
                 matrix,
-                TranslationRotation::new(*wall_kick, Rotation::Clockwise(self.center.clone())),
+                TranslationRotation::new(*wall_kick, RotationType::Clockwise, &self.center),
             ) {
                 Err(()) => {
                     continue;
@@ -115,15 +118,15 @@ impl PlayerTetromino for Tetromino {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let wall_kicks_translations =
-            TetrominoKind::wall_kicks_translations(&self.kind, -1, self.rotation_status);
+        let wall_kicks_translations = TetrominoKind::wall_kicks_translations(
+            &self.kind,
+            RotationType::Counterclockwise,
+            self.rotation_status,
+        );
         for wall_kick in &wall_kicks_translations {
             match self.check_possible(
                 matrix,
-                TranslationRotation::new(
-                    *wall_kick,
-                    Rotation::Counterclockwise(self.center.clone()),
-                ),
+                TranslationRotation::new(*wall_kick, RotationType::Counterclockwise, &self.center),
             ) {
                 Err(()) => {
                     continue;

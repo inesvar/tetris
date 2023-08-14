@@ -1,6 +1,6 @@
 //! Defines the specificities of the 7 kinds of Tetromino pieces : colors, starting positions, wall-kicks.
-use super::point::Point;
 use super::rotation_state::RotationState;
+use super::{point::Point, translation_rotation::RotationType};
 use crate::assets::TetrisColor;
 use serde::{Deserialize, Serialize};
 
@@ -28,7 +28,11 @@ pub(in crate::tetris_back_end) trait TetrominoKindImplementation {
     fn get_color(&self) -> TetrisColor;
 
     /// Returns an array of the 5 SRS wall-kick translations.
-    fn wall_kicks_translations(&self, rotation: i8, rotation_status: RotationState) -> [Point; 5];
+    fn wall_kicks_translations(
+        &self,
+        rtype: RotationType,
+        rotation_status: RotationState,
+    ) -> [Point; 5];
 }
 
 impl TetrominoKindImplementation for TetrominoKind {
@@ -70,7 +74,11 @@ impl TetrominoKindImplementation for TetrominoKind {
         }
     }
 
-    fn wall_kicks_translations(&self, rotation: i8, rotation_status: RotationState) -> [Point; 5] {
+    fn wall_kicks_translations(
+        &self,
+        rtype: RotationType,
+        rotation_status: RotationState,
+    ) -> [Point; 5] {
         // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
         match self {
             // since the O piece doesn't even rotate
@@ -80,57 +88,57 @@ impl TetrominoKindImplementation for TetrominoKind {
             // and not on a block like in the code
             // (the true position of the initial center is (4.5, 1) and not (4, 1) see line 32.)
             // (its due to the fact that the I piece doesn't have a 3x3 bounding box like the other rotating pieces)
-            TetrominoKind::I => match (rotation_status, rotation) {
-                (RotationState::R0, 1) => [
+            TetrominoKind::I => match (rotation_status, rtype) {
+                (RotationState::R0, RotationType::Clockwise) => [
                     Point::new(1, 0),
                     Point::new(1, 0) + Point::new(-2, 0),
                     Point::new(1, 0) + Point::new(1, 0),
                     Point::new(1, 0) + Point::new(-2, -1),
                     Point::new(1, 0) + Point::new(1, 2),
                 ],
-                (RotationState::R1, -1) => [
+                (RotationState::R1, RotationType::Counterclockwise) => [
                     Point::new(-1, 0),
                     Point::new(-1, 0) + Point::new(2, 0),
                     Point::new(-1, 0) + Point::new(-1, 0),
                     Point::new(-1, 0) + Point::new(2, 1),
                     Point::new(-1, 0) + Point::new(-1, -2),
                 ],
-                (RotationState::R1, 1) => [
+                (RotationState::R1, RotationType::Clockwise) => [
                     Point::new(0, 1),
                     Point::new(0, 1) + Point::new(-1, 0),
                     Point::new(0, 1) + Point::new(2, 0),
                     Point::new(0, 1) + Point::new(-1, 2),
                     Point::new(0, 1) + Point::new(2, -1),
                 ],
-                (RotationState::R2, -1) => [
+                (RotationState::R2, RotationType::Counterclockwise) => [
                     Point::new(0, -1),
                     Point::new(0, -1) + Point::new(1, 0),
                     Point::new(0, -1) + Point::new(-2, 0),
                     Point::new(0, -1) + Point::new(1, -2),
                     Point::new(0, -1) + Point::new(-2, 1),
                 ],
-                (RotationState::R2, 1) => [
+                (RotationState::R2, RotationType::Clockwise) => [
                     Point::new(-1, 0),
                     Point::new(-1, 0) + Point::new(2, 0),
                     Point::new(-1, 0) + Point::new(-1, 0),
                     Point::new(-1, 0) + Point::new(2, 1),
                     Point::new(-1, 0) + Point::new(-1, -2),
                 ],
-                (RotationState::R3, -1) => [
+                (RotationState::R3, RotationType::Counterclockwise) => [
                     Point::new(1, 0),
                     Point::new(1, 0) + Point::new(-2, 0),
                     Point::new(1, 0) + Point::new(1, 0),
                     Point::new(1, 0) + Point::new(-2, -1),
                     Point::new(1, 0) + Point::new(1, 2),
                 ],
-                (RotationState::R3, 1) => [
+                (RotationState::R3, RotationType::Clockwise) => [
                     Point::new(0, -1),
                     Point::new(0, -1) + Point::new(1, 0),
                     Point::new(0, -1) + Point::new(-2, 0),
                     Point::new(0, -1) + Point::new(1, -2),
                     Point::new(0, -1) + Point::new(-2, 1),
                 ],
-                (RotationState::R0, -1) => [
+                (RotationState::R0, RotationType::Counterclockwise) => [
                     Point::new(0, 1),
                     Point::new(0, 1) + Point::new(-1, 0),
                     Point::new(0, 1) + Point::new(2, 0),
@@ -139,57 +147,57 @@ impl TetrominoKindImplementation for TetrominoKind {
                 ],
                 _ => unreachable!(),
             },
-            _ => match (rotation_status, rotation) {
-                (RotationState::R0, 1) => [
+            _ => match (rotation_status, rtype) {
+                (RotationState::R0, RotationType::Clockwise) => [
                     Point::new(0, 0),
                     Point::new(-1, 0),
                     Point::new(-1, 1),
                     Point::new(0, -2),
                     Point::new(-1, -2),
                 ],
-                (RotationState::R1, -1) => [
+                (RotationState::R1, RotationType::Counterclockwise) => [
                     Point::new(0, 0),
                     Point::new(1, 0),
                     Point::new(1, -1),
                     Point::new(0, 2),
                     Point::new(1, 2),
                 ],
-                (RotationState::R1, 1) => [
+                (RotationState::R1, RotationType::Clockwise) => [
                     Point::new(0, 0),
                     Point::new(1, 0),
                     Point::new(1, -1),
                     Point::new(0, 2),
                     Point::new(1, 2),
                 ],
-                (RotationState::R2, -1) => [
+                (RotationState::R2, RotationType::Counterclockwise) => [
                     Point::new(0, 0),
                     Point::new(-1, 0),
                     Point::new(-1, 1),
                     Point::new(0, -2),
                     Point::new(-1, -2),
                 ],
-                (RotationState::R2, 1) => [
+                (RotationState::R2, RotationType::Clockwise) => [
                     Point::new(0, 0),
                     Point::new(1, 0),
                     Point::new(1, 1),
                     Point::new(0, -2),
                     Point::new(1, -2),
                 ],
-                (RotationState::R3, -1) => [
+                (RotationState::R3, RotationType::Counterclockwise) => [
                     Point::new(0, 0),
                     Point::new(-1, 0),
                     Point::new(-1, -1),
                     Point::new(0, 2),
                     Point::new(-1, 2),
                 ],
-                (RotationState::R3, 1) => [
+                (RotationState::R3, RotationType::Clockwise) => [
                     Point::new(0, 0),
                     Point::new(-1, 0),
                     Point::new(-1, -1),
                     Point::new(0, 2),
                     Point::new(-1, 2),
                 ],
-                (RotationState::R0, -1) => [
+                (RotationState::R0, RotationType::Counterclockwise) => [
                     Point::new(0, 0),
                     Point::new(1, 0),
                     Point::new(1, 1),
