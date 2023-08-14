@@ -308,7 +308,7 @@ impl App<'_> {
         }
         match key_press {
             KeyPress::Restart => {
-                    self.restart();
+                self.restart();
             }
             KeyPress::Resume => {
                 self.running = RunningState::Running;

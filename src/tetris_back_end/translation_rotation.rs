@@ -1,14 +1,14 @@
-use crate::point::Point;
-pub struct TranslateRotate {
+use super::point::Point;
+pub struct TranslationRotation {
     pub translation: Point,
     pub rotation: i8,
     pub center: Option<Point>,
 }
 
-impl TranslateRotate {
+impl TranslationRotation {
     pub fn new(translation: Point, rotation: i8, center: &Point) -> Self {
         let center = *center + translation;
-        TranslateRotate {
+        TranslationRotation {
             translation,
             rotation,
             center: Some(center),
@@ -16,7 +16,7 @@ impl TranslateRotate {
     }
 
     pub fn null() -> Self {
-        TranslateRotate {
+        TranslationRotation {
             translation: Point::new(0, 0),
             rotation: 0,
             center: None,
@@ -24,7 +24,7 @@ impl TranslateRotate {
     }
 
     pub fn translation(translation: Point) -> Self {
-        TranslateRotate {
+        TranslationRotation {
             translation,
             rotation: 0,
             center: None,
@@ -32,14 +32,14 @@ impl TranslateRotate {
     }
 
     pub fn fall() -> Self {
-        TranslateRotate::translation(Point::new(0, 1))
+        TranslationRotation::translation(Point::new(0, 1))
     }
 
     pub fn right() -> Self {
-        TranslateRotate::translation(Point::new(1, 0))
+        TranslationRotation::translation(Point::new(1, 0))
     }
 
     pub fn left() -> Self {
-        TranslateRotate::translation(Point::new(-1, 0))
+        TranslationRotation::translation(Point::new(-1, 0))
     }
 }

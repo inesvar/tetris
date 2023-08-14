@@ -1,10 +1,12 @@
 use crate::assets::Assets;
 use crate::circular_buffer::CircularBuffer;
 use crate::settings::{
-    BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS, TETROMINO_MAX_WIDTH, TETROMINO_MAX_HEIGHT, TEXT_COLOR, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
+    BLOCK_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y, GRID_BG_COLOR, GRID_COLOR,
+    GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS, TETROMINO_MAX_HEIGHT,
+    TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
 use crate::ui::text::Text;
-use crate::{tetris_grid::TetrisGrid, tetromino::Tetromino};
+use crate::{tetris_back_end::tetris_grid::TetrisGrid, tetris_back_end::tetromino::Tetromino};
 
 use graphics::types::{Matrix2d, Rectangle};
 use graphics::{color, rectangle, Context, Transformed};
