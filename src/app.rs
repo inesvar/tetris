@@ -229,7 +229,7 @@ impl App<'_> {
     }
 
     ///
-    /// 
+    ///
     /// The higher fall_speed_divide is, the slower the pieces fall.
     pub(crate) fn update(&mut self, args: &UpdateArgs, fall_speed_divide: u64, freeze: u64) {
         // first apply the changes inside the views

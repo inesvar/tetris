@@ -87,7 +87,7 @@ impl LocalPlayer {
         }
     }
 
-    // Sets a new active_tetromino when the precedent one is frozen
+    /// Sets a new active_tetromino when the precedent one is frozen.
     fn get_new_tetromino(&mut self) {
         // Refill the bag if necessary
         if self.bag_of_tetromino.is_empty() {
@@ -99,7 +99,8 @@ impl LocalPlayer {
             .check_possible(&self.player_screen.grid.rows, TranslationRotation::null())
             .is_err()
         {
-            // If not, set the game_over flag and return the tetromino to the bag
+            // If not, it's a lock out situation
+            // set the game_over flag and return the tetromino to the bag
             self.declare_game_over();
             self.player_screen
                 .fifo_next_tetromino
@@ -153,6 +154,22 @@ impl LocalPlayer {
         self.player_screen.render(transform, ctx, gl, assets);
     }
 
+    /// update is called before each render so that the informations on the screen are as recent as possible.
+    ///
+    /// It's responsible for the following tetromino events :
+    /// - the tetromino "falling" down naturally
+    /// - the tetromino freezing at the bottom and a new one appearing at the top
+    /// - the tetromino moving continuously to the right (resp. left) on a long key press
+    ///
+    /// It's also responsible for :
+    /// - updating the keyboard clock
+    /// - updating the ghost tetromino
+    /// - adding garbage
+    ///
+    /// - sending the serialized data to the remote
+    ///     // TODO move the sending somewhere else?
+    /// -
+    ///
     pub fn update(
         &mut self,
         keybindings: &Keybindings,
@@ -160,43 +177,15 @@ impl LocalPlayer {
         fall_speed_divide: u64,
         freeze: u64,
     ) {
+        /* Actions in this function have to be carefully ordered so that there are no uncoherences.
+         *
+         * For instance, garbage has to be added AFTER the tetromino is moved because it hasn't been rendered yet
+         * so the player couldn't adapt.
+         */
+
         /**********************************
-         *          AT EVERY TICK         *
+         *   MOVING the ACTIVE_TETROMINO  *
          **********************************/
-
-        // Updates the time for the keyboard
-        self.keyboard.update();
-
-        // Updates the ghost_tetromino
-        let mut ghost = self.player_screen.active_tetromino.make_ghost_copy();
-        ghost.hard_drop(&self.player_screen.grid.rows);
-        self.player_screen.ghost_tetromino = Some(ghost);
-
-        // Adds garbage to the grid
-        if self.garbage_to_be_added != 0
-            && self
-                .player_screen
-                .grid
-                .add_garbage(self.garbage_to_be_added)
-                .is_err()
-        {
-            self.declare_game_over();
-        }
-        self.garbage_to_be_added = 0;
-
-        // Send the player_screen data if necessary
-        if self.sender {
-            self.send_serialized();
-        }
-
-        // Set the number of completed lines to 0
-        if self.player_screen.new_completed_lines != 0 {
-            println!(
-                "the {} completed lines were sent to the adversary and they were reset to 0",
-                self.player_screen.new_completed_lines
-            );
-            self.player_screen.new_completed_lines = 0;
-        }
 
         /**********************************
          *         EVERY 5 TICKS          *
@@ -217,7 +206,7 @@ impl LocalPlayer {
                     // if the tetromino reaches the bottom, set the freeze_frame
                     self.freeze_frame = frame_counter + freeze;
                 }
-        // Translate the tetromino right or left on a long key press
+            // Translate the tetromino right or left on a long key press
             } else if self.keyboard.is_any_delay_pressed(&keybindings.left_keys) {
                 self.player_screen
                     .active_tetromino
@@ -232,7 +221,7 @@ impl LocalPlayer {
         /**********************************
          *    EVERY FALL_SPEED_DIVIDE     *
          *              ---               *
-         * "continuous" but slow actions  *
+         *  "continuous" slower actions   *
          **********************************/
 
         // move the tetromino down to emulate its fall
@@ -275,11 +264,61 @@ impl LocalPlayer {
             self.player_screen.score += self.player_screen.new_completed_lines;
             self.get_new_tetromino();
         }
+
+        /**********************************
+         *          AT EVERY TICK         *
+         *              ---               *
+         *      preparing the new render  *
+         **********************************/
+
+        // Updates the time for the keyboard
+        self.keyboard.update();
+
+        // Updates the ghost_tetromino
+        let mut ghost = self.player_screen.active_tetromino.make_ghost_copy();
+        ghost.hard_drop(&self.player_screen.grid.rows);
+        self.player_screen.ghost_tetromino = Some(ghost);
+
+        // Adds garbage to the grid
+        if self.garbage_to_be_added != 0
+            && self
+                .player_screen
+                .grid
+                .add_garbage(self.garbage_to_be_added)
+                .is_err()
+        {
+            self.declare_game_over();
+        }
+        self.garbage_to_be_added = 0;
+
+        // Send the player_screen data if necessary
+        if self.sender {
+            self.send_serialized();
+        }
+
+        // Set the number of completed lines to 0
+        if self.player_screen.new_completed_lines != 0 {
+            println!(
+                "the {} completed lines were sent to the adversary and they were reset to 0",
+                self.player_screen.new_completed_lines
+            );
+            self.player_screen.new_completed_lines = 0;
+        }
     }
 
+    /// handle_key_press is called when a key is pressed.
+    ///
+    /// It moves the tetromino accordingly if needed, it's responsible for all tetromino events except for the following (which are handled in update) :
+    /// - the tetromino "falling" down naturally
+    /// - the tetromino "freezing" at the bottom
+    /// - the tetromino moving continuously to the right (resp. left) on a long key press
+    ///
+    /// Its also responsible for the events :
+    /// - pause
+    /// - restart
     pub fn handle_key_press(
         &mut self,
-        keybindings_manager: &Keybindings,
+        keybindings: &Keybindings,
         key: Key,
         running: RunningState,
     ) -> KeyPress {
@@ -303,10 +342,14 @@ impl LocalPlayer {
             return KeyPress::Pause;
         }
 
+        /******************************
+         *         ACTIVE GAME        *
+         ******************************/
+
         // Pressed once events
         if self
             .keyboard
-            .is_any_pressed(&keybindings_manager.rotate_clockwise_keys)
+            .is_any_pressed(&keybindings.rotate_clockwise_keys)
         {
             // rotate once the tetromino
             self.player_screen
@@ -314,7 +357,7 @@ impl LocalPlayer {
                 .turn_clockwise(&self.player_screen.grid.rows);
         } else if self
             .keyboard
-            .is_any_pressed(&keybindings_manager.rotate_counterclockwise_keys)
+            .is_any_pressed(&keybindings.rotate_counterclockwise_keys)
         {
             // rotate once the tetromino
             self.player_screen
@@ -322,10 +365,7 @@ impl LocalPlayer {
                 .turn_counterclockwise(&self.player_screen.grid.rows);
         }
 
-        if self
-            .keyboard
-            .is_any_pressed(&keybindings_manager.hard_drop_keys)
-        {
+        if self.keyboard.is_any_pressed(&keybindings.hard_drop_keys) {
             // hard drop the tetromino
             self.player_screen
                 .active_tetromino
@@ -346,7 +386,7 @@ impl LocalPlayer {
 
         if self
             .keyboard
-            .is_any_pressed(&keybindings_manager.hold_tetromino_keys)
+            .is_any_pressed(&keybindings.hold_tetromino_keys)
         {
             // hold the tetromino
             if let Some(mut saved) = self.player_screen.saved_tetromino {
@@ -362,14 +402,11 @@ impl LocalPlayer {
             }
         }
 
-        if self.keyboard.is_any_pressed(&keybindings_manager.left_keys) {
+        if self.keyboard.is_any_pressed(&keybindings.left_keys) {
             self.player_screen
                 .active_tetromino
                 .left(&self.player_screen.grid.rows);
-        } else if self
-            .keyboard
-            .is_any_pressed(&keybindings_manager.right_keys)
-        {
+        } else if self.keyboard.is_any_pressed(&keybindings.right_keys) {
             self.player_screen
                 .active_tetromino
                 .right(&self.player_screen.grid.rows);
