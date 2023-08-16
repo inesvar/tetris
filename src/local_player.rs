@@ -280,15 +280,9 @@ impl LocalPlayer {
         self.player_screen.ghost_tetromino = Some(ghost);
 
         // Adds garbage to the grid
-        if self.garbage_to_be_added != 0
-            && self
-                .player_screen
-                .grid
-                .add_garbage(self.garbage_to_be_added)
-                .is_err()
-        {
-            self.declare_game_over();
-        }
+        self.player_screen
+            .grid
+            .add_garbage(self.garbage_to_be_added);
         self.garbage_to_be_added = 0;
 
         // Send the player_screen data if necessary
