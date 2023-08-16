@@ -251,18 +251,24 @@ impl LocalPlayer {
                 .check_possible(&self.player_screen.grid.rows, TranslationRotation::fall())
                 .is_err()
         {
-            self.player_screen.new_completed_lines = self
+            match self
                 .player_screen
                 .grid
-                .freeze_tetromino(&mut self.player_screen.active_tetromino);
-            if self.player_screen.new_completed_lines != 0 {
-                println!(
-                    "{} lines were completed",
-                    self.player_screen.new_completed_lines
-                );
+                .freeze_tetromino(&mut self.player_screen.active_tetromino)
+            {
+                Some(completed_lines) => {
+                    self.player_screen.new_completed_lines = completed_lines;
+                    if self.player_screen.new_completed_lines != 0 {
+                        println!(
+                            "{} lines were completed",
+                            self.player_screen.new_completed_lines
+                        );
+                    }
+                    self.player_screen.score += self.player_screen.new_completed_lines;
+                    self.get_new_tetromino();
+                }
+                None => self.declare_game_over(),
             }
-            self.player_screen.score += self.player_screen.new_completed_lines;
-            self.get_new_tetromino();
         }
 
         /**********************************
@@ -359,25 +365,6 @@ impl LocalPlayer {
                 .turn_counterclockwise(&self.player_screen.grid.rows);
         }
 
-        if self.keyboard.is_any_pressed(&keybindings.hard_drop_keys) {
-            // hard drop the tetromino
-            self.player_screen
-                .active_tetromino
-                .hard_drop(&self.player_screen.grid.rows);
-            self.player_screen.new_completed_lines = self
-                .player_screen
-                .grid
-                .freeze_tetromino(&mut self.player_screen.active_tetromino);
-            if self.player_screen.new_completed_lines != 0 {
-                println!(
-                    "{} lines were completed",
-                    self.player_screen.new_completed_lines
-                );
-            }
-            self.player_screen.score += self.player_screen.new_completed_lines;
-            self.get_new_tetromino();
-        }
-
         if self
             .keyboard
             .is_any_pressed(&keybindings.hold_tetromino_keys)
@@ -396,6 +383,7 @@ impl LocalPlayer {
             }
         }
 
+        // move the tetromino left or right
         if self.keyboard.is_any_pressed(&keybindings.left_keys) {
             self.player_screen
                 .active_tetromino
@@ -404,6 +392,31 @@ impl LocalPlayer {
             self.player_screen
                 .active_tetromino
                 .right(&self.player_screen.grid.rows);
+        }
+
+        if self.keyboard.is_any_pressed(&keybindings.hard_drop_keys) {
+            // hard drop the tetromino
+            self.player_screen
+                .active_tetromino
+                .hard_drop(&self.player_screen.grid.rows);
+            match self
+                .player_screen
+                .grid
+                .freeze_tetromino(&mut self.player_screen.active_tetromino)
+            {
+                Some(completed_lines) => {
+                    self.player_screen.new_completed_lines = completed_lines;
+                    if self.player_screen.new_completed_lines != 0 {
+                        println!(
+                            "{} lines were completed",
+                            self.player_screen.new_completed_lines
+                        );
+                    }
+                    self.player_screen.score += self.player_screen.new_completed_lines;
+                    self.get_new_tetromino();
+                }
+                None => self.declare_game_over(),
+            }
         }
         KeyPress::Other
     }

@@ -41,11 +41,10 @@ impl TetrisGrid {
                         BLOCK_SIZE,
                     );
                     outline_rect.draw(outline_dims, &ctx.draw_state, self.transform, gl);
-
-                    match cell {
-                        Some(block) => block.render(self.transform, &ctx.draw_state, gl, assets),
-                        None => {}
-                    }
+                }
+                match cell {
+                    Some(block) => block.render(self.transform, &ctx.draw_state, gl, assets),
+                    None => {}
                 }
             }
         }
