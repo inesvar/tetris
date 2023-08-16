@@ -49,11 +49,19 @@ impl TetrisGrid {
     }
 
     /// Push the Tetromino into the grid and return the number of lines completed.
-    pub fn freeze_tetromino(&mut self, tetromino: &mut Tetromino) -> u64 {
+    pub fn freeze_tetromino(&mut self, tetromino: &mut Tetromino) -> Option<u64> {
+        let mut game_over = true;
         let mut blocks = tetromino.split();
         for block in &mut blocks {
             self.rows[block.position.y as usize][block.position.x as usize] = Some(*block);
             self.line_sum[block.position.y as usize] += 1;
+            // if there's a block below the top of the visible grid, continue playing
+            if block.position.y as usize > 1 {
+                game_over = false;
+            }
+        }
+        if game_over {
+            return None;
         }
         let mut score = 0;
         for y in 0..self.nb_rows {
@@ -75,7 +83,7 @@ impl TetrisGrid {
                 score += 1;
             }
         }
-        score
+        Some(score)
     }
 
     /// Adds the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
