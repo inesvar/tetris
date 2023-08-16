@@ -35,6 +35,7 @@ impl RemotePlayer {
                 once!("unwrapped from {}", SERVER_IP);
                 {
                     let mut screen = screen.lock().unwrap();
+                    // if the new_completed_lines haven't been read yet, ensure they're not rewritten
                     if screen.new_completed_lines != 0 {
                         let a = screen.new_completed_lines;
                         *screen = deserialized;
