@@ -58,6 +58,7 @@ impl TetrisGrid {
         let mut score = 0;
         for y in 0..self.nb_rows {
             if self.line_sum[y as usize] == self.nb_columns as u8 {
+                // TODO neatly separate this in a private function
                 self.rows.remove(y as usize);
                 self.rows.insert(0, vec![None; self.nb_columns as usize]);
 
@@ -77,75 +78,54 @@ impl TetrisGrid {
         score
     }
 
-    /// Add the specified number of lines at the bottom of the grid.
-    pub fn add_garbage(&mut self, mut completed_lines: u64) -> Result<(), ()> {
+    /// Adds the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
+    pub fn add_garbage(&mut self, completed_lines: u64) {
         println!(
             "the garbage creating function was called for {} lines",
             completed_lines
         );
-        if completed_lines == 4 {
-            completed_lines += 1;
-        }
         if completed_lines < 2 {
-            Ok(())
-        } else if self.line_sum[(completed_lines - 2) as usize] > 0 {
-            let mut rng = rand::thread_rng();
-            let empty = rng.gen::<u32>() % self.nb_columns;
-
-            for _ in 0..=(completed_lines - 2) {
-                self.line_sum
-                    .insert(self.nb_rows as usize, (self.nb_columns - 1) as u8);
-                self.line_sum.remove(0);
-
-                self.rows
-                    .insert(self.nb_rows as usize, vec![None; self.nb_columns as usize]);
-                for x in 0..self.nb_columns {
-                    if x != empty {
-                        self.rows[self.nb_rows as usize][x as usize] =
-                            Some(Block::new(TetrisColor::Grey, x as i8, self.nb_rows as i8));
-                    } else {
-                        self.rows[self.nb_rows as usize][x as usize] = None;
-                    }
-                }
-                self.rows.remove(0);
-                // move all block up
-                for y in 0..self.nb_rows {
-                    for block in self.rows[y as usize].iter_mut().flatten() {
-                        block.go_up();
-                    }
-                }
-            }
-            println!("{} lines were removed", completed_lines - 2);
-            Err(())
+            return;
+        }
+        let lines_to_add = if completed_lines == 4 {
+            4
         } else {
-            let mut rng = rand::thread_rng();
-            let empty = rng.gen::<u32>() % self.nb_columns;
+            completed_lines - 1
+        };
 
-            for _ in 0..=(completed_lines - 2) {
-                self.line_sum
-                    .insert(self.nb_rows as usize, (self.nb_columns - 1) as u8);
-                self.line_sum.remove(0);
+        /*****************************
+         *     CHANGING THE GRID     *
+         *****************************/
 
-                self.rows
-                    .insert(self.nb_rows as usize, vec![None; self.nb_columns as usize]);
-                for x in 0..self.nb_columns {
-                    if x != empty {
-                        self.rows[self.nb_rows as usize][x as usize] =
-                            Some(Block::new(TetrisColor::Grey, x as i8, self.nb_rows as i8));
-                    } else {
-                        self.rows[self.nb_rows as usize][x as usize] = None;
-                    }
-                }
-                self.rows.remove(0);
-                // move all block up
-                for y in 0..self.nb_rows {
-                    for block in self.rows[y as usize].iter_mut().flatten() {
-                        block.go_up();
-                    }
+        // store the column index that will be empty
+        let mut rng = rand::thread_rng();
+        let empty = rng.gen::<u32>() % self.nb_columns;
+
+        for _ in 0..lines_to_add {
+            // move the rows and line_sum one line up
+            self.line_sum
+                .insert(self.nb_rows as usize, (self.nb_columns - 1) as u8);
+            self.line_sum.remove(0);
+
+            self.rows
+                .insert(self.nb_rows as usize, vec![None; self.nb_columns as usize]);
+            for x in 0..self.nb_columns {
+                // add blocks in the entire line except in one column
+                if x != empty {
+                    self.rows[self.nb_rows as usize][x as usize] =
+                        Some(Block::new(TetrisColor::Grey, x as i8, self.nb_rows as i8));
+                } else {
+                    self.rows[self.nb_rows as usize][x as usize] = None;
                 }
             }
-            println!("{} lines were removed", completed_lines - 1);
-            Ok(())
+            self.rows.remove(0);
+
+            // set the coordinates of the blocks higher
+            for y in 0..self.nb_rows {
+                for block in self.rows[y as usize].iter_mut().flatten() {
+                    block.go_up(); // TODO add a function to move blocks a certain number of cells up
+                }
+            }
         }
     }
 
