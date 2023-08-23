@@ -21,7 +21,7 @@ mod keyboard;
 mod local_player;
 mod macros;
 mod player_screen;
-mod remote_player;
+mod remote;
 mod settings;
 mod tetris_back_end;
 mod ui;
