@@ -1,52 +1,41 @@
-//! Allows to move an abstract point on a grid.
+//! Defines a point on a grid that can move.
 use serde::{Deserialize, Serialize};
 
 /// Point on a finite wrap-around 2D grid.
 ///
-/// Notably implements **Transform** trait and std::ops::Add and std::ops::AddAssign.
-///
-/// A point by itself is abstract and doesn't implement collisions
-/// (it moves without any knownledge of its surroundings).
+/// A point moves without knownledge of its surroundings through [Transform]
+/// and thus doesn't implement collisions.
 #[derive(Clone, Copy, Serialize, Deserialize, Default)]
-pub(in crate::tetris_back_end) struct Point {
+pub(super) struct Point {
     /// horizontal coordinate, from left to right
-    pub(in crate::tetris_back_end) x: i8,
+    pub(super) x: i8,
     /// vertical coordinate, *from top to bottom*
-    pub(in crate::tetris_back_end) y: i8,
+    pub(super) y: i8,
 }
 
 /// Unhindered moves on a grid (used when collisions aren't necessary)
 ///
 /// ## Uses
-/// - Tetromino *center* (go_down, go_right, go_left)
-/// - Tetromino *blocks* (rotate_clockwise, rotate_counterclockwise) when checking if a rotation is possible
-/// - TetrisGrid *blocks* (go_down, go_up) when receiving/completing lines
-///
-/// ## Functions
-/// - **go_down**(), **go_up**(), **go_right**(), **go_left**()
-///
-/// move one grid cell in the given direction
-///
-/// - **rotate_clockwise**(origin: Point), **rotate_counterclockwise**(origin: Point)
-///
-/// rotate 90° around the origin
-pub(in crate::tetris_back_end) trait Transform {
-    /// Move down one cell without checking if it's empty
+/// - [Tetromino](super::Tetromino) *center* (go_down, go_right, go_left)
+/// - [Tetromino](super::Tetromino) *blocks* (rotate_clockwise, rotate_counterclockwise) when checking if a rotation is possible
+/// - [TetrisGrid](super::TetrisGrid) *blocks* (go_down, go_up) when receiving/completing lines
+pub(super) trait Transform {
+    /// Move down one cell without checking if it's empty.
     fn go_down(&mut self);
-    /// Move up one cell without checking if it's empty
+    /// Move up one cell without checking if it's empty.
     fn go_up(&mut self);
-    /// Move one cell left without checking if it's empty
+    /// Move one cell left without checking if it's empty.
     fn go_left(&mut self);
-    /// Move one cell right without checking if it's empty
+    /// Move one cell right without checking if it's empty.
     fn go_right(&mut self);
-    /// Rotate 90° clockwise around the given origin without checking if the destination is empty
+    /// Rotate 90° clockwise around the given origin without checking if the destination is empty.
     fn rotate_clockwise(&mut self, other: &Point);
-    /// Rotate 90° counterclockwise around the given origin without checking if the destination is empty
+    /// Rotate 90° counterclockwise around the given origin without checking if the destination is empty.
     fn rotate_counterclockwise(&mut self, other: &Point);
 }
 
 impl Point {
-    pub(in crate::tetris_back_end) fn new(x: i8, y: i8) -> Self {
+    pub(super) fn new(x: i8, y: i8) -> Self {
         Point { x, y }
     }
 }

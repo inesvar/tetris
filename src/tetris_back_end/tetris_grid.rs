@@ -1,29 +1,9 @@
-use super::block::Block;
-use super::point::Transform;
-use super::tetromino::Tetromino;
+//! Defines the implementation of a [TetrisGrid](super::TetrisGrid).
+use super::{block::Block, point::Transform, TetrisGrid, Tetromino};
 use crate::assets::TetrisColor;
 use crate::settings::BLOCK_SIZE;
 use graphics::types::Matrix2d;
 use rand::Rng;
-use serde::{Deserialize, Serialize};
-
-pub type GridLine = Vec<Option<Block>>;
-
-/// Tetris grid containing Blocks.
-#[derive(Serialize, Deserialize)]
-pub struct TetrisGrid {
-    pub x: f64,
-    pub y: f64,
-    nb_columns: u32,
-    nb_rows: u32,
-    pub rows: Vec<GridLine>,
-    line_sum: Vec<u8>,
-    pub total_width: f64,
-    pub total_height: f64,
-    pub visible_width: f64,
-    pub visible_height: f64,
-    pub transform: Matrix2d<f64>,
-}
 
 impl TetrisGrid {
     pub fn new(x: f64, y: f64, nb_columns: u32, nb_rows: u32) -> TetrisGrid {

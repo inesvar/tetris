@@ -2,16 +2,16 @@ use crate::{settings::TEXT_COLOR, ui::text::Text};
 use piston::{Key, MouseButton};
 
 pub struct TextInput {
-    pub(in crate::ui) x: f64,
-    pub(in crate::ui) y: f64,
-    pub(in crate::ui) width: f64,
-    pub(in crate::ui) height: f64,
-    pub(in crate::ui) text: Text,
-    pub(in crate::ui) cursor: String,
-    pub(in crate::ui) info_text: Text,
+    pub(super) x: f64,
+    pub(super) y: f64,
+    pub(super) width: f64,
+    pub(super) height: f64,
+    pub(super) text: Text,
+    pub(super) cursor: String,
+    pub(super) info_text: Text,
     placeholder: String,
-    pub(in crate::ui) focused: bool,
-    pub(in crate::ui) animation_counter: u64,
+    pub(super) focused: bool,
+    pub(super) animation_counter: u64,
 }
 
 impl TextInput {

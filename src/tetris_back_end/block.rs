@@ -1,40 +1,37 @@
-//! Allows collisions of renderable blocks in the grid.
-use super::point::{Point, Transform};
-use super::tetris_grid::GridLine;
-use super::translation_rotation::{Rotation, TranslationRotation};
+//! Defines a tetris block and the useful functions to move it inside a tetris grid.
+use super::{
+    point::{Point, Transform},
+    translation_rotation::Rotation,
+    GridMatrix, TranslationRotation,
+};
 use crate::assets::TetrisColor;
 use serde::{Deserialize, Serialize};
 
-/// Coloured tetris Block in a finite wrap-around 2D grid.
+/// Coloured tetris block in a finite 2D grid.
 ///
-/// Notably implements **Collision** trait.
-///
-/// A block can be rendered and implements collisions,
-/// but it can also be moved without using information
-/// about its surroudings through the Transform trait.
+/// A block can move inside a grid, constrained by the bounds of the grid and other blocks, through [Collision].
+/// However it can also move without using information
+/// about its surroudings through [Transform].
+/// A block has a [render()](Block::render()).
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Block {
-    pub(in crate::tetris_back_end) position: Point,
-    pub(in crate::tetris_back_end) color: TetrisColor,
+    pub(super) position: Point,
+    pub(super) color: TetrisColor,
 }
 
-/// Moves blocks in the grid in such a way that :
-/// - blocks stay in the playing field
-/// - blocks can't overlap, they only move to empty places
+/// Moves a block inside the grid, eventually handling the collision with other blocks in the matrix.
+///
+/// The block can never leave the matrix.
 ///
 /// ## Uses
-/// - anytime a Tetromino moves, its *blocks* rely on Collision
-///
-/// ## Functions
-/// - **move_to**(matrix: &\[GridLine\], movement: &TranslationRotation)
-///
-/// returns either a block with the resulting coordinates or Err(())
-pub(in crate::tetris_back_end) trait Collision {
-    fn move_to(&self, matrix: &[GridLine], movement: &TranslationRotation) -> Result<Block, ()>;
+/// - anytime a [Tetromino](super::Tetromino) moves
+pub(super) trait Collision {
+    /// Applies a given *movement* to a block in a given *matrix*.
+    fn move_to(&self, matrix: &GridMatrix, movement: &TranslationRotation) -> Result<Block, ()>;
 }
 
 impl Block {
-    pub(in crate::tetris_back_end) fn new(color: TetrisColor, x: i8, y: i8) -> Self {
+    pub(super) fn new(color: TetrisColor, x: i8, y: i8) -> Self {
         Block {
             position: Point::new(x, y),
             color,
@@ -69,7 +66,7 @@ impl Default for Block {
 }
 
 impl Collision for Block {
-    fn move_to(&self, matrix: &[GridLine], movement: &TranslationRotation) -> Result<Block, ()> {
+    fn move_to(&self, matrix: &GridMatrix, movement: &TranslationRotation) -> Result<Block, ()> {
         // Apply the TranslationRotation
         let mut copy = self.translation_by(movement);
         match movement.rotation {

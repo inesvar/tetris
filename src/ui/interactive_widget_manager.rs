@@ -38,9 +38,9 @@ pub enum KeyInputType {
 }
 
 pub struct InteractiveWidgetManager {
-    pub(in crate::ui) buttons: HashMap<ButtonType, Button>,
-    pub(in crate::ui) text_inputs: HashMap<TextInputType, TextInput>,
-    pub(in crate::ui) key_inputs: HashMap<KeyInputType, KeyInput>,
+    pub(super) buttons: HashMap<ButtonType, Button>,
+    pub(super) text_inputs: HashMap<TextInputType, TextInput>,
+    pub(super) key_inputs: HashMap<KeyInputType, KeyInput>,
 }
 
 impl InteractiveWidgetManager {

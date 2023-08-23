@@ -5,8 +5,8 @@ use crate::settings::{
     GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS, TETROMINO_MAX_HEIGHT,
     TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
+use crate::tetris_back_end::{TetrisGrid, Tetromino};
 use crate::ui::text::Text;
-use crate::{tetris_back_end::tetris_grid::TetrisGrid, tetris_back_end::tetromino::Tetromino};
 use graphics::types::{Matrix2d, Rectangle};
 use graphics::{rectangle, Context, Transformed};
 use opengl_graphics::GlGraphics;

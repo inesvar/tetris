@@ -1,25 +1,28 @@
-//! Defines rotation states of a Tetromino.
+//! Defines a rotation state that describes the orientation of a [Tetromino](super::Tetromino).
 use serde::{Deserialize, Serialize};
 
-/// Rotation state of a Tetromino among the 4 possible.
+/// Rotation state of a [Tetromino](super::Tetromino) among the 4 possible.
 #[derive(Clone, Copy, Serialize, Deserialize)]
-pub(in crate::tetris_back_end) enum RotationState {
+pub(super) enum RotationState {
     R0,
     R1,
     R2,
     R3,
 }
 
-/// Implementation of RotationState (used only by Tetromino).
-pub(in crate::tetris_back_end) trait RotationStateImplementation {
-    /// Update the RotationStatus with a turn clockwise.
+/// Updates the rotation state.
+///
+/// ## Uses
+/// - anytime a [Tetromino](super::Tetromino) turns
+pub(super) trait RotationStateUpdate {
+    /// Update the rotation state with a turn clockwise.
     fn clockwise(&mut self);
 
-    /// Update the RotationStatus with a turn counterclockwise.
+    /// Update the rotation state with a turn counterclockwise.
     fn counterclockwise(&mut self);
 }
 
-impl RotationStateImplementation for RotationState {
+impl RotationStateUpdate for RotationState {
     fn clockwise(&mut self) {
         match self {
             RotationState::R0 => {
