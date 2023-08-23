@@ -3,7 +3,7 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 use crate::graphics::Transformed;
-use crate::remote_player::RemotePlayer;
+use crate::remote::remote_player::RemotePlayer;
 use crate::settings::{self, *};
 use crate::Assets;
 
