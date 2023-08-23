@@ -29,8 +29,8 @@ impl RemotePlayer {
         let screen = Arc::clone(&self.screen);
         let first_screen_received = Arc::clone(&self.first_screen_received);
         let self_for_listener = RemotePlayer {
-            screen: screen,
-            first_screen_received: first_screen_received,
+            screen,
+            first_screen_received,
         };
         // creating a listener in a separate thread
         let listener = TcpListener::bind(SERVER_IP).unwrap();
@@ -41,27 +41,32 @@ impl RemotePlayer {
                 let new_screen =
                     serde_cbor::from_reader::<PlayerScreen, TcpStream>(stream).unwrap();
                 once!("unwrapped from {}", SERVER_IP);
-                {
-                    let mut local_screen = self_for_listener.screen.lock().unwrap();
-                    // if the new_completed_lines haven't been read yet, ensure it's not rewritten
-                    if local_screen.new_completed_lines != 0 {
-                        let a = local_screen.new_completed_lines;
-                        *local_screen = new_screen;
-                        local_screen.new_completed_lines = a;
-                    } else {
-                        *local_screen = new_screen;
-                    }
-                    // erase the ghost tetromino so there's no confusion for the player on which grid is his
-                    local_screen.ghost_tetromino = None;
-                }
-                // if this is the first new_screen received, set the first_screen_received bit
-                {
-                    if !*self_for_listener.first_screen_received.lock().unwrap() {
-                        *self_for_listener.first_screen_received.lock().unwrap() = true;
-                    }
-                }
+                self_for_listener.update_screen(new_screen);
             }
         });
+    }
+
+    /// Updates the remote player with the new_screen received.
+    fn update_screen(&self, new_screen: PlayerScreen) {
+        {
+            let mut local_screen = self.screen.lock().unwrap();
+            // if the new_completed_lines haven't been read yet, ensure it's not rewritten
+            if local_screen.new_completed_lines != 0 {
+                let a = local_screen.new_completed_lines;
+                *local_screen = new_screen;
+                local_screen.new_completed_lines = a;
+            } else {
+                *local_screen = new_screen;
+            }
+            // erase the ghost tetromino so there's no confusion for the player on which grid is his
+            local_screen.ghost_tetromino = None;
+        }
+        // if this is the first new_screen received, set the first_screen_received bit
+        {
+            if !*self.first_screen_received.lock().unwrap() {
+                *self.first_screen_received.lock().unwrap() = true;
+            }
+        }
     }
 
     pub fn render(
