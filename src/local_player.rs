@@ -4,11 +4,7 @@ use crate::circular_buffer::CircularBuffer;
 use crate::keyboard::Keyboard;
 use crate::player_screen::PlayerScreen;
 use crate::tetris_back_end::{
-    tetris_grid::TetrisGrid,
-    tetromino::{PlayerTetromino, Tetromino},
-    tetromino_bag::new_random_bag,
-    tetromino_kind::TetrominoKind,
-    translation_rotation::TranslationRotation,
+    new_tetromino_bag, TetrisGrid, Tetromino, TetrominoKind, TranslationRotation,
 };
 use crate::{once, settings::*};
 use graphics::types::Matrix2d;
@@ -48,7 +44,7 @@ impl LocalPlayer {
     pub fn new(seed: u64, sender: bool) -> Self {
         let grid = TetrisGrid::new(DEFAULT_GRID_X, DEFAULT_GRID_Y, NB_COLUMNS, NB_ROWS);
         let mut rng = Pcg32::seed_from_u64(seed);
-        let mut bag_of_tetromino = new_random_bag(BAG_SIZE, &mut rng);
+        let mut bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut rng);
         let first_tetromino =
             Tetromino::new(bag_of_tetromino.pop().unwrap(), &grid.rows[..]).unwrap();
         let mut fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
@@ -56,7 +52,7 @@ impl LocalPlayer {
             if let Some(t) = bag_of_tetromino.pop() {
                 fifo_next_tetromino.push(Tetromino::new_unchecked(t));
             } else {
-                bag_of_tetromino = new_random_bag(BAG_SIZE, &mut rng);
+                bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut rng);
                 if let Some(t) = bag_of_tetromino.pop() {
                     fifo_next_tetromino.push(Tetromino::new_unchecked(t));
                 } else {
@@ -92,7 +88,7 @@ impl LocalPlayer {
     fn get_new_tetromino(&mut self) {
         // Refill the bag if necessary
         if self.bag_of_tetromino.is_empty() {
-            self.bag_of_tetromino = new_random_bag(BAG_SIZE, &mut self.rng);
+            self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
         }
         // Check if there's enough place on the grid for a new tetromino
         let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();

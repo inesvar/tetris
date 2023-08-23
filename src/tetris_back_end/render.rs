@@ -1,12 +1,9 @@
-//! Defines the render of types Block, Tetromino and TetrisGrid.
-use super::block::Block;
-use super::tetris_grid::TetrisGrid;
-use super::tetromino::Tetromino;
-use crate::graphics::Transformed;
+//! Defines the render functions of types [Block](super::block::Block::render()), [Tetromino](super::Tetromino::render()) and [TetrisGrid](super::TetrisGrid::render()).
+use super::{block::Block, TetrisGrid, Tetromino};
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
 use crate::Assets;
-use graphics::draw_state::Blend;
 use graphics::types::{Matrix2d, Rectangle, Scalar};
+use graphics::{draw_state::Blend, Transformed};
 use graphics::{rectangle, Context, DrawState, Image};
 use opengl_graphics::GlGraphics;
 

@@ -1,42 +1,12 @@
 //! Defines the specificities of the 7 kinds of Tetromino pieces : colors, starting positions, wall-kicks.
-use super::rotation_state::RotationState;
-use super::{point::Point, translation_rotation::RotationType};
+use super::{
+    point::Point, rotation_state::RotationState, translation_rotation::RotationType, TetrominoKind,
+};
 use crate::assets::TetrisColor;
-use serde::{Deserialize, Serialize};
 
-/// TetrominoKind describes the 7 types of Tetromino.
-#[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
-pub enum TetrominoKind {
-    I,
-    O,
-    T,
-    S,
-    Z,
-    J,
-    L,
-}
-
-/// Implementation of TetrominoKind (used only by Tetromino).
-pub(in crate::tetris_back_end) trait TetrominoKindImplementation {
+impl TetrominoKind {
     /// Returns the name of the TetrominoKind variant.
-    fn get(&self) -> String;
-
-    /// Returns the initial position of the center and the blocks of a tetromino.
-    fn get_initial_position(&self) -> [i8; 10];
-
-    /// Returns the color associated with the TetrominoKind.
-    fn get_color(&self) -> TetrisColor;
-
-    /// Returns an array of the 5 SRS wall-kick translations.
-    fn wall_kicks_translations(
-        &self,
-        rtype: RotationType,
-        rotation_status: RotationState,
-    ) -> [Point; 5];
-}
-
-impl TetrominoKindImplementation for TetrominoKind {
-    fn get(&self) -> String {
+    pub(super) fn get(&self) -> String {
         match self {
             TetrominoKind::I => "I".to_owned(),
             TetrominoKind::O => "O".to_owned(),
@@ -48,7 +18,8 @@ impl TetrominoKindImplementation for TetrominoKind {
         }
     }
 
-    fn get_initial_position(&self) -> [i8; 10] {
+    /// Returns the initial position of the center and the blocks of a tetromino.
+    pub(super) fn get_initial_position(&self) -> [i8; 10] {
         // cf https://tetris.fandom.com/wiki/SRS#Spawn_Orientation_and_Location
         match self {
             // in order : center_x, center_y, first_block_x, first_block_y, second_block_x, second_block_y...
@@ -62,7 +33,8 @@ impl TetrominoKindImplementation for TetrominoKind {
         }
     }
 
-    fn get_color(&self) -> TetrisColor {
+    /// Returns the color associated with the TetrominoKind.
+    pub(super) fn get_color(&self) -> TetrisColor {
         match self {
             TetrominoKind::I => TetrisColor::Cyan,
             TetrominoKind::O => TetrisColor::Yellow,
@@ -74,7 +46,8 @@ impl TetrominoKindImplementation for TetrominoKind {
         }
     }
 
-    fn wall_kicks_translations(
+    /// Returns an array of the 5 SRS wall-kick translations.
+    pub(super) fn wall_kicks_translations(
         &self,
         rtype: RotationType,
         rotation_status: RotationState,

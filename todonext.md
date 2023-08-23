@@ -1,5 +1,11 @@
 # TO DO SOON
 
+
+### back end
+- change TetrisGrid so that it only remenbers the TetrominoKind of the blocks in the matrix
+    that means the render has to be modified
+
+
 ## Tetris Guideline
 
 - the freeze_tetromino can make you game over according to TG

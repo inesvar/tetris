@@ -1,21 +1,15 @@
 //! Defines composite movements needed to describe how a tetromino moves.
-use super::point::Point;
-
-/// Movements composed by a translation, then a rotation.
-pub struct TranslationRotation {
-    pub(in crate::tetris_back_end) translation: Point,
-    pub(in crate::tetris_back_end) rotation: Rotation,
-}
+use super::{point::Point, TranslationRotation};
 
 /// Rotation movement.
-pub(in crate::tetris_back_end) enum Rotation {
+pub(super) enum Rotation {
     Clockwise(Point),
     Counterclockwise(Point),
     None,
 }
 
 /// Rotation types.
-pub(in crate::tetris_back_end) enum RotationType {
+pub(super) enum RotationType {
     Clockwise,
     Counterclockwise,
 }
@@ -46,11 +40,7 @@ impl TranslationRotation {
 
     /// Returns a composite movement, translation then rotation (around the translated center).
     /// For a pure translation, use translation method.
-    pub(in crate::tetris_back_end) fn new(
-        translation: Point,
-        rtype: RotationType,
-        center: &Point,
-    ) -> Self {
+    pub(super) fn new(translation: Point, rtype: RotationType, center: &Point) -> Self {
         TranslationRotation {
             translation,
             // the rotation center is the center of the struct translated by translation
@@ -59,7 +49,7 @@ impl TranslationRotation {
     }
 
     /// Returns a translation movement.
-    pub(in crate::tetris_back_end) fn translation(translation: Point) -> Self {
+    pub(super) fn translation(translation: Point) -> Self {
         TranslationRotation {
             translation,
             rotation: Rotation::None,
@@ -67,12 +57,12 @@ impl TranslationRotation {
     }
 
     /// Returns a translation one cell to the right.
-    pub(in crate::tetris_back_end) fn right() -> Self {
+    pub(super) fn right() -> Self {
         TranslationRotation::translation(Point::new(1, 0))
     }
 
     /// Returns a translation one cell to the left.
-    pub(in crate::tetris_back_end) fn left() -> Self {
+    pub(super) fn left() -> Self {
         TranslationRotation::translation(Point::new(-1, 0))
     }
 }

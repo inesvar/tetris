@@ -6,20 +6,20 @@ use crate::{
 use piston::{Key, MouseButton};
 
 pub struct KeyInput {
-    pub(in crate::ui) x: f64,
-    pub(in crate::ui) y: f64,
-    pub(in crate::ui) width: f64,
-    pub(in crate::ui) height: f64,
-    pub(in crate::ui) focused: bool, // true : display custom_text and cursor, false : depends on custom
-    pub(in crate::ui) custom: bool, // when unfocused, true : display custom_text, false : display keys_to_string(init_keys)
-    pub(in crate::ui) custom_text: Text,
-    pub(in crate::ui) cursor: String,
-    pub(in crate::ui) keys: Vec<Key>,
-    init_keys: Vec<Key>,                 // initial values from settings.rs
-    pub(in crate::ui) placeholder: Text, // initial text
-    pub(in crate::ui) commit: bool,      // true : update app's settings
-    pub(in crate::ui) info_text: Text,
-    pub(in crate::ui) animation_counter: u64,
+    pub(super) x: f64,
+    pub(super) y: f64,
+    pub(super) width: f64,
+    pub(super) height: f64,
+    pub(super) focused: bool, // true : display custom_text and cursor, false : depends on custom
+    pub(super) custom: bool, // when unfocused, true : display custom_text, false : display keys_to_string(init_keys)
+    pub(super) custom_text: Text,
+    pub(super) cursor: String,
+    pub(super) keys: Vec<Key>,
+    init_keys: Vec<Key>,          // initial values from settings.rs
+    pub(super) placeholder: Text, // initial text
+    pub(super) commit: bool,      // true : update app's settings
+    pub(super) info_text: Text,
+    pub(super) animation_counter: u64,
 }
 
 impl KeyInput {
