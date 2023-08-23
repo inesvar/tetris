@@ -328,25 +328,32 @@ impl LocalPlayer {
     ) -> KeyPress {
         self.keyboard.set_pressed(key);
 
+        /******************************
+         *       UNACTIVE GAME        *
+         ******************************/
+
         // the unactive game only listens to the RESTART_KEYS
-        if running == RunningState::NotRunning && !self.keyboard.is_any_last_pressed(&RESTART_KEYS)
-        {
-            return KeyPress::Other;
-        } else if running == RunningState::NotRunning
-            && self.keyboard.is_any_last_pressed(&RESTART_KEYS)
-        {
-            return KeyPress::Restart;
+        if running == RunningState::NotRunning {
+            if self.keyboard.is_any_last_pressed(&RESTART_KEYS) {
+                return KeyPress::Restart;
+            } else {
+                return KeyPress::Other;
+            }
         }
 
+        /******************************
+         * (ABOUT TO BE) PAUSED GAME  *
+         ******************************/
+
         // the paused game only listens to the PAUSE_KEYS
-        if running == RunningState::Paused && !self.keyboard.is_any_last_pressed(&PAUSE_KEYS) {
-            return KeyPress::Other;
-        } else if running == RunningState::Paused && self.keyboard.is_any_last_pressed(&PAUSE_KEYS)
-        {
-            return KeyPress::Resume;
-            // the game pauses if PAUSE_KEYS are pressed
-        } else if running == RunningState::Running && self.keyboard.is_any_last_pressed(&PAUSE_KEYS)
-        {
+        if running == RunningState::Paused {
+            if self.keyboard.is_any_last_pressed(&PAUSE_KEYS) {
+                return KeyPress::Resume;
+            } else {
+                return KeyPress::Other;
+            }
+        // the game pauses if PAUSE_KEYS are pressed
+        } else if running == RunningState::Running && self.keyboard.is_any_last_pressed(&PAUSE_KEYS) {
             return KeyPress::Pause;
         }
 
@@ -364,6 +371,7 @@ impl LocalPlayer {
                 .active_tetromino
                 .turn_clockwise(&self.player_screen.grid.matrix);
         }
+        // it's not an if else in case the player put the same keybindings for both clock and counter...
         if self
             .keyboard
             .is_any_last_pressed(&keybindings.rotate_counterclockwise_keys)
@@ -398,6 +406,7 @@ impl LocalPlayer {
                 .active_tetromino
                 .left(&self.player_screen.grid.matrix);
         }
+        // it's not an if else in case the player put the same keybindings for both left and right...
         if self.keyboard.is_any_last_pressed(&keybindings.right_keys) {
             self.player_screen
                 .active_tetromino
