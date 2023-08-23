@@ -24,18 +24,26 @@ impl RemotePlayer {
     }
 
     pub fn listen(&self) {
+        // building a second RemotePlayer that points to the same pointees than self
+        // this is necessary because self can't be moved out to another thread
         let screen = Arc::clone(&self.screen);
         let initialized = Arc::clone(&self.initialized);
+        let self_for_listener = RemotePlayer {
+            screen: screen,
+            initialized,
+        };
+        // creating a listener in a separate thread
         let listener = TcpListener::bind(SERVER_IP).unwrap();
         thread::spawn(move || {
+            // for each incoming message
             for stream in listener.incoming() {
                 let stream = stream.unwrap();
                 let deserialized =
                     serde_cbor::from_reader::<PlayerScreen, TcpStream>(stream).unwrap();
                 once!("unwrapped from {}", SERVER_IP);
                 {
-                    let mut screen = screen.lock().unwrap();
-                    // if the new_completed_lines haven't been read yet, ensure they're not rewritten
+                    let mut screen = self_for_listener.screen.lock().unwrap();
+                    // if the new_completed_lines haven't been read yet, ensure it's not rewritten
                     if screen.new_completed_lines != 0 {
                         let a = screen.new_completed_lines;
                         *screen = deserialized;
@@ -43,11 +51,13 @@ impl RemotePlayer {
                     } else {
                         *screen = deserialized;
                     }
+                    // erase the ghost tetromino so there's no confusion for the player on which grid is his
                     screen.ghost_tetromino = None;
                 }
+                // if this is the first new_screen received, set the initialized bit
                 {
-                    if !*initialized.lock().unwrap() {
-                        *initialized.lock().unwrap() = true;
+                    if !*self_for_listener.initialized.lock().unwrap() {
+                        *self_for_listener.initialized.lock().unwrap() = true;
                     }
                 }
             }
