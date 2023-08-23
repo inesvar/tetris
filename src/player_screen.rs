@@ -58,14 +58,14 @@ impl PlayerScreen {
         );
         score_text.render(transform, &ctx, gl, &mut assets.main_font);
 
-        self.grid.render(transform, &ctx, gl, assets);
+        self.grid.render(transform, &ctx.draw_state, gl, assets);
 
         if let Some(ghost) = self.ghost_tetromino {
-            ghost.render(self.grid.transform, &ctx, gl, assets);
+            ghost.render(self.grid.transform, &ctx.draw_state, gl, assets);
         }
 
         self.active_tetromino
-            .render(self.grid.transform, &ctx, gl, assets);
+            .render(self.grid.transform, &ctx.draw_state, gl, assets);
 
         // drawing a border for the hold piece
         let transform = self.grid.transform.trans(
@@ -85,7 +85,7 @@ impl PlayerScreen {
                 -self.grid.total_width * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
                 TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
             );
-            saved.render(transform, &ctx, gl, assets);
+            saved.render(transform, &ctx.draw_state, gl, assets);
         }
 
         // drawing a border for the fifo of next pieces
@@ -109,7 +109,7 @@ impl PlayerScreen {
             self.fifo_next_tetromino
                 .get(i)
                 .unwrap()
-                .render(transform, &ctx, gl, assets);
+                .render(transform, &ctx.draw_state, gl, assets);
         }
     }
 }

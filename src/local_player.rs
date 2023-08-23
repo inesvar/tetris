@@ -46,7 +46,7 @@ impl LocalPlayer {
         let mut rng = Pcg32::seed_from_u64(seed);
         let mut bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut rng);
         let first_tetromino =
-            Tetromino::new(bag_of_tetromino.pop().unwrap(), &grid.rows[..]).unwrap();
+            Tetromino::new(bag_of_tetromino.pop().unwrap(), &grid.matrix[..]).unwrap();
         let mut fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
         for _ in 0..NB_NEXT_TETROMINO {
             if let Some(t) = bag_of_tetromino.pop() {
@@ -93,7 +93,7 @@ impl LocalPlayer {
         // Check if there's enough place on the grid for a new tetromino
         let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
         if possible_active
-            .check_possible(&self.player_screen.grid.rows, TranslationRotation::null())
+            .check_possible(&self.player_screen.grid.matrix, TranslationRotation::null())
             .is_err()
         {
             // If not, it's a lock out situation
@@ -196,7 +196,7 @@ impl LocalPlayer {
                 if self
                     .player_screen
                     .active_tetromino
-                    .fall(&self.player_screen.grid.rows)
+                    .fall(&self.player_screen.grid.matrix)
                     .is_err()
                     && self.freeze_frame < frame_counter
                 {
@@ -207,11 +207,11 @@ impl LocalPlayer {
             } else if self.keyboard.is_any_delay_pressed(&keybindings.left_keys) {
                 self.player_screen
                     .active_tetromino
-                    .left(&self.player_screen.grid.rows);
+                    .left(&self.player_screen.grid.matrix);
             } else if self.keyboard.is_any_delay_pressed(&keybindings.right_keys) {
                 self.player_screen
                     .active_tetromino
-                    .right(&self.player_screen.grid.rows);
+                    .right(&self.player_screen.grid.matrix);
             }
         }
 
@@ -226,7 +226,7 @@ impl LocalPlayer {
             && self
                 .player_screen
                 .active_tetromino
-                .fall(&self.player_screen.grid.rows)
+                .fall(&self.player_screen.grid.matrix)
                 .is_err()
             && self.freeze_frame < frame_counter
         {
@@ -245,7 +245,7 @@ impl LocalPlayer {
             && self
                 .player_screen
                 .active_tetromino
-                .check_possible(&self.player_screen.grid.rows, TranslationRotation::fall())
+                .check_possible(&self.player_screen.grid.matrix, TranslationRotation::fall())
                 .is_err()
         {
             match self
@@ -279,7 +279,7 @@ impl LocalPlayer {
 
         // Updates the ghost_tetromino
         let mut ghost = self.player_screen.active_tetromino.make_ghost_copy();
-        ghost.hard_drop(&self.player_screen.grid.rows);
+        ghost.hard_drop(&self.player_screen.grid.matrix);
         self.player_screen.ghost_tetromino = Some(ghost);
 
         // Adds garbage to the grid
@@ -351,7 +351,7 @@ impl LocalPlayer {
             // rotate once the tetromino
             self.player_screen
                 .active_tetromino
-                .turn_clockwise(&self.player_screen.grid.rows);
+                .turn_clockwise(&self.player_screen.grid.matrix);
         } else if self
             .keyboard
             .is_any_pressed(&keybindings.rotate_counterclockwise_keys)
@@ -359,7 +359,7 @@ impl LocalPlayer {
             // rotate once the tetromino
             self.player_screen
                 .active_tetromino
-                .turn_counterclockwise(&self.player_screen.grid.rows);
+                .turn_counterclockwise(&self.player_screen.grid.matrix);
         }
 
         if self
@@ -384,18 +384,18 @@ impl LocalPlayer {
         if self.keyboard.is_any_pressed(&keybindings.left_keys) {
             self.player_screen
                 .active_tetromino
-                .left(&self.player_screen.grid.rows);
+                .left(&self.player_screen.grid.matrix);
         } else if self.keyboard.is_any_pressed(&keybindings.right_keys) {
             self.player_screen
                 .active_tetromino
-                .right(&self.player_screen.grid.rows);
+                .right(&self.player_screen.grid.matrix);
         }
 
         if self.keyboard.is_any_pressed(&keybindings.hard_drop_keys) {
             // hard drop the tetromino
             self.player_screen
                 .active_tetromino
-                .hard_drop(&self.player_screen.grid.rows);
+                .hard_drop(&self.player_screen.grid.matrix);
             match self
                 .player_screen
                 .grid

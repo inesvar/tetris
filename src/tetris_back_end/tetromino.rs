@@ -4,14 +4,14 @@ use super::{
     point::{Point, Transform},
     rotation_state::{RotationState, RotationStateUpdate},
     translation_rotation::RotationType,
-    GridMatrix, Tetromino, TetrominoKind, TranslationRotation,
+    GridLine, GridMatrix, Tetromino, TetrominoKind, TranslationRotation,
 };
 use core::fmt::Display;
 use std::fmt::Formatter;
 
 impl Tetromino {
     /// Moves the Tetromino down one cell if it's possible.
-    pub fn fall(&mut self, matrix: &[Vec<Option<Block>>]) -> Result<(), ()> {
+    pub fn fall(&mut self, matrix: &[GridLine]) -> Result<(), ()> {
         self.blocks = self.check_possible(matrix, TranslationRotation::fall())?;
         self.center.go_down();
         Ok(())
