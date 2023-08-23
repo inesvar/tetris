@@ -2,6 +2,7 @@
 use self::{
     block::Block, point::Point, rotation_state::RotationState, translation_rotation::Rotation,
 };
+use crate::assets::TetrisColor;
 use graphics::types::Matrix2d;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
@@ -38,17 +39,17 @@ pub enum TetrominoKind {
     L,
 }
 
-type GridLine = Vec<Option<Block>>;
+type GridLine = Vec<Option<TetrisColor>>;
 pub type GridMatrix = [GridLine];
 
-/// Tetris grid containing Blocks.
+/// Tetris grid containing blocks. It actually ontly contains their color as the coordinates of the blocks are given by their index in the matrix.
 #[derive(Serialize, Deserialize)]
 pub struct TetrisGrid {
     pub x: f64,
     pub y: f64,
     nb_columns: u32,
     nb_rows: u32,
-    pub rows: Vec<GridLine>,
+    pub matrix: Vec<GridLine>,
     line_sum: Vec<u8>,
     pub total_width: f64,
     pub total_height: f64,

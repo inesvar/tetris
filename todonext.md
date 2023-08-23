@@ -1,10 +1,7 @@
 # TO DO SOON
 
-
-### back end
-- change TetrisGrid so that it only remenbers the TetrominoKind of the blocks in the matrix
-    that means the render has to be modified
-
+- create a render trait
+- review app.rs because it's too complicated
 
 ## Tetris Guideline
 
