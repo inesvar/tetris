@@ -1,6 +1,9 @@
-use crate::ui::interactive_widget_manager::KeyInputType;
+use std::{cell::RefCell, net::TcpStream};
+
+use crate::{once, ui::interactive_widget_manager::KeyInputType};
 use opengl_graphics::OpenGL;
 use piston::Key;
+use serde::Deserialize;
 
 // Change this to OpenGL::V2_1 if not working.
 pub static OPENGL_VERSION: OpenGL = OpenGL::V4_5;
@@ -140,10 +143,15 @@ pub static RESTART_KEYS: [Key; 1] = [Key::R];
 pub static PAUSE_KEYS: [Key; 1] = [Key::P];
 pub static KEY_REPEAT_DELAY: u64 = 20;
 
+/// Settings represents parameters that need to be common between players in multiplayer mode.
+///
+/// To this purpose, it has a send() method.
+#[derive(Deserialize)]
 pub struct Settings {
     pub seed: u64,
     pub bag_size: u32,
     pub nb_next_tetromino: usize,
+    pub serialize_as_msg: RefCell<bool>,
 }
 
 impl Settings {
@@ -155,7 +163,25 @@ impl Settings {
             seed,
             bag_size,
             nb_next_tetromino,
+            serialize_as_msg: true.into(),
         }
+    }
+
+    pub fn send(&self) {
+        /* serialized_as_msg absolutely needs to be set to true
+         * as it is used as a flag during the serialization
+         * intuitively, Settings need to be serialized twice :
+         * first as the SettingsMsg enum variant
+         * then as the actual Settings struct
+         */
+        {
+            let mut a = self.serialize_as_msg.borrow_mut();
+            *a = true;
+        }
+        if let Ok(stream) = TcpStream::connect(VIEWER_IP) {
+            serde_cbor::to_writer::<TcpStream, Settings>(stream, &self).unwrap();
+        }
+        once!("sent serialized data to {}", VIEWER_IP);
     }
 }
 
