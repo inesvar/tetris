@@ -63,8 +63,6 @@ impl RemotePlayer {
             } else {
                 *local_screen = new_screen;
             }
-            // erase the ghost tetromino so there's no confusion for the player on which grid is his
-            local_screen.ghost_tetromino = None;
         }
         // if this is the first new_screen received, set the first_screen_received bit
         {

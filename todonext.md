@@ -1,7 +1,5 @@
 # TO DO SOON
 
-- change the serialization of PlayerScreen so that the ghost tetromino is not sent
-
 ## Tetris Guideline
 
 - the freeze_tetromino can make you game over according to TG
