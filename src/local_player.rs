@@ -24,6 +24,7 @@ pub struct LocalPlayer {
     /// PlayerScreen, not LocalPlayer, is rendered.
     /// PlayerScreen, not LocalPlayer, will be sent to the remote.
     player_screen: PlayerScreen,
+    /// keyboards keeps track of which keys are pressed and if they were pressed for a long time.
     keyboard: Keyboard,
     /// freeze_frame indicates when to freeze the active_tetromino and get a new one.
     ///
@@ -31,6 +32,7 @@ pub struct LocalPlayer {
     freeze_frame: u64,
     bag_of_tetromino: Vec<TetrominoKind>,
     sender: bool,
+    /// garbage_to_be_added is set before the update and reset during the update.
     garbage_to_be_added: u64,
     #[serde(skip, default = "new_pcg")]
     rng: Pcg32,
@@ -117,11 +119,20 @@ impl LocalPlayer {
         self.garbage_to_be_added = completed_lines;
     }
 
-    pub fn send_serialized(&self) {
+    /// Sends the player screen to the remote player and resets the new_completed_lines attribute.
+    fn send_serialized(&mut self) {
         if let Ok(stream) = TcpStream::connect(VIEWER_IP) {
             serde_cbor::to_writer::<TcpStream, PlayerScreen>(stream, &self.player_screen).unwrap();
         }
         once!("sent serialized data to {}", VIEWER_IP);
+        // Set the number of completed lines to 0
+        if self.player_screen.new_completed_lines != 0 {
+            once!(
+                "the {} completed lines were sent to the adversary and they were reset to 0",
+                self.player_screen.new_completed_lines
+            );
+            self.player_screen.new_completed_lines = 0;
+        }
     }
 }
 
@@ -162,11 +173,7 @@ impl LocalPlayer {
     /// - updating the keyboard clock
     /// - updating the ghost tetromino
     /// - adding garbage
-    ///
     /// - sending the serialized data to the remote
-    ///     // TODO move the sending somewhere else?
-    /// -
-    ///
     pub fn update(
         &mut self,
         keybindings: &Keybindings,
@@ -219,6 +226,7 @@ impl LocalPlayer {
          *    EVERY FALL_SPEED_DIVIDE     *
          *              ---               *
          *  "continuous" slower actions   *
+         *       periodic actions         *
          **********************************/
 
         // move the tetromino down to emulate its fall
@@ -253,6 +261,7 @@ impl LocalPlayer {
                 .grid
                 .freeze_tetromino(&mut self.player_screen.active_tetromino)
             {
+                // if lines were clearing by freezing the tetromino, set the attribute new_completed_lines
                 Some(completed_lines) => {
                     self.player_screen.new_completed_lines = completed_lines;
                     if self.player_screen.new_completed_lines != 0 {
@@ -264,6 +273,7 @@ impl LocalPlayer {
                     self.player_screen.score += self.player_screen.new_completed_lines;
                     self.get_new_tetromino();
                 }
+                // if the tetromino froze above the visible grid, it's game over !
                 None => self.declare_game_over(),
             }
         }
@@ -291,15 +301,6 @@ impl LocalPlayer {
         // Send the player_screen data if necessary
         if self.sender {
             self.send_serialized();
-        }
-
-        // Set the number of completed lines to 0
-        if self.player_screen.new_completed_lines != 0 {
-            println!(
-                "the {} completed lines were sent to the adversary and they were reset to 0",
-                self.player_screen.new_completed_lines
-            );
-            self.player_screen.new_completed_lines = 0;
         }
     }
 
