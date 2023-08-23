@@ -74,6 +74,7 @@ impl LocalPlayer {
             saved_tetromino: None,
             fifo_next_tetromino,
             ghost_tetromino: None,
+            serialize_as_msg: true.into(),
         };
 
         LocalPlayer {

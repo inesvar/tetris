@@ -1,3 +1,4 @@
+use super::message_type::MessageType;
 use crate::assets::Assets;
 use crate::once;
 use crate::player_screen::PlayerScreen;
@@ -38,10 +39,14 @@ impl RemotePlayer {
             // for each incoming message
             for stream in listener.incoming() {
                 let stream = stream.unwrap();
-                let new_screen =
-                    serde_cbor::from_reader::<PlayerScreen, TcpStream>(stream).unwrap();
+                let message = serde_cbor::from_reader::<MessageType, TcpStream>(stream).unwrap();
                 once!("unwrapped from {}", SERVER_IP);
-                self_for_listener.update_screen(new_screen);
+                match message {
+                    MessageType::PlayerScreenMsg(new_screen) => {
+                        self_for_listener.update_screen(new_screen)
+                    }
+                    _ => {}
+                }
             }
         });
     }

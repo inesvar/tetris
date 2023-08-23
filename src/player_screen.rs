@@ -7,14 +7,13 @@ use crate::settings::{
 };
 use crate::ui::text::Text;
 use crate::{tetris_back_end::tetris_grid::TetrisGrid, tetris_back_end::tetromino::Tetromino};
-
 use graphics::types::{Matrix2d, Rectangle};
-use graphics::{color, rectangle, Context, Transformed};
+use graphics::{rectangle, Context, Transformed};
 use opengl_graphics::GlGraphics;
-use piston::RenderArgs;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use std::cell::RefCell;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 pub struct PlayerScreen {
     pub grid: TetrisGrid,
     pub score: u64,
@@ -24,6 +23,7 @@ pub struct PlayerScreen {
     pub saved_tetromino: Option<Tetromino>,
     pub fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
     pub ghost_tetromino: Option<Tetromino>,
+    pub serialize_as_msg: RefCell<bool>,
 }
 
 impl PlayerScreen {
@@ -37,6 +37,7 @@ impl PlayerScreen {
             saved_tetromino: None,
             fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new(),
             ghost_tetromino: None,
+            serialize_as_msg: true.into(),
         }
     }
 
