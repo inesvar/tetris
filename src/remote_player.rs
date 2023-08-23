@@ -11,7 +11,7 @@ use std::thread;
 
 pub struct RemotePlayer {
     screen: Arc<Mutex<PlayerScreen>>,
-    initialized: Arc<Mutex<bool>>,
+    first_screen_received: Arc<Mutex<bool>>,
 }
 
 impl RemotePlayer {
@@ -19,7 +19,7 @@ impl RemotePlayer {
         let arc = Arc::new(Mutex::new(PlayerScreen::empty()));
         RemotePlayer {
             screen: arc,
-            initialized: Arc::new(Mutex::new(false)),
+            first_screen_received: Arc::new(Mutex::new(false)),
         }
     }
 
@@ -27,10 +27,10 @@ impl RemotePlayer {
         // building a second RemotePlayer that points to the same pointees than self
         // this is necessary because self can't be moved out to another thread
         let screen = Arc::clone(&self.screen);
-        let initialized = Arc::clone(&self.initialized);
+        let first_screen_received = Arc::clone(&self.first_screen_received);
         let self_for_listener = RemotePlayer {
             screen: screen,
-            initialized,
+            first_screen_received: first_screen_received,
         };
         // creating a listener in a separate thread
         let listener = TcpListener::bind(SERVER_IP).unwrap();
@@ -38,26 +38,26 @@ impl RemotePlayer {
             // for each incoming message
             for stream in listener.incoming() {
                 let stream = stream.unwrap();
-                let deserialized =
+                let new_screen =
                     serde_cbor::from_reader::<PlayerScreen, TcpStream>(stream).unwrap();
                 once!("unwrapped from {}", SERVER_IP);
                 {
-                    let mut screen = self_for_listener.screen.lock().unwrap();
+                    let mut local_screen = self_for_listener.screen.lock().unwrap();
                     // if the new_completed_lines haven't been read yet, ensure it's not rewritten
-                    if screen.new_completed_lines != 0 {
-                        let a = screen.new_completed_lines;
-                        *screen = deserialized;
-                        screen.new_completed_lines = a;
+                    if local_screen.new_completed_lines != 0 {
+                        let a = local_screen.new_completed_lines;
+                        *local_screen = new_screen;
+                        local_screen.new_completed_lines = a;
                     } else {
-                        *screen = deserialized;
+                        *local_screen = new_screen;
                     }
                     // erase the ghost tetromino so there's no confusion for the player on which grid is his
-                    screen.ghost_tetromino = None;
+                    local_screen.ghost_tetromino = None;
                 }
-                // if this is the first new_screen received, set the initialized bit
+                // if this is the first new_screen received, set the first_screen_received bit
                 {
-                    if !*self_for_listener.initialized.lock().unwrap() {
-                        *self_for_listener.initialized.lock().unwrap() = true;
+                    if !*self_for_listener.first_screen_received.lock().unwrap() {
+                        *self_for_listener.first_screen_received.lock().unwrap() = true;
                     }
                 }
             }
@@ -71,7 +71,7 @@ impl RemotePlayer {
         gl: &mut GlGraphics,
         assets: &mut Assets,
     ) {
-        if !*self.initialized.lock().unwrap() {
+        if !*self.first_screen_received.lock().unwrap() {
             return;
         }
         {
