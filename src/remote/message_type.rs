@@ -1,4 +1,6 @@
-use crate::{player_screen::PlayerScreen, settings::Settings};
+use crate::{
+    player_screen::PlayerScreen, settings::Settings, tetris_back_end::tetromino::Tetromino,
+};
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
 /// MessageType represents all different kinds of messages that can be sent.
@@ -76,7 +78,7 @@ impl Serialize for PlayerScreen {
             s.serialize_field("saved_tetromino", &self.saved_tetromino)?;
             s.serialize_field("fifo_next_tetromino", &self.fifo_next_tetromino)?;
             // TODO : change this to None
-            s.serialize_field("ghost_tetromino", &self.ghost_tetromino)?;
+            s.serialize_field("ghost_tetromino", &None::<Tetromino>)?;
             s.serialize_field("serialize_as_msg", &self.serialize_as_msg)?;
             s.end()
         } else {
