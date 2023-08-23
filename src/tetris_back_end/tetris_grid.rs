@@ -88,13 +88,13 @@ impl TetrisGrid {
 
     /// Adds the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
     pub fn add_garbage(&mut self, completed_lines: u64) {
+        if completed_lines < 2 {
+            return;
+        }
         println!(
             "the garbage creating function was called for {} lines",
             completed_lines
         );
-        if completed_lines < 2 {
-            return;
-        }
         let lines_to_add = if completed_lines == 4 {
             4
         } else {
