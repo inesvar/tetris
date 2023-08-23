@@ -49,8 +49,6 @@ impl Keyboard {
     pub fn is_any_pressed(&self, keys: &[Key]) -> bool {
         for key in keys {
             if self.is_pressed(*key) {
-                println!("pressed : true");
-                println!("delay pressed : {}", self.is_any_delay_pressed(keys));
                 return true;
             }
         }

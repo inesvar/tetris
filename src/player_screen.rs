@@ -18,7 +18,8 @@ pub struct PlayerScreen {
     pub grid: TetrisGrid,
     pub score: u64,
     pub game_over: bool,
-    pub new_completed_lines: u64,
+    /// is set and reset during the update resp. when lines are cleared and when data is sent to the remote players
+    pub new_completed_lines: u64, 
     pub active_tetromino: Tetromino,
     pub saved_tetromino: Option<Tetromino>,
     pub fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,

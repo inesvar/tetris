@@ -1,7 +1,9 @@
 # TO DO SOON
 
-- create a render trait
+
+- CORRECT HANDLE KEY PRESS
 - review app.rs because it's too complicated
+- in keyboard, replace the hashmap to booleans by a hashset
 
 ## Tetris Guideline
 
