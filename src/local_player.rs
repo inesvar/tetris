@@ -199,7 +199,7 @@ impl LocalPlayer {
 
         // Translate the tetromino down on a key press
         if frame_counter % 5 == 0 {
-            if self.keyboard.is_any_pressed(&keybindings.fall_keys) {
+            if self.keyboard.is_any_delay_pressed(&keybindings.fall_keys) {
                 if self
                     .player_screen
                     .active_tetromino
@@ -210,12 +210,18 @@ impl LocalPlayer {
                     // if the tetromino reaches the bottom, set the freeze_frame
                     self.freeze_frame = frame_counter + freeze;
                 }
-            // Translate the tetromino right or left on a long key press
-            } else if self.keyboard.is_any_delay_pressed(&keybindings.left_keys) {
+                // Translate the tetromino right or left on a long key press
+            }
+            if self.keyboard.is_any_delay_pressed(&keybindings.left_keys)
+                && !self.keyboard.is_any_delay_pressed(&keybindings.right_keys)
+            {
                 self.player_screen
                     .active_tetromino
                     .left(&self.player_screen.grid.matrix);
-            } else if self.keyboard.is_any_delay_pressed(&keybindings.right_keys) {
+            }
+            if self.keyboard.is_any_delay_pressed(&keybindings.right_keys)
+                && !self.keyboard.is_any_delay_pressed(&keybindings.left_keys)
+            {
                 self.player_screen
                     .active_tetromino
                     .right(&self.player_screen.grid.matrix);
@@ -323,20 +329,24 @@ impl LocalPlayer {
         self.keyboard.set_pressed(key);
 
         // the unactive game only listens to the RESTART_KEYS
-        if running == RunningState::NotRunning && !self.keyboard.is_any_pressed(&RESTART_KEYS) {
+        if running == RunningState::NotRunning && !self.keyboard.is_any_last_pressed(&RESTART_KEYS)
+        {
             return KeyPress::Other;
-        } else if running == RunningState::NotRunning && self.keyboard.is_any_pressed(&RESTART_KEYS)
+        } else if running == RunningState::NotRunning
+            && self.keyboard.is_any_last_pressed(&RESTART_KEYS)
         {
             return KeyPress::Restart;
         }
 
         // the paused game only listens to the PAUSE_KEYS
-        if running == RunningState::Paused && !self.keyboard.is_any_pressed(&PAUSE_KEYS) {
+        if running == RunningState::Paused && !self.keyboard.is_any_last_pressed(&PAUSE_KEYS) {
             return KeyPress::Other;
-        } else if running == RunningState::Paused && self.keyboard.is_any_pressed(&PAUSE_KEYS) {
+        } else if running == RunningState::Paused && self.keyboard.is_any_last_pressed(&PAUSE_KEYS)
+        {
             return KeyPress::Resume;
             // the game pauses if PAUSE_KEYS are pressed
-        } else if running == RunningState::Running && self.keyboard.is_any_pressed(&PAUSE_KEYS) {
+        } else if running == RunningState::Running && self.keyboard.is_any_last_pressed(&PAUSE_KEYS)
+        {
             return KeyPress::Pause;
         }
 
@@ -347,15 +357,16 @@ impl LocalPlayer {
         // Pressed once events
         if self
             .keyboard
-            .is_any_pressed(&keybindings.rotate_clockwise_keys)
+            .is_any_last_pressed(&keybindings.rotate_clockwise_keys)
         {
             // rotate once the tetromino
             self.player_screen
                 .active_tetromino
                 .turn_clockwise(&self.player_screen.grid.matrix);
-        } else if self
+        }
+        if self
             .keyboard
-            .is_any_pressed(&keybindings.rotate_counterclockwise_keys)
+            .is_any_last_pressed(&keybindings.rotate_counterclockwise_keys)
         {
             // rotate once the tetromino
             self.player_screen
@@ -365,7 +376,7 @@ impl LocalPlayer {
 
         if self
             .keyboard
-            .is_any_pressed(&keybindings.hold_tetromino_keys)
+            .is_any_last_pressed(&keybindings.hold_tetromino_keys)
         {
             // hold the tetromino
             if let Some(mut saved) = self.player_screen.saved_tetromino {
@@ -382,17 +393,21 @@ impl LocalPlayer {
         }
 
         // move the tetromino left or right
-        if self.keyboard.is_any_pressed(&keybindings.left_keys) {
+        if self.keyboard.is_any_last_pressed(&keybindings.left_keys) {
             self.player_screen
                 .active_tetromino
                 .left(&self.player_screen.grid.matrix);
-        } else if self.keyboard.is_any_pressed(&keybindings.right_keys) {
+        }
+        if self.keyboard.is_any_last_pressed(&keybindings.right_keys) {
             self.player_screen
                 .active_tetromino
                 .right(&self.player_screen.grid.matrix);
         }
 
-        if self.keyboard.is_any_pressed(&keybindings.hard_drop_keys) {
+        if self
+            .keyboard
+            .is_any_last_pressed(&keybindings.hard_drop_keys)
+        {
             // hard drop the tetromino
             self.player_screen
                 .active_tetromino
