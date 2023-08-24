@@ -66,7 +66,7 @@ pub struct PlayerScreen {
     pub fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
     /// The shade of the active tetromino after hard drop.
     pub ghost_tetromino: Option<Tetromino>,
-    /// Flag not to be modified except in Serialize.
+    /// Flag not to be modified except in Serialize. Set to true.
     pub serialize_as_msg: RefCell<bool>,
 }
 

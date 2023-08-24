@@ -151,6 +151,7 @@ pub struct Settings {
     pub seed: u64,
     pub bag_size: u32,
     pub nb_next_tetromino: usize,
+    /// Flag not to be modified except in Serialize. Set to true.
     pub serialize_as_msg: RefCell<bool>,
 }
 
