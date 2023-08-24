@@ -31,6 +31,8 @@ impl App<'_> {
                             gl,
                             &mut self.assets.tetris_font,
                         );
+                        self.timer_text
+                            .set_text(format!("Elapsed: {:.2}s", self.clock));
                     } else if self.running == RunningState::NotRunning {
                         self.restart_text.render(
                             ctx.transform,
@@ -38,13 +40,23 @@ impl App<'_> {
                             gl,
                             &mut self.assets.main_font,
                         );
-                    } else {
+                        self.timer_text
+                            .set_text(format!("Elapsed: {:.2}s", self.clock));
+                    } else if self.running == RunningState::Paused {
                         self.pause_text
                             .render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
+                        self.timer_text
+                            .set_text(format!("Elapsed: {:.2}s", self.clock));
+                    } else if self.running == RunningState::Starting {
+                        self.title_text.render(
+                            ctx.transform,
+                            &ctx,
+                            gl,
+                            &mut self.assets.tetris_font,
+                        );
+                        self.timer_text.set_text(format!("Elapsed: 0.00s"));
                     }
 
-                    self.timer_text
-                        .set_text(format!("Elapsed: {:.2}s", self.clock));
                     self.timer_text
                         .render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
 

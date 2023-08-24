@@ -110,4 +110,51 @@ impl TetrisGrid {
         }
         self.line_sum = vec![0; self.nb_rows as usize];
     }
+
+    /// Draw a 1 with blocks of the same color as tetromino.
+    pub(in crate::app::player) fn one(&mut self, tetromino: Tetromino) {
+        let tetris_color = tetromino.blocks[0].color;
+        self.null();
+        self.matrix[9][5] = Some(tetris_color);
+        self.matrix[10][4] = Some(tetris_color);
+        self.matrix[10][5] = Some(tetris_color);
+        self.matrix[11][3] = Some(tetris_color);
+        self.matrix[11][5] = Some(tetris_color);
+        self.matrix[12][5] = Some(tetris_color);
+        self.matrix[13][3] = Some(tetris_color);
+        self.matrix[13][4] = Some(tetris_color);
+        self.matrix[13][5] = Some(tetris_color);
+        self.matrix[13][6] = Some(tetris_color);
+    }
+
+    /// Draw a 2 with blocks of the same color as tetromino.
+    pub(in crate::app::player) fn two(&mut self, tetromino: Tetromino) {
+        let tetris_color = tetromino.blocks[0].color;
+        self.null();
+        self.matrix[9][4] = Some(tetris_color);
+        self.matrix[9][5] = Some(tetris_color);
+        self.matrix[10][3] = Some(tetris_color);
+        self.matrix[10][6] = Some(tetris_color);
+        self.matrix[11][5] = Some(tetris_color);
+        self.matrix[12][4] = Some(tetris_color);
+        self.matrix[13][3] = Some(tetris_color);
+        self.matrix[13][4] = Some(tetris_color);
+        self.matrix[13][5] = Some(tetris_color);
+        self.matrix[13][6] = Some(tetris_color);
+    }
+
+    /// Draw a 3 with blocks of the same color as tetromino.
+    pub(in crate::app::player) fn three(&mut self, tetromino: Tetromino) {
+        let tetris_color = tetromino.blocks[0].color;
+        self.null();
+        self.matrix[9][4] = Some(tetris_color);
+        self.matrix[9][5] = Some(tetris_color);
+        self.matrix[10][3] = Some(tetris_color);
+        self.matrix[10][6] = Some(tetris_color);
+        self.matrix[11][5] = Some(tetris_color);
+        self.matrix[12][3] = Some(tetris_color);
+        self.matrix[12][6] = Some(tetris_color);
+        self.matrix[13][4] = Some(tetris_color);
+        self.matrix[13][5] = Some(tetris_color);
+    }
 }
