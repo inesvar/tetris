@@ -78,11 +78,3 @@ pub struct PlayerScreen {
 fn new_pcg() -> Pcg32 {
     Pcg32::seed_from_u64(0)
 }
-/// Output of [handle_key_press()](LocalPlayer::handle_key_press()) :
-/// indicates whether the player commands lead the game to pause, resume, restart or no.
-pub enum GameFlowChange {
-    Restart,
-    Resume,
-    Pause,
-    Other,
-}

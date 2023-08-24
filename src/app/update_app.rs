@@ -52,7 +52,8 @@ impl App<'_> {
                 }
             }
 
-/*             // same for remote players
+            /*
+            // same for remote players
             for player in &self.remote_players {
                 if player.get_game_over() == true {
                     self.running = RunningState::NotRunning;
