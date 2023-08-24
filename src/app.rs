@@ -1,5 +1,5 @@
 use crate::player::{GameFlowChange, LocalPlayer};
-use crate::remote::remote_player::RemotePlayer;
+use crate::remote::RemotePlayer;
 use crate::settings::*;
 use crate::ui::interactive_widget_manager::ButtonType::{self};
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;

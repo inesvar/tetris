@@ -1,14 +1,12 @@
-use super::message_type::MessageType;
-use crate::assets::Assets;
-use crate::once;
-use crate::player::PlayerScreen;
-use crate::settings::SERVER_IP;
-use graphics::math::Matrix2d;
-use graphics::Context;
+use super::MessageType;
+use crate::{assets::Assets, once, player::PlayerScreen, settings::SERVER_IP};
+use graphics::{math::Matrix2d, Context};
 use opengl_graphics::GlGraphics;
-use std::net::{TcpListener, TcpStream};
-use std::sync::{Arc, Mutex};
-use std::thread;
+use std::{
+    net::{TcpListener, TcpStream},
+    sync::{Arc, Mutex},
+    thread,
+};
 
 pub struct RemotePlayer {
     screen: Arc<Mutex<PlayerScreen>>,
@@ -51,27 +49,6 @@ impl RemotePlayer {
         });
     }
 
-    /// Updates the remote player with the new_screen received.
-    fn update_screen(&self, new_screen: PlayerScreen) {
-        {
-            let mut local_screen = self.screen.lock().unwrap();
-            // if the new_completed_lines haven't been read yet, ensure it's not rewritten
-            if local_screen.new_completed_lines != 0 {
-                let a = local_screen.new_completed_lines;
-                *local_screen = new_screen;
-                local_screen.new_completed_lines = a;
-            } else {
-                *local_screen = new_screen;
-            }
-        }
-        // if this is the first new_screen received, set the first_screen_received bit
-        {
-            if !*self.first_screen_received.lock().unwrap() {
-                *self.first_screen_received.lock().unwrap() = true;
-            }
-        }
-    }
-
     pub fn render(
         &self,
         transform: Matrix2d,
@@ -95,6 +72,27 @@ impl RemotePlayer {
             let lines = screen.new_completed_lines;
             screen.new_completed_lines = 0;
             return lines;
+        }
+    }
+
+    /// Updates the remote player with the new_screen received.
+    fn update_screen(&self, new_screen: PlayerScreen) {
+        {
+            let mut local_screen = self.screen.lock().unwrap();
+            // if the new_completed_lines haven't been read yet, ensure it's not rewritten
+            if local_screen.new_completed_lines != 0 {
+                let a = local_screen.new_completed_lines;
+                *local_screen = new_screen;
+                local_screen.new_completed_lines = a;
+            } else {
+                *local_screen = new_screen;
+            }
+        }
+        // if this is the first new_screen received, set the first_screen_received bit
+        {
+            if !*self.first_screen_received.lock().unwrap() {
+                *self.first_screen_received.lock().unwrap() = true;
+            }
         }
     }
 }

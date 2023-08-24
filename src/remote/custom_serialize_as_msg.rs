@@ -1,32 +1,9 @@
+//! Defines custom Serialize for [Settings] and [PlayerScreen].
+//! 
+//! PlayerScreen is serialized as [MessageType::PlayerScreenMsg](super::MessageType::PlayerScreenMsg).
+//! Settings is serialized as [MessageType::SettingsMsg](super::MessageType::SettingsMsg).
 use crate::{player::PlayerScreen, settings::Settings, back_end::Tetromino};
-use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
-
-/// MessageType represents all different kinds of messages that can be sent.
-///
-/// To avoid copying uselessly, structs PlayerScreen and Settings
-/// are serialized directly into the corresponding enum variants
-/// PlayerScreenMsg { player_screen: PlayerScreen } and
-/// SettingsMsg { settings: Settings }.
-///
-/// Their serializations rely on the position of their fields (0 and 1)
-/// in the struct so the Serialize implementations need to be updated
-/// accordingly in case of change of MessageType.
-#[derive(Serialize, Deserialize)]
-pub enum MessageType {
-    PlayerScreenMsg(PlayerScreen), // not acknowledged as it's sent regularly
-    SettingsMsg(Settings),         // sent by the host of the room
-    RestartMsg,
-    PauseMsg,
-    ResumeMsg,
-    GameOverMsg,
-    HelloMsg,
-    AckSettingsMsg, // sent to the host
-    AckRestartMsg,
-    AckPauseMsg,
-    AckResumeMsg,
-    AckGameOverMsg,
-    AckHelloMsg,
-}
+use serde::{ser::SerializeStruct, Serialize, Serializer};
 
 impl Serialize for Settings {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
