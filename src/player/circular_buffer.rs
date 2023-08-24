@@ -1,8 +1,9 @@
+//! Defines [CircularBuffer] and methods to use it.
 use core::fmt::Display;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 
-/* push back pop front circular buffer */
+/// Push back pop front circular buffer
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CircularBuffer<const K: usize, T: Default + Copy + Serialize + Display>
 where
@@ -37,8 +38,9 @@ impl<const K: usize, T: Default + Copy + Serialize + for<'a> Deserialize<'a> + D
     CircularBuffer<K, T>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
-{
-    pub fn new() -> Self {
+{   
+    /// Construct a new circular buffer of size K for type T.
+    pub(super) fn new() -> Self {
         CircularBuffer::<K, T> {
             array: [T::default(); K],
             begin: 0,
@@ -46,7 +48,8 @@ where
         }
     }
 
-    pub fn get(&self, i: usize) -> Option<T> {
+    /// Get the i-th element in the buffer.
+    pub(super) fn get(&self, i: usize) -> Option<T> {
         //println!("getting {i} from {}", self);
         if i < self.size {
             Some(self.array[(self.begin + i) % K])
@@ -55,7 +58,8 @@ where
         }
     }
 
-    pub fn push(&mut self, t: T) {
+    /// Push an element to the back of the buffer.
+    pub(super) fn push(&mut self, t: T) {
         if self.size != K {
             self.array[(self.begin + self.size) % K] = t;
             self.size += 1;
@@ -63,7 +67,8 @@ where
         //println!("pushed {t}, now {}", self);
     }
 
-    pub fn push_front(&mut self, t: T) {
+    /// Push an element to the front of the buffer.
+    pub(super) fn push_front(&mut self, t: T) {
         if self.size != K {
             let begin: usize = if self.begin > 0 {
                 self.begin - 1
@@ -77,7 +82,8 @@ where
         //println!("pushed {t}, now {}", self);
     }
 
-    pub fn pop(&mut self) -> Option<T> {
+    /// Pop an element from the front of the buffer.
+    pub(super) fn pop(&mut self) -> Option<T> {
         //println!("popping from {}", self);
         if self.size != 0 {
             let pop = self.array[self.begin];
