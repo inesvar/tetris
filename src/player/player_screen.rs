@@ -1,7 +1,7 @@
 //! Defines the [render()](PlayerScreen::render()) and [constructor](PlayerScreen::empty()) of [PlayerScreen].
+use super::back_end::{TetrisGrid, Tetromino};
 use super::{CircularBuffer, PlayerScreen};
 use crate::assets::Assets;
-use crate::back_end::{TetrisGrid, Tetromino};
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y, GRID_BG_COLOR, GRID_COLOR,
     GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS, TETROMINO_MAX_HEIGHT,

@@ -2,7 +2,10 @@
 //!
 //! PlayerScreen can be serialized as [MessageType::PlayerScreenMsg](super::MessageType::PlayerScreenMsg).
 //! Settings can be serialized as [MessageType::SettingsMsg](super::MessageType::SettingsMsg).
-use crate::{back_end::Tetromino, player::PlayerScreen, settings::Settings};
+use crate::{
+    player::{PlayerScreen, Tetromino},
+    settings::Settings,
+};
 use serde::{ser::SerializeStruct, Serialize, Serializer};
 
 impl Serialize for Settings {
