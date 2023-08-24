@@ -1,8 +1,10 @@
 //! Defines the app that handles the players, their interactions and the changes of views, settings and number of players.
+mod player;
 mod render_app;
 mod update_app;
 
-use crate::player::{GameFlowChange, LocalPlayer};
+use self::player::{GameFlowChange, LocalPlayer};
+pub use self::player::{PlayerScreen, Tetromino};
 use crate::remote::RemotePlayer;
 use crate::settings::*;
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
