@@ -1,13 +1,15 @@
+//! Defines the app that handles the players, their interactions and the changes of views, settings and number of players.
+mod render_app;
+mod update_app;
+
 use crate::player::{GameFlowChange, LocalPlayer};
 use crate::remote::RemotePlayer;
 use crate::settings::*;
-use crate::ui::interactive_widget_manager::ButtonType::{self};
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
 use crate::Assets;
-use graphics::Transformed;
 use opengl_graphics::{GlGraphics, OpenGL};
-use piston::{MouseButton, RenderArgs, UpdateArgs};
+use piston::MouseButton;
 use piston_window::Key;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -151,146 +153,6 @@ impl App<'_> {
             app.remote_players[0].listen()
         }
         app
-    }
-
-    pub(crate) fn render(&mut self, args: &RenderArgs) {
-        self.gl.draw(args.viewport(), |ctx, gl| {
-            // Clear the screen.
-            graphics::clear(BG_COLOR, gl);
-
-            match self.view_state {
-                ViewState::MainMenu => {
-                    self.title_text
-                        .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.widget_manager
-                        .render(ctx.transform, &ctx, gl, &mut self.assets)
-                }
-                ViewState::Settings => {
-                    self.title_text
-                        .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.widget_manager
-                        .render(ctx.transform, &ctx, gl, &mut self.assets)
-                }
-                _ => {
-                    if self.running == RunningState::Running {
-                        self.title_text.render(
-                            ctx.transform,
-                            &ctx,
-                            gl,
-                            &mut self.assets.tetris_font,
-                        );
-                    } else if self.running == RunningState::NotRunning {
-                        self.restart_text.render(
-                            ctx.transform,
-                            &ctx,
-                            gl,
-                            &mut self.assets.main_font,
-                        );
-                    } else {
-                        self.pause_text
-                            .render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
-                    }
-
-                    self.timer_text
-                        .set_text(format!("Elapsed: {:.2}s", self.clock));
-                    self.timer_text
-                        .render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
-
-                    let mut nb_players = 0;
-                    for player in &mut self.local_players {
-                        player.render(
-                            ctx.transform
-                                .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0),
-                            &ctx,
-                            gl,
-                            &mut self.assets,
-                        );
-                        nb_players += 1;
-                    }
-                    for player in &mut self.remote_players {
-                        player.render(
-                            ctx.transform
-                                .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0),
-                            &ctx,
-                            gl,
-                            &mut self.assets,
-                        );
-                        nb_players += 1;
-                    }
-
-                    self.widget_manager
-                        .render(ctx.transform, &ctx, gl, &mut self.assets)
-                }
-            }
-        });
-    }
-
-    ///
-    ///
-    /// The higher fall_speed_divide is, the slower the pieces fall.
-    pub(crate) fn update(&mut self, args: &UpdateArgs, fall_speed_divide: u64, freeze: u64) {
-        // first apply the changes inside the views
-        if self.view_state == ViewState::Settings {
-            self.widget_manager
-                .update_settings(&mut self.keybindings_manager);
-        } else if self.running == RunningState::Running {
-            // on ne fait pas d'update quand running == false
-            self.clock += args.dt;
-            self.frame_counter = self.frame_counter.wrapping_add(1);
-            if let PlayerConfig::TwoRemote = self.player_config {
-                for player in &mut self.local_players {
-                    let completed_lines = self.remote_players[0].get_lines_completed();
-                    if completed_lines != 0 {
-                        println!("the adversary completed {} lines", completed_lines);
-                        player.add_garbage(completed_lines);
-                    }
-                }
-            }
-            for player in &mut self.local_players {
-                player.update(
-                    &self.keybindings_manager,
-                    self.frame_counter,
-                    fall_speed_divide,
-                    freeze,
-                );
-            }
-        }
-        // taking into account the player states after a new piece was added
-        // two options :
-        // either the player didn't lose => nothing to do
-        // there was a game over => the running must be set to NotRunning
-        for player in &self.local_players {
-            if player.get_game_over() == true {
-                self.running = RunningState::NotRunning;
-            }
-        }
-        /* for player in &self.remote_players {
-            if player.get_game_over() == true {
-                self.running = RunningState::NotRunning;
-            }
-        } */
-        // then eventually change the view
-        let result = self.widget_manager.update_view();
-        match result {
-            ButtonType::ToPause => self.pause(),
-            ButtonType::Nothing => {}
-            ButtonType::BackToMainMenu => {
-                if self.view_state == ViewState::SinglePlayerGame
-                    && self.running == RunningState::Running
-                {
-                    self.pause()
-                };
-                self.set_view(ViewState::MainMenu)
-            }
-            ButtonType::ToSettings => self.set_view(ViewState::Settings),
-            ButtonType::ToSinglePlayerGame => {
-                if self.view_state == ViewState::MainMenu && self.running == RunningState::Paused {
-                    self.pause()
-                };
-                self.set_view(ViewState::SinglePlayerGame)
-            }
-            _ => {}
-        }
     }
 
     pub fn handle_text_input(&mut self, input: &String) {
