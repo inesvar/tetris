@@ -1,6 +1,6 @@
-use crate::local_player::{KeyPress, LocalPlayer};
+use crate::player::{KeyPress, LocalPlayer};
 use crate::remote::remote_player::RemotePlayer;
-use crate::settings::{self, *};
+use crate::settings::*;
 use crate::ui::interactive_widget_manager::ButtonType::{self};
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
