@@ -1,3 +1,4 @@
+//! Defines the render function of [App].
 use super::{App, RunningState, ViewState};
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
 use graphics::Transformed;
