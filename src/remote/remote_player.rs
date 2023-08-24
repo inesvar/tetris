@@ -1,5 +1,5 @@
 use super::MessageType;
-use crate::{assets::Assets, once, player::PlayerScreen, settings::SERVER_IP};
+use crate::{app::PlayerScreen, assets::Assets, once, settings::SERVER_IP};
 use graphics::{math::Matrix2d, Context};
 use opengl_graphics::GlGraphics;
 use std::{

@@ -6,7 +6,7 @@ mod remote_player;
 
 pub use self::remote_player::RemotePlayer;
 
-use crate::{player::PlayerScreen, settings::Settings};
+use crate::{app::PlayerScreen, settings::Settings};
 use serde::{Deserialize, Serialize};
 
 /// MessageType represents all different kinds of messages that can be sent.
