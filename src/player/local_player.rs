@@ -1,3 +1,4 @@
+//! Defines the general implementation of [LocalPlayer].
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
 };

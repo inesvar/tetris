@@ -47,7 +47,7 @@ impl PressedKeys {
         false
     }
 
-    /// decrements the press delay countdown for all keys
+    /// Decrements the press delay countdown for all pressed keys.
     pub(super) fn update(&mut self) {
         for counter in self.delay_to_long_press.values_mut() {
             if *counter > 0 {

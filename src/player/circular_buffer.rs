@@ -3,7 +3,7 @@ use core::fmt::Display;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 
-/// Push back pop front circular buffer
+/// Push back pop front circular buffer.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CircularBuffer<const K: usize, T: Default + Copy + Serialize + Display>
 where
