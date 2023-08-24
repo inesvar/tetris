@@ -1,13 +1,13 @@
 //! Defines custom Serialize for [Settings] and [PlayerScreen].
-//! 
+//!
 //! PlayerScreen can be serialized as [MessageType::PlayerScreenMsg](super::MessageType::PlayerScreenMsg).
 //! Settings can be serialized as [MessageType::SettingsMsg](super::MessageType::SettingsMsg).
-use crate::{player::PlayerScreen, settings::Settings, back_end::Tetromino};
+use crate::{back_end::Tetromino, player::PlayerScreen, settings::Settings};
 use serde::{ser::SerializeStruct, Serialize, Serializer};
 
 impl Serialize for Settings {
     /// Serializes this value.
-    /// 
+    ///
     /// It is serialized as SettingsMsg(self) if serialize_as_msg is set to true.
     /// Otherwise, it's serialized as it would with #[derive(Serialize)].
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -42,7 +42,7 @@ impl Serialize for Settings {
 
 impl Serialize for PlayerScreen {
     /// Serializes this value.
-    /// 
+    ///
     /// It is serialized as PlayerScreenMsg(self) if serialize_as_msg is set to true.
     /// Otherwise, it's serialized as it would with #[derive(Serialize)].
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>

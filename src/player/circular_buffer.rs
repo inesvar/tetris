@@ -38,7 +38,7 @@ impl<const K: usize, T: Default + Copy + Serialize + for<'a> Deserialize<'a> + D
     CircularBuffer<K, T>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
-{   
+{
     /// Construct a new circular buffer of size K for type T.
     pub(super) fn new() -> Self {
         CircularBuffer::<K, T> {

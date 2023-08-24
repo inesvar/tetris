@@ -2,7 +2,6 @@
 //!
 //! This module uses [back_end](crate::back_end) to make the tetromino move according to the player's commands.
 //! It also generates new tetromino pieces and handles the queue of next pieces.
-
 mod circular_buffer;
 mod handle_key_player;
 mod local_player;
@@ -19,7 +18,7 @@ use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 
 /// Local player contains all the informations relative to one player.
-/// 
+///
 /// - the elements to show on screen
 /// - the pressed keys
 /// - the next tetromino in the queue as well as a random generator

@@ -1,13 +1,4 @@
 //! Defines the back-end of the tetris game.
-use self::{
-    block::Block, point::Point, rotation_state::RotationState, translation_rotation::Rotation,
-};
-use crate::assets::TetrisColor;
-use graphics::types::Matrix2d;
-use rand::seq::SliceRandom;
-use rand_pcg::Pcg32;
-use serde::{Deserialize, Serialize};
-
 mod block;
 mod point;
 mod render;
@@ -16,6 +7,15 @@ mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;
 mod translation_rotation;
+
+use self::{
+    block::Block, point::Point, rotation_state::RotationState, translation_rotation::Rotation,
+};
+use crate::assets::TetrisColor;
+use graphics::types::Matrix2d;
+use rand::seq::SliceRandom;
+use rand_pcg::Pcg32;
+use serde::{Deserialize, Serialize};
 
 /// Tetromino piece among the 7 kinds in the game positioned on the grid.
 #[derive(Clone, Copy, Serialize, Deserialize)]
