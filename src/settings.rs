@@ -167,6 +167,7 @@ impl Settings {
         }
     }
 
+    #[allow(dead_code)]
     pub fn send(&self) {
         /* serialized_as_msg absolutely needs to be set to true
          * as it is used as a flag during the serialization

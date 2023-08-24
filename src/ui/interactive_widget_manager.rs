@@ -1,6 +1,5 @@
-use crate::app::ViewState;
 use crate::settings::{
-    self, Keybindings, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_KEY_INPUT_HEIGHT,
+    Keybindings, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_KEY_INPUT_HEIGHT,
     DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
 };
 use crate::ui::button::Button;
@@ -271,9 +270,9 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub fn handle_mouse_release(&mut self, mouse_button: MouseButton, cursor_position: &[f64; 2]) {
+    pub fn handle_mouse_release(&mut self, mouse_button: MouseButton) {
         for button in self.buttons.values_mut() {
-            button.handle_mouse_release(mouse_button, cursor_position);
+            button.handle_mouse_release(mouse_button);
         }
     }
 
