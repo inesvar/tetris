@@ -1,7 +1,7 @@
 use super::message_type::MessageType;
 use crate::assets::Assets;
+use crate::local_player::PlayerScreen;
 use crate::once;
-use crate::player_screen::PlayerScreen;
 use crate::settings::SERVER_IP;
 use graphics::math::Matrix2d;
 use graphics::Context;

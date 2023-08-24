@@ -1,5 +1,5 @@
+use super::CircularBuffer;
 use crate::assets::Assets;
-use crate::circular_buffer::CircularBuffer;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y, GRID_BG_COLOR, GRID_COLOR,
     GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS, TETROMINO_MAX_HEIGHT,
@@ -7,8 +7,10 @@ use crate::settings::{
 };
 use crate::tetris_back_end::{TetrisGrid, Tetromino};
 use crate::ui::text::Text;
-use graphics::types::{Matrix2d, Rectangle};
-use graphics::{rectangle, Context, Transformed};
+use graphics::{
+    types::{Matrix2d, Rectangle},
+    {rectangle, Context, Transformed},
+};
 use opengl_graphics::GlGraphics;
 use serde::Deserialize;
 use std::cell::RefCell;

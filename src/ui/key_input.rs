@@ -1,8 +1,4 @@
-use crate::{
-    keyboard::{key_to_string, keys_to_string},
-    settings::TEXT_COLOR,
-    ui::text::Text,
-};
+use crate::{settings::TEXT_COLOR, ui::text::Text};
 use piston::{Key, MouseButton};
 
 pub struct KeyInput {
@@ -140,4 +136,19 @@ impl KeyInput {
             self.keys = vec![];
         }
     }
+}
+
+fn key_to_string(key: Key) -> String {
+    if key == Key::Unknown {
+        return String::from("");
+    }
+    format!("{:?}, ", key)
+}
+
+fn keys_to_string(keys: &[Key]) -> String {
+    let mut s = String::new();
+    for key in keys {
+        s.push_str(&key_to_string(*key));
+    }
+    s
 }
