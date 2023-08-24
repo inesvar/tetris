@@ -20,7 +20,7 @@ mod macros;
 mod player;
 mod remote;
 mod settings;
-mod tetris_back_end;
+mod back_end;
 mod ui;
 
 #[derive(Parser, Debug)]

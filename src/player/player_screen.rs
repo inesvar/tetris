@@ -1,33 +1,18 @@
-use super::CircularBuffer;
+//! Defines the [render()](PlayerScreen::render()) and [constructor](PlayerScreen::empty()) of [PlayerScreen].
+use super::{CircularBuffer, PlayerScreen};
 use crate::assets::Assets;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y, GRID_BG_COLOR, GRID_COLOR,
     GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS, TETROMINO_MAX_HEIGHT,
     TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
-use crate::tetris_back_end::{TetrisGrid, Tetromino};
+use crate::back_end::{TetrisGrid, Tetromino};
 use crate::ui::text::Text;
 use graphics::{
     types::{Matrix2d, Rectangle},
     {rectangle, Context, Transformed},
 };
 use opengl_graphics::GlGraphics;
-use serde::Deserialize;
-use std::cell::RefCell;
-
-#[derive(Deserialize)]
-pub struct PlayerScreen {
-    pub grid: TetrisGrid,
-    pub score: u64,
-    pub game_over: bool,
-    /// is set and reset during the update resp. when lines are cleared and when data is sent to the remote players
-    pub new_completed_lines: u64,
-    pub active_tetromino: Tetromino,
-    pub saved_tetromino: Option<Tetromino>,
-    pub fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
-    pub ghost_tetromino: Option<Tetromino>,
-    pub serialize_as_msg: RefCell<bool>,
-}
 
 impl PlayerScreen {
     pub fn empty() -> Self {

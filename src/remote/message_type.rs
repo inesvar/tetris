@@ -1,4 +1,4 @@
-use crate::{player::PlayerScreen, settings::Settings, tetris_back_end::Tetromino};
+use crate::{player::PlayerScreen, settings::Settings, back_end::Tetromino};
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
 /// MessageType represents all different kinds of messages that can be sent.
