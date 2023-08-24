@@ -118,7 +118,6 @@ impl TetrominoKind {
                     Point::new(0, 1) + Point::new(-1, 2),
                     Point::new(0, 1) + Point::new(2, -1),
                 ],
-                _ => unreachable!(),
             },
             _ => match (rotation_status, rtype) {
                 (RotationState::R0, RotationType::Clockwise) => [
@@ -177,7 +176,6 @@ impl TetrominoKind {
                     Point::new(0, -2),
                     Point::new(1, -2),
                 ],
-                _ => unreachable!(),
             },
         }
     }

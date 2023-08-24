@@ -16,7 +16,7 @@ use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent};
 
 mod app;
 mod assets;
-mod local_player;
+mod player;
 mod macros;
 mod remote;
 mod settings;
