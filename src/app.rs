@@ -1,4 +1,4 @@
-use crate::player::{KeyPress, LocalPlayer};
+use crate::player::{GameFlowChange, LocalPlayer};
 use crate::remote::remote_player::RemotePlayer;
 use crate::settings::*;
 use crate::ui::interactive_widget_manager::ButtonType::{self};
@@ -302,18 +302,18 @@ impl App<'_> {
     }
 
     pub fn handle_key_press(&mut self, key: Key) {
-        let mut key_press = KeyPress::Other;
+        let mut key_press = GameFlowChange::Other;
         for player in &mut self.local_players {
             key_press = player.handle_key_press(&self.keybindings_manager, key, self.running)
         }
         match key_press {
-            KeyPress::Restart => {
+            GameFlowChange::Restart => {
                 self.restart();
             }
-            KeyPress::Resume => {
+            GameFlowChange::Resume => {
                 self.running = RunningState::Running;
             }
-            KeyPress::Pause => {
+            GameFlowChange::Pause => {
                 self.running = RunningState::Paused;
             }
             _ => {}

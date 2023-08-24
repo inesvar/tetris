@@ -2,7 +2,7 @@
 //! 
 //! [handle_key_press()](LocalPlayer::handle_key_press()) is called when a key is pressed.
 //! [handle_key_release()](LocalPlayer::handle_key_release()) is called when a key is released.
-use super::{KeyPress, LocalPlayer};
+use super::{GameFlowChange, LocalPlayer};
 use crate::{
     app::RunningState,
     settings::{Keybindings, PAUSE_KEYS, RESTART_KEYS},
@@ -25,7 +25,7 @@ impl LocalPlayer {
         keybindings: &Keybindings,
         key: Key,
         running: RunningState,
-    ) -> KeyPress {
+    ) -> GameFlowChange {
         self.keyboard.set_pressed(key);
 
         /******************************
@@ -35,9 +35,9 @@ impl LocalPlayer {
         // the unactive game only listens to the RESTART_KEYS
         if running == RunningState::NotRunning {
             if self.keyboard.is_any_last_pressed(&RESTART_KEYS) {
-                return KeyPress::Restart;
+                return GameFlowChange::Restart;
             } else {
-                return KeyPress::Other;
+                return GameFlowChange::Other;
             }
         }
 
@@ -48,14 +48,14 @@ impl LocalPlayer {
         // the paused game only listens to the PAUSE_KEYS
         if running == RunningState::Paused {
             if self.keyboard.is_any_last_pressed(&PAUSE_KEYS) {
-                return KeyPress::Resume;
+                return GameFlowChange::Resume;
             } else {
-                return KeyPress::Other;
+                return GameFlowChange::Other;
             }
         // the game pauses if PAUSE_KEYS are pressed
         } else if running == RunningState::Running && self.keyboard.is_any_last_pressed(&PAUSE_KEYS)
         {
-            return KeyPress::Pause;
+            return GameFlowChange::Pause;
         }
 
         /******************************
@@ -141,7 +141,7 @@ impl LocalPlayer {
                 None => self.declare_game_over(),
             }
         }
-        KeyPress::Other
+        GameFlowChange::Other
     }
 
     pub fn handle_key_release(&mut self, key: Key) {
