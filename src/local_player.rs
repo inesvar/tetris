@@ -1,8 +1,10 @@
+mod circular_buffer;
+mod keyboard;
+mod player_screen;
+
+pub use self::{circular_buffer::CircularBuffer, keyboard::Keyboard, player_screen::PlayerScreen};
 use crate::app::RunningState;
 use crate::assets::Assets;
-use crate::circular_buffer::CircularBuffer;
-use crate::keyboard::Keyboard;
-use crate::player_screen::PlayerScreen;
 use crate::tetris_back_end::{
     new_tetromino_bag, TetrisGrid, Tetromino, TetrominoKind, TranslationRotation,
 };

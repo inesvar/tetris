@@ -65,18 +65,3 @@ impl Keyboard {
         }
     }
 }
-
-pub fn key_to_string(key: Key) -> String {
-    if key == Key::Unknown {
-        return String::from("");
-    }
-    format!("{:?}, ", key)
-}
-
-pub fn keys_to_string(keys: &[Key]) -> String {
-    let mut s = String::new();
-    for key in keys {
-        s.push_str(&key_to_string(*key));
-    }
-    s
-}

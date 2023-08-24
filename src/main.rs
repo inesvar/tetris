@@ -16,11 +16,8 @@ use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent};
 
 mod app;
 mod assets;
-mod circular_buffer;
-mod keyboard;
 mod local_player;
 mod macros;
-mod player_screen;
 mod remote;
 mod settings;
 mod tetris_back_end;
