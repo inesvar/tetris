@@ -1,5 +1,10 @@
 use super::MessageType;
-use crate::{app::PlayerScreen, assets::Assets, once, settings::SERVER_IP};
+use crate::{
+    app::{GameFlowChange, PlayerScreen},
+    assets::Assets,
+    once,
+    settings::SERVER_IP,
+};
 use graphics::{math::Matrix2d, Context};
 use opengl_graphics::GlGraphics;
 use std::{
@@ -11,6 +16,7 @@ use std::{
 pub struct RemotePlayer {
     screen: Arc<Mutex<PlayerScreen>>,
     first_screen_received: Arc<Mutex<bool>>,
+    game_flow_message: Arc<Mutex<GameFlowChange>>,
 }
 
 impl RemotePlayer {
@@ -19,6 +25,7 @@ impl RemotePlayer {
         RemotePlayer {
             screen: arc,
             first_screen_received: Arc::new(Mutex::new(false)),
+            game_flow_message: Arc::new(Mutex::new(GameFlowChange::Other)),
         }
     }
 
@@ -27,9 +34,11 @@ impl RemotePlayer {
         // this is necessary because self can't be moved out to another thread
         let screen = Arc::clone(&self.screen);
         let first_screen_received = Arc::clone(&self.first_screen_received);
+        let game_flow_message = Arc::clone(&self.game_flow_message);
         let self_for_listener = RemotePlayer {
             screen,
             first_screen_received,
+            game_flow_message,
         };
         // creating a listener in a separate thread
         let listener = TcpListener::bind(SERVER_IP).unwrap();

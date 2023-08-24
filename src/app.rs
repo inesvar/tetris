@@ -4,7 +4,7 @@ mod remote;
 mod render_app;
 mod update_app;
 
-use self::player::{GameFlowChange, LocalPlayer};
+use self::player::LocalPlayer;
 pub use self::player::{PlayerScreen, Tetromino};
 use self::remote::RemotePlayer;
 use crate::settings::*;
@@ -16,6 +16,16 @@ use piston::MouseButton;
 use piston_window::Key;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+
+/// Indicates whether the player commands lead the game to pause, resume, restart or no.
+/// The GameOver variant is only used for remote players.
+pub enum GameFlowChange {
+    Restart,
+    Resume,
+    Pause,
+    GameOver,
+    Other,
+}
 
 #[derive(Debug, PartialEq)]
 pub enum ViewState {
