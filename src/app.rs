@@ -1,27 +1,26 @@
 use crate::local_player::{KeyPress, LocalPlayer};
 use crate::remote::remote_player::RemotePlayer;
 use crate::settings::{self, *};
-use crate::Assets;
-use graphics::Transformed;
-use rand::Rng;
-use serde::{Deserialize, Serialize};
-
 use crate::ui::interactive_widget_manager::ButtonType::{self};
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
+use crate::Assets;
+use graphics::Transformed;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::{MouseButton, RenderArgs, UpdateArgs};
 use piston_window::Key;
+use rand::Rng;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq)]
 pub enum ViewState {
     MainMenu,
     Settings,
-    JoinRoom,
-    CreateRoom,
+    //JoinRoom,
+    //CreateRoom,
     SinglePlayerGame,
-    LocalMultiplayerGame,
-    OnlineMultiplayerGame,
+    //LocalMultiplayerGame,
+    //OnlineMultiplayerGame,
 }
 
 pub enum PlayerConfig {
@@ -53,9 +52,7 @@ pub struct App<'a> {
     restart_text: Text,
     pause_text: Text,
     timer_text: Text,
-
     pub cursor_position: [f64; 2],
-
     widget_manager: InteractiveWidgetManager,
     keybindings_manager: Keybindings,
     settings_manager: Settings,

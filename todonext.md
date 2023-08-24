@@ -1,7 +1,7 @@
 # TO DO SOON
 
 
-- CORRECT HANDLE KEY PRESS
+- SEPARATE local_player into different files coz that's unbelievable
 - review app.rs because it's too complicated
 - in keyboard, replace the hashmap to booleans by a hashset
 
