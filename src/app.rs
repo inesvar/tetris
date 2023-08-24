@@ -55,6 +55,7 @@ pub struct App<'a> {
     pub cursor_position: [f64; 2],
     widget_manager: InteractiveWidgetManager,
     keybindings_manager: Keybindings,
+    #[allow(dead_code)]
     settings_manager: Settings,
 }
 
@@ -337,8 +338,7 @@ impl App<'_> {
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
-        self.widget_manager
-            .handle_mouse_release(button, &self.cursor_position);
+        self.widget_manager.handle_mouse_release(button);
     }
 
     fn set_view(&mut self, view_state: ViewState) {
@@ -353,6 +353,7 @@ impl App<'_> {
             ViewState::SinglePlayerGame => {
                 self.widget_manager = InteractiveWidgetManager::new_single_player_game()
             }
+            #[allow(unreachable_patterns)]
             _ => self.widget_manager = InteractiveWidgetManager::new_empty(),
         }
     }
