@@ -1,7 +1,7 @@
 //! Defines the update function of [App].
 //!
 //! [update()](App::update()) is called before each render when the game is active.
-use super::{App, PlayerConfig, RunningState, ViewState};
+use super::{App, Countdown, PlayerConfig, RunningState, ViewState};
 use crate::ui::interactive_widget_manager::ButtonType;
 use piston::UpdateArgs;
 
@@ -19,8 +19,15 @@ impl App<'_> {
         if self.view_state == ViewState::Settings {
             self.widget_manager
                 .update_settings(&mut self.keybindings_manager);
+        } else if self.running == RunningState::Starting {
+            self.clock += args.dt;
+            match self.clock {
+                i if i < 1.0 => self.countdown(&Countdown::Three),
+                i if i < 2.0 => self.countdown(&Countdown::Two),
+                i if i < 3.0 => self.countdown(&Countdown::One),
+                _ => self.start(),
+            }
         } else if self.running == RunningState::Running {
-            // on ne fait pas d'update quand running == false
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             if let PlayerConfig::TwoRemote = self.player_config {

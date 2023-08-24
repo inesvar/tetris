@@ -51,6 +51,7 @@ pub enum RunningState {
     Running,
     Paused,
     NotRunning,
+    Starting,
 }
 
 pub struct App<'a> {
@@ -240,12 +241,30 @@ impl App<'_> {
             self.running = RunningState::Paused;
         }
     }
-
+    /// Starts a countdown then starts the game.
     fn restart(&mut self) {
-        self.running = RunningState::Running;
+        self.running = RunningState::Starting;
         self.clock = 0.0;
+    }
+
+    /// Makes the game active.
+    fn start(&mut self) {
         for player in &mut self.local_players {
             player.restart();
         }
+        self.clock = 0.0;
+        self.running = RunningState::Running;
     }
+
+    fn countdown(&mut self, i: &Countdown) {
+        for player in &mut self.local_players {
+            player.countdown(i);
+        }
+    }
+}
+
+pub(self) enum Countdown {
+    One,
+    Two,
+    Three,
 }

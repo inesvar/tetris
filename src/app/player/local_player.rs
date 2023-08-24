@@ -3,8 +3,7 @@ use super::back_end::{new_tetromino_bag, TetrisGrid, Tetromino, TranslationRotat
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
 };
-use crate::assets::Assets;
-use crate::{once, settings::*};
+use crate::{app::Countdown, assets::Assets, once, settings::*};
 use graphics::types::Matrix2d;
 use opengl_graphics::GlGraphics;
 use piston_window::Context;
@@ -61,9 +60,9 @@ impl LocalPlayer {
     }
 
     pub fn restart(&mut self) {
+        self.player_screen.grid.null();
         self.player_screen.game_over = false;
         self.player_screen.score = 0;
-        self.player_screen.grid.null();
     }
 
     pub fn get_game_over(&self) -> bool {
@@ -83,6 +82,23 @@ impl LocalPlayer {
         assets: &mut Assets,
     ) {
         self.player_screen.render(transform, ctx, gl, assets);
+    }
+
+    pub(in crate::app) fn countdown(&mut self, i: &Countdown) {
+        match i {
+            Countdown::One => self
+                .player_screen
+                .grid
+                .one(self.player_screen.fifo_next_tetromino.get(1).unwrap()),
+            Countdown::Two => self
+                .player_screen
+                .grid
+                .two(self.player_screen.fifo_next_tetromino.get(0).unwrap()),
+            Countdown::Three => self
+                .player_screen
+                .grid
+                .three(self.player_screen.active_tetromino),
+        }
     }
 }
 
