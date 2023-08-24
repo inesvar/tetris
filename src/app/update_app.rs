@@ -24,6 +24,7 @@ impl App<'_> {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             if let PlayerConfig::TwoRemote = self.player_config {
+                // add garbage
                 for player in &mut self.local_players {
                     let completed_lines = self.remote_players[0].get_lines_completed();
                     if completed_lines != 0 {
@@ -32,6 +33,7 @@ impl App<'_> {
                     }
                 }
             }
+            // update
             for player in &mut self.local_players {
                 player.update(
                     &self.keybindings_manager,
@@ -40,21 +42,24 @@ impl App<'_> {
                     freeze,
                 );
             }
-        }
-        // taking into account the player states after a new piece was added
-        // two options :
-        // either the player didn't lose => nothing to do
-        // there was a game over => the running must be set to NotRunning
-        for player in &self.local_players {
-            if player.get_game_over() == true {
-                self.running = RunningState::NotRunning;
+            // taking into account the player states after a new piece was added
+            // two options :
+            // either the player didn't lose => nothing to do
+            // there was a game over => the running must be set to NotRunning
+            for player in &self.local_players {
+                if player.get_game_over() == true {
+                    self.running = RunningState::NotRunning;
+                }
             }
+
+/*             // same for remote players
+            for player in &self.remote_players {
+                if player.get_game_over() == true {
+                    self.running = RunningState::NotRunning;
+                }
+            } */
         }
-        /* for player in &self.remote_players {
-            if player.get_game_over() == true {
-                self.running = RunningState::NotRunning;
-            }
-        } */
+
         // then eventually change the view
         let result = self.widget_manager.update_view();
         match result {
