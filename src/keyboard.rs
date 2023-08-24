@@ -20,14 +20,13 @@ impl Keyboard {
 
     pub fn set_pressed(&mut self, key: Key) {
         self.last_pressed_key = key;
-        self.delay_to_long_press
-            .insert(key, KEY_REPEAT_DELAY);
+        self.delay_to_long_press.insert(key, KEY_REPEAT_DELAY);
     }
 
     pub fn set_released(&mut self, key: Key) {
         self.delay_to_long_press.remove(&key);
     }
-    
+
     pub fn is_any_last_pressed(&self, keys: &[Key]) -> bool {
         for key in keys {
             if self.is_last_pressed(*key) {
@@ -36,7 +35,7 @@ impl Keyboard {
         }
         false
     }
-    
+
     pub fn is_any_delay_pressed(&self, keys: &[Key]) -> bool {
         for key in keys {
             if self.is_delay_pressed(*key) {
@@ -45,7 +44,7 @@ impl Keyboard {
         }
         false
     }
-    
+
     /// decrements the press delay countdown for all keys
     pub fn update(&mut self) {
         for counter in self.delay_to_long_press.values_mut() {
