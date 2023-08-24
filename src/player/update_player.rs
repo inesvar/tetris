@@ -1,8 +1,8 @@
 //! Defines the update function of [LocalPlayer].
 //!
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
-use super::LocalPlayer;
-use crate::{back_end::TranslationRotation, settings::Keybindings};
+use super::{back_end::TranslationRotation, LocalPlayer};
+use crate::settings::Keybindings;
 
 impl LocalPlayer {
     /// update is called before each render so that the informations on the screen are as recent as possible.

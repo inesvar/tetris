@@ -2,6 +2,7 @@
 //!
 //! This module uses [back_end](crate::back_end) to make the tetromino move according to the player's commands.
 //! It also generates new tetromino pieces and handles the queue of next pieces.
+mod back_end;
 mod circular_buffer;
 mod handle_key_player;
 mod local_player;
@@ -9,8 +10,12 @@ mod player_screen;
 mod pressed_keys;
 mod update_player;
 
-use self::{circular_buffer::CircularBuffer, pressed_keys::PressedKeys};
-use crate::back_end::{TetrisGrid, Tetromino, TetrominoKind};
+pub use self::back_end::Tetromino;
+use self::{
+    back_end::{TetrisGrid, TetrominoKind},
+    circular_buffer::CircularBuffer,
+    pressed_keys::PressedKeys,
+};
 use crate::settings::NB_NEXT_TETROMINO;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;

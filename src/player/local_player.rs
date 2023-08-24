@@ -1,9 +1,9 @@
 //! Defines the general implementation of [LocalPlayer].
+use super::back_end::{new_tetromino_bag, TetrisGrid, Tetromino, TranslationRotation};
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
 };
 use crate::assets::Assets;
-use crate::back_end::{new_tetromino_bag, TetrisGrid, Tetromino, TranslationRotation};
 use crate::{once, settings::*};
 use graphics::types::Matrix2d;
 use opengl_graphics::GlGraphics;
