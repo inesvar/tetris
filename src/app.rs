@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 
 /// Indicates whether the player commands lead the game to pause, resume, restart or no.
 /// The GameOver variant is only used for remote players.
+#[derive(Debug)]
 pub enum GameFlowChange {
     Restart,
     Resume,
