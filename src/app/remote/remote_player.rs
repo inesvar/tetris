@@ -54,16 +54,20 @@ impl RemotePlayer {
                         self_for_listener.update_screen(new_screen)
                     }
                     MessageType::GameOverMsg => {
-                        self_for_listener.update_game_flow(GameFlowChange::GameOver)
+                        self_for_listener.update_game_flow(GameFlowChange::GameOver);
+                        println!("GAME FLOW CHANGE : game over");
                     }
                     MessageType::PauseMsg => {
-                        self_for_listener.update_game_flow(GameFlowChange::Pause)
+                        self_for_listener.update_game_flow(GameFlowChange::Pause);
+                        println!("GAME FLOW CHANGE : pause");
                     }
                     MessageType::RestartMsg => {
-                        self_for_listener.update_game_flow(GameFlowChange::Restart)
+                        self_for_listener.update_game_flow(GameFlowChange::Restart);
+                        println!("GAME FLOW CHANGE : restart");
                     }
                     MessageType::ResumeMsg => {
-                        self_for_listener.update_game_flow(GameFlowChange::Resume)
+                        self_for_listener.update_game_flow(GameFlowChange::Resume);
+                        println!("GAME FLOW CHANGE : resume");
                     }
                     _ => {}
                 }
@@ -120,45 +124,6 @@ impl RemotePlayer {
 
     /// Updates the remote player with the game flow new message received.
     fn update_game_flow(&self, new_game_flow: GameFlowChange) {
-        match new_game_flow {
-            GameFlowChange::GameOver => {
-                if let Ok(stream) = TcpStream::connect(SERVER_IP) {
-                    serde_cbor::to_writer::<TcpStream, MessageType>(
-                        stream,
-                        &MessageType::AckGameOverMsg,
-                    )
-                    .unwrap();
-                }
-            }
-            GameFlowChange::Pause => {
-                if let Ok(stream) = TcpStream::connect(SERVER_IP) {
-                    serde_cbor::to_writer::<TcpStream, MessageType>(
-                        stream,
-                        &MessageType::AckPauseMsg,
-                    )
-                    .unwrap();
-                }
-            }
-            GameFlowChange::Restart => {
-                if let Ok(stream) = TcpStream::connect(SERVER_IP) {
-                    serde_cbor::to_writer::<TcpStream, MessageType>(
-                        stream,
-                        &MessageType::AckRestartMsg,
-                    )
-                    .unwrap();
-                }
-            }
-            GameFlowChange::Resume => {
-                if let Ok(stream) = TcpStream::connect(SERVER_IP) {
-                    serde_cbor::to_writer::<TcpStream, MessageType>(
-                        stream,
-                        &MessageType::AckResumeMsg,
-                    )
-                    .unwrap();
-                }
-            }
-            _ => unreachable!(),
-        }
         {
             let mut game_flow = self.game_flow_message.lock().unwrap();
             *game_flow = new_game_flow;
@@ -166,19 +131,19 @@ impl RemotePlayer {
     }
 
     /// Returns the game_flow_message and resets it
-    fn get_game_flow(&self) -> GameFlowChange {
+    pub(in crate::app) fn get_game_flow(&self) -> GameFlowChange {
         let mut last_game_flow: GameFlowChange = GameFlowChange::Other;
         {
             std::mem::swap(
                 &mut last_game_flow,
                 &mut self.game_flow_message.lock().unwrap(),
             );
-            println!(
+            /* println!(
                 "after swap, self.last_game_flow is {:?}",
                 self.game_flow_message.lock().unwrap()
-            );
+            ); */
         }
-        println!("after swap, last game flow is {last_game_flow:?}");
+        //println!("after swap, last game flow is {last_game_flow:?}");
         return last_game_flow;
     }
 }

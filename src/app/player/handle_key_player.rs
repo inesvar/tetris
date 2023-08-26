@@ -139,7 +139,10 @@ impl LocalPlayer {
                     self.player_screen.score += self.player_screen.new_completed_lines;
                     self.get_new_tetromino();
                 }
-                None => self.declare_game_over(),
+                None => {
+                    self.declare_game_over();
+                    return GameFlowChange::GameOver;
+                }
             }
         }
         GameFlowChange::Other

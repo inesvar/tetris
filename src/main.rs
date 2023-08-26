@@ -89,6 +89,8 @@ fn main() {
             app.handle_key_press(key);
         }
 
+        app.handle_remote();
+
         if let Some(text) = e.text_args() {
             app.handle_text_input(&text);
         }

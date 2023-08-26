@@ -27,11 +27,4 @@ pub enum MessageType {
     PauseMsg,
     ResumeMsg,
     GameOverMsg,
-    HelloMsg,
-    AckSettingsMsg, // sent to the host
-    AckRestartMsg,
-    AckPauseMsg,
-    AckResumeMsg,
-    AckGameOverMsg,
-    AckHelloMsg,
 }
