@@ -71,7 +71,7 @@ impl App<'_> {
                         );
                         nb_players += 1;
                     }
-                    for player in &mut self.remote_players {
+                    for player in &mut self.remote_player {
                         player.render(
                             ctx.transform
                                 .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0),

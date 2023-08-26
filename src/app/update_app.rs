@@ -1,7 +1,7 @@
 //! Defines the update function of [App].
 //!
 //! [update()](App::update()) is called before each render when the game is active.
-use super::{App, Countdown, PlayerConfig, RunningState, ViewState};
+use super::{App, Countdown, GameFlowChange, PlayerConfig, RunningState, ViewState};
 use crate::ui::interactive_widget_manager::ButtonType;
 use piston::UpdateArgs;
 
@@ -33,7 +33,7 @@ impl App<'_> {
             if let PlayerConfig::TwoRemote = self.player_config {
                 // add garbage
                 for player in &mut self.local_players {
-                    let completed_lines = self.remote_players[0].get_lines_completed();
+                    let completed_lines = self.remote_player[0].get_lines_completed();
                     if completed_lines != 0 {
                         println!("the adversary completed {} lines", completed_lines);
                         player.add_garbage(completed_lines);
@@ -53,19 +53,23 @@ impl App<'_> {
             // two options :
             // either the player didn't lose => nothing to do
             // there was a game over => the running must be set to NotRunning
+            let mut game_over = false;
             for player in &self.local_players {
                 if player.get_game_over() == true {
-                    self.running = RunningState::NotRunning;
+                    game_over = true;
                 }
             }
 
-            /*
             // same for remote players
-            for player in &self.remote_players {
-                if player.get_game_over() == true {
-                    self.running = RunningState::NotRunning;
+            for player in &self.remote_player {
+                if player.get_game_flow() == GameFlowChange::GameOver {
+                    game_over = true;
                 }
-            } */
+            }
+
+            if game_over {
+                self.game_over();
+            }
         }
 
         // then eventually change the view
@@ -83,9 +87,9 @@ impl App<'_> {
             }
             ButtonType::ToSettings => self.set_view(ViewState::Settings),
             ButtonType::ToSinglePlayerGame => {
-                if self.view_state == ViewState::MainMenu && self.running == RunningState::Paused {
+                /* if self.view_state == ViewState::MainMenu && self.running == RunningState::Paused {
                     self.pause()
-                };
+                }; */
                 self.set_view(ViewState::SinglePlayerGame)
             }
             _ => {}

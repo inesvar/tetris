@@ -4,9 +4,12 @@ mod remote;
 mod render_app;
 mod update_app;
 
+use std::net::TcpStream;
+
 use self::player::LocalPlayer;
 pub use self::player::{PlayerScreen, Tetromino};
 use self::remote::RemotePlayer;
+use crate::app::remote::MessageType;
 use crate::settings::*;
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
@@ -19,7 +22,7 @@ use serde::{Deserialize, Serialize};
 
 /// Indicates whether the player commands lead the game to pause, resume, restart or no.
 /// The GameOver variant is only used for remote players.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum GameFlowChange {
     Restart,
     Resume,
@@ -58,7 +61,7 @@ pub enum RunningState {
 pub struct App<'a> {
     gl: GlGraphics,
     local_players: Vec<LocalPlayer>,
-    remote_players: Vec<RemotePlayer>,
+    remote_player: Vec<RemotePlayer>,
     player_config: PlayerConfig,
     view_state: ViewState,
     assets: Assets<'a>,
@@ -119,7 +122,7 @@ impl App<'_> {
         let app = App {
             gl: GlGraphics::new(gl_version),
             local_players: players,
-            remote_players: rem_players,
+            remote_player: rem_players,
             player_config,
             view_state: ViewState::MainMenu,
             assets,
@@ -163,9 +166,9 @@ impl App<'_> {
         };
 
         if let PlayerConfig::Viewer = app.player_config {
-            app.remote_players[0].listen()
+            app.remote_player[0].listen()
         } else if let PlayerConfig::TwoRemote = app.player_config {
-            app.remote_players[0].listen()
+            app.remote_player[0].listen()
         }
         app
     }
@@ -188,10 +191,13 @@ impl App<'_> {
                 self.restart();
             }
             GameFlowChange::Resume => {
-                self.running = RunningState::Running;
+                self.pause();
             }
             GameFlowChange::Pause => {
-                self.running = RunningState::Paused;
+                self.pause();
+            }
+            GameFlowChange::GameOver => {
+                self.game_over();
             }
             _ => {}
         }
@@ -199,6 +205,38 @@ impl App<'_> {
         match self.view_state {
             ViewState::MainMenu => self.widget_manager.handle_key_press(key),
             ViewState::Settings => self.widget_manager.handle_key_press(key),
+            _ => {}
+        }
+    }
+
+    pub fn handle_remote(&mut self) {
+        let mut game_flow_change: GameFlowChange = GameFlowChange::Other;
+        for player in &self.remote_player {
+            // supposing there's only one player
+            // TODO : change this for multiple remote players
+            game_flow_change = player.get_game_flow();
+        }
+        match game_flow_change {
+            GameFlowChange::GameOver => {
+                if self.running == RunningState::Running {
+                    self.game_over()
+                }
+            }
+            GameFlowChange::Pause => {
+                if self.running == RunningState::Running {
+                    self.pause()
+                }
+            }
+            GameFlowChange::Resume => {
+                if self.running == RunningState::Paused {
+                    self.pause()
+                }
+            }
+            GameFlowChange::Restart => {
+                if self.running == RunningState::NotRunning {
+                    self.restart()
+                }
+            }
             _ => {}
         }
     }
@@ -237,13 +275,16 @@ impl App<'_> {
 
     fn pause(&mut self) {
         if self.running == RunningState::Paused {
+            Self::send_message(MessageType::ResumeMsg);
             self.running = RunningState::Running;
         } else if self.running == RunningState::Running {
+            Self::send_message(MessageType::PauseMsg);
             self.running = RunningState::Paused;
         }
     }
     /// Starts a countdown then starts the game.
     fn restart(&mut self) {
+        Self::send_message(MessageType::RestartMsg);
         self.running = RunningState::Starting;
         self.clock = 0.0;
     }
@@ -257,9 +298,21 @@ impl App<'_> {
         self.running = RunningState::Running;
     }
 
+    /// Makes the game unactive.
+    fn game_over(&mut self) {
+        Self::send_message(MessageType::GameOverMsg);
+        self.running = RunningState::NotRunning;
+    }
+
     fn countdown(&mut self, i: &Countdown) {
         for player in &mut self.local_players {
             player.countdown(i);
+        }
+    }
+
+    fn send_message(message: MessageType) {
+        if let Ok(stream) = TcpStream::connect(VIEWER_IP) {
+            serde_cbor::to_writer::<TcpStream, MessageType>(stream, &message).unwrap();
         }
     }
 }

@@ -115,10 +115,12 @@ impl TetrisGrid {
     pub(in crate::app::player) fn one(&mut self, tetromino: Tetromino) {
         let tetris_color = tetromino.blocks[0].color;
         self.null();
+        // starting from the top of the number
+        // careful, it's matrix[y][x] and y increases towards the bottom
         self.matrix[9][5] = Some(tetris_color);
         self.matrix[10][4] = Some(tetris_color);
         self.matrix[10][5] = Some(tetris_color);
-        self.matrix[11][3] = Some(tetris_color);
+        //? self.matrix[11][3] = Some(tetris_color);
         self.matrix[11][5] = Some(tetris_color);
         self.matrix[12][5] = Some(tetris_color);
         self.matrix[13][3] = Some(tetris_color);
@@ -131,6 +133,8 @@ impl TetrisGrid {
     pub(in crate::app::player) fn two(&mut self, tetromino: Tetromino) {
         let tetris_color = tetromino.blocks[0].color;
         self.null();
+        // starting from the top of the number
+        // careful, it's matrix[y][x] and y increases towards the bottom
         self.matrix[9][4] = Some(tetris_color);
         self.matrix[9][5] = Some(tetris_color);
         self.matrix[10][3] = Some(tetris_color);
@@ -147,6 +151,8 @@ impl TetrisGrid {
     pub(in crate::app::player) fn three(&mut self, tetromino: Tetromino) {
         let tetris_color = tetromino.blocks[0].color;
         self.null();
+        // starting from the top of the number
+        // careful, it's matrix[y][x] and y increases towards the bottom
         self.matrix[9][4] = Some(tetris_color);
         self.matrix[9][5] = Some(tetris_color);
         self.matrix[10][3] = Some(tetris_color);
