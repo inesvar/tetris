@@ -1,7 +1,7 @@
 # TO DO SOON
 
-- understand why pause for both works once in every two blue moons
 - send serialized screen DURING START
+- the countdown cannot be stopped
 - erase active tetromino on restart... it can be in the middle of the screen
 
 ## Tetris Guideline
