@@ -30,7 +30,11 @@ impl App<'_> {
         } else if self.running == RunningState::Running {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
-            if let PlayerConfig::TwoRemote = self.player_config {
+            if let PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: _,
+            } = self.player_config
+            {
                 // add garbage
                 for player in &mut self.local_players {
                     let completed_lines = self.remote_player[0].get_lines_completed();

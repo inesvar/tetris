@@ -1,5 +1,6 @@
 # TO DO SOON
 
+- read the two useful IPs from text file
 - send serialized screen DURING START
 - erase active tetromino on restart... it can be in the middle of the screen
 

@@ -3,7 +3,6 @@ use crate::{
     app::{GameFlowChange, PlayerScreen},
     assets::Assets,
     once,
-    settings::SERVER_IP,
 };
 use graphics::{math::Matrix2d, Context};
 use opengl_graphics::GlGraphics;
@@ -29,7 +28,7 @@ impl RemotePlayer {
         }
     }
 
-    pub fn listen(&self) {
+    pub fn listen(&self, local_ip: &str) {
         // building a second RemotePlayer that points to the same pointees than self
         // this is necessary because self can't be moved out to another thread
         let screen = Arc::clone(&self.screen);
@@ -41,13 +40,13 @@ impl RemotePlayer {
             game_flow_message,
         };
         // creating a listener in a separate thread
-        let listener = TcpListener::bind(SERVER_IP).unwrap();
+        let listener = TcpListener::bind(local_ip).unwrap();
         thread::spawn(move || {
             // for each incoming message
             for stream in listener.incoming() {
                 let stream = stream.unwrap();
                 let message = serde_cbor::from_reader::<MessageType, TcpStream>(stream).unwrap();
-                once!("unwrapped from {}", SERVER_IP);
+                once!("unwrapped from packet from remote");
                 match message {
                     MessageType::PlayerScreenMsg(new_screen) => {
                         self_for_listener.get_game_flow();

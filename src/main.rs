@@ -7,12 +7,12 @@ extern crate piston;
 use crate::app::App;
 use crate::assets::Assets;
 use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION};
-use app::PlayerConfig;
 use clap::Parser;
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
 use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent};
+use settings::{LOCAL_IP, REMOTE_IP};
 
 mod app;
 mod assets;
@@ -36,6 +36,17 @@ struct Args {
     viewer: bool,
 }
 
+pub enum PlayerConfig {
+    Local,
+    Streamer(&'static str),
+    TwoLocal,
+    TwoRemote {
+        local_ip: &'static str,
+        remote_ip: &'static str,
+    },
+    Viewer(&'static str),
+}
+
 // TO CHECK OUT THE COMMAND LINE OPTIONS use the following template
 // cargo run -- -h
 
@@ -46,18 +57,24 @@ fn main() {
     let config: PlayerConfig = if args.two_local {
         PlayerConfig::TwoLocal
     } else if args.two_remote {
-        PlayerConfig::TwoRemote
+        PlayerConfig::TwoRemote {
+            local_ip: LOCAL_IP,
+            remote_ip: REMOTE_IP,
+        }
     } else if args.streamer {
-        PlayerConfig::Streamer
+        PlayerConfig::Streamer(REMOTE_IP)
     } else if args.viewer {
-        PlayerConfig::Viewer
+        PlayerConfig::Viewer(LOCAL_IP)
     } else {
         PlayerConfig::Local
     };
 
     let window_width = match config {
         PlayerConfig::TwoLocal => DEFAULT_WINDOW_WIDTH * 2,
-        PlayerConfig::TwoRemote => DEFAULT_WINDOW_WIDTH * 2,
+        PlayerConfig::TwoRemote {
+            local_ip: _,
+            remote_ip: _,
+        } => DEFAULT_WINDOW_WIDTH * 2,
         _ => DEFAULT_WINDOW_WIDTH,
     };
 
