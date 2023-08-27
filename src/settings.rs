@@ -166,12 +166,12 @@ impl Settings {
         let bag_size = BAG_SIZE;
         let nb_next_tetromino = NB_NEXT_TETROMINO;
         let mut remote_ip = None;
-        match player_config {
-            PlayerConfig::Streamer(ip) => remote_ip = Some(ip.to_string()),
+        match &player_config {
+            PlayerConfig::Streamer(ip) => remote_ip = Some(String::from(ip.as_str())),
             PlayerConfig::TwoRemote {
                 local_ip: _,
                 remote_ip: ip,
-            } => remote_ip = Some(ip.to_string()),
+            } => remote_ip = Some(String::from(ip.as_str())),
             _ => {}
         }
 
@@ -210,11 +210,3 @@ impl Settings {
 pub static BAG_SIZE: u32 = 14; // typical sizes are 7 and 14, 1 is entirely random
                                // for size 7 * n + k, k < 7, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
 pub const NB_NEXT_TETROMINO: usize = 6;
-
-/****************************************/
-/*       ONLINE GAME PARAMETERS         */
-/****************************************/
-
-pub const LOCAL_IP: &str = "127.0.0.1:16001";
-pub const REMOTE_IP: &str = "127.0.0.1:16000";
-//IMPORTANT: do not use localhost, only use the result of hostname -I

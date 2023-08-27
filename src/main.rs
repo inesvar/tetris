@@ -12,7 +12,7 @@ use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
 use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent};
-use settings::{LOCAL_IP, REMOTE_IP};
+use std::fs;
 
 mod app;
 mod assets;
@@ -38,13 +38,10 @@ struct Args {
 
 pub enum PlayerConfig {
     Local,
-    Streamer(&'static str),
+    Streamer(String),
     TwoLocal,
-    TwoRemote {
-        local_ip: &'static str,
-        remote_ip: &'static str,
-    },
-    Viewer(&'static str),
+    TwoRemote { local_ip: String, remote_ip: String },
+    Viewer(String),
 }
 
 // TO CHECK OUT THE COMMAND LINE OPTIONS use the following template
@@ -54,17 +51,33 @@ fn main() {
     // Check the command line arguments.
     let args = Args::parse();
 
+    let mut local_ip =
+        fs::read_to_string("local_ip.txt").expect("Should have been able to read the file");
+
+    let mut remote_ip =
+        fs::read_to_string("remote_ip.txt").expect("Should have been able to read the file");
+
+    if local_ip.ends_with("\n") {
+        local_ip.pop();
+    }
+
+    if remote_ip.ends_with("\n") {
+        remote_ip.pop();
+    }
+    println!("remote ip is {}.", remote_ip);
+    println!("local ip is {}.", local_ip);
+
     let config: PlayerConfig = if args.two_local {
         PlayerConfig::TwoLocal
     } else if args.two_remote {
         PlayerConfig::TwoRemote {
-            local_ip: LOCAL_IP,
-            remote_ip: REMOTE_IP,
+            local_ip,
+            remote_ip,
         }
     } else if args.streamer {
-        PlayerConfig::Streamer(REMOTE_IP)
+        PlayerConfig::Streamer(remote_ip)
     } else if args.viewer {
-        PlayerConfig::Viewer(LOCAL_IP)
+        PlayerConfig::Viewer(local_ip)
     } else {
         PlayerConfig::Local
     };

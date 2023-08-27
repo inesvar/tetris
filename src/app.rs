@@ -84,30 +84,32 @@ impl App<'_> {
         let mut rng = rand::thread_rng();
         let seed: u64 = rng.gen();
 
-        match player_config {
+        match &player_config {
             PlayerConfig::Local => {
                 local_player = LocalPlayer::new(seed, &player_config);
                 players = vec![local_player];
-                rem_players = vec![];
+                rem_players = vec![]
             }
             PlayerConfig::Streamer(_) => {
                 local_player = LocalPlayer::new(seed, &player_config);
                 players = vec![local_player];
-                rem_players = vec![];
+                rem_players = vec![]
             }
-            PlayerConfig::Viewer(_) => {
+            PlayerConfig::Viewer(local_ip) => {
                 remote_player = RemotePlayer::new();
                 players = vec![];
                 rem_players = vec![remote_player];
+                rem_players[0].listen(&local_ip)
             }
             PlayerConfig::TwoRemote {
-                local_ip: _,
+                local_ip,
                 remote_ip: _,
             } => {
                 local_player = LocalPlayer::new(seed, &player_config);
                 players = vec![local_player];
                 remote_player = RemotePlayer::new();
                 rem_players = vec![remote_player];
+                rem_players[0].listen(&local_ip)
             }
             _ => todo!(),
         }
@@ -160,16 +162,6 @@ impl App<'_> {
             keybindings_manager: Keybindings::new(),
             settings_manager,
         };
-
-        if let PlayerConfig::Viewer(local_ip) = app.player_config {
-            app.remote_player[0].listen(local_ip)
-        } else if let PlayerConfig::TwoRemote {
-            local_ip,
-            remote_ip: _,
-        } = app.player_config
-        {
-            app.remote_player[0].listen(local_ip)
-        }
         app
     }
 
@@ -312,7 +304,7 @@ impl App<'_> {
 
     /// Sends message to the remote if there's a remote.
     fn send_message(&self, message: MessageType) {
-        match self.player_config {
+        match &self.player_config {
             PlayerConfig::Streamer(remote_ip) => {
                 if let Ok(stream) = TcpStream::connect(remote_ip) {
                     serde_cbor::to_writer::<TcpStream, MessageType>(stream, &message).unwrap();
