@@ -9,11 +9,11 @@ use std::net::TcpStream;
 use self::player::LocalPlayer;
 pub use self::player::{PlayerScreen, Tetromino};
 use self::remote::RemotePlayer;
-use crate::app::remote::MessageType;
 use crate::settings::*;
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
 use crate::Assets;
+use crate::{app::remote::MessageType, PlayerConfig};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::MouseButton;
 use piston_window::Key;
@@ -40,14 +40,6 @@ pub enum ViewState {
     SinglePlayerGame,
     //LocalMultiplayerGame,
     //OnlineMultiplayerGame,
-}
-
-pub enum PlayerConfig {
-    Local,
-    Streamer,
-    TwoLocal,
-    TwoRemote,
-    Viewer,
 }
 
 #[derive(PartialEq, Serialize, Deserialize, Clone, Copy)]
@@ -94,22 +86,25 @@ impl App<'_> {
 
         match player_config {
             PlayerConfig::Local => {
-                local_player = LocalPlayer::new(seed, false);
+                local_player = LocalPlayer::new(seed, &player_config);
                 players = vec![local_player];
                 rem_players = vec![];
             }
-            PlayerConfig::Streamer => {
-                local_player = LocalPlayer::new(seed, true);
+            PlayerConfig::Streamer(_) => {
+                local_player = LocalPlayer::new(seed, &player_config);
                 players = vec![local_player];
                 rem_players = vec![];
             }
-            PlayerConfig::Viewer => {
+            PlayerConfig::Viewer(_) => {
                 remote_player = RemotePlayer::new();
                 players = vec![];
                 rem_players = vec![remote_player];
             }
-            PlayerConfig::TwoRemote => {
-                local_player = LocalPlayer::new(seed, true);
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: _,
+            } => {
+                local_player = LocalPlayer::new(seed, &player_config);
                 players = vec![local_player];
                 remote_player = RemotePlayer::new();
                 rem_players = vec![remote_player];
@@ -118,6 +113,7 @@ impl App<'_> {
         }
 
         let assets = Assets::new(assets_folder);
+        let settings_manager = Settings::new(seed, &player_config);
 
         let app = App {
             gl: GlGraphics::new(gl_version),
@@ -162,13 +158,17 @@ impl App<'_> {
 
             widget_manager: InteractiveWidgetManager::new_main_menu(),
             keybindings_manager: Keybindings::new(),
-            settings_manager: Settings::new(seed),
+            settings_manager,
         };
 
-        if let PlayerConfig::Viewer = app.player_config {
-            app.remote_player[0].listen()
-        } else if let PlayerConfig::TwoRemote = app.player_config {
-            app.remote_player[0].listen()
+        if let PlayerConfig::Viewer(local_ip) = app.player_config {
+            app.remote_player[0].listen(local_ip)
+        } else if let PlayerConfig::TwoRemote {
+            local_ip,
+            remote_ip: _,
+        } = app.player_config
+        {
+            app.remote_player[0].listen(local_ip)
         }
         app
     }
@@ -275,16 +275,16 @@ impl App<'_> {
 
     fn pause(&mut self) {
         if self.running == RunningState::Paused {
-            Self::send_message(MessageType::ResumeMsg);
+            self.send_message(MessageType::ResumeMsg);
             self.running = RunningState::Running;
         } else if self.running == RunningState::Running {
-            Self::send_message(MessageType::PauseMsg);
+            self.send_message(MessageType::PauseMsg);
             self.running = RunningState::Paused;
         }
     }
     /// Starts a countdown then starts the game.
     fn restart(&mut self) {
-        Self::send_message(MessageType::RestartMsg);
+        self.send_message(MessageType::RestartMsg);
         self.running = RunningState::Starting;
         self.clock = 0.0;
     }
@@ -300,7 +300,7 @@ impl App<'_> {
 
     /// Makes the game unactive.
     fn game_over(&mut self) {
-        Self::send_message(MessageType::GameOverMsg);
+        self.send_message(MessageType::GameOverMsg);
         self.running = RunningState::NotRunning;
     }
 
@@ -310,9 +310,23 @@ impl App<'_> {
         }
     }
 
-    fn send_message(message: MessageType) {
-        if let Ok(stream) = TcpStream::connect(VIEWER_IP) {
-            serde_cbor::to_writer::<TcpStream, MessageType>(stream, &message).unwrap();
+    /// Sends message to the remote if there's a remote.
+    fn send_message(&self, message: MessageType) {
+        match self.player_config {
+            PlayerConfig::Streamer(remote_ip) => {
+                if let Ok(stream) = TcpStream::connect(remote_ip) {
+                    serde_cbor::to_writer::<TcpStream, MessageType>(stream, &message).unwrap();
+                }
+            }
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip,
+            } => {
+                if let Ok(stream) = TcpStream::connect(remote_ip) {
+                    serde_cbor::to_writer::<TcpStream, MessageType>(stream, &message).unwrap();
+                }
+            }
+            _ => {}
         }
     }
 }

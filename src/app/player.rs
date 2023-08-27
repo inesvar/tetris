@@ -44,6 +44,7 @@ pub struct LocalPlayer {
     bag_of_tetromino: Vec<TetrominoKind>,
     /// Whether information has to be sent to the remote or not.
     sender: bool,
+    remote_ip: String,
     /// garbage_to_be_added is set before the update and reset during the update.
     garbage_to_be_added: u64,
     /// Random generator for the next pieces of tetromino.

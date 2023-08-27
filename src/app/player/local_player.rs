@@ -3,7 +3,7 @@ use super::back_end::{new_tetromino_bag, TetrisGrid, Tetromino, TranslationRotat
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
 };
-use crate::{app::Countdown, assets::Assets, once, settings::*};
+use crate::{app::Countdown, assets::Assets, once, settings::*, PlayerConfig};
 use graphics::types::Matrix2d;
 use opengl_graphics::GlGraphics;
 use piston_window::Context;
@@ -12,7 +12,7 @@ use rand_pcg::Pcg32;
 use std::net::TcpStream;
 
 impl LocalPlayer {
-    pub fn new(seed: u64, sender: bool) -> Self {
+    pub fn new(seed: u64, player_config: &PlayerConfig) -> Self {
         let grid = TetrisGrid::new(DEFAULT_GRID_X, DEFAULT_GRID_Y, NB_COLUMNS, NB_ROWS);
         let mut rng = Pcg32::seed_from_u64(seed);
         let mut bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut rng);
@@ -30,6 +30,22 @@ impl LocalPlayer {
                     unreachable!();
                 }
             }
+        }
+        let mut remote_ip = String::from("");
+        let mut sender = false;
+        match player_config {
+            PlayerConfig::Streamer(ip) => {
+                sender = true;
+                remote_ip = ip.to_string();
+            }
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: ip,
+            } => {
+                sender = true;
+                remote_ip = ip.to_string();
+            }
+            _ => {}
         }
 
         let player_screen = PlayerScreen {
@@ -50,6 +66,7 @@ impl LocalPlayer {
             freeze_frame: 0, // that's about 10 billion years at 60fps
             bag_of_tetromino,
             sender,
+            remote_ip,
             garbage_to_be_added: 0,
             rng,
         }
@@ -134,10 +151,10 @@ impl LocalPlayer {
 
     /// Sends the player screen to the remote player and resets the new_completed_lines attribute.
     pub(super) fn send_serialized(&mut self) {
-        if let Ok(stream) = TcpStream::connect(VIEWER_IP) {
+        if let Ok(stream) = TcpStream::connect(&self.remote_ip) {
             serde_cbor::to_writer::<TcpStream, PlayerScreen>(stream, &self.player_screen).unwrap();
         }
-        once!("sent serialized data to {}", VIEWER_IP);
+        once!("sent serialized data to the remote");
         // Set the number of completed lines to 0
         if self.player_screen.new_completed_lines != 0 {
             once!(

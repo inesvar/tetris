@@ -1,11 +1,11 @@
 use std::{cell::RefCell, net::TcpStream};
 
-use crate::{once, ui::interactive_widget_manager::KeyInputType};
+use crate::{once, ui::interactive_widget_manager::KeyInputType, PlayerConfig};
 use opengl_graphics::OpenGL;
 use piston::Key;
 use serde::Deserialize;
 
-static SCALE_FACTOR : f64= 0.7;
+static SCALE_FACTOR: f64 = 0.7;
 
 // Change this to OpenGL::V2_1 if not working.
 pub static OPENGL_VERSION: OpenGL = OpenGL::V4_5;
@@ -156,24 +156,35 @@ pub struct Settings {
     pub seed: u64,
     pub bag_size: u32,
     pub nb_next_tetromino: usize,
+    remote_ip: Option<String>,
     /// Flag not to be modified except in Serialize. Set to true.
     pub serialize_as_msg: RefCell<bool>,
 }
 
 impl Settings {
-    pub fn new(seed: u64) -> Settings {
+    pub fn new(seed: u64, player_config: &PlayerConfig) -> Settings {
         let bag_size = BAG_SIZE;
         let nb_next_tetromino = NB_NEXT_TETROMINO;
+        let mut remote_ip = None;
+        match player_config {
+            PlayerConfig::Streamer(ip) => remote_ip = Some(ip.to_string()),
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: ip,
+            } => remote_ip = Some(ip.to_string()),
+            _ => {}
+        }
 
         Settings {
             seed,
             bag_size,
             nb_next_tetromino,
+            remote_ip,
             serialize_as_msg: true.into(),
         }
     }
 
-    #[allow(dead_code)]
+    /// Sends serialized settings to the remote. Should never be called when there's no remote.
     pub fn send(&self) {
         /* serialized_as_msg absolutely needs to be set to true
          * as it is used as a flag during the serialization
@@ -181,14 +192,18 @@ impl Settings {
          * first as the SettingsMsg enum variant
          * then as the actual Settings struct
          */
+        match self.remote_ip {
+            None => unreachable!(),
+            _ => {}
+        }
         {
             let mut a = self.serialize_as_msg.borrow_mut();
             *a = true;
         }
-        if let Ok(stream) = TcpStream::connect(VIEWER_IP) {
+        if let Ok(stream) = TcpStream::connect(self.remote_ip.as_ref().unwrap()) {
             serde_cbor::to_writer::<TcpStream, Settings>(stream, &self).unwrap();
         }
-        once!("sent serialized data to {}", VIEWER_IP);
+        once!("sent serialized data to remote");
     }
 }
 
@@ -200,6 +215,6 @@ pub const NB_NEXT_TETROMINO: usize = 6;
 /*       ONLINE GAME PARAMETERS         */
 /****************************************/
 
-pub static SERVER_IP: &str = "127.0.0.1:16001";
-pub static VIEWER_IP: &str = "127.0.0.1:16000";
+pub const LOCAL_IP: &str = "127.0.0.1:16001";
+pub const REMOTE_IP: &str = "127.0.0.1:16000";
 //IMPORTANT: do not use localhost, only use the result of hostname -I
