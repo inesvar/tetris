@@ -22,16 +22,16 @@ mod ui;
 
 #[derive(Parser, Debug)]
 struct Args {
-    // two local players
+    /* // two local players
     #[arg(long)]
-    two_local: bool,
-    // two remote player
-    #[arg(long)]
+    two_local: bool, */
+    /// two remote player
+    #[arg(short, long)]
     two_remote: bool,
-    // sending screen
+    /// sending screen
     #[arg(short, long)]
     streamer: bool,
-    // viewing remote screen
+    /// viewing remote screen
     #[arg(short, long)]
     viewer: bool,
 }
@@ -67,9 +67,10 @@ fn main() {
     println!("remote ip is {}.", remote_ip);
     println!("local ip is {}.", local_ip);
 
-    let config: PlayerConfig = if args.two_local {
+    let config: PlayerConfig = /*if args.two_local {
         PlayerConfig::TwoLocal
-    } else if args.two_remote {
+    } else  */
+    if args.two_remote {
         PlayerConfig::TwoRemote {
             local_ip,
             remote_ip,

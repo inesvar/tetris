@@ -14,9 +14,9 @@ rm -rf "$path"/tetris
 cp ./target/debug/tetris "$path"
 
 #launch one player
-cargo run -- --two-remote&
+cargo run -- -t&
 
 cd ~/tetrisApp
 
 #then the second
-./tetris --two-remote
+./tetris -t
