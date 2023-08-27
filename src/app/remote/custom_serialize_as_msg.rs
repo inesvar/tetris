@@ -17,9 +17,7 @@ impl Serialize for Settings {
     where
         S: Serializer,
     {
-        println!("entered serializer");
         if !*self.serialize_as_msg.borrow() {
-            println!("second loop");
             let mut s = serializer.serialize_struct("Settings", 4)?;
             s.serialize_field("seed", &self.seed)?;
             s.serialize_field("bag_size", &self.bag_size)?;
@@ -31,8 +29,6 @@ impl Serialize for Settings {
                 let mut a = self.serialize_as_msg.borrow_mut();
                 *a = false;
             }
-            println!("first loop");
-            println!("serializing variant");
             let s = serializer.serialize_newtype_variant("MessageType", 1, "SettingsMsg", self);
             {
                 let mut a = self.serialize_as_msg.borrow_mut();
@@ -52,9 +48,7 @@ impl Serialize for PlayerScreen {
     where
         S: Serializer,
     {
-        println!("entered serializer");
         if !*self.serialize_as_msg.borrow() {
-            println!("second loop");
             let mut s = serializer.serialize_struct("PlayerScreen", 9)?;
             s.serialize_field("grid", &self.grid)?;
             s.serialize_field("score", &self.score)?;
@@ -72,8 +66,6 @@ impl Serialize for PlayerScreen {
                 let mut a = self.serialize_as_msg.borrow_mut();
                 *a = false;
             }
-            println!("first loop");
-            println!("serializing variant");
             let s = serializer.serialize_newtype_variant("MessageType", 0, "PlayerScreenMsg", self);
             {
                 let mut a = self.serialize_as_msg.borrow_mut();
