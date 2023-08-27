@@ -27,6 +27,9 @@ impl App<'_> {
                 i if i < 3.0 => self.countdown(&Countdown::One),
                 _ => self.start(),
             }
+            for player in &mut self.local_players {
+                player.send_serialized();
+            }
         } else if self.running == RunningState::Running {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);

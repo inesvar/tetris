@@ -72,14 +72,47 @@ impl LocalPlayer {
         }
     }
 
+    pub fn renew(&mut self, seed: u64) {
+        self.player_screen.grid.null();
+        self.player_screen.score = 0;
+        self.player_screen.saved_tetromino = None;
+        self.player_screen.ghost_tetromino = None;
+        self.rng = Pcg32::seed_from_u64(seed);
+        self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
+        self.player_screen.active_tetromino = Tetromino::new(
+            self.bag_of_tetromino.pop().unwrap(),
+            &self.player_screen.grid.matrix[..],
+        )
+        .unwrap();
+        self.player_screen.fifo_next_tetromino =
+            CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
+        for _ in 0..NB_NEXT_TETROMINO {
+            if let Some(t) = self.bag_of_tetromino.pop() {
+                self.player_screen
+                    .fifo_next_tetromino
+                    .push(Tetromino::new_unchecked(t));
+            } else {
+                self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
+                if let Some(t) = self.bag_of_tetromino.pop() {
+                    self.player_screen
+                        .fifo_next_tetromino
+                        .push(Tetromino::new_unchecked(t));
+                } else {
+                    unreachable!();
+                }
+            }
+        }
+        self.freeze_frame = 0;
+        self.player_screen.game_over = false;
+    }
+
     pub fn add_garbage(&mut self, completed_lines: u64) {
         self.garbage_to_be_added = completed_lines;
     }
 
-    pub fn restart(&mut self) {
+    pub fn start(&mut self) {
         self.player_screen.grid.null();
         self.player_screen.game_over = false;
-        self.player_screen.score = 0;
     }
 
     pub fn get_game_over(&self) -> bool {
@@ -150,7 +183,7 @@ impl LocalPlayer {
     }
 
     /// Sends the player screen to the remote player and resets the new_completed_lines attribute.
-    pub(super) fn send_serialized(&mut self) {
+    pub(in crate::app) fn send_serialized(&mut self) {
         if let Ok(stream) = TcpStream::connect(&self.remote_ip) {
             serde_cbor::to_writer::<TcpStream, PlayerScreen>(stream, &self.player_screen).unwrap();
         }
