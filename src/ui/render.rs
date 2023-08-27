@@ -1,5 +1,5 @@
 use crate::assets::Assets;
-use crate::settings::TEXT_COLOR;
+use crate::settings::{DEFAULT_BUTTON_Y_SPACING, TEXT_COLOR};
 use crate::ui::button::Button;
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::key_input::KeyInput;
@@ -73,7 +73,7 @@ impl TextInput {
         if self.cursor.len() > 0 {
             self.text.content.pop();
         }
-        let info_transform = transform.trans(0.0, -50.0);
+        let info_transform = transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
         self.info_text.render(info_transform, ctx, gl, font);
     }
 }
@@ -127,7 +127,7 @@ impl KeyInput {
         }
 
         // render the info_text
-        let info_transform = transform.trans(0.0, -50.0);
+        let info_transform = transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
         self.info_text.render(info_transform, ctx, gl, font);
     }
 }

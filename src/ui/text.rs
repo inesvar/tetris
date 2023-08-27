@@ -1,5 +1,7 @@
 use graphics::types::Color;
 
+use crate::settings::DEFAULT_FONT_SIZE;
+
 #[derive(Clone)]
 pub struct Text {
     pub x: f64,
@@ -27,9 +29,9 @@ impl Text {
             x: 0.0,
             y: 0.0,
             content: String::from(""),
-            font_size: 16,
+            font_size: DEFAULT_FONT_SIZE,
             color: [0.0, 0.0, 0.0, 0.0],
-            view: graphics::text::Text::new_color([0.0, 0.0, 0.0, 0.0], 16),
+            view: graphics::text::Text::new_color([0.0, 0.0, 0.0, 0.0], DEFAULT_FONT_SIZE),
         }
     }
 

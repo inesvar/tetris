@@ -1,4 +1,4 @@
-use crate::ui::text::Text;
+use crate::{settings::DEFAULT_FONT_SIZE, ui::text::Text};
 use graphics::color;
 use piston::MouseButton;
 
@@ -21,7 +21,7 @@ impl Button {
             y,
             width,
             height,
-            text: Text::new(text, 16, 0.0, 0.0, color::BLACK),
+            text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, color::BLACK),
             background_color: [0.8, 0.8, 0.8, 1.0],
             commit: false,
             is_pressed: false,

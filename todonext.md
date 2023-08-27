@@ -1,6 +1,7 @@
 # TO DO SOON
 
-
+- send serialized screen DURING START
+- erase active tetromino on restart... it can be in the middle of the screen
 
 ## Tetris Guideline
 

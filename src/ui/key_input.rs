@@ -1,4 +1,7 @@
-use crate::{settings::TEXT_COLOR, ui::text::Text};
+use crate::{
+    settings::{DEFAULT_FONT_SIZE, TEXT_COLOR},
+    ui::text::Text,
+};
 use piston::{Key, MouseButton};
 
 pub struct KeyInput {
@@ -36,13 +39,13 @@ impl KeyInput {
             height,
             focused: false,
             custom: false,
-            custom_text: Text::new("", 16, x, y, TEXT_COLOR),
+            custom_text: Text::new("", DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
             cursor: String::from(""),
             keys: vec![],
             init_keys: vec_keys,
-            placeholder: Text::new(placeholder, 16, x, y, TEXT_COLOR),
+            placeholder: Text::new(placeholder, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
             commit: false,
-            info_text: Text::new(info_text, 16, x, y, TEXT_COLOR),
+            info_text: Text::new(info_text, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
             animation_counter: 0,
         }
     }
