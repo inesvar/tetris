@@ -1,4 +1,7 @@
-use crate::{settings::TEXT_COLOR, ui::text::Text};
+use crate::{
+    settings::{DEFAULT_FONT_SIZE, TEXT_COLOR},
+    ui::text::Text,
+};
 use piston::{Key, MouseButton};
 
 pub struct TextInput {
@@ -21,9 +24,9 @@ impl TextInput {
             y,
             width,
             height,
-            info_text: Text::new("", 16, x, y, TEXT_COLOR),
+            info_text: Text::new("", DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
             cursor: String::from(""),
-            text: Text::new(placeholder, 16, x, y, TEXT_COLOR),
+            text: Text::new(placeholder, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
             placeholder: String::from(placeholder),
             focused: false,
             animation_counter: 0,
@@ -43,9 +46,9 @@ impl TextInput {
             y,
             width,
             height,
-            info_text: Text::new(info_text, 16, x, y, TEXT_COLOR),
+            info_text: Text::new(info_text, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
             cursor: String::from(""),
-            text: Text::new(placeholder, 16, x, y, TEXT_COLOR),
+            text: Text::new(placeholder, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
             placeholder: String::from(placeholder),
             focused: false,
             animation_counter: 0,

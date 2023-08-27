@@ -5,6 +5,8 @@ use opengl_graphics::OpenGL;
 use piston::Key;
 use serde::Deserialize;
 
+static SCALE_FACTOR : f64= 0.7;
+
 // Change this to OpenGL::V2_1 if not working.
 pub static OPENGL_VERSION: OpenGL = OpenGL::V4_5;
 
@@ -15,39 +17,42 @@ pub static NB_ROWS: u32 = 22;
 /* POSITIONS IN SINGLE PLAYER GAME VIEW */
 /****************************************/
 
-pub static DEFAULT_WINDOW_WIDTH: u32 = 650;
-pub static DEFAULT_WINDOW_HEIGHT: u32 = 700;
+pub static DEFAULT_WINDOW_WIDTH: u32 = (650.0 * SCALE_FACTOR) as u32;
+pub static DEFAULT_WINDOW_HEIGHT: u32 = (700.0 * SCALE_FACTOR) as u32;
 
 // coordinates of the top left corner of the grid
 // changing this moves everything in the single-player view except the title
-pub static DEFAULT_GRID_X: f64 = 200.0;
-pub static DEFAULT_GRID_Y: f64 = 120.0;
+pub static DEFAULT_GRID_X: f64 = 200.0 * SCALE_FACTOR;
+pub static DEFAULT_GRID_Y: f64 = 120.0 * SCALE_FACTOR;
 
 // height of the title "Tetris" and "Press R to (re)start"
-pub static DEFAULT_TITLE_Y: f64 = 50.0;
+pub static DEFAULT_TITLE_Y: f64 = 50.0 * SCALE_FACTOR;
 // height of the text on the left side indicating the score
 pub static DEFAULT_SCORE_TEXT_Y: f64 = DEFAULT_GRID_Y + 8.0 * BLOCK_SIZE;
 
-pub static BLOCK_SIZE: f64 = 25.0;
+pub static BLOCK_SIZE: f64 = 25.0 * SCALE_FACTOR;
 pub static TETROMINO_MAX_WIDTH: f64 = 4.0 * BLOCK_SIZE;
 pub static TETROMINO_MAX_HEIGHT: f64 = 2.0 * BLOCK_SIZE;
-pub static GRID_THICKNESS: f64 = 0.5;
+pub static GRID_THICKNESS: f64 = 0.5 * SCALE_FACTOR;
 
 /****************************************/
 /*      POSITIONS IN MAIN MENU VIEW     */
 /****************************************/
 
 // size of the buttons
-pub static DEFAULT_BUTTON_WIDTH: f64 = 300.0;
-pub static DEFAULT_BUTTON_HEIGHT: f64 = 50.0;
+pub static DEFAULT_BUTTON_WIDTH: f64 = 300.0 * SCALE_FACTOR;
+pub static DEFAULT_BUTTON_HEIGHT: f64 = 50.0 * SCALE_FACTOR;
+pub static DEFAULT_BUTTON_Y_SPACING: f64 = 100.0 * SCALE_FACTOR;
+// size of the text
+pub static DEFAULT_FONT_SIZE: u32 = (16.0 * SCALE_FACTOR) as u32;
 
 /****************************************/
 /*      POSITIONS IN SETTINGS VIEW      */
 /****************************************/
 
 // size of the buttons
-pub static DEFAULT_KEY_INPUT_WIDTH: f64 = 200.0;
-pub static DEFAULT_KEY_INPUT_HEIGHT: f64 = 50.0;
+pub static DEFAULT_KEY_INPUT_WIDTH: f64 = 200.0 * SCALE_FACTOR;
+pub static DEFAULT_KEY_INPUT_HEIGHT: f64 = 50.0 * SCALE_FACTOR;
 
 /****************************************/
 /*               COLORS                 */
@@ -195,6 +200,6 @@ pub const NB_NEXT_TETROMINO: usize = 6;
 /*       ONLINE GAME PARAMETERS         */
 /****************************************/
 
-pub static SERVER_IP: &str = "127.0.0.1:16000";
-pub static VIEWER_IP: &str = "127.0.0.1:16001";
+pub static SERVER_IP: &str = "127.0.0.1:16001";
+pub static VIEWER_IP: &str = "127.0.0.1:16000";
 //IMPORTANT: do not use localhost, only use the result of hostname -I
