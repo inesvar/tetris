@@ -151,7 +151,7 @@ pub static KEY_REPEAT_DELAY: u64 = 20;
 /// Settings represents parameters that need to be common between players in multiplayer mode.
 ///
 /// To this purpose, it has a send() method.
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Settings {
     pub seed: u64,
     pub bag_size: u32,

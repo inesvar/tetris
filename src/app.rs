@@ -28,6 +28,7 @@ pub enum GameFlowChange {
     Resume,
     Pause,
     GameOver,
+    Sync(Settings),
     Other,
 }
 
@@ -67,8 +68,9 @@ pub struct App<'a> {
     pub cursor_position: [f64; 2],
     widget_manager: InteractiveWidgetManager,
     keybindings_manager: Keybindings,
-    #[allow(dead_code)]
     settings_manager: Settings,
+    is_synchronized: bool,
+    is_host: bool,
 }
 
 impl App<'_> {
@@ -83,6 +85,7 @@ impl App<'_> {
         let rem_players: Vec<RemotePlayer>;
         let mut rng = rand::thread_rng();
         let seed: u64 = rng.gen();
+        let mut is_host = false;
 
         match &player_config {
             PlayerConfig::Local => {
@@ -109,7 +112,12 @@ impl App<'_> {
                 players = vec![local_player];
                 remote_player = RemotePlayer::new();
                 rem_players = vec![remote_player];
-                rem_players[0].listen(&local_ip)
+                rem_players[0].listen(&local_ip);
+                is_host = if local_ip.chars().last().unwrap() == '0' {
+                    true
+                } else {
+                    false
+                };
             }
             _ => todo!(),
         }
@@ -155,12 +163,12 @@ impl App<'_> {
             clock: 0.0,
             frame_counter: 0,
             running: RunningState::NotRunning,
-
             cursor_position: [0.0, 0.0],
-
             widget_manager: InteractiveWidgetManager::new_main_menu(),
             keybindings_manager: Keybindings::new(),
             settings_manager,
+            is_synchronized: false,
+            is_host,
         };
         app
     }
@@ -179,18 +187,10 @@ impl App<'_> {
             key_press = player.handle_key_press(&self.keybindings_manager, key, self.running)
         }
         match key_press {
-            GameFlowChange::Restart => {
-                self.restart();
-            }
-            GameFlowChange::Resume => {
-                self.pause();
-            }
-            GameFlowChange::Pause => {
-                self.pause();
-            }
-            GameFlowChange::GameOver => {
-                self.game_over();
-            }
+            GameFlowChange::Restart => self.restart(),
+            GameFlowChange::Resume => self.pause(),
+            GameFlowChange::Pause => self.pause(),
+            GameFlowChange::GameOver => self.game_over(),
             _ => {}
         }
 
@@ -227,6 +227,20 @@ impl App<'_> {
             GameFlowChange::Restart => {
                 if self.running == RunningState::NotRunning {
                     self.restart()
+                }
+            }
+            GameFlowChange::Sync(new_settings) => {
+                self.settings_manager.seed = new_settings.seed;
+                self.settings_manager.bag_size = new_settings.bag_size;
+                self.settings_manager.nb_next_tetromino = new_settings.nb_next_tetromino;
+                for player in &mut self.local_players {
+                    player.renew(new_settings.seed);
+                }
+                self.is_synchronized = true;
+                if self.is_host {
+                    self.restart()
+                } else {
+                    self.settings_manager.send();
                 }
             }
             _ => {}
@@ -278,16 +292,25 @@ impl App<'_> {
     }
     /// Starts a countdown then starts the game.
     fn restart(&mut self) {
-        println!("RESTART");
-        self.send_message(MessageType::RestartMsg);
-        self.running = RunningState::Starting;
-        self.clock = 0.0;
+        if self.is_synchronized {
+            println!("RESTART");
+            self.send_message(MessageType::RestartMsg);
+            self.running = RunningState::Starting;
+            self.clock = 0.0;
+        } else if self.is_host {
+            println!("HOST SYNCHRONIZE");
+            let mut rng = rand::thread_rng();
+            self.settings_manager.seed = rng.gen();
+            self.settings_manager.send();
+        } else {
+            self.send_message(MessageType::RestartMsg);
+        }
     }
 
     /// Makes the game active.
     fn start(&mut self) {
         for player in &mut self.local_players {
-            player.restart();
+            player.start();
         }
         self.clock = 0.0;
         self.running = RunningState::Running;
@@ -298,6 +321,7 @@ impl App<'_> {
         println!("GAMEOVER");
         self.send_message(MessageType::GameOverMsg);
         self.running = RunningState::NotRunning;
+        self.is_synchronized = false;
     }
 
     fn countdown(&mut self, i: &Countdown) {

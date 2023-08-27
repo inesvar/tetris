@@ -51,6 +51,9 @@ impl RemotePlayer {
                     MessageType::PlayerScreenMsg(new_screen) => {
                         self_for_listener.update_screen(new_screen)
                     }
+                    MessageType::SettingsMsg(new_settings) => {
+                        self_for_listener.update_game_flow(GameFlowChange::Sync(new_settings));
+                    }
                     MessageType::GameOverMsg => {
                         self_for_listener.update_game_flow(GameFlowChange::GameOver);
                     }
@@ -63,7 +66,6 @@ impl RemotePlayer {
                     MessageType::ResumeMsg => {
                         self_for_listener.update_game_flow(GameFlowChange::Resume);
                     }
-                    _ => {}
                 }
             }
         });
