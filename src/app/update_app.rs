@@ -64,12 +64,12 @@ impl App<'_> {
                 }
             }
 
-            // same for remote players
+            /* // same for remote players
             for player in &self.remote_player {
                 if player.get_game_flow() == GameFlowChange::GameOver {
                     game_over = true;
                 }
-            }
+            } */
 
             if game_over {
                 self.game_over();

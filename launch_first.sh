@@ -14,9 +14,7 @@ rm -rf "$path"/tetris
 cp ./target/debug/tetris "$path"
 
 #launch one player
-cargo run -- -t&
+cargo run -- -t
 
-cd ~/tetrisApp
-
-#then the second
-./tetris -t
+# the idea is then to execute tetris in tetrisApp in another terminal 
+# so that the prints don't get mixed

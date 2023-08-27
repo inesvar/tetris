@@ -267,15 +267,18 @@ impl App<'_> {
 
     fn pause(&mut self) {
         if self.running == RunningState::Paused {
+            println!("RESUME");
             self.send_message(MessageType::ResumeMsg);
             self.running = RunningState::Running;
         } else if self.running == RunningState::Running {
+            println!("PAUSE");
             self.send_message(MessageType::PauseMsg);
             self.running = RunningState::Paused;
         }
     }
     /// Starts a countdown then starts the game.
     fn restart(&mut self) {
+        println!("RESTART");
         self.send_message(MessageType::RestartMsg);
         self.running = RunningState::Starting;
         self.clock = 0.0;
@@ -292,6 +295,7 @@ impl App<'_> {
 
     /// Makes the game unactive.
     fn game_over(&mut self) {
+        println!("GAMEOVER");
         self.send_message(MessageType::GameOverMsg);
         self.running = RunningState::NotRunning;
     }
