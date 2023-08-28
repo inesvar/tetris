@@ -22,6 +22,7 @@ impl App<'_> {
         } else if self.view_state == ViewState::CreateRoom {
             self.widget_manager.update_clipboard();
         } else if self.view_state == ViewState::JoinRoom {
+            self.widget_manager.update_clipboard();
             self.widget_manager.update_from_text();
         } else if self.view_state == ViewState::Game && self.running == RunningState::Starting {
             self.clock += args.dt;

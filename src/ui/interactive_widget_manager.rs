@@ -22,12 +22,15 @@ pub enum ButtonType {
     BackToMainMenu,
     ToPause,
     CopyToClipboard,
+    PasteFromClipboard,
     Nothing,
 }
 
 impl ButtonType {
     fn view_changer(&self) -> bool {
-        *self != Self::CopyToClipboard && *self != Self::ToTwoRemoteGame
+        *self != Self::CopyToClipboard
+            && *self != Self::ToTwoRemoteGame
+            && *self != Self::PasteFromClipboard
     }
 }
 
@@ -331,9 +334,18 @@ impl InteractiveWidgetManager {
             "Join room",
         );
 
+        let paste_ip = Button::new(
+            DEFAULT_WINDOW_WIDTH as f64 / 2.0 + DEFAULT_BUTTON_WIDTH * 0.7,
+            DEFAULT_WINDOW_HEIGHT as f64 / 3.0,
+            DEFAULT_BUTTON_WIDTH / 6.0,
+            DEFAULT_BUTTON_HEIGHT / 2.0,
+            "Paste",
+        );
+
         let mut buttons = HashMap::new();
         buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
         buttons.insert(ButtonType::ToTwoRemoteGame, join_room);
+        buttons.insert(ButtonType::PasteFromClipboard, paste_ip);
         let mut text_inputs = HashMap::new();
         text_inputs.insert(TextInputType::IpAddressInput, room_ip_input);
         let key_inputs = HashMap::new();
@@ -385,9 +397,9 @@ impl InteractiveWidgetManager {
             .unwrap_or_else(|| panic!("Button {:?} not found", button_type))
     }
 
-    pub fn get_input(&self, input_type: TextInputType) -> &TextInput {
+    pub fn get_input(&mut self, input_type: TextInputType) -> &mut TextInput {
         self.text_inputs
-            .get(&input_type)
+            .get_mut(&input_type)
             .unwrap_or_else(|| panic!("Input {:?} not found", input_type))
     }
 
@@ -401,15 +413,31 @@ impl InteractiveWidgetManager {
     }
 
     pub fn update_clipboard(&mut self) {
-        let button = self.get_button(&ButtonType::CopyToClipboard);
-        if button.commit() {
-            println!("supposed to COPY");
-            //let ip = local_ip().unwrap().to_string();
-            let ip = "127.0.0.1".to_string();
-            let text = format!("{}{}", ip, HOST_PORT);
-            let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-            ctx.set_contents(text.to_owned()).unwrap();
-        }
+        match self.buttons.get_mut(&ButtonType::CopyToClipboard) {
+            Some(button) => {
+                if button.commit() {
+                    println!("supposed to COPY");
+                    //let ip = local_ip().unwrap().to_string();
+                    let ip = "127.0.0.1".to_string();
+                    let text = format!("{}{}", ip, HOST_PORT);
+                    let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+                    ctx.set_contents(text.to_owned()).unwrap();
+                }
+            }
+            None => {}
+        };
+        match self.buttons.get_mut(&ButtonType::PasteFromClipboard) {
+            Some(button) => {
+                if button.commit() {
+                    println!("supposed to PASTE");
+                    let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+                    let ip = ctx.get_contents().unwrap();
+                    let mut text_input = self.get_input(TextInputType::IpAddressInput);
+                    text_input.text.content = ip;
+                }
+            }
+            None => {}
+        };
     }
 
     pub fn update_from_text(&mut self) {

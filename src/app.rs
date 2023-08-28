@@ -146,7 +146,8 @@ impl App<'_> {
             //let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
             let local_ip = "127.0.0.1".to_string() + HOST_PORT;
             if let Ok(stream) = TcpStream::connect(local_ip) {
-                serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::KillMsg).unwrap();
+                serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::KillMsg)
+                    .unwrap();
             }
         }
 
