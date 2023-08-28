@@ -70,6 +70,9 @@ impl RemotePlayer {
                         self_for_listener.update_game_flow(GameFlowChange::Hello(remote_ip));
                         break;
                     }
+                    MessageType::KillMsg => {
+                        break;
+                    }
                 }
             }
             println!("thread over");

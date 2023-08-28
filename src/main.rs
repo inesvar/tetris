@@ -84,6 +84,7 @@ fn main() {
             }
             app.handle_remote();
         } else if multiplayer {
+            window.set_size([DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT]);
             multiplayer = false;
         }
 
