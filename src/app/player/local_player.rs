@@ -110,6 +110,12 @@ impl LocalPlayer {
         self.garbage_to_be_added = completed_lines;
     }
 
+    pub fn get_lines_completed(&mut self) -> u64 {
+        let lines = self.player_screen.new_completed_lines;
+        self.player_screen.new_completed_lines = 0;
+        lines
+    }
+
     pub fn start(&mut self) {
         self.player_screen.grid.null();
         self.player_screen.game_over = false;
