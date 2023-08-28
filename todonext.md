@@ -1,9 +1,6 @@
 # TO DO SOON
 
-- during the countdown, the tetromino pieces can move...
-- the countdown cannot be stopped
 - when player becomes host, a convenient port number is written to the file
-- erase active tetromino on restart... it can be in the middle of the screen
 
 ## Tetris Guideline
 
