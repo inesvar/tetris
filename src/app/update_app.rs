@@ -19,7 +19,11 @@ impl App<'_> {
         if self.view_state == ViewState::Settings {
             self.widget_manager
                 .update_settings(&mut self.keybindings_manager);
-        } else if self.running == RunningState::Starting {
+        } else if self.view_state == ViewState::CreateRoom {
+            self.widget_manager.update_clipboard();
+        } else if self.view_state == ViewState::SinglePlayerGame
+            && self.running == RunningState::Starting
+        {
             self.clock += args.dt;
             match self.clock {
                 i if i < 1.0 => self.countdown(&Countdown::Three),
@@ -30,7 +34,9 @@ impl App<'_> {
             for player in &mut self.local_players {
                 player.send_serialized();
             }
-        } else if self.running == RunningState::Running {
+        } else if self.view_state == ViewState::SinglePlayerGame
+            && self.running == RunningState::Running
+        {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             if let PlayerConfig::TwoRemote {
@@ -82,14 +88,14 @@ impl App<'_> {
         // then eventually change the view
         let result = self.widget_manager.update_view();
         match result {
-            ButtonType::ToPause => self.pause(),
+            ButtonType::ToPause => {
+                if self.view_state == ViewState::SinglePlayerGame {
+                    self.pause()
+                }
+            }
             ButtonType::Nothing => {}
             ButtonType::BackToMainMenu => {
-                if self.view_state == ViewState::SinglePlayerGame
-                    && self.running == RunningState::Running
-                {
-                    self.pause()
-                };
+                println!("back to main menu");
                 self.set_view(ViewState::MainMenu)
             }
             ButtonType::ToSettings => self.set_view(ViewState::Settings),
@@ -99,6 +105,7 @@ impl App<'_> {
                 }; */
                 self.set_view(ViewState::SinglePlayerGame)
             }
+            ButtonType::ToCreateRoom => self.set_view(ViewState::CreateRoom),
             _ => {}
         }
     }
