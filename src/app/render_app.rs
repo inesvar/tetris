@@ -23,6 +23,12 @@ impl App<'_> {
                     self.widget_manager
                         .render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
+                ViewState::CreateRoom => {
+                    self.title_text
+                        .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
+                    self.widget_manager
+                        .render(ctx.transform, &ctx, gl, &mut self.assets)
+                }
                 _ => {
                     if self.running == RunningState::Running {
                         self.title_text.render(

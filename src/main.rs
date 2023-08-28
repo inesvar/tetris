@@ -1,3 +1,4 @@
+extern crate clipboard;
 extern crate find_folder;
 extern crate glutin_window;
 extern crate graphics;
@@ -51,8 +52,9 @@ fn main() {
     // Check the command line arguments.
     let args = Args::parse();
 
-    let mut local_ip =
-        fs::read_to_string("local_ip.txt").expect("Should have been able to read the file");
+    //let mut local_ip = my_local_ip.to_string() + &fs::read_to_string("local_port.txt").expect("Should have been able to read the file");
+    let mut local_ip = String::from("127.0.0.1")
+        + &fs::read_to_string("local_port.txt").expect("Should have been able to read the file");
 
     let mut remote_ip =
         fs::read_to_string("remote_ip.txt").expect("Should have been able to read the file");

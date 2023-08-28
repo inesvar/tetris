@@ -37,7 +37,7 @@ pub enum ViewState {
     MainMenu,
     Settings,
     //JoinRoom,
-    //CreateRoom,
+    CreateRoom,
     SinglePlayerGame,
     //LocalMultiplayerGame,
     //OnlineMultiplayerGame,
@@ -173,6 +173,48 @@ impl App<'_> {
         app
     }
 
+    pub fn set_player_config(&mut self, player_config: PlayerConfig) {
+        let local_player: LocalPlayer;
+        let remote_player: RemotePlayer;
+
+        match &player_config {
+            PlayerConfig::Local => {
+                local_player = LocalPlayer::new(self.settings_manager.seed, &player_config);
+                self.local_players = vec![local_player];
+                self.remote_player = vec![]
+            }
+            PlayerConfig::Streamer(_) => {
+                local_player = LocalPlayer::new(self.settings_manager.seed, &player_config);
+                self.local_players = vec![local_player];
+                self.remote_player = vec![]
+            }
+            PlayerConfig::Viewer(local_ip) => {
+                remote_player = RemotePlayer::new();
+                self.local_players = vec![];
+                self.remote_player = vec![remote_player];
+                self.remote_player[0].listen(&local_ip)
+            }
+            PlayerConfig::TwoRemote {
+                local_ip,
+                remote_ip: _,
+            } => {
+                local_player = LocalPlayer::new(self.settings_manager.seed, &player_config);
+                self.local_players = vec![local_player];
+                remote_player = RemotePlayer::new();
+                self.remote_player = vec![remote_player];
+                self.remote_player[0].listen(&local_ip);
+                self.is_host = if local_ip.chars().last().unwrap() == '0' {
+                    true
+                } else {
+                    false
+                };
+            }
+            _ => todo!(),
+        }
+
+        self.settings_manager.set_player_config(&player_config);
+    }
+
     pub fn handle_text_input(&mut self, input: &String) {
         match self.view_state {
             ViewState::MainMenu => self.widget_manager.handle_text_input(input),
@@ -274,7 +316,9 @@ impl App<'_> {
             ViewState::SinglePlayerGame => {
                 self.widget_manager = InteractiveWidgetManager::new_single_player_game()
             }
-            #[allow(unreachable_patterns)]
+            ViewState::CreateRoom => {
+                self.widget_manager = InteractiveWidgetManager::new_create_room()
+            }
             _ => self.widget_manager = InteractiveWidgetManager::new_empty(),
         }
     }
@@ -292,18 +336,29 @@ impl App<'_> {
     }
     /// Starts a countdown then starts the game.
     fn restart(&mut self) {
-        if self.is_synchronized {
-            println!("RESTART");
-            self.send_message(MessageType::RestartMsg);
-            self.running = RunningState::Starting;
-            self.clock = 0.0;
-        } else if self.is_host {
-            println!("HOST SYNCHRONIZE");
-            let mut rng = rand::thread_rng();
-            self.settings_manager.seed = rng.gen();
-            self.settings_manager.send();
-        } else {
-            self.send_message(MessageType::RestartMsg);
+        match &self.player_config {
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: _,
+            } => {
+                if self.is_synchronized {
+                    println!("RESTART");
+                    self.send_message(MessageType::RestartMsg);
+                    self.running = RunningState::Starting;
+                    self.clock = 0.0;
+                } else if self.is_host {
+                    println!("HOST SYNCHRONIZE");
+                    let mut rng = rand::thread_rng();
+                    self.settings_manager.seed = rng.gen();
+                    self.settings_manager.send();
+                } else {
+                    self.send_message(MessageType::RestartMsg);
+                }
+            }
+            _ => {
+                self.running = RunningState::Starting;
+                self.clock = 0.0;
+            }
         }
     }
 

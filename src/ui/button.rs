@@ -2,6 +2,8 @@ use crate::{settings::DEFAULT_FONT_SIZE, ui::text::Text};
 use graphics::color;
 use piston::MouseButton;
 
+/// Button that changes color when pressed.
+/// The widget manager will know the button was pressed when it makes its next query.
 #[derive(Clone)]
 pub struct Button {
     pub x: f64,
@@ -65,6 +67,7 @@ impl Button {
         match button {
             MouseButton::Left => {
                 if self.are_coords_inside_button(cursor_position[0], cursor_position[1]) {
+                    println!("button press");
                     self.background_color = [0.5, 0.5, 0.5, 1.0];
                     self.is_pressed = true;
                     self.commit = true;

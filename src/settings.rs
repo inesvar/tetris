@@ -184,6 +184,17 @@ impl Settings {
         }
     }
 
+    pub fn set_player_config(&mut self, player_config: &PlayerConfig) {
+        match &player_config {
+            PlayerConfig::Streamer(ip) => self.remote_ip = Some(String::from(ip.as_str())),
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: ip,
+            } => self.remote_ip = Some(String::from(ip.as_str())),
+            _ => {}
+        }
+    }
+
     /// Sends serialized settings to the remote. Should never be called when there's no remote.
     pub fn send(&self) {
         /* serialized_as_msg absolutely needs to be set to true
@@ -195,10 +206,6 @@ impl Settings {
         match self.remote_ip {
             None => unreachable!(),
             _ => {}
-        }
-        {
-            let mut a = self.serialize_as_msg.borrow_mut();
-            *a = true;
         }
         if let Ok(stream) = TcpStream::connect(self.remote_ip.as_ref().unwrap()) {
             serde_cbor::to_writer::<TcpStream, Settings>(stream, &self).unwrap();

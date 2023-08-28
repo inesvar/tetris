@@ -1,10 +1,13 @@
 use crate::settings::{
     Keybindings, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
-    DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
+    DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT,
+    DEFAULT_WINDOW_WIDTH,
 };
 use crate::ui::button::Button;
 use crate::ui::key_input::KeyInput;
 use crate::ui::text_input::TextInput;
+use clipboard::{ClipboardContext, ClipboardProvider};
+use local_ip_address::local_ip;
 use piston::{Key, MouseButton};
 use std::collections::HashMap;
 
@@ -16,6 +19,7 @@ pub enum ButtonType {
     ToSettings,
     BackToMainMenu,
     ToPause,
+    CopyToClipboard,
     Nothing,
 }
 
@@ -264,6 +268,36 @@ impl InteractiveWidgetManager {
         }
     }
 
+    pub fn new_create_room() -> InteractiveWidgetManager {
+        let back_to_main_menu_button = Button::new(
+            (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            DEFAULT_BUTTON_WIDTH / 6.0,
+            DEFAULT_BUTTON_HEIGHT / 2.0,
+            "Back",
+        );
+
+        let copy_ip = Button::new(
+            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+            DEFAULT_BUTTON_WIDTH,
+            DEFAULT_BUTTON_HEIGHT,
+            "Copy room IP",
+        );
+
+        let mut buttons = HashMap::new();
+        buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+        buttons.insert(ButtonType::CopyToClipboard, copy_ip);
+        let text_inputs = HashMap::new();
+        let key_inputs = HashMap::new();
+
+        InteractiveWidgetManager {
+            buttons,
+            text_inputs,
+            key_inputs,
+        }
+    }
+
     pub fn handle_mouse_press(&mut self, mouse_button: MouseButton, cursor_position: &[f64; 2]) {
         for text_input in self.text_inputs.values_mut() {
             text_input.handle_mouse_press(mouse_button, cursor_position);
@@ -319,9 +353,22 @@ impl InteractiveWidgetManager {
         }
     }
 
+    pub fn update_clipboard(&mut self) {
+        for (button_type, button) in self.buttons.iter_mut() {
+            if *button_type == ButtonType::CopyToClipboard && button.commit() {
+                println!("supposed to COPY");
+                let ip = local_ip().unwrap().to_string();
+                let text = format!("{}:16000", ip);
+                let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+                ctx.set_contents(text.to_owned()).unwrap();
+            }
+        }
+    }
+
     pub fn update_view(&mut self) -> ButtonType {
         for (button_type, button) in self.buttons.iter_mut() {
-            if button.commit() {
+            if *button_type != ButtonType::CopyToClipboard && button.commit() {
+                println!("button type is {:?}", button_type);
                 return button_type.clone();
             }
         }
