@@ -4,6 +4,8 @@ mod remote;
 mod render_app;
 mod update_app;
 
+use std::fs::File;
+use std::io::Write;
 use std::net::TcpStream;
 
 use self::player::LocalPlayer;
@@ -323,6 +325,8 @@ impl App<'_> {
                 self.widget_manager = InteractiveWidgetManager::new_single_player_game()
             }
             ViewState::CreateRoom => {
+                let mut file = File::open("local_port.txt").unwrap();
+                file.write(HOST_PORT.as_bytes()).unwrap();
                 self.widget_manager = InteractiveWidgetManager::new_create_room()
             }
             _ => self.widget_manager = InteractiveWidgetManager::new_empty(),
