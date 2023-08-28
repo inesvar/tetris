@@ -141,6 +141,15 @@ impl App<'_> {
     }
 
     pub fn set_player_config(&mut self, player_config: PlayerConfig) {
+        // kill the previous listener
+        if self.player_config.is_remote() {
+            //let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
+            let local_ip = "127.0.0.1".to_string() + HOST_PORT;
+            if let Ok(stream) = TcpStream::connect(local_ip) {
+                serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::KillMsg).unwrap();
+            }
+        }
+
         println!("setting player config {:?}", player_config);
         let local_player: LocalPlayer;
         let remote_player: RemotePlayer;

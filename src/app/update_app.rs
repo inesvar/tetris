@@ -101,13 +101,17 @@ impl App<'_> {
             }
             ButtonType::ToSettings => self.set_view(ViewState::Settings),
             ButtonType::ToSinglePlayerGame => {
-                /* if self.view_state == ViewState::MainMenu && self.running == RunningState::Paused {
-                    self.pause()
-                }; */
+                self.set_player_config(PlayerConfig::Local);
                 self.set_view(ViewState::Game)
             }
             ButtonType::ToCreateRoom => self.set_view(ViewState::CreateRoom),
-            ButtonType::ToJoinRoom => self.set_view(ViewState::JoinRoom),
+            ButtonType::ToJoinRoom => {
+                if self.player_config == PlayerConfig::Local {
+                    self.set_view(ViewState::JoinRoom)
+                } else if self.player_config.is_remote() {
+                    self.set_view(ViewState::Game)
+                }
+            }
             ButtonType::ToTwoRemoteGameInfo {
                 local_ip,
                 remote_ip,

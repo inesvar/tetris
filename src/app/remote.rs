@@ -28,4 +28,5 @@ pub enum MessageType {
     ResumeMsg,
     GameOverMsg,
     HelloMsg(String),
+    KillMsg,
 }
