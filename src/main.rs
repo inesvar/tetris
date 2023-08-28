@@ -1,6 +1,5 @@
 extern crate clipboard;
 extern crate find_folder;
-extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
@@ -14,8 +13,10 @@ use piston::{
     event_loop::{EventSettings, Events},
     input::{RenderEvent, UpdateEvent},
     window::WindowSettings,
+    AdvancedWindow, {Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent},
 };
-use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent};
+use piston_window::PistonWindow;
+use sdl2_window::Sdl2Window;
 
 mod app;
 mod assets;
@@ -46,9 +47,8 @@ impl PlayerConfig {
 }
 
 fn main() {
-
-    // Create a Glutin window.
-    let mut window: piston_window::PistonWindow =
+    // Create a Sdl2 window.
+    let mut window: PistonWindow<Sdl2Window> =
         WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
             .graphics_api(OPENGL_VERSION)
             .vsync(true)
@@ -60,6 +60,7 @@ fn main() {
     let mut app = App::new(OPENGL_VERSION);
     let mut fall_speed_divide: u64 = 50;
     let mut freeze: u64 = 50;
+    let mut multiplayer = false;
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
@@ -77,7 +78,13 @@ fn main() {
 
         if app.player_config.is_remote() {
             once!("main knows that we're remote");
+            if !multiplayer {
+                window.set_size([DEFAULT_WINDOW_WIDTH * 2, DEFAULT_WINDOW_HEIGHT]);
+                multiplayer = true;
+            }
             app.handle_remote();
+        } else if multiplayer {
+            multiplayer = false;
         }
 
         if let Some(text) = e.text_args() {

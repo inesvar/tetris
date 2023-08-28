@@ -1,7 +1,7 @@
 //! Defines the update function of [App].
 //!
 //! [update()](App::update()) is called before each render when the game is active.
-use super::{App, Countdown, PlayerConfig, RunningState, ViewState, remote::MessageType};
+use super::{remote::MessageType, App, Countdown, PlayerConfig, RunningState, ViewState};
 use crate::ui::interactive_widget_manager::ButtonType;
 use piston::UpdateArgs;
 

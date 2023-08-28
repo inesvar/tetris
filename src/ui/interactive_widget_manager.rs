@@ -333,10 +333,7 @@ impl InteractiveWidgetManager {
 
         let mut buttons = HashMap::new();
         buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
-        buttons.insert(
-            ButtonType::ToTwoRemoteGame,
-            join_room,
-        );
+        buttons.insert(ButtonType::ToTwoRemoteGame, join_room);
         let mut text_inputs = HashMap::new();
         text_inputs.insert(TextInputType::IpAddressInput, room_ip_input);
         let key_inputs = HashMap::new();
@@ -433,7 +430,13 @@ impl InteractiveWidgetManager {
                 "Join this room",
             );
 
-            self.buttons.insert(ButtonType::ToTwoRemoteGameInfo { local_ip, remote_ip }, join_room);
+            self.buttons.insert(
+                ButtonType::ToTwoRemoteGameInfo {
+                    local_ip,
+                    remote_ip,
+                },
+                join_room,
+            );
         }
     }
 
