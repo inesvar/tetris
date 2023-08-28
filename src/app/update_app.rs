@@ -1,7 +1,7 @@
 //! Defines the update function of [App].
 //!
 //! [update()](App::update()) is called before each render when the game is active.
-use super::{App, Countdown, GameFlowChange, PlayerConfig, RunningState, ViewState};
+use super::{App, Countdown, PlayerConfig, RunningState, ViewState};
 use crate::ui::interactive_widget_manager::ButtonType;
 use piston::UpdateArgs;
 
@@ -21,9 +21,7 @@ impl App<'_> {
                 .update_settings(&mut self.keybindings_manager);
         } else if self.view_state == ViewState::CreateRoom {
             self.widget_manager.update_clipboard();
-        } else if self.view_state == ViewState::SinglePlayerGame
-            && self.running == RunningState::Starting
-        {
+        } else if self.view_state == ViewState::Game && self.running == RunningState::Starting {
             self.clock += args.dt;
             match self.clock {
                 i if i < 1.0 => self.countdown(&Countdown::Three),
@@ -34,9 +32,7 @@ impl App<'_> {
             for player in &mut self.local_players {
                 player.send_serialized();
             }
-        } else if self.view_state == ViewState::SinglePlayerGame
-            && self.running == RunningState::Running
-        {
+        } else if self.view_state == ViewState::Game && self.running == RunningState::Running {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             if let PlayerConfig::TwoRemote {
@@ -89,13 +85,16 @@ impl App<'_> {
         let result = self.widget_manager.update_view();
         match result {
             ButtonType::ToPause => {
-                if self.view_state == ViewState::SinglePlayerGame {
+                if self.view_state == ViewState::Game {
                     self.pause()
                 }
             }
             ButtonType::Nothing => {}
             ButtonType::BackToMainMenu => {
                 println!("back to main menu");
+                if self.running == RunningState::Running {
+                    self.pause()
+                };
                 self.set_view(ViewState::MainMenu)
             }
             ButtonType::ToSettings => self.set_view(ViewState::Settings),
@@ -103,7 +102,7 @@ impl App<'_> {
                 /* if self.view_state == ViewState::MainMenu && self.running == RunningState::Paused {
                     self.pause()
                 }; */
-                self.set_view(ViewState::SinglePlayerGame)
+                self.set_view(ViewState::Game)
             }
             ButtonType::ToCreateRoom => self.set_view(ViewState::CreateRoom),
             _ => {}
