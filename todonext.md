@@ -1,6 +1,10 @@
 # TO DO SOON
 
-- do not recreate players in set_player_config
+
+
+# to test on two computers 
+
+- replace all the 127.0.0.1 by the commented line above
 
 ## Tetris Guideline
 
