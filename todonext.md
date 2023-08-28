@@ -1,6 +1,6 @@
 # TO DO SOON
 
-- when player becomes host, a convenient port number is written to the file
+- add a paste button in join room
 
 ## Tetris Guideline
 

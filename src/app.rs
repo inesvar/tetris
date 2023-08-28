@@ -4,23 +4,20 @@ mod remote;
 mod render_app;
 mod update_app;
 
-use std::fs::File;
-use std::io::Write;
-use std::net::TcpStream;
-
 use self::player::LocalPlayer;
 pub use self::player::{PlayerScreen, Tetromino};
 use self::remote::RemotePlayer;
-use crate::settings::*;
 use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::ui::text::Text;
 use crate::Assets;
 use crate::{app::remote::MessageType, PlayerConfig};
+use crate::{once, settings::*};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::MouseButton;
 use piston_window::Key;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+use std::{fs::File, io::Write, net::TcpStream};
 
 /// Indicates whether the player commands lead the game to pause, resume, restart or no.
 /// The GameOver variant is only used for remote players.
@@ -31,6 +28,7 @@ pub enum GameFlowChange {
     Pause,
     GameOver,
     Sync(Settings),
+    Hello(String),
     Other,
 }
 
@@ -38,11 +36,9 @@ pub enum GameFlowChange {
 pub enum ViewState {
     MainMenu,
     Settings,
-    //JoinRoom,
+    JoinRoom,
     CreateRoom,
     Game,
-    //LocalMultiplayerGame,
-    //OnlineMultiplayerGame,
 }
 
 #[derive(PartialEq, Serialize, Deserialize, Clone, Copy)]
@@ -176,6 +172,7 @@ impl App<'_> {
     }
 
     pub fn set_player_config(&mut self, player_config: PlayerConfig) {
+        println!("setting player config {:?}", player_config);
         let local_player: LocalPlayer;
         let remote_player: RemotePlayer;
 
@@ -215,12 +212,14 @@ impl App<'_> {
         }
 
         self.settings_manager.set_player_config(&player_config);
+        self.player_config = player_config;
     }
 
     pub fn handle_text_input(&mut self, input: &String) {
         match self.view_state {
             ViewState::MainMenu => self.widget_manager.handle_text_input(input),
             ViewState::Settings => self.widget_manager.handle_text_input(input),
+            ViewState::JoinRoom => self.widget_manager.handle_text_input(input),
             _ => {}
         }
     }
@@ -230,6 +229,7 @@ impl App<'_> {
         match self.view_state {
             ViewState::MainMenu => self.widget_manager.handle_key_press(key),
             ViewState::Settings => self.widget_manager.handle_key_press(key),
+            ViewState::JoinRoom => self.widget_manager.handle_key_press(key),
             ViewState::Game => {
                 for player in &mut self.local_players {
                     game_key_press =
@@ -248,6 +248,7 @@ impl App<'_> {
     }
 
     pub fn handle_remote(&mut self) {
+        once!("handle remote was called");
         let mut game_flow_change: GameFlowChange = GameFlowChange::Other;
         for player in &self.remote_player {
             // supposing there's only one player
@@ -272,6 +273,7 @@ impl App<'_> {
                 }
             }
             GameFlowChange::Restart => {
+                once!("restart was received");
                 if self.running == RunningState::NotRunning {
                     self.set_view(ViewState::Game);
                     self.restart()
@@ -290,6 +292,15 @@ impl App<'_> {
                 } else {
                     self.settings_manager.send();
                 }
+            }
+            GameFlowChange::Hello(remote_ip) => {
+                //let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
+                let local_ip = "127.0.0.1".to_string() + HOST_PORT;
+                let player_config = PlayerConfig::TwoRemote {
+                    local_ip,
+                    remote_ip,
+                };
+                self.set_player_config(player_config);
             }
             _ => {}
         }
@@ -327,9 +338,16 @@ impl App<'_> {
             ViewState::CreateRoom => {
                 let mut file = File::create("local_port.txt").unwrap();
                 file.write(HOST_PORT.as_bytes()).unwrap();
+                //let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
+                let local_ip = "127.0.0.1".to_string() + HOST_PORT;
+                self.set_player_config(PlayerConfig::Viewer(local_ip));
                 self.widget_manager = InteractiveWidgetManager::new_create_room()
             }
-            _ => self.widget_manager = InteractiveWidgetManager::new_empty(),
+            ViewState::JoinRoom => {
+                let mut file = File::create("local_port.txt").unwrap();
+                file.write(GUEST_PORT.as_bytes()).unwrap();
+                self.widget_manager = InteractiveWidgetManager::new_join_room()
+            }
         }
     }
 

@@ -27,4 +27,5 @@ pub enum MessageType {
     PauseMsg,
     ResumeMsg,
     GameOverMsg,
+    HelloMsg(String),
 }

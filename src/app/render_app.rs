@@ -29,7 +29,13 @@ impl App<'_> {
                     self.widget_manager
                         .render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
-                _ => {
+                ViewState::JoinRoom => {
+                    self.title_text
+                        .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
+                    self.widget_manager
+                        .render(ctx.transform, &ctx, gl, &mut self.assets)
+                }
+                ViewState::Game => {
                     if self.running == RunningState::Running {
                         self.title_text.render(
                             ctx.transform,

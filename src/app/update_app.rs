@@ -1,7 +1,7 @@
 //! Defines the update function of [App].
 //!
 //! [update()](App::update()) is called before each render when the game is active.
-use super::{App, Countdown, PlayerConfig, RunningState, ViewState};
+use super::{App, Countdown, PlayerConfig, RunningState, ViewState, remote::MessageType};
 use crate::ui::interactive_widget_manager::ButtonType;
 use piston::UpdateArgs;
 
@@ -21,6 +21,8 @@ impl App<'_> {
                 .update_settings(&mut self.keybindings_manager);
         } else if self.view_state == ViewState::CreateRoom {
             self.widget_manager.update_clipboard();
+        } else if self.view_state == ViewState::JoinRoom {
+            self.widget_manager.update_from_text();
         } else if self.view_state == ViewState::Game && self.running == RunningState::Starting {
             self.clock += args.dt;
             match self.clock {
@@ -105,6 +107,18 @@ impl App<'_> {
                 self.set_view(ViewState::Game)
             }
             ButtonType::ToCreateRoom => self.set_view(ViewState::CreateRoom),
+            ButtonType::ToJoinRoom => self.set_view(ViewState::JoinRoom),
+            ButtonType::ToTwoRemoteGameInfo {
+                local_ip,
+                remote_ip,
+            } => {
+                self.set_player_config(PlayerConfig::TwoRemote {
+                    local_ip: local_ip.clone(),
+                    remote_ip,
+                });
+                self.set_view(ViewState::Game);
+                self.send_message(MessageType::HelloMsg(local_ip));
+            }
             _ => {}
         }
     }

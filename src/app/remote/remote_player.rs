@@ -66,8 +66,13 @@ impl RemotePlayer {
                     MessageType::ResumeMsg => {
                         self_for_listener.update_game_flow(GameFlowChange::Resume);
                     }
+                    MessageType::HelloMsg(remote_ip) => {
+                        self_for_listener.update_game_flow(GameFlowChange::Hello(remote_ip));
+                        break;
+                    }
                 }
             }
+            println!("thread over");
         });
     }
 

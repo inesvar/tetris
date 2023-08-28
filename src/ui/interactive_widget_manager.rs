@@ -1,6 +1,7 @@
 use crate::settings::{
     Keybindings, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
-    DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, HOST_PORT,
+    DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
+    GUEST_PORT, HOST_PORT,
 };
 use crate::ui::button::Button;
 use crate::ui::key_input::KeyInput;
@@ -13,6 +14,8 @@ use std::collections::HashMap;
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum ButtonType {
     ToSinglePlayerGame,
+    ToTwoRemoteGame,
+    ToTwoRemoteGameInfo { local_ip: String, remote_ip: String },
     ToCreateRoom,
     ToJoinRoom,
     ToSettings,
@@ -20,6 +23,12 @@ pub enum ButtonType {
     ToPause,
     CopyToClipboard,
     Nothing,
+}
+
+impl ButtonType {
+    fn view_changer(&self) -> bool {
+        *self != Self::CopyToClipboard && *self != Self::ToTwoRemoteGame
+    }
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
@@ -297,6 +306,48 @@ impl InteractiveWidgetManager {
         }
     }
 
+    pub fn new_join_room() -> InteractiveWidgetManager {
+        let back_to_main_menu_button = Button::new(
+            (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            DEFAULT_BUTTON_WIDTH / 6.0,
+            DEFAULT_BUTTON_HEIGHT / 2.0,
+            "Back",
+        );
+
+        let join_room = Button::new(
+            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+            DEFAULT_BUTTON_WIDTH,
+            DEFAULT_BUTTON_HEIGHT,
+            "Join room",
+        );
+
+        let room_ip_input = TextInput::new(
+            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 3.0,
+            DEFAULT_BUTTON_WIDTH,
+            DEFAULT_BUTTON_HEIGHT,
+            "Join room",
+        );
+
+        let mut buttons = HashMap::new();
+        buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+        buttons.insert(
+            ButtonType::ToTwoRemoteGame,
+            join_room,
+        );
+        let mut text_inputs = HashMap::new();
+        text_inputs.insert(TextInputType::IpAddressInput, room_ip_input);
+        let key_inputs = HashMap::new();
+
+        InteractiveWidgetManager {
+            buttons,
+            text_inputs,
+            key_inputs,
+        }
+    }
+
     pub fn handle_mouse_press(&mut self, mouse_button: MouseButton, cursor_position: &[f64; 2]) {
         for text_input in self.text_inputs.values_mut() {
             text_input.handle_mouse_press(mouse_button, cursor_position);
@@ -331,9 +382,9 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub fn get_button(&self, button_type: ButtonType) -> &Button {
+    pub fn get_button(&mut self, button_type: &ButtonType) -> &mut Button {
         self.buttons
-            .get(&button_type)
+            .get_mut(&button_type)
             .unwrap_or_else(|| panic!("Button {:?} not found", button_type))
     }
 
@@ -353,20 +404,42 @@ impl InteractiveWidgetManager {
     }
 
     pub fn update_clipboard(&mut self) {
-        for (button_type, button) in self.buttons.iter_mut() {
-            if *button_type == ButtonType::CopyToClipboard && button.commit() {
-                println!("supposed to COPY");
-                let ip = local_ip().unwrap().to_string();
-                let text = format!("{}{}", ip, HOST_PORT);
-                let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-                ctx.set_contents(text.to_owned()).unwrap();
-            }
+        let button = self.get_button(&ButtonType::CopyToClipboard);
+        if button.commit() {
+            println!("supposed to COPY");
+            //let ip = local_ip().unwrap().to_string();
+            let ip = "127.0.0.1".to_string();
+            let text = format!("{}{}", ip, HOST_PORT);
+            let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+            ctx.set_contents(text.to_owned()).unwrap();
+        }
+    }
+
+    pub fn update_from_text(&mut self) {
+        let button = self.get_button(&ButtonType::ToTwoRemoteGame);
+        if button.commit() {
+            let text_input = self.get_input(TextInputType::IpAddressInput);
+            let remote_ip = text_input.text.content.clone();
+            println!("remote ip is {remote_ip}");
+            //let local_ip = local_ip().unwrap().to_string();
+            let local_ip = "127.0.0.1".to_string();
+            let local_ip = format!("{}{}", local_ip, GUEST_PORT);
+
+            let join_room = Button::new_committed(
+                DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+                DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+                DEFAULT_BUTTON_WIDTH,
+                DEFAULT_BUTTON_HEIGHT,
+                "Join this room",
+            );
+
+            self.buttons.insert(ButtonType::ToTwoRemoteGameInfo { local_ip, remote_ip }, join_room);
         }
     }
 
     pub fn update_view(&mut self) -> ButtonType {
         for (button_type, button) in self.buttons.iter_mut() {
-            if *button_type != ButtonType::CopyToClipboard && button.commit() {
+            if button_type.view_changer() && button.commit() {
                 println!("button type is {:?}", button_type);
                 return button_type.clone();
             }
