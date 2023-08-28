@@ -20,15 +20,15 @@ pub static NB_ROWS: u32 = 22;
 /****************************************/
 
 pub static DEFAULT_WINDOW_WIDTH: u32 = (650.0 * SCALE_FACTOR) as u32;
-pub static DEFAULT_WINDOW_HEIGHT: u32 = (700.0 * SCALE_FACTOR) as u32;
+pub static DEFAULT_WINDOW_HEIGHT: u32 = (800.0 * SCALE_FACTOR) as u32;
 
 // coordinates of the top left corner of the grid
 // changing this moves everything in the single-player view except the title
 pub static DEFAULT_GRID_X: f64 = 200.0 * SCALE_FACTOR;
-pub static DEFAULT_GRID_Y: f64 = 120.0 * SCALE_FACTOR;
+pub static DEFAULT_GRID_Y: f64 = 160.0 * SCALE_FACTOR;
 
 // height of the title "Tetris" and "Press R to (re)start"
-pub static DEFAULT_TITLE_Y: f64 = 50.0 * SCALE_FACTOR;
+pub static DEFAULT_TITLE_Y: f64 = 100.0 * SCALE_FACTOR;
 // height of the text on the left side indicating the score
 pub static DEFAULT_SCORE_TEXT_Y: f64 = DEFAULT_GRID_Y + 8.0 * BLOCK_SIZE;
 
