@@ -133,9 +133,10 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub fn new_settings(settings: &Keybindings) -> InteractiveWidgetManager {
+    pub fn new_settings(settings: &Keybindings, id: usize) -> InteractiveWidgetManager {
+        let player_x = id as f64 * DEFAULT_BUTTON_WIDTH;
         let fall_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 / 4.0,
+            DEFAULT_WINDOW_WIDTH as f64 / 4.0 + player_x,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
@@ -144,7 +145,7 @@ impl InteractiveWidgetManager {
         );
 
         let hard_drop_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 / 4.0,
+            DEFAULT_WINDOW_WIDTH as f64 / 4.0 + player_x,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
@@ -153,7 +154,7 @@ impl InteractiveWidgetManager {
         );
 
         let right_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 / 4.0,
+            DEFAULT_WINDOW_WIDTH as f64 / 4.0 + player_x,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
@@ -162,7 +163,7 @@ impl InteractiveWidgetManager {
         );
 
         let left_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 / 4.0,
+            DEFAULT_WINDOW_WIDTH as f64 / 4.0 + player_x,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
@@ -171,7 +172,7 @@ impl InteractiveWidgetManager {
         );
 
         let rotate_clockwise_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0,
+            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0 + player_x,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
@@ -180,7 +181,7 @@ impl InteractiveWidgetManager {
         );
 
         let rotate_counterclockwise_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0,
+            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0 + player_x,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
@@ -189,23 +190,27 @@ impl InteractiveWidgetManager {
         );
 
         let hold_tetromino_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0,
+            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0 + player_x,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
             &settings.hold_tetromino_keys,
             "Hold Tetromino Keys :",
         );
-        let back_to_main_menu_button = Button::new(
-            (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
-            DEFAULT_BUTTON_WIDTH / 6.0,
-            DEFAULT_BUTTON_HEIGHT / 2.0,
-            "Back",
-        );
 
         let mut buttons = HashMap::new();
-        buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+        
+        if id == 0 {
+            let back_to_main_menu_button = Button::new(
+                (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+                (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+                DEFAULT_BUTTON_WIDTH / 6.0,
+                DEFAULT_BUTTON_HEIGHT / 2.0,
+                "Back",
+            );
+            buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+        }
+
         let text_inputs = HashMap::new();
 
         let mut key_inputs = HashMap::new();
