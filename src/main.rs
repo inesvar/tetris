@@ -41,7 +41,7 @@ struct Args {
     viewer: bool,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum PlayerConfig {
     Local,
     Streamer(String),
@@ -57,7 +57,7 @@ impl PlayerConfig {
                 local_ip: _,
                 remote_ip: _,
             } => true,
-            PlayerConfig::Streamer(_) => true,
+            PlayerConfig::Viewer(_) => true,
             _ => false,
         }
     }
@@ -84,8 +84,8 @@ fn main() {
     if remote_ip.ends_with("\n") {
         remote_ip.pop();
     }
-    println!("remote ip is {}.", remote_ip);
-    println!("local ip is {}.", local_ip);
+    //println!("remote ip is {}.", remote_ip);
+    //println!("local ip is {}.", local_ip);
 
     let config: PlayerConfig = /*if args.two_local {
         PlayerConfig::TwoLocal
@@ -141,6 +141,7 @@ fn main() {
         }
 
         if app.player_config.is_remote() {
+            once!("main knows that we're remote");
             app.handle_remote();
         }
 

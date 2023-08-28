@@ -30,6 +30,19 @@ impl Button {
         }
     }
 
+    pub fn new_committed(x: f64, y: f64, width: f64, height: f64, text: &str) -> Self {
+        Button {
+            x,
+            y,
+            width,
+            height,
+            text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, color::BLACK),
+            background_color: [0.8, 0.8, 0.8, 1.0],
+            commit: true,
+            is_pressed: false,
+        }
+    }
+
     pub fn default() -> Button {
         Button {
             x: 0.0,
