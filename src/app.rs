@@ -309,7 +309,7 @@ impl App<'_> {
             ViewState::MainMenu => self.widget_manager = InteractiveWidgetManager::new_main_menu(),
             ViewState::Settings => {
                 self.widget_manager =
-                    InteractiveWidgetManager::new_settings(&self.keybindings_manager)
+                    InteractiveWidgetManager::new_settings(&self.keybindings_manager, 0)
             }
             ViewState::Game => {
                 self.widget_manager = InteractiveWidgetManager::new_single_player_game()
