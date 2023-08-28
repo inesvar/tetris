@@ -1,6 +1,6 @@
 use crate::settings::{
     Keybindings, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
-    DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
+    DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, HOST_PORT,
 };
 use crate::ui::button::Button;
 use crate::ui::key_input::KeyInput;
@@ -357,7 +357,7 @@ impl InteractiveWidgetManager {
             if *button_type == ButtonType::CopyToClipboard && button.commit() {
                 println!("supposed to COPY");
                 let ip = local_ip().unwrap().to_string();
-                let text = format!("{}:16000", ip);
+                let text = format!("{}{}", ip, HOST_PORT);
                 let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
                 ctx.set_contents(text.to_owned()).unwrap();
             }
