@@ -337,7 +337,7 @@ impl App<'_> {
             ViewState::Game => {
                 self.widget_manager = vec![InteractiveWidgetManager::new_single_player_game()];
                 if self.player_config == PlayerConfig::TwoLocal {
-                    self.keybindings_manager = vec![Keybindings::new(), Keybindings::new()];
+                    self.keybindings_manager = vec![Keybindings::new_two_local(0), Keybindings::new_two_local(1)];
                 }
             }
             ViewState::CreateRoom => {

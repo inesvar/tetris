@@ -69,6 +69,14 @@ pub static TEXT_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
 /*          GAME KEYBINDINGS            */
 /****************************************/
 
+static FALL_KEYS: [Key; 2] = [Key::Down, Key::S];
+static HARD_DROP_KEYS: [Key; 2] = [Key::Space, Key::X];
+static RIGHT_KEYS: [Key; 2] = [Key::Right, Key::D];
+static LEFT_KEYS: [Key; 2] = [Key::Left, Key::Q];
+static ROTATE_CLOCKWISE_KEYS: [Key; 2] = [Key::Up, Key::E];
+static ROTATE_COUNTERCLOCKWISE_KEYS: [Key; 2] = [Key::NumPad0, Key::A];
+static HOLD_TETROMINO_KEYS: [Key; 2] = [Key::Exclaim, Key::C];
+
 pub struct Keybindings {
     pub fall_keys: Vec<Key>,
     pub hard_drop_keys: Vec<Key>,
@@ -97,6 +105,46 @@ impl Keybindings {
             rotate_clockwise_keys,
             rotate_counterclockwise_keys,
             hold_tetromino_keys,
+        }
+    }
+
+    pub fn new_two_local(id: usize) -> Keybindings {
+        if id == 0 {
+            let fall_keys = vec![FALL_KEYS[0]];
+            let hard_drop_keys = vec![HARD_DROP_KEYS[0]];
+            let right_keys = vec![RIGHT_KEYS[0]];
+            let left_keys = vec![LEFT_KEYS[0]];
+            let rotate_clockwise_keys = vec![ROTATE_CLOCKWISE_KEYS[0]];
+            let rotate_counterclockwise_keys = vec![ROTATE_COUNTERCLOCKWISE_KEYS[0]];
+            let hold_tetromino_keys = vec![HOLD_TETROMINO_KEYS[0]];
+
+            Keybindings {
+                fall_keys,
+                hard_drop_keys,
+                right_keys,
+                left_keys,
+                rotate_clockwise_keys,
+                rotate_counterclockwise_keys,
+                hold_tetromino_keys,
+            }
+        } else {
+            let fall_keys = vec![FALL_KEYS[1]];
+            let hard_drop_keys = vec![HARD_DROP_KEYS[1]];
+            let right_keys = vec![RIGHT_KEYS[1]];
+            let left_keys = vec![LEFT_KEYS[1]];
+            let rotate_clockwise_keys = vec![ROTATE_CLOCKWISE_KEYS[1]];
+            let rotate_counterclockwise_keys = vec![ROTATE_COUNTERCLOCKWISE_KEYS[1]];
+            let hold_tetromino_keys = vec![HOLD_TETROMINO_KEYS[1]];
+
+            Keybindings {
+                fall_keys,
+                hard_drop_keys,
+                right_keys,
+                left_keys,
+                rotate_clockwise_keys,
+                rotate_counterclockwise_keys,
+                hold_tetromino_keys,
+            }
         }
     }
 
@@ -132,14 +180,6 @@ impl Keybindings {
         println!();
     }
 }
-
-static FALL_KEYS: [Key; 2] = [Key::Down, Key::S];
-static HARD_DROP_KEYS: [Key; 1] = [Key::Space];
-static RIGHT_KEYS: [Key; 2] = [Key::Right, Key::D];
-static LEFT_KEYS: [Key; 2] = [Key::Left, Key::Q];
-static ROTATE_CLOCKWISE_KEYS: [Key; 2] = [Key::Up, Key::E];
-static ROTATE_COUNTERCLOCKWISE_KEYS: [Key; 2] = [Key::NumPad3, Key::A];
-static HOLD_TETROMINO_KEYS: [Key; 1] = [Key::C];
 
 /****************************************/
 /*           APP PARAMETERS             */
