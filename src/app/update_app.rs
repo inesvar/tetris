@@ -51,6 +51,16 @@ impl App<'_> {
                         player.add_garbage(completed_lines);
                     }
                 }
+            } else if let PlayerConfig::TwoLocal = self.player_config {
+                // add garbage
+                let completed_lines = self.local_players[0].get_lines_completed();
+                if completed_lines != 0 {
+                    self.local_players[1].add_garbage(completed_lines);
+                }
+                let completed_lines = self.local_players[1].get_lines_completed();
+                if completed_lines != 0 {
+                    self.local_players[0].add_garbage(completed_lines);
+                }
             }
             // update
             for player in &mut self.local_players {
