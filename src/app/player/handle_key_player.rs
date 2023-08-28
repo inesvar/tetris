@@ -27,46 +27,45 @@ impl LocalPlayer {
         key: Key,
         running: RunningState,
     ) -> GameFlowChange {
-        
         /******************************
          *       STARTING GAME        *
          ******************************/
-         // the starting game doesn't listen to anything
-         if running == RunningState::Starting {
-             return GameFlowChange::Other;
+        // the starting game doesn't listen to anything
+        if running == RunningState::Starting {
+            return GameFlowChange::Other;
         }
-            
+
         self.keyboard.set_pressed(key);
-        
+
         /******************************
          *       UNACTIVE GAME        *
          ******************************/
 
-        // the unactive game only listens to the RESTART_KEYS 
+        // the unactive game only listens to the RESTART_KEYS
         if running == RunningState::NotRunning {
             if self.keyboard.is_any_last_pressed(&RESTART_KEYS) {
                 return GameFlowChange::Restart;
             } else {
                 return GameFlowChange::Other;
-            }    
-        }    
+            }
+        }
 
         /******************************
          * (ABOUT TO BE) PAUSED GAME  *
          ******************************/
 
-        // the paused game only listens to the PAUSE_KEYS 
+        // the paused game only listens to the PAUSE_KEYS
         if running == RunningState::Paused {
             if self.keyboard.is_any_last_pressed(&PAUSE_KEYS) {
                 return GameFlowChange::Resume;
             } else {
                 return GameFlowChange::Other;
-            }    
-        // the game pauses if PAUSE_KEYS are pressed    
+            }
+        // the game pauses if PAUSE_KEYS are pressed
         } else if running == RunningState::Running && self.keyboard.is_any_last_pressed(&PAUSE_KEYS)
         {
             return GameFlowChange::Pause;
-        }    
+        }
 
         /******************************
          *         ACTIVE GAME        *

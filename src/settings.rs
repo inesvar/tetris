@@ -5,7 +5,7 @@ use opengl_graphics::OpenGL;
 use piston::Key;
 use serde::Deserialize;
 
-static SCALE_FACTOR: f64 = 0.7;
+static SCALE_FACTOR: f64 = 1.0;
 pub static HOST_PORT: &str = ":16000";
 pub static GUEST_PORT: &str = ":16001";
 
@@ -35,7 +35,7 @@ pub static DEFAULT_SCORE_TEXT_Y: f64 = DEFAULT_GRID_Y + 8.0 * BLOCK_SIZE;
 pub static BLOCK_SIZE: f64 = 25.0 * SCALE_FACTOR;
 pub static TETROMINO_MAX_WIDTH: f64 = 4.0 * BLOCK_SIZE;
 pub static TETROMINO_MAX_HEIGHT: f64 = 2.0 * BLOCK_SIZE;
-pub static GRID_THICKNESS: f64 = 0.5 * SCALE_FACTOR;
+pub static GRID_THICKNESS: f64 = 0.5;
 
 /****************************************/
 /*      POSITIONS IN MAIN MENU VIEW     */
