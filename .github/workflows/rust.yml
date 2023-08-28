@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: DependencyInstall
-      run: sudo apt-get install build-essential; sudo apt install libsdl2-dev;
+      run: sudo apt install libxcb-dev; sudo apt install libsdl2-dev;
     - name: Build
       run: cargo build --verbose
     - name: Run tests
