@@ -187,7 +187,12 @@ impl App<'_> {
                     false
                 };
             }
-            _ => todo!(),
+            PlayerConfig::TwoLocal => {
+                local_player = LocalPlayer::new(self.settings_manager.seed, &player_config);
+                let second_local = LocalPlayer::new(self.settings_manager.seed, &player_config);
+                self.local_players = vec![local_player, second_local];
+                self.remote_player = vec![]
+            }
         }
 
         self.settings_manager.set_player_config(&player_config);
@@ -299,7 +304,7 @@ impl App<'_> {
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
         for widget_manager in &mut self.widget_manager {
             widget_manager.handle_mouse_press(button, &self.cursor_position);
-        }  
+        }
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
@@ -312,17 +317,28 @@ impl App<'_> {
         println!("setting view to {:?}", view_state);
         self.view_state = view_state;
         match self.view_state {
-            ViewState::MainMenu => self.widget_manager = vec![InteractiveWidgetManager::new_main_menu()],
+            ViewState::MainMenu => {
+                self.widget_manager = vec![InteractiveWidgetManager::new_main_menu()]
+            }
             ViewState::Settings => {
-                self.widget_manager =
-                vec![InteractiveWidgetManager::new_settings(&self.keybindings_manager[0], 0)];
+                self.widget_manager = vec![InteractiveWidgetManager::new_settings(
+                    &self.keybindings_manager[0],
+                    0,
+                )];
                 if self.player_config == PlayerConfig::TwoLocal {
                     self.keybindings_manager.push(Keybindings::new());
-                    self.widget_manager.push(InteractiveWidgetManager::new_settings(&self.keybindings_manager[1], 1));
+                    self.widget_manager
+                        .push(InteractiveWidgetManager::new_settings(
+                            &self.keybindings_manager[1],
+                            1,
+                        ));
                 }
             }
             ViewState::Game => {
                 self.widget_manager = vec![InteractiveWidgetManager::new_single_player_game()];
+                if self.player_config == PlayerConfig::TwoLocal {
+                    self.keybindings_manager = vec![Keybindings::new(), Keybindings::new()];
+                }
             }
             ViewState::CreateRoom => {
                 let mut file = File::create("local_port.txt").unwrap();

@@ -20,8 +20,7 @@ impl App<'_> {
                     self.title_text
                         .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
                     for widget_manager in &mut self.widget_manager {
-                        widget_manager
-                            .render(ctx.transform, &ctx, gl, &mut self.assets);
+                        widget_manager.render(ctx.transform, &ctx, gl, &mut self.assets);
                     }
                 }
                 ViewState::CreateRoom => {
@@ -93,8 +92,7 @@ impl App<'_> {
                         nb_players += 1;
                     }
 
-                    self.widget_manager[0]
-                        .render(ctx.transform, &ctx, gl, &mut self.assets)
+                    self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
             }
         });

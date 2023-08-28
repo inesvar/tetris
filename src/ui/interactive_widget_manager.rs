@@ -134,7 +134,7 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_settings(settings: &Keybindings, id: usize) -> InteractiveWidgetManager {
-        let player_x = id as f64 * DEFAULT_BUTTON_WIDTH;
+        let player_x = id as f64 * DEFAULT_WINDOW_WIDTH as f64;
         let fall_keys_input = KeyInput::new_with_info(
             DEFAULT_WINDOW_WIDTH as f64 / 4.0 + player_x,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
@@ -199,7 +199,7 @@ impl InteractiveWidgetManager {
         );
 
         let mut buttons = HashMap::new();
-        
+
         if id == 0 {
             let back_to_main_menu_button = Button::new(
                 (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,

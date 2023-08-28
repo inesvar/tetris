@@ -18,8 +18,7 @@ impl App<'_> {
         // first apply the changes inside the views
         if self.view_state == ViewState::Settings {
             for (id, widget_manager) in self.widget_manager.iter_mut().enumerate() {
-                widget_manager
-                    .update_settings(&mut self.keybindings_manager[id]);
+                widget_manager.update_settings(&mut self.keybindings_manager[id]);
             }
         } else if self.view_state == ViewState::CreateRoom {
             self.widget_manager[0].update_clipboard();
@@ -135,6 +134,10 @@ impl App<'_> {
                 });
                 self.set_view(ViewState::Game);
                 self.send_message(MessageType::HelloMsg(local_ip));
+            }
+            ButtonType::ToTwoLocalGame => {
+                self.set_player_config(PlayerConfig::TwoLocal);
+                self.set_view(ViewState::Game);
             }
             _ => {}
         }
