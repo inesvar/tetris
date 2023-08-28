@@ -44,6 +44,17 @@ impl PlayerConfig {
             _ => false,
         }
     }
+
+    pub fn is_multiplayer(&self) -> bool {
+        match self {
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: _,
+            } => true,
+            PlayerConfig::TwoLocal => true,
+            _ => false,
+        }
+    }
 }
 
 fn main() {
@@ -78,11 +89,14 @@ fn main() {
 
         if app.player_config.is_remote() {
             once!("main knows that we're remote");
+            app.handle_remote();
+        }
+
+        if app.player_config.is_multiplayer() {
             if !multiplayer {
                 window.set_size([DEFAULT_WINDOW_WIDTH * 2, DEFAULT_WINDOW_HEIGHT]);
                 multiplayer = true;
             }
-            app.handle_remote();
         } else if multiplayer {
             window.set_size([DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT]);
             multiplayer = false;

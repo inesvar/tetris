@@ -1,6 +1,6 @@
 # TO DO SOON
 
-- widget also make a double for the game
+- keyboard new for two local
 
 # to test on two computers 
 
