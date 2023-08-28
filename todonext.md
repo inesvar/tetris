@@ -1,6 +1,6 @@
 # TO DO SOON
 
-
+- playerconfig twolocal
 
 # to test on two computers 
 

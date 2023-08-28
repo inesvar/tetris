@@ -7,6 +7,7 @@ use crate::ui::button::Button;
 use crate::ui::key_input::KeyInput;
 use crate::ui::text_input::TextInput;
 use clipboard::{ClipboardContext, ClipboardProvider};
+#[allow(unused_imports)]
 use local_ip_address::local_ip;
 use piston::{Key, MouseButton};
 use std::collections::HashMap;
@@ -20,6 +21,7 @@ pub enum ButtonType {
     ToJoinRoom,
     ToSettings,
     BackToMainMenu,
+    ToTwoLocalGame,
     ToPause,
     CopyToClipboard,
     PasteFromClipboard,
@@ -61,7 +63,7 @@ impl InteractiveWidgetManager {
     pub fn new_main_menu() -> InteractiveWidgetManager {
         let create_single_player_game_button = Button::new(
             DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 - DEFAULT_BUTTON_Y_SPACING,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "New single-player game",
@@ -69,7 +71,7 @@ impl InteractiveWidgetManager {
 
         let create_room_button = Button::new(
             DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Create new room",
@@ -77,7 +79,7 @@ impl InteractiveWidgetManager {
 
         let join_room_button = Button::new(
             DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Join room",
@@ -85,10 +87,18 @@ impl InteractiveWidgetManager {
 
         let settings_button = Button::new(
             DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Settings",
+        );
+
+        let create_two_player_game_button = Button::new(
+            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
+            DEFAULT_BUTTON_WIDTH,
+            DEFAULT_BUTTON_HEIGHT,
+            "New two-player game",
         );
 
         let mut buttons = HashMap::new();
@@ -99,9 +109,10 @@ impl InteractiveWidgetManager {
         buttons.insert(ButtonType::ToCreateRoom, create_room_button);
         buttons.insert(ButtonType::ToJoinRoom, join_room_button);
         buttons.insert(ButtonType::ToSettings, settings_button);
+        buttons.insert(ButtonType::ToTwoLocalGame, create_two_player_game_button);
 
-        let mut text_inputs = HashMap::new();
-        text_inputs.insert(
+        let text_inputs = HashMap::new();
+        /* text_inputs.insert(
             TextInputType::DebugTextInput,
             TextInput::new_with_info(
                 (10.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
@@ -111,7 +122,7 @@ impl InteractiveWidgetManager {
                 "Type here...",
                 "try this pls",
             ),
-        );
+        ); */
 
         let key_inputs = HashMap::new();
 

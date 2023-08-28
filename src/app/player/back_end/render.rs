@@ -30,7 +30,7 @@ impl TetrisGrid {
         outline_rect.draw(empty_dims, &draw_state, self.transform, gl);
 
         for (y, row) in self.matrix.iter().enumerate() {
-            for (x, cell) in row.iter().enumerate() {
+            for (x, _cell) in row.iter().enumerate() {
                 if y > 1 {
                     let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
                     let outline_dims = rectangle::square(
