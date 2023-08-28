@@ -5,13 +5,17 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 
-use crate::app::App;
-use crate::assets::Assets;
-use crate::settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION};
+use crate::{
+    app::App,
+    assets::Assets,
+    settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION},
+};
 use clap::Parser;
-use piston::event_loop::{EventSettings, Events};
-use piston::input::{RenderEvent, UpdateEvent};
-use piston::window::WindowSettings;
+use piston::{
+    event_loop::{EventSettings, Events},
+    input::{RenderEvent, UpdateEvent},
+    window::WindowSettings,
+};
 use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent};
 use std::fs;
 
@@ -37,12 +41,26 @@ struct Args {
     viewer: bool,
 }
 
+#[derive(PartialEq)]
 pub enum PlayerConfig {
     Local,
     Streamer(String),
     TwoLocal,
     TwoRemote { local_ip: String, remote_ip: String },
     Viewer(String),
+}
+
+impl PlayerConfig {
+    pub fn is_remote(&self) -> bool {
+        match self {
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: _,
+            } => true,
+            PlayerConfig::Streamer(_) => true,
+            _ => false,
+        }
+    }
 }
 
 // TO CHECK OUT THE COMMAND LINE OPTIONS use the following template
@@ -122,7 +140,9 @@ fn main() {
             app.handle_key_press(key);
         }
 
-        app.handle_remote();
+        if app.player_config.is_remote() {
+            app.handle_remote();
+        }
 
         if let Some(text) = e.text_args() {
             app.handle_text_input(&text);

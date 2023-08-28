@@ -38,7 +38,7 @@ pub enum ViewState {
     Settings,
     //JoinRoom,
     CreateRoom,
-    SinglePlayerGame,
+    Game,
     //LocalMultiplayerGame,
     //OnlineMultiplayerGame,
 }
@@ -55,7 +55,7 @@ pub struct App<'a> {
     gl: GlGraphics,
     local_players: Vec<LocalPlayer>,
     remote_player: Vec<RemotePlayer>,
-    player_config: PlayerConfig,
+    pub player_config: PlayerConfig,
     view_state: ViewState,
     assets: Assets<'a>,
     pub clock: f64,
@@ -224,21 +224,23 @@ impl App<'_> {
     }
 
     pub fn handle_key_press(&mut self, key: Key) {
-        let mut key_press = GameFlowChange::Other;
-        for player in &mut self.local_players {
-            key_press = player.handle_key_press(&self.keybindings_manager, key, self.running)
+        let mut game_key_press = GameFlowChange::Other;
+        match self.view_state {
+            ViewState::MainMenu => self.widget_manager.handle_key_press(key),
+            ViewState::Settings => self.widget_manager.handle_key_press(key),
+            ViewState::Game => {
+                for player in &mut self.local_players {
+                    game_key_press =
+                        player.handle_key_press(&self.keybindings_manager, key, self.running)
+                }
+            }
+            ViewState::CreateRoom => {}
         }
-        match key_press {
+        match game_key_press {
             GameFlowChange::Restart => self.restart(),
             GameFlowChange::Resume => self.pause(),
             GameFlowChange::Pause => self.pause(),
             GameFlowChange::GameOver => self.game_over(),
-            _ => {}
-        }
-
-        match self.view_state {
-            ViewState::MainMenu => self.widget_manager.handle_key_press(key),
-            ViewState::Settings => self.widget_manager.handle_key_press(key),
             _ => {}
         }
     }
@@ -263,6 +265,7 @@ impl App<'_> {
             }
             GameFlowChange::Resume => {
                 if self.running == RunningState::Paused {
+                    self.set_view(ViewState::Game);
                     self.pause()
                 }
             }
@@ -290,8 +293,10 @@ impl App<'_> {
     }
 
     pub fn handle_key_release(&mut self, key: Key) {
-        for player in &mut self.local_players {
-            player.handle_key_release(key);
+        if self.view_state == ViewState::Game {
+            for player in &mut self.local_players {
+                player.handle_key_release(key);
+            }
         }
     }
 
@@ -313,7 +318,7 @@ impl App<'_> {
                 self.widget_manager =
                     InteractiveWidgetManager::new_settings(&self.keybindings_manager)
             }
-            ViewState::SinglePlayerGame => {
+            ViewState::Game => {
                 self.widget_manager = InteractiveWidgetManager::new_single_player_game()
             }
             ViewState::CreateRoom => {
@@ -334,7 +339,7 @@ impl App<'_> {
             self.running = RunningState::Paused;
         }
     }
-    /// Starts a countdown then starts the game.
+    /// Starts a countdown then starts the game. Inn TwoRemote mode, sends a synchronizing message.
     fn restart(&mut self) {
         match &self.player_config {
             PlayerConfig::TwoRemote {
