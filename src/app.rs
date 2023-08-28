@@ -72,53 +72,22 @@ pub struct App<'a> {
 }
 
 impl App<'_> {
-    pub fn new(gl_version: OpenGL, player_config: PlayerConfig) -> App<'static> {
+    pub fn new(gl_version: OpenGL) -> App<'static> {
         let assets_folder = find_folder::Search::ParentsThenKids(3, 3)
             .for_folder("assets")
             .unwrap();
 
         let local_player: LocalPlayer;
-        let remote_player: RemotePlayer;
         let players: Vec<LocalPlayer>;
         let rem_players: Vec<RemotePlayer>;
         let mut rng = rand::thread_rng();
         let seed: u64 = rng.gen();
-        let mut is_host = false;
+        let is_host = false;
+        let player_config = PlayerConfig::Local;
 
-        match &player_config {
-            PlayerConfig::Local => {
-                local_player = LocalPlayer::new(seed, &player_config);
-                players = vec![local_player];
-                rem_players = vec![]
-            }
-            PlayerConfig::Streamer(_) => {
-                local_player = LocalPlayer::new(seed, &player_config);
-                players = vec![local_player];
-                rem_players = vec![]
-            }
-            PlayerConfig::Viewer(local_ip) => {
-                remote_player = RemotePlayer::new();
-                players = vec![];
-                rem_players = vec![remote_player];
-                rem_players[0].listen(&local_ip)
-            }
-            PlayerConfig::TwoRemote {
-                local_ip,
-                remote_ip: _,
-            } => {
-                local_player = LocalPlayer::new(seed, &player_config);
-                players = vec![local_player];
-                remote_player = RemotePlayer::new();
-                rem_players = vec![remote_player];
-                rem_players[0].listen(&local_ip);
-                is_host = if local_ip.chars().last().unwrap() == '0' {
-                    true
-                } else {
-                    false
-                };
-            }
-            _ => todo!(),
-        }
+        local_player = LocalPlayer::new(seed, &player_config);
+        players = vec![local_player];
+        rem_players = vec![];
 
         let assets = Assets::new(assets_folder);
         let settings_manager = Settings::new(seed, &player_config);
