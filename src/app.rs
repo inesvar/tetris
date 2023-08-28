@@ -271,6 +271,7 @@ impl App<'_> {
             }
             GameFlowChange::Restart => {
                 if self.running == RunningState::NotRunning {
+                    self.set_view(ViewState::Game);
                     self.restart()
                 }
             }
