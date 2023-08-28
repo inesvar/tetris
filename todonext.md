@@ -1,5 +1,7 @@
 # TO DO SOON
 
+- new single player game always has to be accessible
+- do not recreate players in set_player_config
 - add a paste button in join room
 
 ## Tetris Guideline

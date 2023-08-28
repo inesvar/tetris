@@ -10,36 +10,18 @@ use crate::{
     assets::Assets,
     settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION},
 };
-use clap::Parser;
 use piston::{
     event_loop::{EventSettings, Events},
     input::{RenderEvent, UpdateEvent},
     window::WindowSettings,
 };
 use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent};
-use std::fs;
 
 mod app;
 mod assets;
 mod macros;
 mod settings;
 mod ui;
-
-#[derive(Parser, Debug)]
-struct Args {
-    /* // two local players
-    #[arg(long)]
-    two_local: bool, */
-    /// two remote player
-    #[arg(short, long)]
-    two_remote: bool,
-    /// sending screen
-    #[arg(short, long)]
-    streamer: bool,
-    /// viewing remote screen
-    #[arg(short, long)]
-    viewer: bool,
-}
 
 #[derive(PartialEq, Debug)]
 pub enum PlayerConfig {
@@ -63,58 +45,11 @@ impl PlayerConfig {
     }
 }
 
-// TO CHECK OUT THE COMMAND LINE OPTIONS use the following template
-// cargo run -- -h
-
 fn main() {
-    // Check the command line arguments.
-    let args = Args::parse();
-
-    //let mut local_ip = my_local_ip.to_string() + &fs::read_to_string("local_port.txt").expect("Should have been able to read the file");
-    let mut local_ip = String::from("127.0.0.1")
-        + &fs::read_to_string("local_port.txt").expect("Should have been able to read the file");
-
-    let mut remote_ip =
-        fs::read_to_string("remote_ip.txt").expect("Should have been able to read the file");
-
-    if local_ip.ends_with("\n") {
-        local_ip.pop();
-    }
-
-    if remote_ip.ends_with("\n") {
-        remote_ip.pop();
-    }
-    //println!("remote ip is {}.", remote_ip);
-    //println!("local ip is {}.", local_ip);
-
-    let config: PlayerConfig = /*if args.two_local {
-        PlayerConfig::TwoLocal
-    } else  */
-    if args.two_remote {
-        PlayerConfig::TwoRemote {
-            local_ip,
-            remote_ip,
-        }
-    } else if args.streamer {
-        PlayerConfig::Streamer(remote_ip)
-    } else if args.viewer {
-        PlayerConfig::Viewer(local_ip)
-    } else {
-        PlayerConfig::Local
-    };
-
-    let window_width = match config {
-        PlayerConfig::TwoLocal => DEFAULT_WINDOW_WIDTH * 2,
-        PlayerConfig::TwoRemote {
-            local_ip: _,
-            remote_ip: _,
-        } => DEFAULT_WINDOW_WIDTH * 2,
-        _ => DEFAULT_WINDOW_WIDTH,
-    };
 
     // Create a Glutin window.
     let mut window: piston_window::PistonWindow =
-        WindowSettings::new("TETRIS", [window_width, DEFAULT_WINDOW_HEIGHT])
+        WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
             .graphics_api(OPENGL_VERSION)
             .vsync(true)
             .exit_on_esc(true)
@@ -122,7 +57,7 @@ fn main() {
             .unwrap();
 
     // Create a new game and run it.
-    let mut app = App::new(OPENGL_VERSION, config);
+    let mut app = App::new(OPENGL_VERSION);
     let mut fall_speed_divide: u64 = 50;
     let mut freeze: u64 = 50;
 
