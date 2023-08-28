@@ -14,26 +14,25 @@ impl App<'_> {
                 ViewState::MainMenu => {
                     self.title_text
                         .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.widget_manager
-                        .render(ctx.transform, &ctx, gl, &mut self.assets)
+                    self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
                 ViewState::Settings => {
                     self.title_text
                         .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.widget_manager
-                        .render(ctx.transform, &ctx, gl, &mut self.assets)
+                    for widget_manager in &mut self.widget_manager {
+                        widget_manager
+                            .render(ctx.transform, &ctx, gl, &mut self.assets);
+                    }
                 }
                 ViewState::CreateRoom => {
                     self.title_text
                         .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.widget_manager
-                        .render(ctx.transform, &ctx, gl, &mut self.assets)
+                    self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
                 ViewState::JoinRoom => {
                     self.title_text
                         .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.widget_manager
-                        .render(ctx.transform, &ctx, gl, &mut self.assets)
+                    self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
                 ViewState::Game => {
                     if self.running == RunningState::Running {
@@ -94,7 +93,7 @@ impl App<'_> {
                         nb_players += 1;
                     }
 
-                    self.widget_manager
+                    self.widget_manager[0]
                         .render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
             }

@@ -17,13 +17,15 @@ impl App<'_> {
     pub fn update(&mut self, args: &UpdateArgs, fall_speed_divide: u64, freeze: u64) {
         // first apply the changes inside the views
         if self.view_state == ViewState::Settings {
-            self.widget_manager
-                .update_settings(&mut self.keybindings_manager);
+            for (id, widget_manager) in self.widget_manager.iter_mut().enumerate() {
+                widget_manager
+                    .update_settings(&mut self.keybindings_manager[id]);
+            }
         } else if self.view_state == ViewState::CreateRoom {
-            self.widget_manager.update_clipboard();
+            self.widget_manager[0].update_clipboard();
         } else if self.view_state == ViewState::JoinRoom {
-            self.widget_manager.update_clipboard();
-            self.widget_manager.update_from_text();
+            self.widget_manager[0].update_clipboard();
+            self.widget_manager[0].update_from_text();
         } else if self.view_state == ViewState::Game && self.running == RunningState::Starting {
             self.clock += args.dt;
             match self.clock {
@@ -63,9 +65,9 @@ impl App<'_> {
                 }
             }
             // update
-            for player in &mut self.local_players {
+            for (id, player) in self.local_players.iter_mut().enumerate() {
                 player.update(
-                    &self.keybindings_manager,
+                    &self.keybindings_manager[id],
                     self.frame_counter,
                     fall_speed_divide,
                     freeze,
@@ -95,7 +97,7 @@ impl App<'_> {
         }
 
         // then eventually change the view
-        let result = self.widget_manager.update_view();
+        let result = self.widget_manager[0].update_view();
         match result {
             ButtonType::ToPause => {
                 if self.view_state == ViewState::Game {

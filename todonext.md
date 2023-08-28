@@ -1,6 +1,6 @@
 # TO DO SOON
 
-- playerconfig twolocal
+- widget also make a double for the game
 
 # to test on two computers 
 

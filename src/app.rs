@@ -64,8 +64,8 @@ pub struct App<'a> {
     pause_text: Text,
     timer_text: Text,
     pub cursor_position: [f64; 2],
-    widget_manager: InteractiveWidgetManager,
-    keybindings_manager: Keybindings,
+    widget_manager: Vec<InteractiveWidgetManager>,
+    keybindings_manager: Vec<Keybindings>,
     settings_manager: Settings,
     is_synchronized: bool,
     is_host: bool,
@@ -131,8 +131,8 @@ impl App<'_> {
             frame_counter: 0,
             running: RunningState::NotRunning,
             cursor_position: [0.0, 0.0],
-            widget_manager: InteractiveWidgetManager::new_main_menu(),
-            keybindings_manager: Keybindings::new(),
+            widget_manager: vec![InteractiveWidgetManager::new_main_menu()],
+            keybindings_manager: vec![Keybindings::new()],
             settings_manager,
             is_synchronized: false,
             is_host,
@@ -196,9 +196,8 @@ impl App<'_> {
 
     pub fn handle_text_input(&mut self, input: &String) {
         match self.view_state {
-            ViewState::MainMenu => self.widget_manager.handle_text_input(input),
-            ViewState::Settings => self.widget_manager.handle_text_input(input),
-            ViewState::JoinRoom => self.widget_manager.handle_text_input(input),
+            ViewState::MainMenu => self.widget_manager[0].handle_text_input(input),
+            ViewState::JoinRoom => self.widget_manager[0].handle_text_input(input),
             _ => {}
         }
     }
@@ -206,13 +205,17 @@ impl App<'_> {
     pub fn handle_key_press(&mut self, key: Key) {
         let mut game_key_press = GameFlowChange::Other;
         match self.view_state {
-            ViewState::MainMenu => self.widget_manager.handle_key_press(key),
-            ViewState::Settings => self.widget_manager.handle_key_press(key),
-            ViewState::JoinRoom => self.widget_manager.handle_key_press(key),
+            ViewState::MainMenu => self.widget_manager[0].handle_key_press(key),
+            ViewState::Settings => {
+                for widget_manager in &mut self.widget_manager {
+                    widget_manager.handle_key_press(key);
+                }
+            }
+            ViewState::JoinRoom => self.widget_manager[0].handle_key_press(key),
             ViewState::Game => {
-                for player in &mut self.local_players {
+                for (id, player) in self.local_players.iter_mut().enumerate() {
                     game_key_press =
-                        player.handle_key_press(&self.keybindings_manager, key, self.running)
+                        player.handle_key_press(&self.keybindings_manager[id], key, self.running)
                 }
             }
             ViewState::CreateRoom => {}
@@ -294,25 +297,32 @@ impl App<'_> {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
-        self.widget_manager
-            .handle_mouse_press(button, &self.cursor_position);
+        for widget_manager in &mut self.widget_manager {
+            widget_manager.handle_mouse_press(button, &self.cursor_position);
+        }  
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
-        self.widget_manager.handle_mouse_release(button);
+        for widget_manager in &mut self.widget_manager {
+            widget_manager.handle_mouse_release(button);
+        }
     }
 
     fn set_view(&mut self, view_state: ViewState) {
         println!("setting view to {:?}", view_state);
         self.view_state = view_state;
         match self.view_state {
-            ViewState::MainMenu => self.widget_manager = InteractiveWidgetManager::new_main_menu(),
+            ViewState::MainMenu => self.widget_manager = vec![InteractiveWidgetManager::new_main_menu()],
             ViewState::Settings => {
                 self.widget_manager =
-                    InteractiveWidgetManager::new_settings(&self.keybindings_manager, 0)
+                vec![InteractiveWidgetManager::new_settings(&self.keybindings_manager[0], 0)];
+                if self.player_config == PlayerConfig::TwoLocal {
+                    self.keybindings_manager.push(Keybindings::new());
+                    self.widget_manager.push(InteractiveWidgetManager::new_settings(&self.keybindings_manager[1], 1));
+                }
             }
             ViewState::Game => {
-                self.widget_manager = InteractiveWidgetManager::new_single_player_game()
+                self.widget_manager = vec![InteractiveWidgetManager::new_single_player_game()];
             }
             ViewState::CreateRoom => {
                 let mut file = File::create("local_port.txt").unwrap();
@@ -320,12 +330,12 @@ impl App<'_> {
                 //let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
                 let local_ip = "127.0.0.1".to_string() + HOST_PORT;
                 self.set_player_config(PlayerConfig::Viewer(local_ip));
-                self.widget_manager = InteractiveWidgetManager::new_create_room()
+                self.widget_manager = vec![InteractiveWidgetManager::new_create_room()]
             }
             ViewState::JoinRoom => {
                 let mut file = File::create("local_port.txt").unwrap();
                 file.write(GUEST_PORT.as_bytes()).unwrap();
-                self.widget_manager = InteractiveWidgetManager::new_join_room()
+                self.widget_manager = vec![InteractiveWidgetManager::new_join_room()]
             }
         }
     }
