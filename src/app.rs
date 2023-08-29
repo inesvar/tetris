@@ -17,7 +17,7 @@ use piston::MouseButton;
 use piston_window::Key;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use std::{fs::File, io::Write, net::TcpStream};
+use std::net::TcpStream;
 
 /// Indicates whether the player commands lead the game to pause, resume, restart or no.
 /// The GameOver variant is only used for remote players.
@@ -341,16 +341,16 @@ impl App<'_> {
                 }
             }
             ViewState::CreateRoom => {
-                let mut file = File::create("local_port.txt").unwrap();
-                file.write(HOST_PORT.as_bytes()).unwrap();
+                /* let mut file = File::create("local_port.txt").unwrap();
+                file.write(HOST_PORT.as_bytes()).unwrap(); */
                 //let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
                 let local_ip = "127.0.0.1".to_string() + HOST_PORT;
                 self.set_player_config(PlayerConfig::Viewer(local_ip));
                 self.widget_manager = vec![InteractiveWidgetManager::new_create_room()]
             }
             ViewState::JoinRoom => {
-                let mut file = File::create("local_port.txt").unwrap();
-                file.write(GUEST_PORT.as_bytes()).unwrap();
+                /* let mut file = File::create("local_port.txt").unwrap();
+                file.write(GUEST_PORT.as_bytes()).unwrap(); */
                 self.widget_manager = vec![InteractiveWidgetManager::new_join_room()]
             }
         }

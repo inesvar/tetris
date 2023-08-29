@@ -2,7 +2,7 @@
 
 I think this fixed it
 ```
-sudo apt-get install build-essential
+sudo apt-get install libxcb-shape0-dev libxcb-xfixes0-dev
 ```
 
 # message d'erreur du linker pour -lSDL2
