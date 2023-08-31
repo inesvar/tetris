@@ -433,8 +433,8 @@ impl InteractiveWidgetManager {
             Some(button) => {
                 if button.commit() {
                     println!("supposed to COPY");
-                    //let ip = local_ip().unwrap().to_string();
-                    let ip = "127.0.0.1".to_string();
+                    let ip = local_ip().unwrap().to_string();
+                    //let ip = "127.0.0.1".to_string();
                     let text = format!("{}{}", ip, HOST_PORT);
                     let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
                     ctx.set_contents(text.to_owned()).unwrap();
@@ -448,7 +448,7 @@ impl InteractiveWidgetManager {
                     println!("supposed to PASTE");
                     let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
                     let ip = ctx.get_contents().unwrap();
-                    let mut text_input = self.get_input(TextInputType::IpAddressInput);
+                    let text_input = self.get_input(TextInputType::IpAddressInput);
                     text_input.text.content = ip;
                 }
             }
@@ -462,8 +462,8 @@ impl InteractiveWidgetManager {
             let text_input = self.get_input(TextInputType::IpAddressInput);
             let remote_ip = text_input.text.content.clone();
             println!("remote ip is {remote_ip}");
-            //let local_ip = local_ip().unwrap().to_string();
-            let local_ip = "127.0.0.1".to_string();
+            let local_ip = local_ip().unwrap().to_string();
+            //let local_ip = "127.0.0.1".to_string();
             let local_ip = format!("{}{}", local_ip, GUEST_PORT);
 
             let join_room = Button::new_committed(

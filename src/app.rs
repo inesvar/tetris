@@ -12,6 +12,7 @@ use crate::ui::text::Text;
 use crate::Assets;
 use crate::{app::remote::MessageType, PlayerConfig};
 use crate::{once, settings::*};
+use local_ip_address::local_ip;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::MouseButton;
 use piston_window::Key;
@@ -143,8 +144,8 @@ impl App<'_> {
     pub fn set_player_config(&mut self, player_config: PlayerConfig) {
         // kill the previous listener
         if self.player_config.is_remote() {
-            //let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
-            let local_ip = "127.0.0.1".to_string() + HOST_PORT;
+            let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
+            //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
             if let Ok(stream) = TcpStream::connect(local_ip) {
                 serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::KillMsg)
                     .unwrap();
@@ -281,8 +282,8 @@ impl App<'_> {
                 }
             }
             GameFlowChange::Hello(remote_ip) => {
-                //let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
-                let local_ip = "127.0.0.1".to_string() + HOST_PORT;
+                let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
+                //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
                 let player_config = PlayerConfig::TwoRemote {
                     local_ip,
                     remote_ip,
@@ -343,8 +344,8 @@ impl App<'_> {
             ViewState::CreateRoom => {
                 /* let mut file = File::create("local_port.txt").unwrap();
                 file.write(HOST_PORT.as_bytes()).unwrap(); */
-                //let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
-                let local_ip = "127.0.0.1".to_string() + HOST_PORT;
+                let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
+                //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
                 self.set_player_config(PlayerConfig::Viewer(local_ip));
                 self.widget_manager = vec![InteractiveWidgetManager::new_create_room()]
             }
