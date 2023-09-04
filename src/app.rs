@@ -193,10 +193,12 @@ impl App<'_> {
                 self.remote_player = vec![]
             }
             PlayerConfig::Viewer(local_ip) => {
-                remote_player = RemotePlayer::new();
                 self.local_players = vec![];
-                self.remote_player = vec![remote_player];
-                self.remote_player[0].listen(&local_ip)
+                if self.remote_player.len() == 0 {
+                    remote_player = RemotePlayer::new();
+                    self.remote_player = vec![remote_player];
+                    self.remote_player[0].listen(&local_ip);
+                }
             }
             PlayerConfig::TwoRemote {
                 local_ip,

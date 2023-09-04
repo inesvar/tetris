@@ -74,7 +74,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 - DEFAULT_BUTTON_Y_SPACING,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
-            "New single-player game",
+            "Single-player game",
         );
 
         let create_room_button = Button::new(
@@ -106,7 +106,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
-            "New two-player game",
+            "two-player game",
         );
 
         let mut buttons = HashMap::new();
@@ -120,17 +120,6 @@ impl InteractiveWidgetManager {
         buttons.insert(ButtonType::ToTwoLocalGame, create_two_player_game_button);
 
         let text_inputs = HashMap::new();
-        /* text_inputs.insert(
-            TextInputType::DebugTextInput,
-            TextInput::new_with_info(
-                (10.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-                (10.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
-                2.0 / 3.0 * DEFAULT_BUTTON_WIDTH,
-                DEFAULT_BUTTON_HEIGHT,
-                "Type here...",
-                "try this pls",
-            ),
-        ); */
 
         let key_inputs = HashMap::new();
 
@@ -455,10 +444,10 @@ impl InteractiveWidgetManager {
         );
 
         let paste_ip = Button::new(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0 + DEFAULT_BUTTON_WIDTH * 0.7,
-            DEFAULT_WINDOW_HEIGHT as f64 / 3.0,
-            DEFAULT_BUTTON_WIDTH / 6.0,
-            DEFAULT_BUTTON_HEIGHT / 2.0,
+            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
+            DEFAULT_BUTTON_WIDTH,
+            DEFAULT_BUTTON_HEIGHT,
             "Paste",
         );
 
