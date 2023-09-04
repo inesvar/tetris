@@ -68,7 +68,6 @@ impl RemotePlayer {
                     }
                     MessageType::HelloMsg(remote_ip) => {
                         self_for_listener.update_game_flow(GameFlowChange::Hello(remote_ip));
-                        break;
                     }
                     MessageType::KillMsg => {
                         break;

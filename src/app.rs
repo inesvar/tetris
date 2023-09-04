@@ -103,7 +103,7 @@ impl App<'_> {
         let is_host = false;
         let player_config = PlayerConfig::Local;
 
-        local_player = LocalPlayer::new(seed, &player_config);
+        local_player = LocalPlayer::new(&player_config);
         players = vec![local_player];
         rem_players = vec![];
 
@@ -188,7 +188,7 @@ impl App<'_> {
 
         match &player_config {
             PlayerConfig::Local => {
-                local_player = LocalPlayer::new(self.settings_manager.seed, &player_config);
+                local_player = LocalPlayer::new(&player_config);
                 self.local_players = vec![local_player];
                 self.remote_player = vec![]
             }
@@ -202,11 +202,13 @@ impl App<'_> {
                 local_ip,
                 remote_ip: _,
             } => {
-                local_player = LocalPlayer::new(self.settings_manager.seed, &player_config);
+                local_player = LocalPlayer::new(&player_config);
                 self.local_players = vec![local_player];
-                remote_player = RemotePlayer::new();
-                self.remote_player = vec![remote_player];
-                self.remote_player[0].listen(&local_ip);
+                if self.remote_player.len() == 0 {
+                    remote_player = RemotePlayer::new();
+                    self.remote_player = vec![remote_player];
+                    self.remote_player[0].listen(&local_ip);
+                }
                 self.is_host = if local_ip.chars().last().unwrap() == '0' {
                     true
                 } else {
@@ -214,8 +216,8 @@ impl App<'_> {
                 };
             }
             PlayerConfig::TwoLocal => {
-                local_player = LocalPlayer::new(self.settings_manager.seed, &player_config);
-                let second_local = LocalPlayer::new(self.settings_manager.seed, &player_config);
+                local_player = LocalPlayer::new(&player_config);
+                let second_local = LocalPlayer::new(&player_config);
                 self.local_players = vec![local_player, second_local];
                 self.remote_player = vec![]
             }
@@ -315,6 +317,7 @@ impl App<'_> {
                 };
                 self.set_player_config(player_config);
                 self.set_view(ViewState::Remote);
+                self.local_players[0].send_serialized();
             }
             _ => {}
         }
@@ -432,6 +435,24 @@ impl App<'_> {
                     self.settings_manager.send();
                 } else {
                     self.send_message(MessageType::RestartMsg);
+                }
+            }
+            PlayerConfig::TwoLocal => {
+                self.running = RunningState::Starting;
+                self.clock = 0.0;
+                let mut rng = rand::thread_rng();
+                self.settings_manager.seed = rng.gen();
+                for player in &mut self.local_players {
+                    player.renew(self.settings_manager.seed);
+                }
+            }
+            PlayerConfig::Local => {
+                self.running = RunningState::Starting;
+                self.clock = 0.0;
+                let mut rng = rand::thread_rng();
+                self.settings_manager.seed = rng.gen();
+                for player in &mut self.local_players {
+                    player.renew(self.settings_manager.seed);
                 }
             }
             _ => {
