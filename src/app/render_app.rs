@@ -94,7 +94,7 @@ impl App<'_> {
 
                     self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
-                _ => unreachable!()
+                _ => unreachable!(),
             }
         });
     }
