@@ -269,9 +269,58 @@ impl InteractiveWidgetManager {
             "Pause",
         );
 
+        let settings_button = Button::new(
+            (58.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            DEFAULT_BUTTON_WIDTH / 3.5,
+            DEFAULT_BUTTON_HEIGHT / 2.0,
+            "Settings",
+        );
+
         let mut buttons = HashMap::new();
         buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
         buttons.insert(ButtonType::ToPause, pause_button);
+        buttons.insert(ButtonType::ToSettings, settings_button);
+
+        let text_inputs = HashMap::new();
+        let key_inputs = HashMap::new();
+
+        InteractiveWidgetManager {
+            buttons,
+            text_inputs,
+            key_inputs,
+        }
+    }
+
+    pub fn new_two_player_game() -> InteractiveWidgetManager {
+        let back_to_main_menu_button = Button::new(
+            (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            DEFAULT_BUTTON_WIDTH / 6.0,
+            DEFAULT_BUTTON_HEIGHT / 2.0,
+            "Back",
+        );
+
+        let pause_button = Button::new(
+            (13.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            DEFAULT_BUTTON_WIDTH / 5.0,
+            DEFAULT_BUTTON_HEIGHT / 2.0,
+            "Pause",
+        );
+
+        let settings_button = Button::new(
+            (123.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            DEFAULT_BUTTON_WIDTH / 3.5,
+            DEFAULT_BUTTON_HEIGHT / 2.0,
+            "Settings",
+        );
+
+        let mut buttons = HashMap::new();
+        buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+        buttons.insert(ButtonType::ToPause, pause_button);
+        buttons.insert(ButtonType::ToSettings, settings_button);
 
         let text_inputs = HashMap::new();
         let key_inputs = HashMap::new();
