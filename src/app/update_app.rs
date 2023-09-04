@@ -25,7 +25,7 @@ impl App<'_> {
         } else if self.view_state == ViewState::JoinRoom {
             self.widget_manager[0].update_clipboard();
             self.widget_manager[0].update_from_text();
-        } else if self.view_state == ViewState::Game && self.running == RunningState::Starting {
+        } else if self.view_state.is_game() && self.running == RunningState::Starting {
             self.clock += args.dt;
             match self.clock {
                 i if i < 1.0 => self.countdown(&Countdown::Three),
@@ -36,7 +36,7 @@ impl App<'_> {
             for player in &mut self.local_players {
                 player.send_serialized();
             }
-        } else if self.view_state == ViewState::Game && self.running == RunningState::Running {
+        } else if self.view_state.is_game() && self.running == RunningState::Running {
             self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             if let PlayerConfig::TwoRemote {
@@ -99,7 +99,7 @@ impl App<'_> {
         let result = self.widget_manager[0].update_view();
         match result {
             ButtonType::ToPause => {
-                if self.view_state == ViewState::Game {
+                if self.view_state.is_game() {
                     self.pause()
                 }
             }
@@ -111,17 +111,24 @@ impl App<'_> {
                 };
                 self.set_view(ViewState::MainMenu)
             }
-            ButtonType::ToSettings => self.set_view(ViewState::Settings),
+            ButtonType::ToSettings => {
+                if self.running == RunningState::Running {
+                    self.pause()
+                };
+                self.set_view(ViewState::Settings)
+            }
             ButtonType::ToSinglePlayerGame => {
-                self.set_player_config(PlayerConfig::Local);
-                self.set_view(ViewState::Game)
+                if self.player_config != PlayerConfig::Local {
+                    self.set_player_config(PlayerConfig::Local);
+                }
+                self.set_view(ViewState::Local)
             }
             ButtonType::ToCreateRoom => self.set_view(ViewState::CreateRoom),
             ButtonType::ToJoinRoom => {
                 if self.player_config == PlayerConfig::Local {
                     self.set_view(ViewState::JoinRoom)
                 } else if self.player_config.is_remote() {
-                    self.set_view(ViewState::Game)
+                    self.set_view(ViewState::Remote)
                 }
             }
             ButtonType::ToTwoRemoteGameInfo {
@@ -132,13 +139,24 @@ impl App<'_> {
                     local_ip: local_ip.clone(),
                     remote_ip,
                 });
-                self.set_view(ViewState::Game);
+                self.set_view(ViewState::Remote);
                 self.send_message(MessageType::HelloMsg(local_ip));
             }
             ButtonType::ToTwoLocalGame => {
-                self.set_player_config(PlayerConfig::TwoLocal);
-                self.set_view(ViewState::Game);
+                if self.player_config != PlayerConfig::TwoLocal {
+                    self.set_player_config(PlayerConfig::TwoLocal);
+                }
+                self.set_view(ViewState::TwoLocal);
             }
+            ButtonType::BackToGame => match &self.player_config {
+                PlayerConfig::TwoLocal => self.set_view(ViewState::TwoLocal),
+                PlayerConfig::Local => self.set_view(ViewState::Local),
+                PlayerConfig::TwoRemote {
+                    local_ip: _,
+                    remote_ip: _,
+                } => self.set_view(ViewState::Remote),
+                _ => unreachable!(),
+            },
             _ => {}
         }
     }

@@ -21,6 +21,7 @@ pub enum ButtonType {
     ToJoinRoom,
     ToSettings,
     BackToMainMenu,
+    BackToGame,
     ToTwoLocalGame,
     ToPause,
     CopyToClipboard,
@@ -51,6 +52,13 @@ pub enum KeyInputType {
     RotateClockwiseKey(Vec<Key>),
     RotateCounterclockwiseKey(Vec<Key>),
     HoldTetrominoKey(Vec<Key>),
+}
+
+#[derive(PartialEq)]
+pub enum SettingsType {
+    OnePlayer,
+    LeftPlayer,
+    RightPlayer,
 }
 
 pub struct InteractiveWidgetManager {
@@ -133,8 +141,16 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub fn new_settings(settings: &Keybindings, id: usize) -> InteractiveWidgetManager {
-        let player_x = id as f64 * DEFAULT_WINDOW_WIDTH as f64;
+    pub fn new_settings(
+        settings: &Keybindings,
+        settings_type: SettingsType,
+        from_game: bool,
+    ) -> InteractiveWidgetManager {
+        let player_x = if settings_type == SettingsType::RightPlayer {
+            DEFAULT_WINDOW_WIDTH as f64
+        } else {
+            0.0
+        };
         let fall_keys_input = KeyInput::new_with_info(
             DEFAULT_WINDOW_WIDTH as f64 / 4.0 + player_x,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
@@ -200,15 +216,54 @@ impl InteractiveWidgetManager {
 
         let mut buttons = HashMap::new();
 
-        if id == 0 {
-            let back_to_main_menu_button = Button::new(
-                (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-                (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
-                DEFAULT_BUTTON_WIDTH / 6.0,
-                DEFAULT_BUTTON_HEIGHT / 2.0,
-                "Back",
-            );
-            buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+        if !from_game {
+            match settings_type {
+                SettingsType::OnePlayer => {
+                    let back_to_main_menu_button = Button::new(
+                        (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+                        (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+                        DEFAULT_BUTTON_WIDTH / 6.0,
+                        DEFAULT_BUTTON_HEIGHT / 2.0,
+                        "Back",
+                    );
+                    buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+                }
+                SettingsType::RightPlayer => {}
+                SettingsType::LeftPlayer => {
+                    let back_to_main_menu_button = Button::new(
+                        (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+                        (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+                        DEFAULT_BUTTON_WIDTH / 6.0,
+                        DEFAULT_BUTTON_HEIGHT / 2.0,
+                        "Back",
+                    );
+                    buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+                }
+            }
+        } else {
+            match settings_type {
+                SettingsType::OnePlayer => {
+                    let back_to_game_button = Button::new(
+                        (60.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+                        (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+                        DEFAULT_BUTTON_WIDTH / 6.0,
+                        DEFAULT_BUTTON_HEIGHT / 2.0,
+                        "Back",
+                    );
+                    buttons.insert(ButtonType::BackToGame, back_to_game_button);
+                }
+                SettingsType::RightPlayer => {}
+                SettingsType::LeftPlayer => {
+                    let back_to_game_button = Button::new(
+                        (125.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
+                        (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+                        DEFAULT_BUTTON_WIDTH / 6.0,
+                        DEFAULT_BUTTON_HEIGHT / 2.0,
+                        "Back",
+                    );
+                    buttons.insert(ButtonType::BackToGame, back_to_game_button);
+                }
+            }
         }
 
         let text_inputs = HashMap::new();
