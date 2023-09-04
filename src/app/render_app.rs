@@ -10,7 +10,7 @@ impl App<'_> {
             // Clear the screen.
             graphics::clear(BG_COLOR, gl);
 
-            match self.view_state {
+            match &self.view_state {
                 ViewState::MainMenu => {
                     self.title_text
                         .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
@@ -33,7 +33,7 @@ impl App<'_> {
                         .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
                     self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
-                ViewState::Game => {
+                a if a.is_game() => {
                     if self.running == RunningState::Running {
                         self.title_text.render(
                             ctx.transform,
@@ -94,6 +94,7 @@ impl App<'_> {
 
                     self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
+                _ => unreachable!()
             }
         });
     }

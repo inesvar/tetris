@@ -34,10 +34,6 @@ impl LocalPlayer {
         let mut remote_ip = String::from("");
         let mut sender = false;
         match player_config {
-            PlayerConfig::Streamer(ip) => {
-                sender = true;
-                remote_ip = ip.to_string();
-            }
             PlayerConfig::TwoRemote {
                 local_ip: _,
                 remote_ip: ip,

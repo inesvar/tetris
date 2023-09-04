@@ -209,7 +209,6 @@ impl Settings {
         let nb_next_tetromino = NB_NEXT_TETROMINO;
         let mut remote_ip = None;
         match &player_config {
-            PlayerConfig::Streamer(ip) => remote_ip = Some(String::from(ip.as_str())),
             PlayerConfig::TwoRemote {
                 local_ip: _,
                 remote_ip: ip,
@@ -228,7 +227,6 @@ impl Settings {
 
     pub fn set_player_config(&mut self, player_config: &PlayerConfig) {
         match &player_config {
-            PlayerConfig::Streamer(ip) => self.remote_ip = Some(String::from(ip.as_str())),
             PlayerConfig::TwoRemote {
                 local_ip: _,
                 remote_ip: ip,

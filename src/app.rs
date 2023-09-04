@@ -7,8 +7,10 @@ mod update_app;
 use self::player::LocalPlayer;
 pub use self::player::{PlayerScreen, Tetromino};
 use self::remote::RemotePlayer;
-use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
-use crate::ui::text::Text;
+use crate::ui::{
+    interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
+    text::Text,
+};
 use crate::Assets;
 use crate::{app::remote::MessageType, PlayerConfig};
 use crate::{once, settings::*};
@@ -33,13 +35,28 @@ pub enum GameFlowChange {
     Other,
 }
 
+/// View state indicates what is on screen.
+/// The game states are handled differently with help of the [is_game()] method.
 #[derive(Debug, PartialEq)]
 pub enum ViewState {
     MainMenu,
     Settings,
     JoinRoom,
     CreateRoom,
-    Game,
+    Local,
+    TwoLocal,
+    Remote,
+}
+
+impl ViewState {
+    fn is_game(&self) -> bool {
+        match &self {
+            Self::Local => true,
+            Self::TwoLocal => true,
+            Self::Remote => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(PartialEq, Serialize, Deserialize, Clone, Copy)]
@@ -142,27 +159,29 @@ impl App<'_> {
     }
 
     pub fn set_player_config(&mut self, player_config: PlayerConfig) {
+        // make the game unactive
+        self.running = RunningState::NotRunning;
         // kill the previous listener
         if self.player_config.is_remote() {
-            let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
+            let server: String;
+            if self.is_host {
+                server = local_ip().unwrap().to_string() + HOST_PORT;
+            } else {
+                server = local_ip().unwrap().to_string() + GUEST_PORT;
+            }
             //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
-            if let Ok(stream) = TcpStream::connect(local_ip) {
+            if let Ok(stream) = TcpStream::connect(server) {
                 serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::KillMsg)
                     .unwrap();
             }
         }
 
-        println!("setting player config {:?}", player_config);
+        println!("SETTING PLAYER CONFIG {:?}", player_config);
         let local_player: LocalPlayer;
         let remote_player: RemotePlayer;
 
         match &player_config {
             PlayerConfig::Local => {
-                local_player = LocalPlayer::new(self.settings_manager.seed, &player_config);
-                self.local_players = vec![local_player];
-                self.remote_player = vec![]
-            }
-            PlayerConfig::Streamer(_) => {
                 local_player = LocalPlayer::new(self.settings_manager.seed, &player_config);
                 self.local_players = vec![local_player];
                 self.remote_player = vec![]
@@ -210,7 +229,7 @@ impl App<'_> {
 
     pub fn handle_key_press(&mut self, key: Key) {
         let mut game_key_press = GameFlowChange::Other;
-        match self.view_state {
+        match &self.view_state {
             ViewState::MainMenu => self.widget_manager[0].handle_key_press(key),
             ViewState::Settings => {
                 for widget_manager in &mut self.widget_manager {
@@ -218,13 +237,13 @@ impl App<'_> {
                 }
             }
             ViewState::JoinRoom => self.widget_manager[0].handle_key_press(key),
-            ViewState::Game => {
+            a if a.is_game() => {
                 for (id, player) in self.local_players.iter_mut().enumerate() {
                     game_key_press =
                         player.handle_key_press(&self.keybindings_manager[id], key, self.running)
                 }
             }
-            ViewState::CreateRoom => {}
+            _ => {}
         }
         match game_key_press {
             GameFlowChange::Restart => self.restart(),
@@ -256,14 +275,14 @@ impl App<'_> {
             }
             GameFlowChange::Resume => {
                 if self.running == RunningState::Paused {
-                    self.set_view(ViewState::Game);
+                    self.set_view(ViewState::Remote);
                     self.pause()
                 }
             }
             GameFlowChange::Restart => {
                 once!("restart was received");
                 if self.running == RunningState::NotRunning {
-                    self.set_view(ViewState::Game);
+                    self.set_view(ViewState::Remote);
                     self.restart()
                 }
             }
@@ -295,7 +314,7 @@ impl App<'_> {
     }
 
     pub fn handle_key_release(&mut self, key: Key) {
-        if self.view_state == ViewState::Game {
+        if self.view_state.is_game() {
             for player in &mut self.local_players {
                 player.handle_key_release(key);
             }
@@ -316,34 +335,49 @@ impl App<'_> {
 
     fn set_view(&mut self, view_state: ViewState) {
         println!("setting view to {:?}", view_state);
+        let from_game = self.view_state.is_game();
         self.view_state = view_state;
         match self.view_state {
             ViewState::MainMenu => {
                 self.widget_manager = vec![InteractiveWidgetManager::new_main_menu()]
             }
             ViewState::Settings => {
-                self.widget_manager = vec![InteractiveWidgetManager::new_settings(
-                    &self.keybindings_manager[0],
-                    0,
-                )];
+                match &self.player_config {
+                    PlayerConfig::Local => {
+                        self.widget_manager = vec![InteractiveWidgetManager::new_settings(
+                            &self.keybindings_manager[0],
+                            SettingsType::OnePlayer,
+                            from_game,
+                        )]
+                    }
+                    _ => {
+                        self.widget_manager = vec![InteractiveWidgetManager::new_settings(
+                            &self.keybindings_manager[0],
+                            SettingsType::LeftPlayer,
+                            from_game,
+                        )]
+                    }
+                }
                 if self.player_config == PlayerConfig::TwoLocal {
                     self.keybindings_manager.push(Keybindings::new());
                     self.widget_manager
                         .push(InteractiveWidgetManager::new_settings(
                             &self.keybindings_manager[1],
-                            1,
+                            SettingsType::RightPlayer,
+                            from_game,
                         ));
                 }
             }
-            ViewState::Game => {
-                if self.player_config == PlayerConfig::TwoLocal {
-                    self.keybindings_manager = vec![Keybindings::new_two_local(0), Keybindings::new_two_local(1)];
-                }
-                if self.player_config.is_multiplayer() {
-                    self.widget_manager = vec![InteractiveWidgetManager::new_two_player_game()];
-                } else {
-                    self.widget_manager = vec![InteractiveWidgetManager::new_single_player_game()];
-                }
+            ViewState::TwoLocal => {
+                self.keybindings_manager =
+                    vec![Keybindings::new_two_local(0), Keybindings::new_two_local(1)];
+                self.widget_manager = vec![InteractiveWidgetManager::new_two_player_game()];
+            }
+            ViewState::Local => {
+                self.widget_manager = vec![InteractiveWidgetManager::new_single_player_game()];
+            }
+            ViewState::Remote => {
+                self.widget_manager = vec![InteractiveWidgetManager::new_two_player_game()];
             }
             ViewState::CreateRoom => {
                 /* let mut file = File::create("local_port.txt").unwrap();
@@ -426,11 +460,6 @@ impl App<'_> {
     /// Sends message to the remote if there's a remote.
     fn send_message(&self, message: MessageType) {
         match &self.player_config {
-            PlayerConfig::Streamer(remote_ip) => {
-                if let Ok(stream) = TcpStream::connect(remote_ip) {
-                    serde_cbor::to_writer::<TcpStream, MessageType>(stream, &message).unwrap();
-                }
-            }
             PlayerConfig::TwoRemote {
                 local_ip: _,
                 remote_ip,

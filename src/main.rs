@@ -27,7 +27,6 @@ mod ui;
 #[derive(PartialEq, Debug)]
 pub enum PlayerConfig {
     Local,
-    Streamer(String),
     TwoLocal,
     TwoRemote { local_ip: String, remote_ip: String },
     Viewer(String),
