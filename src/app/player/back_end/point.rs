@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// A point moves without knownledge of its surroundings through [Transform]
 /// and thus doesn't implement collisions.
-#[derive(Clone, Copy, Serialize, Deserialize, Default)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 pub(super) struct Point {
     /// horizontal coordinate, from left to right
     pub(super) x: i8,
@@ -50,6 +50,12 @@ impl std::ops::Add for Point {
 impl std::ops::AddAssign for Point {
     fn add_assign(&mut self, other: Point) {
         *self = *self + other;
+    }
+}
+
+impl Default for Point {
+    fn default() -> Self {
+        Point::new(0, -10)
     }
 }
 

@@ -250,7 +250,7 @@ impl Settings {
         if let Ok(stream) = TcpStream::connect(self.remote_ip.as_ref().unwrap()) {
             serde_cbor::to_writer::<TcpStream, Settings>(stream, &self).unwrap();
         }
-        once!("sent serialized data to remote");
+        once!("sent serialized settings to remote");
     }
 }
 
