@@ -12,25 +12,12 @@ use rand_pcg::Pcg32;
 use std::net::TcpStream;
 
 impl LocalPlayer {
-    pub fn new(seed: u64, player_config: &PlayerConfig) -> Self {
+    pub fn new(player_config: &PlayerConfig) -> Self {
         let grid = TetrisGrid::new(DEFAULT_GRID_X, DEFAULT_GRID_Y, NB_COLUMNS, NB_ROWS);
-        let mut rng = Pcg32::seed_from_u64(seed);
-        let mut bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut rng);
-        let first_tetromino =
-            Tetromino::new(bag_of_tetromino.pop().unwrap(), &grid.matrix[..]).unwrap();
-        let mut fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
-        for _ in 0..NB_NEXT_TETROMINO {
-            if let Some(t) = bag_of_tetromino.pop() {
-                fifo_next_tetromino.push(Tetromino::new_unchecked(t));
-            } else {
-                bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut rng);
-                if let Some(t) = bag_of_tetromino.pop() {
-                    fifo_next_tetromino.push(Tetromino::new_unchecked(t));
-                } else {
-                    unreachable!();
-                }
-            }
-        }
+        let rng = Pcg32::seed_from_u64(0);
+        let bag_of_tetromino = Vec::new();
+        let first_tetromino = Tetromino::default();
+        let fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
         let mut remote_ip = String::from("");
         let mut sender = false;
         match player_config {
