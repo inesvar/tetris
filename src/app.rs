@@ -162,18 +162,24 @@ impl App<'_> {
         // make the game unactive
         self.running = RunningState::NotRunning;
         // kill the previous listener
-        if self.player_config.is_remote() {
-            let server: String;
-            if self.is_host {
-                server = local_ip().unwrap().to_string() + HOST_PORT;
-            } else {
-                server = local_ip().unwrap().to_string() + GUEST_PORT;
+        match self.player_config {
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: _,
+            } => {
+                let server: String;
+                if self.is_host {
+                    server = local_ip().unwrap().to_string() + HOST_PORT;
+                } else {
+                    server = local_ip().unwrap().to_string() + GUEST_PORT;
+                }
+                //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
+                if let Ok(stream) = TcpStream::connect(server) {
+                    serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::KillMsg)
+                        .unwrap();
+                }
             }
-            //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
-            if let Ok(stream) = TcpStream::connect(server) {
-                serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::KillMsg)
-                    .unwrap();
-            }
+            _ => {}
         }
 
         println!("SETTING PLAYER CONFIG {:?}", player_config);
@@ -308,6 +314,7 @@ impl App<'_> {
                     remote_ip,
                 };
                 self.set_player_config(player_config);
+                self.set_view(ViewState::Remote);
             }
             _ => {}
         }
