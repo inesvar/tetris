@@ -16,7 +16,7 @@ use piston::{
     AdvancedWindow, {Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent},
 };
 use piston_window::PistonWindow;
-use sdl2_window::Sdl2Window;
+use glfw_window::GlfwWindow;
 
 mod app;
 mod assets;
@@ -58,7 +58,7 @@ impl PlayerConfig {
 
 fn main() {
     // Create a Sdl2 window.
-    let mut window: PistonWindow<Sdl2Window> =
+    let mut window: PistonWindow<GlfwWindow> =
         WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
             .graphics_api(OPENGL_VERSION)
             .vsync(true)
