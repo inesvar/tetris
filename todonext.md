@@ -1,4 +1,11 @@
+# TO DO NOW
+
+- repare the pause
+- make a special settings back to game button
+
 # TO DO SOON
+
+
 
 - clean the code
 - document it
