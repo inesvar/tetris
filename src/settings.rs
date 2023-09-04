@@ -6,8 +6,8 @@ use piston::Key;
 use serde::Deserialize;
 
 static SCALE_FACTOR: f64 = 1.0;
-pub static HOST_PORT: &str = ":16000";
-pub static GUEST_PORT: &str = ":16001";
+pub static HOST_PORT: &str = ":26000";
+pub static GUEST_PORT: &str = ":26005";
 
 // Change this to OpenGL::V2_1 if not working.
 pub static OPENGL_VERSION: OpenGL = OpenGL::V4_5;
