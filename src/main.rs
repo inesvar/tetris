@@ -62,7 +62,6 @@ fn main() {
         WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
             .graphics_api(OPENGL_VERSION)
             .vsync(true)
-            .exit_on_esc(true)
             .build()
             .unwrap();
 
