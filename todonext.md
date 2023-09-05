@@ -18,4 +18,4 @@ Add the target (you can also change this for whatever target you're cross compil
 
 You can build your crate easily with:
 
-        cargo build --target x86_64-pc-windows-gnu
+        cargo build --release --target x86_64-pc-windows-gnu
