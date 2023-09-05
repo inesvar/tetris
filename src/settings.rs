@@ -109,7 +109,7 @@ impl Keybindings {
     }
 
     pub fn new_two_local(id: usize) -> Keybindings {
-        if id == 0 {
+        if id == 1 {
             let fall_keys = vec![FALL_KEYS[0]];
             let hard_drop_keys = vec![HARD_DROP_KEYS[0]];
             let right_keys = vec![RIGHT_KEYS[0]];
