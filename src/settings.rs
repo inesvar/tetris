@@ -78,12 +78,12 @@ static ROTATE_COUNTERCLOCKWISE_KEYS_1P: [Key; 1] = [Key::NumPad0];
 static HOLD_TETROMINO_KEYS_1P: [Key; 1] = [Key::C];
 
 static FALL_KEYS_2P: [Key; 2] = [Key::S, Key::NumPad5];
-static HARD_DROP_KEYS_2P: [Key; 2] = [Key::C, Key::NumPad0];
+static HARD_DROP_KEYS_2P: [Key; 2] = [Key::LCtrl, Key::NumPad0];
 static RIGHT_KEYS_2P: [Key; 2] = [Key::D, Key::NumPad6];
 static LEFT_KEYS_2P: [Key; 2] = [Key::A, Key::NumPad4];
 static ROTATE_CLOCKWISE_KEYS_2P: [Key; 2] = [Key::W, Key::NumPad8];
 static ROTATE_COUNTERCLOCKWISE_KEYS_2P: [Key; 2] = [Key::E, Key::NumPad9];
-static HOLD_TETROMINO_KEYS_2P: [Key; 2] = [Key::LCtrl, Key::NumPadEnter];
+static HOLD_TETROMINO_KEYS_2P: [Key; 2] = [Key::C, Key::NumPadPlus];
 
 pub struct Keybindings {
     pub fall_keys: Vec<Key>,
