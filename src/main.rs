@@ -10,19 +10,19 @@ use crate::{
     settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION},
 };
 use piston::{
-    event_loop::{EventSettings, Events},
-    input::{RenderEvent, UpdateEvent},
-    window::WindowSettings,
-    AdvancedWindow, {Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent},
+    {Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent},
+    AdvancedWindow,
+    event_loop::{Events, EventSettings},
+    input::{RenderEvent, UpdateEvent}, window::WindowSettings,
 };
 use piston_window::PistonWindow;
 use glfw_window::GlfwWindow;
 
 mod app;
 mod assets;
-mod macros;
 mod settings;
 mod ui;
+mod utils;
 
 #[derive(PartialEq, Debug)]
 pub enum PlayerConfig {
