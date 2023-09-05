@@ -190,7 +190,10 @@ impl App<'_> {
             PlayerConfig::Local => {
                 local_player = LocalPlayer::new(&player_config);
                 self.local_players = vec![local_player];
-                self.remote_player = vec![]
+                self.remote_player = vec![];
+                if self.keybindings_manager.len() > 1 {
+                    self.keybindings_manager = vec![Keybindings::new()];
+                }
             }
             PlayerConfig::Viewer(local_ip) => {
                 self.local_players = vec![];
@@ -198,6 +201,9 @@ impl App<'_> {
                     remote_player = RemotePlayer::new();
                     self.remote_player = vec![remote_player];
                     self.remote_player[0].listen(&local_ip);
+                }
+                if self.keybindings_manager.len() > 1 {
+                    self.keybindings_manager = vec![Keybindings::new()];
                 }
             }
             PlayerConfig::TwoRemote {
@@ -216,12 +222,16 @@ impl App<'_> {
                 } else {
                     false
                 };
+                if self.keybindings_manager.len() > 1 {
+                    self.keybindings_manager = vec![Keybindings::new()];
+                }
             }
             PlayerConfig::TwoLocal => {
                 local_player = LocalPlayer::new(&player_config);
                 let second_local = LocalPlayer::new(&player_config);
                 self.local_players = vec![local_player, second_local];
-                self.remote_player = vec![]
+                self.remote_player = vec![];
+                self.keybindings_manager = vec![Keybindings::new_two_local(0), Keybindings::new_two_local(1)];
             }
         }
 
@@ -371,7 +381,6 @@ impl App<'_> {
                     }
                 }
                 if self.player_config == PlayerConfig::TwoLocal {
-                    self.keybindings_manager.push(Keybindings::new());
                     self.widget_manager
                         .push(InteractiveWidgetManager::new_settings(
                             &self.keybindings_manager[1],
@@ -381,8 +390,6 @@ impl App<'_> {
                 }
             }
             ViewState::TwoLocal => {
-                self.keybindings_manager =
-                    vec![Keybindings::new_two_local(0), Keybindings::new_two_local(1)];
                 self.widget_manager = vec![InteractiveWidgetManager::new_two_player_game()];
             }
             ViewState::Local => {
