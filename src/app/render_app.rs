@@ -3,6 +3,7 @@ use super::{App, RunningState, ViewState};
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
 use graphics::Transformed;
 use piston::RenderArgs;
+use crate::utils::formattings::format_seconds;
 
 impl App<'_> {
     pub fn render(&mut self, args: &RenderArgs) {
@@ -42,7 +43,7 @@ impl App<'_> {
                             &mut self.assets.tetris_font,
                         );
                         self.timer_text
-                            .set_text(format!("Elapsed: {:.2}s", self.clock));
+                            .set_text(format_seconds(self.clock));
                     } else if self.running == RunningState::NotRunning {
                         self.restart_text.render(
                             ctx.transform,
