@@ -21,12 +21,12 @@ use serde::{Deserialize, Serialize};
 /// accordingly in case of change of MessageType.
 #[derive(Serialize, Deserialize)]
 pub enum MessageType {
-    PlayerScreenMsg(PlayerScreen), // not acknowledged as it's sent regularly
-    SettingsMsg(Settings),         // sent by the host of the room
-    RestartMsg,
-    PauseMsg,
-    ResumeMsg,
-    GameOverMsg,
-    HelloMsg(String),
-    KillMsg,
+    PlayerScreen(PlayerScreen), // not acknowledged as it's sent regularly
+    Settings(Settings),         // sent by the host of the room
+    Restart,
+    Pause,
+    Resume,
+    GameOver,
+    Hello(String),
+    Kill,
 }

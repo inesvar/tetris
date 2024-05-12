@@ -165,7 +165,7 @@ impl App<'_> {
             };
             //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
             if let Ok(stream) = TcpStream::connect(server) {
-                serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::KillMsg)
+                serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::Kill)
                     .unwrap();
             }
         }
@@ -402,11 +402,11 @@ impl App<'_> {
     fn pause(&mut self) {
         if self.running == RunningState::Paused {
             println!("RESUME");
-            self.send_message(MessageType::ResumeMsg);
+            self.send_message(MessageType::Resume);
             self.running = RunningState::Running;
         } else if self.running == RunningState::Running {
             println!("PAUSE");
-            self.send_message(MessageType::PauseMsg);
+            self.send_message(MessageType::Pause);
             self.running = RunningState::Paused;
         }
     }
@@ -419,7 +419,7 @@ impl App<'_> {
             } => {
                 if self.is_synchronized {
                     println!("RESTART");
-                    self.send_message(MessageType::RestartMsg);
+                    self.send_message(MessageType::Restart);
                     self.running = RunningState::Starting;
                     self.clock = 0.0;
                 } else if self.is_host {
@@ -428,7 +428,7 @@ impl App<'_> {
                     self.settings_manager.seed = rng.gen();
                     self.settings_manager.send();
                 } else {
-                    self.send_message(MessageType::RestartMsg);
+                    self.send_message(MessageType::Restart);
                 }
             }
             PlayerConfig::TwoLocal => {
@@ -468,7 +468,7 @@ impl App<'_> {
     /// Makes the game unactive.
     fn game_over(&mut self) {
         println!("GAMEOVER");
-        self.send_message(MessageType::GameOverMsg);
+        self.send_message(MessageType::GameOver);
         self.running = RunningState::NotRunning;
         self.is_synchronized = false;
     }
