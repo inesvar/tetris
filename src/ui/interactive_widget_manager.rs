@@ -502,7 +502,7 @@ impl InteractiveWidgetManager {
 
     pub fn get_button(&mut self, button_type: &ButtonType) -> &mut Button {
         self.buttons
-            .get_mut(&button_type)
+            .get_mut(button_type)
             .unwrap_or_else(|| panic!("Button {:?} not found", button_type))
     }
 

@@ -5,7 +5,7 @@ mod render_app;
 mod update_app;
 
 use self::player::LocalPlayer;
-pub use self::player::{PlayerScreen, Tetromino};
+pub use self::player::PlayerScreen;
 use self::remote::RemotePlayer;
 use crate::ui::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
@@ -95,22 +95,19 @@ impl App<'_> {
             .for_folder("assets")
             .unwrap();
 
-        let local_player: LocalPlayer;
-        let players: Vec<LocalPlayer>;
-        let rem_players: Vec<RemotePlayer>;
         let mut rng = rand::thread_rng();
         let seed: u64 = rng.gen();
         let is_host = false;
         let player_config = PlayerConfig::Local;
 
-        local_player = LocalPlayer::new(&player_config);
-        players = vec![local_player];
-        rem_players = vec![];
+        let local_player: LocalPlayer = LocalPlayer::new(&player_config);
+        let players: Vec<LocalPlayer> = vec![local_player];
+        let rem_players: Vec<RemotePlayer> = vec![];
 
         let assets = Assets::new(assets_folder);
         let settings_manager = Settings::new(seed, &player_config);
 
-        let app = App {
+        App {
             gl: GlGraphics::new(gl_version),
             local_players: players,
             remote_player: rem_players,
@@ -154,8 +151,7 @@ impl App<'_> {
             settings_manager,
             is_synchronized: false,
             is_host,
-        };
-        app
+        }
     }
 
     pub fn set_player_config(&mut self, player_config: PlayerConfig) {
@@ -197,10 +193,10 @@ impl App<'_> {
             }
             PlayerConfig::Viewer(local_ip) => {
                 self.local_players = vec![];
-                if self.remote_player.len() == 0 {
+                if self.remote_player.is_empty() {
                     remote_player = RemotePlayer::new();
                     self.remote_player = vec![remote_player];
-                    self.remote_player[0].listen(&local_ip);
+                    self.remote_player[0].listen(local_ip);
                 }
                 if self.keybindings_manager.len() > 1 {
                     self.keybindings_manager = vec![Keybindings::new()];
@@ -212,16 +208,12 @@ impl App<'_> {
             } => {
                 local_player = LocalPlayer::new(&player_config);
                 self.local_players = vec![local_player];
-                if self.remote_player.len() == 0 {
+                if self.remote_player.is_empty() {
                     remote_player = RemotePlayer::new();
                     self.remote_player = vec![remote_player];
-                    self.remote_player[0].listen(&local_ip);
+                    self.remote_player[0].listen(local_ip);
                 }
-                self.is_host = if local_ip.chars().last().unwrap() == '0' {
-                    true
-                } else {
-                    false
-                };
+                self.is_host = local_ip.ends_with('0');
                 if self.keybindings_manager.len() > 1 {
                     self.keybindings_manager = vec![Keybindings::new()];
                 }
@@ -231,7 +223,8 @@ impl App<'_> {
                 let second_local = LocalPlayer::new(&player_config);
                 self.local_players = vec![local_player, second_local];
                 self.remote_player = vec![];
-                self.keybindings_manager = vec![Keybindings::new_two_local(0), Keybindings::new_two_local(1)];
+                self.keybindings_manager =
+                    vec![Keybindings::new_two_local(0), Keybindings::new_two_local(1)];
             }
         }
 
@@ -510,7 +503,7 @@ impl App<'_> {
     }
 }
 
-pub(self) enum Countdown {
+enum Countdown {
     One,
     Two,
     Three,

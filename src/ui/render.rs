@@ -58,7 +58,7 @@ impl TextInput {
 
         if self.focused {
             if self.animation_counter % 60 == 0 {
-                if self.cursor.len() == 0 {
+                if self.cursor.is_empty() {
                     self.cursor.push('|');
                 } else {
                     self.cursor.pop();
@@ -70,7 +70,7 @@ impl TextInput {
 
         self.text.content.push_str(&self.cursor);
         self.text.render(transform, ctx, gl, font);
-        if self.cursor.len() > 0 {
+        if !self.cursor.is_empty() {
             self.text.content.pop();
         }
         let info_transform = transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
@@ -104,7 +104,7 @@ impl KeyInput {
         if self.focused {
             // update the cursor so it appears to be blinking
             if self.animation_counter % 60 == 0 {
-                if self.cursor.len() == 0 {
+                if self.cursor.is_empty() {
                     self.cursor.push('|');
                 } else {
                     self.cursor.pop();
@@ -113,7 +113,7 @@ impl KeyInput {
             // render the text temporarily with the cursor
             self.custom_text.content.push_str(&self.cursor);
             self.custom_text.render(transform, ctx, gl, font);
-            if self.cursor.len() > 0 {
+            if !self.cursor.is_empty() {
                 self.custom_text.content.pop();
             }
         } else {

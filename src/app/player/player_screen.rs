@@ -44,7 +44,7 @@ impl PlayerScreen {
             DEFAULT_SCORE_TEXT_Y,
             TEXT_COLOR,
         );
-        score_text.render(transform, &ctx, gl, &mut assets.main_font);
+        score_text.render(transform, ctx, gl, &mut assets.main_font);
 
         self.grid.render(transform, &ctx.draw_state, gl, assets);
 

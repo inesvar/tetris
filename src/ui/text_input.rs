@@ -72,7 +72,7 @@ impl TextInput {
                     }
                 } else {
                     self.focused = false;
-                    if self.text.content == "" {
+                    if self.text.content.is_empty() {
                         self.text.set_text(String::from(&self.placeholder));
                     }
                 }
@@ -85,13 +85,13 @@ impl TextInput {
         if self.focused {
             match key {
                 Key::Backspace => {
-                    if self.text.content.len() > 0 {
+                    if !self.text.content.is_empty() {
                         self.text.content.pop();
                     }
                 }
                 Key::Return => {
                     self.focused = false;
-                    if self.text.content == "" {
+                    if self.text.content.is_empty() {
                         self.text.set_text(String::from(&self.placeholder));
                     }
                 }
