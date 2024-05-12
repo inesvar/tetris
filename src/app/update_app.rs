@@ -140,7 +140,7 @@ impl App<'_> {
                     remote_ip,
                 });
                 self.set_view(ViewState::Remote);
-                self.send_message(MessageType::HelloMsg(local_ip));
+                self.send_message(MessageType::Hello(local_ip));
                 self.local_players[0].send_serialized();
             }
             ButtonType::ToTwoLocalGame => {

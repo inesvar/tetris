@@ -48,28 +48,28 @@ impl RemotePlayer {
                 let message = serde_cbor::from_reader::<MessageType, TcpStream>(stream).unwrap();
                 once!("unwrapped from packet from remote");
                 match message {
-                    MessageType::PlayerScreenMsg(new_screen) => {
+                    MessageType::PlayerScreen(new_screen) => {
                         self_for_listener.update_screen(new_screen)
                     }
-                    MessageType::SettingsMsg(new_settings) => {
+                    MessageType::Settings(new_settings) => {
                         self_for_listener.update_game_flow(GameFlowChange::Sync(new_settings));
                     }
-                    MessageType::GameOverMsg => {
+                    MessageType::GameOver => {
                         self_for_listener.update_game_flow(GameFlowChange::GameOver);
                     }
-                    MessageType::PauseMsg => {
+                    MessageType::Pause => {
                         self_for_listener.update_game_flow(GameFlowChange::Pause);
                     }
-                    MessageType::RestartMsg => {
+                    MessageType::Restart => {
                         self_for_listener.update_game_flow(GameFlowChange::Restart);
                     }
-                    MessageType::ResumeMsg => {
+                    MessageType::Resume => {
                         self_for_listener.update_game_flow(GameFlowChange::Resume);
                     }
-                    MessageType::HelloMsg(remote_ip) => {
+                    MessageType::Hello(remote_ip) => {
                         self_for_listener.update_game_flow(GameFlowChange::Hello(remote_ip));
                     }
-                    MessageType::KillMsg => {
+                    MessageType::Kill => {
                         break;
                     }
                 }

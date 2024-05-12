@@ -36,6 +36,7 @@ impl ButtonType {
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum TextInputType {
+    #[allow(unused)]
     DebugTextInput,
     IpAddressInput,
 }
