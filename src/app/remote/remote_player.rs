@@ -100,7 +100,7 @@ impl RemotePlayer {
             let mut screen = self.screen.lock().unwrap();
             let lines = screen.new_completed_lines;
             screen.new_completed_lines = 0;
-            return lines;
+            lines
         }
     }
 
@@ -146,6 +146,6 @@ impl RemotePlayer {
                 println!("{last_game_flow:?} was read");
             }
         }
-        return last_game_flow;
+        last_game_flow
     }
 }

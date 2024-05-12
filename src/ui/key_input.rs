@@ -30,7 +30,7 @@ impl KeyInput {
         keys: &[Key],
         info_text: &str,
     ) -> Self {
-        let placeholder: &str = &*keys_to_string(&keys);
+        let placeholder: &str = &keys_to_string(keys);
         let vec_keys = keys.to_vec();
         KeyInput {
             x,
@@ -122,7 +122,7 @@ impl KeyInput {
 
     fn unfocus(&mut self) {
         self.focused = false;
-        if self.custom_text.content == "" {
+        if self.custom_text.content.is_empty() {
             self.custom = false;
             self.custom_text.set_text(keys_to_string(&self.init_keys));
             self.keys = self.init_keys.clone();

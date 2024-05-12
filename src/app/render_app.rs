@@ -1,9 +1,9 @@
 //! Defines the render function of [App].
 use super::{App, RunningState, ViewState};
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
+use crate::utils::formattings::format_seconds;
 use graphics::Transformed;
 use piston::RenderArgs;
-use crate::utils::formattings::format_seconds;
 
 impl App<'_> {
     pub fn render(&mut self, args: &RenderArgs) {
@@ -42,8 +42,7 @@ impl App<'_> {
                             gl,
                             &mut self.assets.tetris_font,
                         );
-                        self.timer_text
-                            .set_text(format_seconds(self.clock));
+                        self.timer_text.set_text(format_seconds(self.clock));
                     } else if self.running == RunningState::NotRunning {
                         self.restart_text.render(
                             ctx.transform,
@@ -65,7 +64,7 @@ impl App<'_> {
                             gl,
                             &mut self.assets.tetris_font,
                         );
-                        self.timer_text.set_text(format!("Elapsed: 0.00s"));
+                        self.timer_text.set_text("Elapsed: 0.00s".to_string());
                     }
 
                     self.timer_text

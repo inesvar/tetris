@@ -78,7 +78,7 @@ impl App<'_> {
             // there was a game over => the running must be set to NotRunning
             let mut game_over = false;
             for player in &self.local_players {
-                if player.get_game_over() == true {
+                if player.get_game_over() {
                     game_over = true;
                 }
             }

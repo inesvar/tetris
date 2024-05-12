@@ -27,7 +27,7 @@ impl TetrisGrid {
         ];
         rectangle(GRID_BG_COLOR, empty_dims, self.transform, gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
-        outline_rect.draw(empty_dims, &draw_state, self.transform, gl);
+        outline_rect.draw(empty_dims, draw_state, self.transform, gl);
 
         for (y, row) in self.matrix.iter().enumerate() {
             for (x, _cell) in row.iter().enumerate() {
@@ -38,7 +38,7 @@ impl TetrisGrid {
                         y as Scalar * BLOCK_SIZE, // + GRID_THICKNESS as Scalar / 20.0,
                         BLOCK_SIZE,
                     );
-                    outline_rect.draw(outline_dims, &draw_state, self.transform, gl);
+                    outline_rect.draw(outline_dims, draw_state, self.transform, gl);
                 }
             }
         }
@@ -46,7 +46,7 @@ impl TetrisGrid {
             for (x, cell) in row.iter().enumerate() {
                 match cell {
                     Some(tetris_color) => {
-                        tetris_color.render(x, y, self.transform, &draw_state, gl, assets)
+                        tetris_color.render(x, y, self.transform, draw_state, gl, assets)
                     }
                     None => {}
                 }
@@ -118,7 +118,7 @@ impl TetrisColor {
         );
 
         Image::new().rect(dims).draw(
-            assets.texture_from_tetris_color(&self),
+            assets.texture_from_tetris_color(self),
             draw_state,
             transform,
             gl,
