@@ -34,25 +34,23 @@ pub enum PlayerConfig {
 
 impl PlayerConfig {
     pub fn is_remote(&self) -> bool {
-        match self {
+        matches!(
+            self,
             PlayerConfig::TwoRemote {
                 local_ip: _,
                 remote_ip: _,
-            } => true,
-            PlayerConfig::Viewer(_) => true,
-            _ => false,
-        }
+            } | PlayerConfig::Viewer(_)
+        )
     }
 
     pub fn is_multiplayer(&self) -> bool {
-        match self {
+        matches!(
+            self,
             PlayerConfig::TwoRemote {
                 local_ip: _,
                 remote_ip: _,
-            } => true,
-            PlayerConfig::TwoLocal => true,
-            _ => false,
-        }
+            } | PlayerConfig::TwoLocal
+        )
     }
 }
 

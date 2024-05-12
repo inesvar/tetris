@@ -63,21 +63,18 @@ impl TextInput {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
-        match button {
-            MouseButton::Left => {
-                if self.are_coords_inside_input(cursor_position[0], cursor_position[1]) {
-                    self.focused = true;
-                    if self.text.content == self.placeholder {
-                        self.text.set_text(String::from(""));
-                    }
-                } else {
-                    self.focused = false;
-                    if self.text.content.is_empty() {
-                        self.text.set_text(String::from(&self.placeholder));
-                    }
+        if button == MouseButton::Left {
+            if self.are_coords_inside_input(cursor_position[0], cursor_position[1]) {
+                self.focused = true;
+                if self.text.content == self.placeholder {
+                    self.text.set_text(String::from(""));
+                }
+            } else {
+                self.focused = false;
+                if self.text.content.is_empty() {
+                    self.text.set_text(String::from(&self.placeholder));
                 }
             }
-            _ => {}
         };
     }
 
@@ -100,7 +97,7 @@ impl TextInput {
         }
     }
 
-    pub fn handle_text_input(&mut self, text: &String) {
+    pub fn handle_text_input(&mut self, text: &str) {
         if self.focused {
             self.text.content.push_str(text);
         }

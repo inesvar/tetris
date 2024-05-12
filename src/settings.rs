@@ -216,12 +216,12 @@ impl Settings {
         let bag_size = BAG_SIZE;
         let nb_next_tetromino = NB_NEXT_TETROMINO;
         let mut remote_ip = None;
-        match &player_config {
-            PlayerConfig::TwoRemote {
-                local_ip: _,
-                remote_ip: ip,
-            } => remote_ip = Some(String::from(ip.as_str())),
-            _ => {}
+        if let PlayerConfig::TwoRemote {
+            local_ip: _,
+            remote_ip: ip,
+        } = &player_config
+        {
+            remote_ip = Some(String::from(ip.as_str()))
         }
 
         Settings {
@@ -234,12 +234,12 @@ impl Settings {
     }
 
     pub fn set_player_config(&mut self, player_config: &PlayerConfig) {
-        match &player_config {
-            PlayerConfig::TwoRemote {
-                local_ip: _,
-                remote_ip: ip,
-            } => self.remote_ip = Some(String::from(ip.as_str())),
-            _ => {}
+        if let PlayerConfig::TwoRemote {
+            local_ip: _,
+            remote_ip: ip,
+        } = &player_config
+        {
+            self.remote_ip = Some(String::from(ip.as_str()))
         }
     }
 
@@ -251,9 +251,8 @@ impl Settings {
          * first as the SettingsMsg enum variant
          * then as the actual Settings struct
          */
-        match self.remote_ip {
-            None => unreachable!(),
-            _ => {}
+        if self.remote_ip.is_none() {
+            unreachable!()
         }
         if let Ok(stream) = TcpStream::connect(self.remote_ip.as_ref().unwrap()) {
             serde_cbor::to_writer::<TcpStream, Settings>(stream, self).unwrap();

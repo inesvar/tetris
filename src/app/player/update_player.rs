@@ -55,6 +55,7 @@ impl LocalPlayer {
                 // if the tetromino reaches the bottom, set the freeze_frame
                 self.freeze_frame = frame_counter + freeze;
             }
+            // Translate the tetromino right or left on a long key press
             if self.keyboard.is_any_delay_pressed(&keybindings.left_keys)
                 && !self.keyboard.is_any_delay_pressed(&keybindings.right_keys)
             {
