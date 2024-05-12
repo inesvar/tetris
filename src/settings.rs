@@ -1,6 +1,6 @@
 use std::{cell::RefCell, net::TcpStream};
 
-use crate::{once, ui::interactive_widget_manager::KeyInputType, PlayerConfig};
+use crate::{once, ui::interactive_widget_manager::TetrisCommand, PlayerConfig};
 use opengl_graphics::OpenGL;
 use piston::Key;
 use serde::Deserialize;
@@ -156,17 +156,17 @@ impl Keybindings {
         }
     }
 
-    pub fn set_keys(&mut self, key_type: &KeyInputType, new_keys: Vec<Key>) {
+    pub fn set_keys(&mut self, key_type: &TetrisCommand, new_keys: Vec<Key>) {
         match key_type {
-            KeyInputType::FallKey(_) => self.fall_keys = new_keys,
-            KeyInputType::HardDropKey(_) => self.hard_drop_keys = new_keys,
-            KeyInputType::RightKey(_) => self.right_keys = new_keys,
-            KeyInputType::LeftKey(_) => self.left_keys = new_keys,
-            KeyInputType::RotateClockwiseKey(_) => self.rotate_clockwise_keys = new_keys,
-            KeyInputType::RotateCounterclockwiseKey(_) => {
+            TetrisCommand::Fall(_) => self.fall_keys = new_keys,
+            TetrisCommand::HardDrop(_) => self.hard_drop_keys = new_keys,
+            TetrisCommand::Right(_) => self.right_keys = new_keys,
+            TetrisCommand::Left(_) => self.left_keys = new_keys,
+            TetrisCommand::RotateClockwise(_) => self.rotate_clockwise_keys = new_keys,
+            TetrisCommand::RotateCounterclockwise(_) => {
                 self.rotate_counterclockwise_keys = new_keys
             }
-            KeyInputType::HoldTetrominoKey(_) => self.hold_tetromino_keys = new_keys,
+            TetrisCommand::HoldTetromino(_) => self.hold_tetromino_keys = new_keys,
         }
     }
 

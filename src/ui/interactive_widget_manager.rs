@@ -44,14 +44,14 @@ pub enum TextInputType {
 }
 
 #[derive(Hash, PartialEq, Eq)]
-pub enum KeyInputType {
-    FallKey(Vec<Key>),
-    HardDropKey(Vec<Key>),
-    RightKey(Vec<Key>),
-    LeftKey(Vec<Key>),
-    RotateClockwiseKey(Vec<Key>),
-    RotateCounterclockwiseKey(Vec<Key>),
-    HoldTetrominoKey(Vec<Key>),
+pub enum TetrisCommand {
+    Fall(Vec<Key>),
+    HardDrop(Vec<Key>),
+    Right(Vec<Key>),
+    Left(Vec<Key>),
+    RotateClockwise(Vec<Key>),
+    RotateCounterclockwise(Vec<Key>),
+    HoldTetromino(Vec<Key>),
 }
 
 #[derive(PartialEq)]
@@ -64,7 +64,7 @@ pub enum SettingsType {
 pub struct InteractiveWidgetManager {
     pub(super) buttons: HashMap<ButtonType, Button>,
     pub(super) text_inputs: HashMap<TextInputType, TextInput>,
-    pub(super) key_inputs: HashMap<KeyInputType, KeyInput>,
+    pub(super) key_inputs: HashMap<TetrisCommand, KeyInput>,
 }
 
 impl InteractiveWidgetManager {
@@ -259,33 +259,31 @@ impl InteractiveWidgetManager {
 
         let mut key_inputs = HashMap::new();
         key_inputs.insert(
-            KeyInputType::FallKey(fall_keys_input.keys.clone()),
+            TetrisCommand::Fall(fall_keys_input.keys.clone()),
             fall_keys_input,
         );
         key_inputs.insert(
-            KeyInputType::HardDropKey(hard_drop_keys_input.keys.clone()),
+            TetrisCommand::HardDrop(hard_drop_keys_input.keys.clone()),
             hard_drop_keys_input,
         );
         key_inputs.insert(
-            KeyInputType::RightKey(right_keys_input.keys.clone()),
+            TetrisCommand::Right(right_keys_input.keys.clone()),
             right_keys_input,
         );
         key_inputs.insert(
-            KeyInputType::LeftKey(left_keys_input.keys.clone()),
+            TetrisCommand::Left(left_keys_input.keys.clone()),
             left_keys_input,
         );
         key_inputs.insert(
-            KeyInputType::RotateClockwiseKey(rotate_clockwise_keys_input.keys.clone()),
+            TetrisCommand::RotateClockwise(rotate_clockwise_keys_input.keys.clone()),
             rotate_clockwise_keys_input,
         );
         key_inputs.insert(
-            KeyInputType::RotateCounterclockwiseKey(
-                rotate_counterclockwise_keys_input.keys.clone(),
-            ),
+            TetrisCommand::RotateCounterclockwise(rotate_counterclockwise_keys_input.keys.clone()),
             rotate_counterclockwise_keys_input,
         );
         key_inputs.insert(
-            KeyInputType::HoldTetrominoKey(hold_tetromino_keys_input.keys.clone()),
+            TetrisCommand::HoldTetromino(hold_tetromino_keys_input.keys.clone()),
             hold_tetromino_keys_input,
         );
 
