@@ -20,15 +20,13 @@ impl LocalPlayer {
         let fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
         let mut remote_ip = String::from("");
         let mut sender = false;
-        match player_config {
-            PlayerConfig::TwoRemote {
-                local_ip: _,
-                remote_ip: ip,
-            } => {
-                sender = true;
-                remote_ip = ip.to_string();
-            }
-            _ => {}
+        if let PlayerConfig::TwoRemote {
+            local_ip: _,
+            remote_ip: ip,
+        } = player_config
+        {
+            sender = true;
+            remote_ip = ip.to_string();
         }
 
         let player_screen = PlayerScreen {

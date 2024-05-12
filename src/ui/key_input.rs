@@ -67,15 +67,12 @@ impl KeyInput {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
-        match button {
-            MouseButton::Left => {
-                if self.are_coords_inside_input(cursor_position[0], cursor_position[1]) {
-                    self.focus();
-                } else if self.focused {
-                    self.unfocus();
-                }
+        if button == MouseButton::Left {
+            if self.are_coords_inside_input(cursor_position[0], cursor_position[1]) {
+                self.focus();
+            } else if self.focused {
+                self.unfocus();
             }
-            _ => {}
         };
     }
 
@@ -104,16 +101,12 @@ impl KeyInput {
     fn pop_key(&mut self) {
         self.custom_text.content.pop();
         while self.custom_text.content.chars().count() > 0 {
-            // TODO change this syntax
-            match self
+            if let Some(" ") = self
                 .custom_text
                 .content
                 .get((self.custom_text.content.len() - 1)..=(self.custom_text.content.len() - 1))
             {
-                Some(" ") => {
-                    break;
-                }
-                _ => {}
+                break;
             }
             self.custom_text.content.pop();
         }

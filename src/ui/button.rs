@@ -77,28 +77,22 @@ impl Button {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
-        match button {
-            MouseButton::Left => {
-                if self.are_coords_inside_button(cursor_position[0], cursor_position[1]) {
-                    println!("button press");
-                    self.background_color = [0.5, 0.5, 0.5, 1.0];
-                    self.is_pressed = true;
-                    self.commit = true;
-                } else {
-                    self.is_pressed = false;
-                }
+        if button == MouseButton::Left {
+            if self.are_coords_inside_button(cursor_position[0], cursor_position[1]) {
+                println!("button press");
+                self.background_color = [0.5, 0.5, 0.5, 1.0];
+                self.is_pressed = true;
+                self.commit = true;
+            } else {
+                self.is_pressed = false;
             }
-            _ => {}
         };
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
-        match button {
-            MouseButton::Left => {
-                self.background_color = [0.8, 0.8, 0.8, 1.0];
-                self.is_pressed = false;
-            }
-            _ => {}
+        if button == MouseButton::Left {
+            self.background_color = [0.8, 0.8, 0.8, 1.0];
+            self.is_pressed = false;
         }
     }
 }

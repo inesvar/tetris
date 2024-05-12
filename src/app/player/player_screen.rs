@@ -94,9 +94,8 @@ impl PlayerScreen {
                 self.grid.total_width * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
-            match self.fifo_next_tetromino.get(i) {
-                Some(tetromino) => tetromino.render(transform, &ctx.draw_state, gl, assets),
-                _ => {}
+            if let Some(tetromino) = self.fifo_next_tetromino.get(i) {
+                tetromino.render(transform, &ctx.draw_state, gl, assets);
             }
         }
     }

@@ -494,7 +494,7 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub fn handle_text_input(&mut self, text: &String) {
+    pub fn handle_text_input(&mut self, text: &str) {
         for text_input in self.text_inputs.values_mut() {
             text_input.handle_text_input(text);
         }
@@ -522,30 +522,24 @@ impl InteractiveWidgetManager {
     }
 
     pub fn update_clipboard(&mut self) {
-        match self.buttons.get_mut(&ButtonType::CopyToClipboard) {
-            Some(button) => {
-                if button.commit() {
-                    println!("supposed to COPY");
-                    let ip = local_ip().unwrap().to_string();
-                    //let ip = "127.0.0.1".to_string();
-                    let text = format!("{}{}", ip, HOST_PORT);
-                    let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-                    ctx.set_contents(text.to_owned()).unwrap();
-                }
+        if let Some(button) = self.buttons.get_mut(&ButtonType::CopyToClipboard) {
+            if button.commit() {
+                println!("supposed to COPY");
+                let ip = local_ip().unwrap().to_string();
+                //let ip = "127.0.0.1".to_string();
+                let text = format!("{}{}", ip, HOST_PORT);
+                let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+                ctx.set_contents(text.to_owned()).unwrap();
             }
-            None => {}
         };
-        match self.buttons.get_mut(&ButtonType::PasteFromClipboard) {
-            Some(button) => {
-                if button.commit() {
-                    println!("supposed to PASTE");
-                    let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-                    let ip = ctx.get_contents().unwrap();
-                    let text_input = self.get_input(TextInputType::IpAddressInput);
-                    text_input.text.content = ip;
-                }
+        if let Some(button) = self.buttons.get_mut(&ButtonType::PasteFromClipboard) {
+            if button.commit() {
+                println!("supposed to PASTE");
+                let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+                let ip = ctx.get_contents().unwrap();
+                let text_input = self.get_input(TextInputType::IpAddressInput);
+                text_input.text.content = ip;
             }
-            None => {}
         };
     }
 
