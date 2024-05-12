@@ -50,12 +50,7 @@ pub enum ViewState {
 
 impl ViewState {
     fn is_game(&self) -> bool {
-        match &self {
-            Self::Local => true,
-            Self::TwoLocal => true,
-            Self::Remote => true,
-            _ => false,
-        }
+        matches!(self, Self::Local | Self::TwoLocal | Self::Remote)
     }
 }
 
@@ -158,24 +153,21 @@ impl App<'_> {
         // make the game unactive
         self.running = RunningState::NotRunning;
         // kill the previous listener
-        match self.player_config {
-            PlayerConfig::TwoRemote {
-                local_ip: _,
-                remote_ip: _,
-            } => {
-                let server: String;
-                if self.is_host {
-                    server = local_ip().unwrap().to_string() + HOST_PORT;
-                } else {
-                    server = local_ip().unwrap().to_string() + GUEST_PORT;
-                }
-                //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
-                if let Ok(stream) = TcpStream::connect(server) {
-                    serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::KillMsg)
-                        .unwrap();
-                }
+        if let PlayerConfig::TwoRemote {
+            local_ip: _,
+            remote_ip: _,
+        } = self.player_config
+        {
+            let server: String = if self.is_host {
+                local_ip().unwrap().to_string() + HOST_PORT
+            } else {
+                local_ip().unwrap().to_string() + GUEST_PORT
+            };
+            //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
+            if let Ok(stream) = TcpStream::connect(server) {
+                serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::KillMsg)
+                    .unwrap();
             }
-            _ => {}
         }
 
         println!("SETTING PLAYER CONFIG {:?}", player_config);
@@ -232,7 +224,7 @@ impl App<'_> {
         self.player_config = player_config;
     }
 
-    pub fn handle_text_input(&mut self, input: &String) {
+    pub fn handle_text_input(&mut self, input: &str) {
         match self.view_state {
             ViewState::MainMenu => self.widget_manager[0].handle_text_input(input),
             ViewState::JoinRoom => self.widget_manager[0].handle_text_input(input),
@@ -489,16 +481,14 @@ impl App<'_> {
 
     /// Sends message to the remote if there's a remote.
     fn send_message(&self, message: MessageType) {
-        match &self.player_config {
-            PlayerConfig::TwoRemote {
-                local_ip: _,
-                remote_ip,
-            } => {
-                if let Ok(stream) = TcpStream::connect(remote_ip) {
-                    serde_cbor::to_writer::<TcpStream, MessageType>(stream, &message).unwrap();
-                }
+        if let PlayerConfig::TwoRemote {
+            local_ip: _,
+            remote_ip,
+        } = &self.player_config
+        {
+            if let Ok(stream) = TcpStream::connect(remote_ip) {
+                serde_cbor::to_writer::<TcpStream, MessageType>(stream, &message).unwrap();
             }
-            _ => {}
         }
     }
 }
