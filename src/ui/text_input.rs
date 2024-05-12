@@ -33,6 +33,7 @@ impl TextInput {
         }
     }
 
+    #[allow(unused)]
     pub fn new_with_info(
         x: f64,
         y: f64,

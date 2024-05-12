@@ -43,6 +43,7 @@ impl Button {
         }
     }
 
+    #[allow(unused)]
     pub fn default() -> Button {
         Button {
             x: 0.0,
@@ -61,10 +62,6 @@ impl Button {
             && x <= self.x + self.width / 2.0
             && y >= self.y - self.height / 2.0
             && y <= self.y + self.height / 2.0
-    }
-
-    pub fn is_pressed(&self) -> bool {
-        self.is_pressed
     }
 
     pub fn commit(&mut self) -> bool {

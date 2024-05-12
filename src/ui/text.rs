@@ -1,6 +1,6 @@
-use graphics::types::Color;
-
+#[allow(unused)]
 use crate::settings::DEFAULT_FONT_SIZE;
+use graphics::types::Color;
 
 #[derive(Clone)]
 pub struct Text {
@@ -24,6 +24,7 @@ impl Text {
         }
     }
 
+    #[allow(unused)]
     pub fn default() -> Text {
         Text {
             x: 0.0,

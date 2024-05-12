@@ -3,11 +3,8 @@ use crate::settings::{
     DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
     GUEST_PORT, HOST_PORT,
 };
-use crate::ui::button::Button;
-use crate::ui::key_input::KeyInput;
-use crate::ui::text_input::TextInput;
+use crate::ui::{button::Button, key_input::KeyInput, text_input::TextInput};
 use clipboard::{ClipboardContext, ClipboardProvider};
-#[allow(unused_imports)]
 use local_ip_address::local_ip;
 use piston::{Key, MouseButton};
 use std::collections::HashMap;
@@ -54,6 +51,7 @@ pub enum TetrisCommand {
     HoldTetromino(Vec<Key>),
 }
 
+#[allow(clippy::enum_variant_names)]
 #[derive(PartialEq)]
 pub enum SettingsType {
     OnePlayer,
@@ -364,18 +362,6 @@ impl InteractiveWidgetManager {
         buttons.insert(ButtonType::ToPause, pause_button);
         buttons.insert(ButtonType::ToSettings, settings_button);
 
-        let text_inputs = HashMap::new();
-        let key_inputs = HashMap::new();
-
-        InteractiveWidgetManager {
-            buttons,
-            text_inputs,
-            key_inputs,
-        }
-    }
-
-    pub fn new_empty() -> InteractiveWidgetManager {
-        let buttons = HashMap::new();
         let text_inputs = HashMap::new();
         let key_inputs = HashMap::new();
 
