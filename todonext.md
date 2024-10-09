@@ -1,6 +1,7 @@
 - press key s open settings
 - add 180° key
 - assets load bug when too low in filesystem
+- re-implement clipboard copy/paste button using arboard (https://crates.io/crates/arboard/3.4.1) 
 
 # build for windows
 
