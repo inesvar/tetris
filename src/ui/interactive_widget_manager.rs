@@ -4,7 +4,6 @@ use crate::settings::{
     GUEST_PORT, HOST_PORT,
 };
 use crate::ui::{button::Button, key_input::KeyInput, text_input::TextInput};
-use clipboard::{ClipboardContext, ClipboardProvider};
 use local_ip_address::local_ip;
 use piston::{Key, MouseButton};
 use std::collections::HashMap;
@@ -506,22 +505,27 @@ impl InteractiveWidgetManager {
         }
     }
 
+    #[allow(warnings)]
     pub fn update_clipboard(&mut self) {
+        todo!();
         if let Some(button) = self.buttons.get_mut(&ButtonType::CopyToClipboard) {
             if button.commit() {
                 println!("supposed to COPY");
                 let ip = local_ip().unwrap().to_string();
                 //let ip = "127.0.0.1".to_string();
                 let text = format!("{}{}", ip, HOST_PORT);
-                let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-                ctx.set_contents(text.to_owned()).unwrap();
+                // TODO set clipboard to text
+                // let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+                // ctx.set_contents(text.to_owned()).unwrap();
             }
         };
         if let Some(button) = self.buttons.get_mut(&ButtonType::PasteFromClipboard) {
             if button.commit() {
                 println!("supposed to PASTE");
-                let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-                let ip = ctx.get_contents().unwrap();
+                // TODO get clipboard contents
+                // let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+                // let ip = ctx.get_contents().unwrap();
+                let ip = String::from("");
                 let text_input = self.get_input(TextInputType::IpAddressInput);
                 text_input.text.content = ip;
             }

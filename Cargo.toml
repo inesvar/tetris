@@ -16,7 +16,6 @@ serde = { version = "1.0.163", features = ["derive"] }
 serde_cbor = "0.11.2"
 rand_pcg = "0.3.1"
 local-ip-address = "0.5.4"
-clipboard = "0.5.0"
 
 [dependencies.pistoncore-glfw_window]
 git = "https://github.com/PistonDevelopers/glfw_window"
