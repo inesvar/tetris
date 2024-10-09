@@ -2,7 +2,7 @@
 
 Currently our Tetris looks like this. 
 
-![](tetris.png)
+![](images/tetris.png)
 
 
 ## What sort of Tetris is this ?
