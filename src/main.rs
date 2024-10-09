@@ -1,4 +1,3 @@
-extern crate clipboard;
 extern crate find_folder;
 extern crate graphics;
 extern crate opengl_graphics;
