@@ -27,85 +27,36 @@ mod settings;
 mod ui;
 mod utils;
 
-/// Creates a window and an event loop interacting with the Tetris application.
+/// Creates the window and the application, runs the event loop.
 fn main() {
-    // Create a Sdl2 window.
+    // Create a Glfw window.
     let mut window: PistonWindow<GlfwWindow> =
         WindowSettings::new("TETRIS", [DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT])
             .graphics_api(OPENGL_VERSION)
             .vsync(true)
             .build()
             .unwrap();
+    let mut bigger_window_size = false;
 
-    // Create a new game and run it.
+    // Create the app.
     let mut app = App::new(OPENGL_VERSION);
-    // TODO: having those variables here is unelegant
-    // they should be in app and their value in settings.
-    let mut fall_speed_divide: u64 = 50;
-    let mut freeze: u64 = 50;
-    let mut multiplayer = false; // TODO: rename window_size
 
-    // Start event loop
+    // Start the event loop.
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
-        if let Some(args) = e.update_args() {
-            app.update(&args, fall_speed_divide, freeze);
-        }
-
-        if let Some(args) = e.render_args() {
-            app.render(&args);
-        }
-
+        // Handle the local user(s) input.
         if let Some(Button::Keyboard(key)) = e.press_args() {
             app.handle_key_press(key);
-        }
-
-        if app.player_config.is_remote() {
-            once!("main knows that we're remote");
-            app.handle_remote();
-        }
-
-        if app.player_config.is_multiplayer() {
-            if !multiplayer {
-                window.set_size([DEFAULT_WINDOW_WIDTH * 2, DEFAULT_WINDOW_HEIGHT]);
-                multiplayer = true;
-            }
-        } else if multiplayer {
-            window.set_size([DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT]);
-            multiplayer = false;
-        }
-
-        if let Some(text) = e.text_args() {
-            app.handle_text_input(&text);
         }
 
         if let Some(Button::Keyboard(key)) = e.release_args() {
             app.handle_key_release(key);
         }
 
-        // TODO : this should be in app :)
-        match app.clock {
-            i if i <= 30.0 => {
-                fall_speed_divide = 50;
-                freeze = 50
-            }
-            i if i <= 60.0 => {
-                fall_speed_divide = 40;
-                freeze = 50
-            }
-            i if i <= 90.0 => {
-                fall_speed_divide = 30;
-                freeze = 50
-            }
-            i if i <= 120.0 => {
-                fall_speed_divide = 20;
-                freeze = 50
-            }
-            _ => {
-                fall_speed_divide = 15;
-                freeze = 50
-            }
+        if let Some(text) = e.text_args() {
+            app.handle_text_input(&text);
         }
+
         if let Some(Button::Mouse(button)) = e.press_args() {
             app.handle_mouse_press(button);
         }
@@ -114,9 +65,34 @@ fn main() {
             app.handle_mouse_release(button);
         }
 
-        // TODO: use if let style to be consistent
-        e.mouse_cursor(|cursor_position| {
+        if let Some(cursor_position) = e.mouse_cursor_args() {
             app.cursor_position = cursor_position;
-        });
+        }
+
+        // Update the size of the window if necessary.
+        if app.player_config.is_multiplayer() {
+            if !bigger_window_size {
+                window.set_size([DEFAULT_WINDOW_WIDTH * 2, DEFAULT_WINDOW_HEIGHT]);
+                bigger_window_size = true;
+            }
+        } else if bigger_window_size {
+            window.set_size([DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT]);
+            bigger_window_size = false;
+        }
+        
+        // Handle the optional remote user input.
+        if app.player_config.is_remote() {
+            once!("main knows that we're remote");
+            app.handle_remote();
+        }
+
+        // Finally update the application and render to the screen.
+        if let Some(args) = e.update_args() {
+            app.update(&args);
+        }
+
+        if let Some(args) = e.render_args() {
+            app.render(&args);
+        }
     }
 }
