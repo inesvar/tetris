@@ -1,8 +1,8 @@
 //! Defines the render functions of types [Block](super::block::Block::render()), [Tetromino](super::Tetromino::render()) and [TetrisGrid](super::TetrisGrid::render()).
 use super::{block::Block, TetrisGrid, Tetromino};
+use crate::assets::Assets;
 use crate::assets::TetrisColor;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
-use crate::Assets;
 use graphics::types::{Matrix2d, Rectangle, Scalar};
 use graphics::{draw_state::Blend, Transformed};
 use graphics::{rectangle, DrawState, Image};

@@ -2,17 +2,17 @@
 //!
 //! It's possible to play either locally or remotely.
 //! The keybindings are customizable.
-extern crate find_folder;
 extern crate graphics;
+extern crate include_assets;
 extern crate opengl_graphics;
 extern crate piston;
 
 use crate::{
     app::App,
-    assets::Assets,
     settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION},
 };
 use glfw_window::GlfwWindow;
+use include_assets::{include_dir, NamedArchive};
 use piston::{
     event_loop::{EventSettings, Events},
     input::{RenderEvent, UpdateEvent},
@@ -39,7 +39,8 @@ fn main() {
     let mut bigger_window_size = false;
 
     // Create the app.
-    let mut app = App::new(OPENGL_VERSION);
+    let assets_archive = NamedArchive::load(include_dir!("src/assets"));
+    let mut app = App::new(OPENGL_VERSION, &assets_archive);
 
     // Start the event loop.
     let mut events = Events::new(EventSettings::new());
@@ -79,7 +80,7 @@ fn main() {
             window.set_size([DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT]);
             bigger_window_size = false;
         }
-        
+
         // Handle the optional remote user input.
         if app.player_config.is_remote() {
             once!("main knows that we're remote");
