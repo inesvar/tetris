@@ -8,13 +8,14 @@ use self::player::LocalPlayer;
 pub use self::player::PlayerScreen;
 use self::remote::RemotePlayer;
 use crate::app::remote::MessageType;
+use crate::assets::Assets;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::ui::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
     text::Text,
 };
-use crate::Assets;
 use crate::{once, settings::*};
+use include_assets::NamedArchive;
 use local_ip_address::local_ip;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::MouseButton;
@@ -117,12 +118,8 @@ pub struct App<'a> {
     freeze: u64,
 }
 
-impl App<'_> {
-    pub fn new(gl_version: OpenGL) -> App<'static> {
-        let assets_folder = find_folder::Search::ParentsThenKids(3, 3)
-            .for_folder("assets")
-            .unwrap();
-
+impl<'a> App<'a> {
+    pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> App<'a> {
         let mut rng = rand::thread_rng();
         let seed: u64 = rng.gen();
         let is_host = false;
@@ -132,7 +129,7 @@ impl App<'_> {
         let players: Vec<LocalPlayer> = vec![local_player];
         let rem_players: Vec<RemotePlayer> = vec![];
 
-        let assets = Assets::new(assets_folder);
+        let assets = Assets::new(assets_archive);
         let settings_manager = Settings::new(seed, &player_config);
 
         App {
