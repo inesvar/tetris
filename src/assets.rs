@@ -1,3 +1,4 @@
+//! Assets include Tetromino block textures and fonts.
 use opengl_graphics::*;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;

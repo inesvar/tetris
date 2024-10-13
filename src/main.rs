@@ -1,3 +1,7 @@
+//! A Tetris application for one or two players.
+//!
+//! It's possible to play either locally or remotely.
+//! The keybindings are customizable.
 extern crate find_folder;
 extern crate graphics;
 extern crate opengl_graphics;
@@ -23,36 +27,7 @@ mod settings;
 mod ui;
 mod utils;
 
-#[derive(PartialEq, Debug)]
-pub enum PlayerConfig {
-    Local,
-    TwoLocal,
-    TwoRemote { local_ip: String, remote_ip: String },
-    Viewer(String),
-}
-
-impl PlayerConfig {
-    pub fn is_remote(&self) -> bool {
-        matches!(
-            self,
-            PlayerConfig::TwoRemote {
-                local_ip: _,
-                remote_ip: _,
-            } | PlayerConfig::Viewer(_)
-        )
-    }
-
-    pub fn is_multiplayer(&self) -> bool {
-        matches!(
-            self,
-            PlayerConfig::TwoRemote {
-                local_ip: _,
-                remote_ip: _,
-            } | PlayerConfig::TwoLocal
-        )
-    }
-}
-
+/// Creates a window and an event loop interacting with the Tetris application.
 fn main() {
     // Create a Sdl2 window.
     let mut window: PistonWindow<GlfwWindow> =
@@ -64,10 +39,13 @@ fn main() {
 
     // Create a new game and run it.
     let mut app = App::new(OPENGL_VERSION);
+    // TODO: having those variables here is unelegant
+    // they should be in app and their value in settings.
     let mut fall_speed_divide: u64 = 50;
     let mut freeze: u64 = 50;
-    let mut multiplayer = false;
+    let mut multiplayer = false; // TODO: rename window_size
 
+    // Start event loop
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.update_args() {
@@ -105,7 +83,7 @@ fn main() {
             app.handle_key_release(key);
         }
 
-        // TODO : think about this, move this and make it less painful
+        // TODO : this should be in app :)
         match app.clock {
             i if i <= 30.0 => {
                 fall_speed_divide = 50;
@@ -136,6 +114,7 @@ fn main() {
             app.handle_mouse_release(button);
         }
 
+        // TODO: use if let style to be consistent
         e.mouse_cursor(|cursor_position| {
             app.cursor_position = cursor_position;
         });

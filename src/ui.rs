@@ -1,4 +1,4 @@
-//! Defines the user interface components of the executable.
+//! User interface components of the executable.
 pub mod button;
 pub mod interactive_widget_manager;
 pub mod key_input;
