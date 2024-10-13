@@ -6,17 +6,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-piston_window = "0.128.0"
-piston = "0.53.0"
-piston2d-graphics = "0.43.0"
-piston2d-opengl_graphics = "0.82.0"
+piston_window = "0.132.0"
+piston = "1.0.0"
+piston2d-graphics = "0.44.0"
+piston2d-opengl_graphics = "0.85.0"
 rand = { version = "0.8.5", features = ["serde"] }
 find_folder = "0.3.0"
-serde = { version = "1.0.163", features = ["derive"] }
+serde = { version = "1.0.210", features = ["derive"] }
 serde_cbor = "0.11.2"
 rand_pcg = "0.3.1"
-local-ip-address = "0.5.4"
+local-ip-address = "0.6.3"
 arboard = "3.4.1"
+include_assets = "1.0.0"
 
 [dependencies.pistoncore-glfw_window]
 git = "https://github.com/PistonDevelopers/glfw_window"
