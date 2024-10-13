@@ -6,4 +6,3 @@ cargo build --release
 
 mkdir "$path"
 cp ./target/release/tetris "$path"
-cp -r ./src/assets "$path"
