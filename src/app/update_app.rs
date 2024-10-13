@@ -9,12 +9,12 @@ impl App<'_> {
     /// update is called before each render so that the informations on the screen are as recent as possible.
     ///
     /// It's responsible for the following :
-    /// - updating the state of the view :
-    ///     - in [ViewState::Settings], updating the settings
-    ///     - if the game is running, updating the local players and checking that the game still runs
-    /// - updating the view through the widget_manager
-    ///
-    pub fn update(&mut self, args: &UpdateArgs, fall_speed_divide: u64, freeze: u64) {
+    /// - update the data in the view, for instance :
+    ///     - in [ViewState::Settings], update the settings
+    ///     - if the game is running, update the grid and check that the game still runs
+    /// - change the view if necessary
+    pub fn update(&mut self, args: &UpdateArgs) {
+        // TODO: split in two functions
         // first apply the changes inside the views
         if self.view_state == ViewState::Settings {
             for (id, widget_manager) in self.widget_manager.iter_mut().enumerate() {
@@ -68,8 +68,8 @@ impl App<'_> {
                 player.update(
                     &self.keybindings_manager[id],
                     self.frame_counter,
-                    fall_speed_divide,
-                    freeze,
+                    self.fall_speed_divide,
+                    self.freeze,
                 );
             }
             // taking into account the player states after a new piece was added
@@ -92,6 +92,30 @@ impl App<'_> {
 
             if game_over {
                 self.game_over();
+            }
+
+            // update the falling speed and freeze speed
+            match self.clock {
+                i if i <= 30.0 => {
+                    self.fall_speed_divide = 50;
+                    self.freeze = 50
+                }
+                i if i <= 60.0 => {
+                    self.fall_speed_divide = 40;
+                    self.freeze = 50
+                }
+                i if i <= 90.0 => {
+                    self.fall_speed_divide = 30;
+                    self.freeze = 50
+                }
+                i if i <= 120.0 => {
+                    self.fall_speed_divide = 20;
+                    self.freeze = 50
+                }
+                _ => {
+                    self.fall_speed_divide = 15;
+                    self.freeze = 50
+                }
             }
         }
 

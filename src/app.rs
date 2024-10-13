@@ -8,6 +8,7 @@ use self::player::LocalPlayer;
 pub use self::player::PlayerScreen;
 use self::remote::RemotePlayer;
 use crate::app::remote::MessageType;
+use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::ui::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
     text::Text,
@@ -112,6 +113,8 @@ pub struct App<'a> {
     settings_manager: Settings,
     is_synchronized: bool,
     is_host: bool,
+    fall_speed_divide: u64,
+    freeze: u64,
 }
 
 impl App<'_> {
@@ -176,6 +179,8 @@ impl App<'_> {
             settings_manager,
             is_synchronized: false,
             is_host,
+            fall_speed_divide: FALL_SPEED_DIVIDE,
+            freeze: FREEZE,
         }
     }
 

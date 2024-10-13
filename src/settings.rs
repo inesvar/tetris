@@ -196,8 +196,11 @@ impl Keybindings {
 /*           APP PARAMETERS             */
 /****************************************/
 
+pub const FALL_SPEED_DIVIDE: u64 = 50;
+pub const FREEZE: u64 = 50;
 // not setable in the UI
-pub static RESTART_KEYS: [Key; 1] = [Key::R];
+// TODO: these should be const
+pub const RESTART_KEYS: [Key; 1] = [Key::R];
 pub static PAUSE_KEYS: [Key; 1] = [Key::P];
 pub static KEY_REPEAT_DELAY: u64 = 20;
 
