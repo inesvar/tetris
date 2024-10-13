@@ -1,6 +1,8 @@
+//! Settings include sizes and colors in the UI and default keybindings.
+
 use std::{cell::RefCell, net::TcpStream};
 
-use crate::{once, ui::interactive_widget_manager::TetrisCommand, PlayerConfig};
+use crate::{app::PlayerConfig, once, ui::interactive_widget_manager::TetrisCommand};
 use opengl_graphics::OpenGL;
 use piston::Key;
 use serde::Deserialize;
@@ -95,6 +97,7 @@ pub struct Keybindings {
     pub hold_tetromino_keys: Vec<Key>,
 }
 
+// TODO: keybindings should be in its own file
 impl Keybindings {
     pub fn new() -> Keybindings {
         let fall_keys = FALL_KEYS_1P.to_vec();
@@ -261,6 +264,7 @@ impl Settings {
     }
 }
 
+// TODO: this could be in the tetris back-end library
 pub static BAG_SIZE: u32 = 14;
 // typical sizes are 7 and 14, 1 is entirely random
 // for size 7 * n + k, k < 7, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times

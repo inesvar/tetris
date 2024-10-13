@@ -1,3 +1,4 @@
+/// Print only the first time.
 #[macro_export]
 macro_rules! once {
     ($($arg:tt)*) => {

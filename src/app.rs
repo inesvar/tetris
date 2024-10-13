@@ -1,4 +1,4 @@
-//! Defines the app that handles the players, their interactions and the changes of views, settings and number of players.
+//! Application that handles the menu, game logic and configuration.
 mod player;
 mod remote;
 mod render_app;
@@ -7,12 +7,12 @@ mod update_app;
 use self::player::LocalPlayer;
 pub use self::player::PlayerScreen;
 use self::remote::RemotePlayer;
+use crate::app::remote::MessageType;
 use crate::ui::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
     text::Text,
 };
 use crate::Assets;
-use crate::{app::remote::MessageType, PlayerConfig};
 use crate::{once, settings::*};
 use local_ip_address::local_ip;
 use opengl_graphics::{GlGraphics, OpenGL};
@@ -21,6 +21,36 @@ use piston_window::Key;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::net::TcpStream;
+
+#[derive(PartialEq, Debug)]
+pub enum PlayerConfig {
+    Local,
+    TwoLocal,
+    TwoRemote { local_ip: String, remote_ip: String },
+    Viewer(String),
+}
+
+impl PlayerConfig {
+    pub fn is_remote(&self) -> bool {
+        matches!(
+            self,
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: _,
+            } | PlayerConfig::Viewer(_)
+        )
+    }
+
+    pub fn is_multiplayer(&self) -> bool {
+        matches!(
+            self,
+            PlayerConfig::TwoRemote {
+                local_ip: _,
+                remote_ip: _,
+            } | PlayerConfig::TwoLocal
+        )
+    }
+}
 
 /// Indicates whether the player commands lead the game to pause, resume, restart or no.
 /// The GameOver variant is only used for remote players.
@@ -259,6 +289,7 @@ impl App<'_> {
         }
     }
 
+    // TODO: add doc
     pub fn handle_remote(&mut self) {
         once!("handle remote was called");
         let mut game_flow_change: GameFlowChange = GameFlowChange::Other;

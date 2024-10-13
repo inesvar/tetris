@@ -3,7 +3,7 @@ use super::back_end::{new_tetromino_bag, TetrisGrid, Tetromino, TranslationRotat
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
 };
-use crate::{app::Countdown, assets::Assets, once, settings::*, PlayerConfig};
+use crate::{app::Countdown, app::PlayerConfig, assets::Assets, once, settings::*};
 use graphics::types::Matrix2d;
 use opengl_graphics::GlGraphics;
 use piston_window::Context;
