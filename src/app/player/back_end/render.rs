@@ -1,5 +1,5 @@
 //! Defines the render functions of types [Block](super::block::Block::render()), [Tetromino](super::Tetromino::render()) and [TetrisGrid](super::TetrisGrid::render()).
-use super::{block::Block, TetrisGrid, Tetromino};
+use super::{block::Block, point::TetrisMoves, TetrisGrid, Tetromino};
 use crate::assets::Assets;
 use crate::assets::TetrisColor;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
@@ -86,8 +86,8 @@ impl Block {
         assets: &Assets,
     ) {
         let dims = rectangle::square(
-            self.position.x as Scalar * BLOCK_SIZE,
-            self.position.y as Scalar * BLOCK_SIZE,
+            self.x() as Scalar * BLOCK_SIZE,
+            self.y() as Scalar * BLOCK_SIZE,
             BLOCK_SIZE,
         );
 

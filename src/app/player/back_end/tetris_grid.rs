@@ -1,5 +1,5 @@
 //! Defines the implementation of a [TetrisGrid](super::TetrisGrid).
-use super::{TetrisGrid, Tetromino};
+use super::{point::TetrisMoves, TetrisGrid, Tetromino};
 use crate::assets::TetrisColor;
 use crate::settings::BLOCK_SIZE;
 use graphics::types::Matrix2d;
@@ -33,10 +33,10 @@ impl TetrisGrid {
         let mut game_over = true;
         let mut blocks = tetromino.split();
         for block in &mut blocks {
-            self.matrix[block.position.y as usize][block.position.x as usize] = Some(block.color);
-            self.line_sum[block.position.y as usize] += 1;
+            self.matrix[block.y() as usize][block.x() as usize] = Some(block.color);
+            self.line_sum[block.y() as usize] += 1;
             // if there's a block below the top of the visible grid, continue playing
-            if block.position.y as usize > 1 {
+            if block.y() as usize > 1 {
                 game_over = false;
             }
         }

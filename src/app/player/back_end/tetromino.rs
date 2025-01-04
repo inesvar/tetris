@@ -1,7 +1,7 @@
 //! Defines the implementation of [Tetromino](super::Tetromino).
 use super::{
     block::{Block, Collision},
-    point::{Point, Transform},
+    point::{Point, TetrisMoves},
     rotation_state::{RotationState, RotationStateUpdate},
     translation_rotation::RotationType,
     GridLine, GridMatrix, Tetromino, TetrominoKind, TranslationRotation,

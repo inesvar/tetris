@@ -1,42 +1,42 @@
-//! Defines a point on a grid that can move.
+//! Defines `struct` [Point] and `trait` [TetrisMoves].
 use serde::{Deserialize, Serialize};
 
-/// Point on a finite wrap-around 2D grid.
-///
-/// A point moves without knownledge of its surroundings through [Transform]
-/// and thus doesn't implement collisions.
-#[derive(Clone, Copy, Serialize, Deserialize)]
+/// Point on a discrete grid, implementing `trait` [TetrisMoves], serializable.
+#[derive(Clone, Copy, Serialize, Deserialize, Default)]
 pub(super) struct Point {
     /// horizontal coordinate, from left to right
-    pub(super) x: i8,
+    x: i8,
     /// vertical coordinate, *from top to bottom*
-    pub(super) y: i8,
+    y: i8,
 }
 
-/// Unhindered moves on a grid (used when collisions aren't necessary)
-///
-/// ## Uses
-/// - [Tetromino](super::Tetromino) *center* (go_down, go_right, go_left)
-/// - [Tetromino](super::Tetromino) *blocks* (rotate_clockwise, rotate_counterclockwise) when checking if a rotation is possible
-/// - [TetrisGrid](super::TetrisGrid) *blocks* (go_down, go_up) when receiving/completing lines
-pub(super) trait Transform {
-    /// Move down one cell without checking if it's empty.
+/// All possible tetromino moves in tetris.
+pub(super) trait TetrisMoves {
+    fn x(&self) -> i8;
+    fn y(&self) -> i8;
+    /// Move down one cell.
     fn go_down(&mut self);
-    /// Move up one cell without checking if it's empty.
-    fn go_up(&mut self);
-    /// Move one cell left without checking if it's empty.
+    /// Move one cell left.
     fn go_left(&mut self);
-    /// Move one cell right without checking if it's empty.
+    /// Move one cell right.
     fn go_right(&mut self);
-    /// Rotate 90° clockwise around the given origin without checking if the destination is empty.
-    fn rotate_clockwise(&mut self, other: &Point);
-    /// Rotate 90° counterclockwise around the given origin without checking if the destination is empty.
-    fn rotate_counterclockwise(&mut self, other: &Point);
+    /// Turn 90° clockwise around point `origin`.
+    fn turn_clockwise_around(&mut self, origin: &Point);
+    /// Turn 90° counterclockwise around point `origin`.
+    fn turn_counterclockwise_around(&mut self, origin: &Point);
 }
 
 impl Point {
     pub(super) fn new(x: i8, y: i8) -> Self {
         Point { x, y }
+    }
+
+    fn turned_clockwise(&self) -> Self {
+        Point::new(self.y, -self.x)
+    }
+
+    fn turned_counterclockwise(&self) -> Self {
+        Point::new(-self.y, self.x)
     }
 }
 
@@ -47,25 +47,30 @@ impl std::ops::Add for Point {
     }
 }
 
+impl std::ops::Sub for Point {
+    type Output = Point;
+    fn sub(self, other: Point) -> Self::Output {
+        Point::new(self.x - other.x, self.y - other.y)
+    }
+}
+
 impl std::ops::AddAssign for Point {
     fn add_assign(&mut self, other: Point) {
         *self = *self + other;
     }
 }
 
-impl Default for Point {
-    fn default() -> Self {
-        Point::new(0, -10)
+impl TetrisMoves for Point {
+    fn x(&self) -> i8 {
+        self.x
     }
-}
 
-impl Transform for Point {
+    fn y(&self) -> i8 {
+        self.y
+    }
+
     fn go_down(&mut self) {
         self.y += 1;
-    }
-
-    fn go_up(&mut self) {
-        self.y -= 1;
     }
 
     fn go_left(&mut self) {
@@ -76,15 +81,13 @@ impl Transform for Point {
         self.x += 1;
     }
 
-    fn rotate_clockwise(&mut self, other: &Point) {
-        let temp = self.x - other.x;
-        self.x = other.x - self.y + other.y;
-        self.y = other.y + temp;
+    fn turn_clockwise_around(&mut self, other: &Point) {
+        let vector = *self - *other;
+        *self = *other + vector.turned_clockwise();
     }
 
-    fn rotate_counterclockwise(&mut self, other: &Point) {
-        let temp = self.x - other.x;
-        self.x = other.x + self.y - other.y;
-        self.y = other.y - temp;
+    fn turn_counterclockwise_around(&mut self, other: &Point) {
+        let vector = *self - *other;
+        *self = *other + vector.turned_counterclockwise();
     }
 }

@@ -1,6 +1,6 @@
 //! Defines a tetris block and the useful functions to move it inside a tetris grid.
 use super::{
-    point::{Point, Transform},
+    point::{Point, TetrisMoves},
     translation_rotation::Rotation,
     GridMatrix, TranslationRotation,
 };
@@ -11,11 +11,11 @@ use serde::{Deserialize, Serialize};
 ///
 /// A block can move inside a grid, constrained by the bounds of the grid and other blocks, through [Collision].
 /// However it can also move without using information
-/// about its surroudings through [Transform].
+/// about its surroudings through [TetrisMoves].
 /// A block has a [render()](Block::render()).
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Block {
-    pub(super) position: Point,
+    position: Point,
     pub(super) color: TetrisColor,
 }
 
@@ -46,10 +46,10 @@ impl Block {
     }
 
     fn check_inside_grid(point: &Point, width: usize, height: usize) -> Result<(), ()> {
-        if point.x < 0 || point.y < 0 {
+        if point.x() < 0 || point.y() < 0 {
             return Err(());
         }
-        if point.x as usize >= width || point.y as usize >= height {
+        if point.x() as usize >= width || point.y() as usize >= height {
             return Err(());
         }
         Ok(())
@@ -71,30 +71,34 @@ impl Collision for Block {
         let mut copy = self.translation_by(movement);
         match movement.rotation {
             Rotation::Clockwise(center) => {
-                copy.rotate_clockwise(&center);
+                copy.turn_clockwise_around(&center);
             }
             Rotation::Counterclockwise(center) => {
-                copy.rotate_counterclockwise(&center);
+                copy.turn_counterclockwise_around(&center);
             }
             _ => {}
         }
         // Check if the block is still inside the grid
         Self::check_inside_grid(&copy.position, matrix[0].len(), matrix.len())?;
         // Check if the block is not on another one
-        match matrix[copy.position.y as usize][copy.position.x as usize] {
+        match matrix[copy.y() as usize][copy.x() as usize] {
             Some(_) => Err(()),
             None => Ok(copy),
         }
     }
 }
 
-impl Transform for Block {
-    fn go_down(&mut self) {
-        self.position.go_down();
+impl TetrisMoves for Block {
+    fn x(&self) -> i8 {
+        self.position.x()
     }
 
-    fn go_up(&mut self) {
-        self.position.go_up();
+    fn y(&self) -> i8 {
+        self.position.y()
+    }
+
+    fn go_down(&mut self) {
+        self.position.go_down();
     }
 
     fn go_left(&mut self) {
@@ -105,11 +109,11 @@ impl Transform for Block {
         self.position.go_right();
     }
 
-    fn rotate_clockwise(&mut self, other: &Point) {
-        self.position.rotate_clockwise(other);
+    fn turn_clockwise_around(&mut self, other: &Point) {
+        self.position.turn_clockwise_around(other);
     }
 
-    fn rotate_counterclockwise(&mut self, other: &Point) {
-        self.position.rotate_counterclockwise(other);
+    fn turn_counterclockwise_around(&mut self, other: &Point) {
+        self.position.turn_counterclockwise_around(other);
     }
 }
