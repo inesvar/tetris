@@ -1,6 +1,5 @@
 //! Defines the back-end of the tetris game.
 mod block;
-mod point;
 mod render;
 mod rotation_state;
 mod tetris_grid;
@@ -9,7 +8,9 @@ mod tetromino_kind;
 mod translation_rotation;
 
 use self::{
-    block::Block, point::Point, rotation_state::RotationState, translation_rotation::Rotation,
+    block::{Block, Position},
+    rotation_state::RotationState,
+    translation_rotation::Rotation,
 };
 use crate::assets::TetrisColor;
 use graphics::types::Matrix2d;
@@ -21,8 +22,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Tetromino {
     kind: TetrominoKind,
-    center: Point,
-    pub(super) blocks: [Block; 4],
+    center: Position,
+    blocks: [Block; 4],
     rotation_status: RotationState,
     pub(super) is_ghost: bool,
 }
@@ -40,7 +41,6 @@ pub enum TetrominoKind {
 }
 
 type GridLine = Vec<Option<TetrisColor>>;
-pub type GridMatrix = [GridLine];
 
 /// Tetris grid containing blocks. It actually ontly contains their color as the coordinates of the blocks are given by their index in the matrix.
 #[derive(Serialize, Deserialize)]
@@ -49,7 +49,7 @@ pub struct TetrisGrid {
     pub y: f64,
     nb_columns: u32,
     nb_rows: u32,
-    pub matrix: Vec<GridLine>,
+    pub(self) matrix: Vec<GridLine>,
     line_sum: Vec<u8>,
     pub total_width: f64,
     pub total_height: f64,
@@ -59,9 +59,17 @@ pub struct TetrisGrid {
 }
 
 /// Movements composed by a translation, then a rotation.
-pub struct TranslationRotation {
-    pub(self) translation: Point,
+pub(in crate::app::player) struct TranslationRotation {
+    pub(self) translation: Position,
     pub(self) rotation: Rotation,
+}
+trait ApplyTranslationRotation {
+    fn move_by(&mut self, movement: &TranslationRotation) {
+        self.translate_by(movement);
+        self.turn_by(movement);
+    }
+    fn translate_by(&mut self, movement: &TranslationRotation);
+    fn turn_by(&mut self, movement: &TranslationRotation);
 }
 
 /// Returns a random bag of TetrominoKind of the specified size using the given rng.

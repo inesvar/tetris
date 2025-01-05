@@ -1,5 +1,5 @@
 //! Defines the implementation of a [TetrisGrid](super::TetrisGrid).
-use super::{point::TetrisMoves, TetrisGrid, Tetromino};
+use super::{block::Block, TetrisGrid, Tetromino};
 use crate::assets::TetrisColor;
 use crate::settings::BLOCK_SIZE;
 use graphics::types::Matrix2d;
@@ -28,12 +28,21 @@ impl TetrisGrid {
         }
     }
 
+    /// Returns true if the `block` is inside the grid in an empty slot.
+    pub(super) fn is_block_available(&self, block: &Block) -> bool {
+        let is_block_inside_grid = block.x() >= 0
+            && block.y() >= 0
+            && (block.x() as u32) < self.nb_columns
+            && (block.y() as u32) < self.nb_rows;
+        is_block_inside_grid && self.matrix[block.y() as usize][block.x() as usize].is_none()
+    }
+
     /// Push the Tetromino into the grid and return the number of lines completed.
     pub fn freeze_tetromino(&mut self, tetromino: &mut Tetromino) -> Option<u64> {
         let mut game_over = true;
         let mut blocks = tetromino.split();
         for block in &mut blocks {
-            self.matrix[block.y() as usize][block.x() as usize] = Some(block.color);
+            self.matrix[block.y() as usize][block.x() as usize] = Some(block.color());
             self.line_sum[block.y() as usize] += 1;
             // if there's a block below the top of the visible grid, continue playing
             if block.y() as usize > 1 {
@@ -113,7 +122,7 @@ impl TetrisGrid {
 
     /// Draw a 1 with blocks of the same color as tetromino.
     pub(in crate::app::player) fn one(&mut self, tetromino: Tetromino) {
-        let tetris_color = tetromino.blocks[0].color;
+        let tetris_color = tetromino.blocks[0].color();
         self.null();
         // starting from the top of the number
         // careful, it's matrix[y][x] and y increases towards the bottom
@@ -131,7 +140,7 @@ impl TetrisGrid {
 
     /// Draw a 2 with blocks of the same color as tetromino.
     pub(in crate::app::player) fn two(&mut self, tetromino: Tetromino) {
-        let tetris_color = tetromino.blocks[0].color;
+        let tetris_color = tetromino.blocks[0].color();
         self.null();
         // starting from the top of the number
         // careful, it's matrix[y][x] and y increases towards the bottom
@@ -149,7 +158,7 @@ impl TetrisGrid {
 
     /// Draw a 3 with blocks of the same color as tetromino.
     pub(in crate::app::player) fn three(&mut self, tetromino: Tetromino) {
-        let tetris_color = tetromino.blocks[0].color;
+        let tetris_color = tetromino.blocks[0].color();
         self.null();
         // starting from the top of the number
         // careful, it's matrix[y][x] and y increases towards the bottom

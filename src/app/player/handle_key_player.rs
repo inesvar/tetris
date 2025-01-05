@@ -79,7 +79,7 @@ impl LocalPlayer {
             // rotate once the tetromino
             self.player_screen
                 .active_tetromino
-                .turn_clockwise(&self.player_screen.grid.matrix);
+                .turn_clockwise(&self.player_screen.grid);
         }
         // it's not an if else in case the player put the same keybindings for both clock and counter...
         if self
@@ -89,7 +89,7 @@ impl LocalPlayer {
             // rotate once the tetromino
             self.player_screen
                 .active_tetromino
-                .turn_counterclockwise(&self.player_screen.grid.matrix);
+                .turn_counterclockwise(&self.player_screen.grid);
         }
 
         if self
@@ -114,13 +114,13 @@ impl LocalPlayer {
         if self.keyboard.is_any_last_pressed(&keybindings.left_keys) {
             self.player_screen
                 .active_tetromino
-                .left(&self.player_screen.grid.matrix);
+                .left(&self.player_screen.grid);
         }
         // it's not an if else in case the player put the same keybindings for both left and right...
         if self.keyboard.is_any_last_pressed(&keybindings.right_keys) {
             self.player_screen
                 .active_tetromino
-                .right(&self.player_screen.grid.matrix);
+                .right(&self.player_screen.grid);
         }
 
         if self
@@ -130,7 +130,7 @@ impl LocalPlayer {
             // hard drop the tetromino
             self.player_screen
                 .active_tetromino
-                .hard_drop(&self.player_screen.grid.matrix);
+                .hard_drop(&self.player_screen.grid);
             match self
                 .player_screen
                 .grid

@@ -1,5 +1,5 @@
 //! Defines the render functions of types [Block](super::block::Block::render()), [Tetromino](super::Tetromino::render()) and [TetrisGrid](super::TetrisGrid::render()).
-use super::{block::Block, point::TetrisMoves, TetrisGrid, Tetromino};
+use super::{block::Block, TetrisGrid, Tetromino};
 use crate::assets::Assets;
 use crate::assets::TetrisColor;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
@@ -44,11 +44,8 @@ impl TetrisGrid {
         }
         for (y, row) in self.matrix.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
-                match cell {
-                    Some(tetris_color) => {
-                        tetris_color.render(x, y, self.transform, draw_state, gl, assets)
-                    }
-                    None => {}
+                if let Some(tetris_color) = cell {
+                    tetris_color.render(x, y, self.transform, draw_state, gl, assets);
                 }
             }
         }
@@ -92,7 +89,7 @@ impl Block {
         );
 
         Image::new().rect(dims).draw(
-            assets.texture_from_tetris_color(&self.color),
+            assets.texture_from_tetris_color(&self.color()),
             draw_state,
             transform,
             gl,

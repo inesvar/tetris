@@ -62,7 +62,7 @@ impl LocalPlayer {
         self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
         self.player_screen.active_tetromino = Tetromino::new(
             self.bag_of_tetromino.pop().unwrap(),
-            &self.player_screen.grid.matrix[..],
+            &self.player_screen.grid,
         )
         .unwrap();
         self.player_screen.fifo_next_tetromino =
@@ -147,9 +147,11 @@ impl LocalPlayer {
             self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
         }
         // Check if there's enough place on the grid for a new tetromino
-        let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
+        // TODO this should be done using the grid method and probably all other calls
+        // using null()...
+        let mut possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
         if possible_active
-            .check_possible(&self.player_screen.grid.matrix, TranslationRotation::null())
+            .move_if_ok(&self.player_screen.grid, &TranslationRotation::null())
             .is_err()
         {
             // If not, it's a lock out situation

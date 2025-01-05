@@ -48,7 +48,7 @@ impl LocalPlayer {
                 && self
                     .player_screen
                     .active_tetromino
-                    .fall(&self.player_screen.grid.matrix)
+                    .fall(&self.player_screen.grid)
                     .is_err()
                 && self.freeze_frame < frame_counter
             {
@@ -61,14 +61,14 @@ impl LocalPlayer {
             {
                 self.player_screen
                     .active_tetromino
-                    .left(&self.player_screen.grid.matrix);
+                    .left(&self.player_screen.grid);
             }
             if self.keyboard.is_any_delay_pressed(&keybindings.right_keys)
                 && !self.keyboard.is_any_delay_pressed(&keybindings.left_keys)
             {
                 self.player_screen
                     .active_tetromino
-                    .right(&self.player_screen.grid.matrix);
+                    .right(&self.player_screen.grid);
             }
         }
 
@@ -84,7 +84,7 @@ impl LocalPlayer {
             && self
                 .player_screen
                 .active_tetromino
-                .fall(&self.player_screen.grid.matrix)
+                .fall(&self.player_screen.grid)
                 .is_err()
             && self.freeze_frame < frame_counter
         {
@@ -103,7 +103,7 @@ impl LocalPlayer {
             && self
                 .player_screen
                 .active_tetromino
-                .check_possible(&self.player_screen.grid.matrix, TranslationRotation::fall())
+                .move_if_ok(&self.player_screen.grid, &TranslationRotation::fall())
                 .is_err()
         {
             match self
@@ -139,7 +139,7 @@ impl LocalPlayer {
 
         // Updates the ghost_tetromino
         let mut ghost = self.player_screen.active_tetromino.make_ghost_copy();
-        ghost.hard_drop(&self.player_screen.grid.matrix);
+        ghost.hard_drop(&self.player_screen.grid);
         self.player_screen.ghost_tetromino = Some(ghost);
 
         // Adds garbage to the grid

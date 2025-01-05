@@ -1,48 +1,41 @@
 //! Defines the implementation of [Tetromino](super::Tetromino).
 use super::{
-    block::{Block, Collision},
-    point::{Point, TetrisMoves},
+    block::{Block, Position},
     rotation_state::{RotationState, RotationStateUpdate},
-    translation_rotation::RotationType,
-    GridLine, GridMatrix, Tetromino, TetrominoKind, TranslationRotation,
+    translation_rotation::{Rotation, RotationType},
+    ApplyTranslationRotation, TetrisGrid, Tetromino, TetrominoKind, TranslationRotation,
 };
 use core::fmt::Display;
 use std::fmt::Formatter;
 
 impl Tetromino {
-    /// Moves the Tetromino down one cell if it's possible.
-    pub fn fall(&mut self, matrix: &[GridLine]) -> Result<(), ()> {
-        self.blocks = self.check_possible(matrix, TranslationRotation::fall())?;
-        self.center.go_down();
-        Ok(())
+    /// Return whether the tetromino could be moved one cell down.
+    pub fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()> {
+        let movement = TranslationRotation::fall();
+        self.move_if_ok(grid, &movement)
     }
 
-    /// Moves the Tetromino as far down as possible.
-    pub fn hard_drop(&mut self, matrix: &GridMatrix) {
-        match self.fall(matrix) {
-            Err(()) => {}
-            Ok(()) => self.hard_drop(matrix),
+    /// Move the tetromino down until it's not possible anymore.
+    pub fn hard_drop(&mut self, grid: &TetrisGrid) {
+        if self.fall(grid).is_ok() {
+            self.hard_drop(grid);
         }
     }
 
-    /// Moves the Tetromino one cell to the left if it's possible.
-    pub fn left(&mut self, matrix: &GridMatrix) {
-        if let Ok(new_blocks) = self.check_possible(matrix, TranslationRotation::left()) {
-            self.blocks = new_blocks;
-            self.center.go_left();
-        }
+    /// Move the tetromino one cell left if it's possible.
+    pub fn left(&mut self, grid: &TetrisGrid) {
+        let movement = TranslationRotation::left();
+        let _ = self.move_if_ok(grid, &movement);
     }
 
-    /// Moves the Tetromino one cell to the right if it's possible.
-    pub fn right(&mut self, matrix: &GridMatrix) {
-        if let Ok(new_blocks) = self.check_possible(matrix, TranslationRotation::right()) {
-            self.blocks = new_blocks;
-            self.center.go_right();
-        }
+    /// Move the tetromino one cell right if it's possible.
+    pub fn right(&mut self, grid: &TetrisGrid) {
+        let movement = TranslationRotation::right();
+        let _ = self.move_if_ok(grid, &movement);
     }
 
-    /// Turns the Tetromino clockwise if it's possible, eventually using wall-kicks.
-    pub fn turn_clockwise(&mut self, matrix: &GridMatrix) {
+    /// Turn the tetromino clockwise if it's possible, eventually using wall-kicks.
+    pub fn turn_clockwise(&mut self, grid: &TetrisGrid) {
         if self.kind == TetrominoKind::O {
             return;
         };
@@ -52,25 +45,16 @@ impl Tetromino {
             self.rotation_status,
         );
         for wall_kick in &wall_kicks_translations {
-            match self.check_possible(
-                matrix,
-                TranslationRotation::new(*wall_kick, RotationType::Clockwise, &self.center),
-            ) {
-                Err(()) => {
-                    continue;
-                }
-                Ok(new_blocks) => {
-                    self.blocks = new_blocks;
-                    self.rotation_status.clockwise();
-                    self.center += *wall_kick;
-                    return;
-                }
+            let movement =
+                TranslationRotation::new(*wall_kick, RotationType::Clockwise, &self.center);
+            if self.move_if_ok(grid, &movement).is_ok() {
+                return;
             }
         }
     }
 
-    /// Turns the Tetromino counterclockwise if it's possible, eventually using wall-kicks.
-    pub fn turn_counterclockwise(&mut self, matrix: &GridMatrix) {
+    /// Turn the tetromino counterclockwise if it's possible, eventually using wall-kicks.
+    pub fn turn_counterclockwise(&mut self, grid: &TetrisGrid) {
         if self.kind == TetrominoKind::O {
             return;
         };
@@ -80,49 +64,46 @@ impl Tetromino {
             self.rotation_status,
         );
         for wall_kick in &wall_kicks_translations {
-            match self.check_possible(
-                matrix,
-                TranslationRotation::new(*wall_kick, RotationType::Counterclockwise, &self.center),
-            ) {
-                Err(()) => {
-                    continue;
-                }
-                Ok(new_blocks) => {
-                    self.blocks = new_blocks;
-                    self.rotation_status.counterclockwise();
-                    self.center += *wall_kick;
-                    return;
-                }
+            let movement =
+                TranslationRotation::new(*wall_kick, RotationType::Counterclockwise, &self.center);
+            if self.move_if_ok(grid, &movement).is_ok() {
+                return;
             }
         }
     }
 
-    /// Returns the resulting position of the Tetromino Blocks if the movement is possible.
-    pub fn check_possible(
-        &self,
-        matrix: &GridMatrix,
-        movement: TranslationRotation,
-    ) -> Result<[Block; 4], ()> {
-        let mut new_blocks = vec![];
-        for i in 0..4 {
-            new_blocks.push(self.blocks[i].move_to(matrix, &movement)?);
+    /// Return whether the tetromino could be moved.
+    pub(in crate::app::player) fn move_if_ok(
+        &mut self,
+        grid: &TetrisGrid,
+        movement: &TranslationRotation,
+    ) -> Result<(), ()> {
+        let mut new_blocks = [Block::default(); 4];
+        for (i, new_block) in new_blocks.iter_mut().enumerate() {
+            *new_block = self.blocks[i].can_be_moved(grid, movement)?;
         }
-        let blocks = [new_blocks[0], new_blocks[1], new_blocks[2], new_blocks[3]];
-        Ok(blocks)
+        self.blocks = new_blocks;
+        match movement.rotation {
+            Rotation::Clockwise(_) => self.rotation_status.clockwise(),
+            Rotation::Counterclockwise(_) => self.rotation_status.counterclockwise(),
+            Rotation::NoRotation => {}
+        };
+        self.center.translate_by(movement);
+        Ok(())
     }
 
     /// Returns an Option eventually containing a Tetromino if its starting position is empty.
-    pub fn new(kind: TetrominoKind, matrix: &GridMatrix) -> Option<Tetromino> {
+    pub fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Tetromino> {
         let positions = kind.get_initial_position();
         let color = kind.get_color();
         for i in 1..5 {
-            if matrix[positions[2 * i + 1] as usize][positions[2 * i] as usize].is_some() {
+            if grid.matrix[positions[2 * i + 1] as usize][positions[2 * i] as usize].is_some() {
                 return None;
             }
         }
         Some(Tetromino {
             kind,
-            center: Point::new(positions[0], positions[1]),
+            center: Position::new(positions[0], positions[1]),
             blocks: [
                 Block::new(color, positions[2], positions[3]),
                 Block::new(color, positions[4], positions[5]),
@@ -140,7 +121,7 @@ impl Tetromino {
         let color = kind.get_color();
         Tetromino {
             kind,
-            center: Point::new(positions[0], positions[1]),
+            center: Position::new(positions[0], positions[1]),
             blocks: [
                 Block::new(color, positions[2], positions[3]),
                 Block::new(color, positions[4], positions[5]),
@@ -156,7 +137,7 @@ impl Tetromino {
     pub fn reset_position(&mut self) {
         let positions = self.kind.get_initial_position();
         let color = self.kind.get_color();
-        self.center = Point::new(positions[0], positions[1]);
+        self.center = Position::new(positions[0], positions[1]);
         self.blocks = [
             Block::new(color, positions[2], positions[3]),
             Block::new(color, positions[4], positions[5]),
@@ -177,7 +158,7 @@ impl Default for Tetromino {
     fn default() -> Self {
         Tetromino {
             kind: TetrominoKind::O,
-            center: Point::default(),
+            center: Position::default(),
             blocks: [Block::default(); 4],
             rotation_status: RotationState::R0,
             is_ghost: false,

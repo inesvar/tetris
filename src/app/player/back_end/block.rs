@@ -1,119 +1,131 @@
-//! Defines a tetris block and the useful functions to move it inside a tetris grid.
+//! Defines `struct` [Block], `struct` [Position].
 use super::{
-    point::{Point, TetrisMoves},
-    translation_rotation::Rotation,
-    GridMatrix, TranslationRotation,
+    translation_rotation::Rotation, ApplyTranslationRotation, TetrisGrid, TranslationRotation,
 };
 use crate::assets::TetrisColor;
+use delegate::delegate;
 use serde::{Deserialize, Serialize};
 
-/// Coloured tetris block in a finite 2D grid.
-///
-/// A block can move inside a grid, constrained by the bounds of the grid and other blocks, through [Collision].
-/// However it can also move without using information
-/// about its surroudings through [TetrisMoves].
-/// A block has a [render()](Block::render()).
+/// Block in a discrete grid, serializable.
 #[derive(Clone, Copy, Serialize, Deserialize)]
-pub struct Block {
-    position: Point,
-    pub(super) color: TetrisColor,
+pub(super) struct Block {
+    position: Position,
+    color: TetrisColor,
 }
 
-/// Moves a block inside the grid, eventually handling the collision with other blocks in the matrix.
-///
-/// The block can never leave the matrix.
-///
-/// ## Uses
-/// - anytime a [Tetromino](super::Tetromino) moves
-pub(super) trait Collision {
-    /// Applies a given *movement* to a block in a given *matrix*.
-    fn move_to(&self, matrix: &GridMatrix, movement: &TranslationRotation) -> Result<Block, ()>;
+/// Position on a discrete grid, serializable.
+#[derive(Clone, Copy, Serialize, Deserialize, Default)]
+pub(super) struct Position {
+    /// horizontal coordinate, from left to right
+    x: i8,
+    /// vertical coordinate, *from top to bottom*
+    y: i8,
+}
+
+impl ApplyTranslationRotation for Block {
+    delegate! {
+        to self.position {
+            fn translate_by(&mut self, movement: &TranslationRotation);
+            fn turn_by(&mut self, movement: &TranslationRotation);
+        }
+    }
+}
+
+impl ApplyTranslationRotation for Position {
+    fn translate_by(&mut self, movement: &TranslationRotation) {
+        *self += movement.translation;
+    }
+
+    fn turn_by(&mut self, movement: &TranslationRotation) {
+        match movement.rotation {
+            Rotation::Clockwise(center) => {
+                let vector = *self - center;
+                *self = center + vector.turned_clockwise();
+            }
+            Rotation::Counterclockwise(center) => {
+                let vector = *self - center;
+                *self = center + vector.turned_counterclockwise();
+            }
+            Rotation::NoRotation => {}
+        }
+    }
 }
 
 impl Block {
     pub(super) fn new(color: TetrisColor, x: i8, y: i8) -> Self {
         Block {
-            position: Point::new(x, y),
+            position: Position::new(x, y),
             color,
         }
     }
 
-    fn translation_by(self, other: &TranslationRotation) -> Self {
-        Block {
-            position: self.position + other.translation,
-            color: self.color,
-        }
+    pub(super) fn x(&self) -> i8 {
+        self.position.x
     }
 
-    fn check_inside_grid(point: &Point, width: usize, height: usize) -> Result<(), ()> {
-        if point.x() < 0 || point.y() < 0 {
-            return Err(());
+    pub(super) fn y(&self) -> i8 {
+        self.position.y
+    }
+
+    pub(super) fn color(&self) -> TetrisColor {
+        self.color
+    }
+
+    pub(super) fn can_be_moved(
+        &self,
+        grid: &TetrisGrid,
+        movement: &TranslationRotation,
+    ) -> Result<Block, ()> {
+        let mut copy = *self;
+        copy.move_by(movement);
+        // Check if `copy` is inside `grid` and on an empty slot
+        if grid.is_block_available(&copy) {
+            Ok(copy)
+        } else {
+            Err(())
         }
-        if point.x() as usize >= width || point.y() as usize >= height {
-            return Err(());
-        }
-        Ok(())
+    }
+}
+
+impl Position {
+    pub(super) fn new(x: i8, y: i8) -> Self {
+        Position { x, y }
+    }
+
+    fn turned_clockwise(&self) -> Self {
+        Position::new(self.y, -self.x)
+    }
+
+    fn turned_counterclockwise(&self) -> Self {
+        Position::new(-self.y, self.x)
     }
 }
 
 impl Default for Block {
     fn default() -> Self {
         Block {
-            position: Point::default(),
+            position: Position::default(),
             color: TetrisColor::Yellow,
         }
     }
 }
 
-impl Collision for Block {
-    fn move_to(&self, matrix: &GridMatrix, movement: &TranslationRotation) -> Result<Block, ()> {
-        // Apply the TranslationRotation
-        let mut copy = self.translation_by(movement);
-        match movement.rotation {
-            Rotation::Clockwise(center) => {
-                copy.turn_clockwise_around(&center);
-            }
-            Rotation::Counterclockwise(center) => {
-                copy.turn_counterclockwise_around(&center);
-            }
-            _ => {}
-        }
-        // Check if the block is still inside the grid
-        Self::check_inside_grid(&copy.position, matrix[0].len(), matrix.len())?;
-        // Check if the block is not on another one
-        match matrix[copy.y() as usize][copy.x() as usize] {
-            Some(_) => Err(()),
-            None => Ok(copy),
-        }
+impl std::ops::Add for Position {
+    type Output = Position;
+    fn add(self, other: Position) -> Self::Output {
+        Position::new(self.x + other.x, self.y + other.y)
     }
 }
 
-impl TetrisMoves for Block {
-    fn x(&self) -> i8 {
-        self.position.x()
+impl std::ops::Sub for Position {
+    type Output = Position;
+    fn sub(self, other: Position) -> Self::Output {
+        Position::new(self.x - other.x, self.y - other.y)
     }
+}
 
-    fn y(&self) -> i8 {
-        self.position.y()
-    }
-
-    fn go_down(&mut self) {
-        self.position.go_down();
-    }
-
-    fn go_left(&mut self) {
-        self.position.go_left();
-    }
-
-    fn go_right(&mut self) {
-        self.position.go_right();
-    }
-
-    fn turn_clockwise_around(&mut self, other: &Point) {
-        self.position.turn_clockwise_around(other);
-    }
-
-    fn turn_counterclockwise_around(&mut self, other: &Point) {
-        self.position.turn_counterclockwise_around(other);
+impl std::ops::AddAssign for Position {
+    fn add_assign(&mut self, other: Position) {
+        *self = *self + other;
     }
 }
