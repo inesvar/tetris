@@ -1,4 +1,4 @@
-//! Defines `struct` [Block], `struct` [Position].
+//! Defines `struct` [Block] and `struct` [Position].
 use super::{
     translation_rotation::Rotation, ApplyTranslationRotation, TetrisGrid, TranslationRotation,
 };
@@ -22,6 +22,7 @@ pub(super) struct Position {
     y: i8,
 }
 
+// TODO move to module moving_primitives
 impl ApplyTranslationRotation for Block {
     delegate! {
         to self.position {
@@ -31,6 +32,7 @@ impl ApplyTranslationRotation for Block {
     }
 }
 
+// TODO move to module moving_primitives
 impl ApplyTranslationRotation for Position {
     fn translate_by(&mut self, movement: &TranslationRotation) {
         *self += &movement.translation;
@@ -71,6 +73,7 @@ impl Block {
         self.color
     }
 
+    // TODO move to module moving_primitives
     pub(super) fn can_be_moved(
         &self,
         grid: &TetrisGrid,

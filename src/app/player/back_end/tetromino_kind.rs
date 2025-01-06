@@ -1,6 +1,6 @@
 //! Defines the specificities of the 7 kinds of Tetromino pieces : colors, starting positions, wall-kicks.
 use super::{
-    block::Position, rotation_state::RotationState, translation_rotation::RotationType,
+    spatial_primitives::Position, rotation_state::RotationState, translation_rotation::RotationType,
     TetrominoKind,
 };
 use crate::assets::TetrisColor;

@@ -1,5 +1,5 @@
 //! Defines the back-end of the tetris game.
-mod block;
+mod spatial_primitives;
 mod render;
 mod rotation_state;
 mod tetris_grid;
@@ -8,7 +8,7 @@ mod tetromino_kind;
 mod translation_rotation;
 
 use self::{
-    block::{Block, Position},
+    spatial_primitives::{Block, Position},
     rotation_state::RotationState,
     translation_rotation::Rotation,
 };

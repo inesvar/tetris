@@ -1,6 +1,6 @@
 //! Defines the implementation of [Tetromino](super::Tetromino).
 use super::{
-    block::{Block, Position},
+    spatial_primitives::{Block, Position},
     rotation_state::{RotationState, RotationStateUpdate},
     translation_rotation::{Rotation, RotationType},
     ApplyTranslationRotation, TetrisGrid, Tetromino, TetrominoKind, TranslationRotation,

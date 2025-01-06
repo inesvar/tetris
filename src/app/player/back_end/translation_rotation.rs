@@ -1,5 +1,5 @@
 //! Defines composite movements needed to describe how a tetromino moves.
-use super::{block::Position, TranslationRotation};
+use super::{spatial_primitives::Position, TranslationRotation};
 
 /// Rotation movement.
 pub(super) enum Rotation {
