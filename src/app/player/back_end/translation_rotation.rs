@@ -40,11 +40,11 @@ impl TranslationRotation {
 
     /// Returns a composite movement, translation then rotation (around the translated center).
     /// For a pure translation, use translation method.
-    pub(super) fn new(translation: Position, rtype: RotationType, center: &Position) -> Self {
+    pub(super) fn new(translation: &Position, rtype: RotationType, center: &Position) -> Self {
         TranslationRotation {
-            translation,
+            translation: *translation,
             // the rotation center is the center of the struct translated by translation
-            rotation: Rotation::new(rtype, *center + translation),
+            rotation: Rotation::new(rtype, center + translation),
         }
     }
 

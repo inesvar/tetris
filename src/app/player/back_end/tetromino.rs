@@ -46,7 +46,7 @@ impl Tetromino {
         );
         for wall_kick in &wall_kicks_translations {
             let movement =
-                TranslationRotation::new(*wall_kick, RotationType::Clockwise, &self.center);
+                TranslationRotation::new(wall_kick, RotationType::Clockwise, &self.center);
             if self.move_if_ok(grid, &movement).is_ok() {
                 return;
             }
@@ -65,7 +65,7 @@ impl Tetromino {
         );
         for wall_kick in &wall_kicks_translations {
             let movement =
-                TranslationRotation::new(*wall_kick, RotationType::Counterclockwise, &self.center);
+                TranslationRotation::new(wall_kick, RotationType::Counterclockwise, &self.center);
             if self.move_if_ok(grid, &movement).is_ok() {
                 return;
             }

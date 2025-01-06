@@ -33,17 +33,17 @@ impl ApplyTranslationRotation for Block {
 
 impl ApplyTranslationRotation for Position {
     fn translate_by(&mut self, movement: &TranslationRotation) {
-        *self += movement.translation;
+        *self += &movement.translation;
     }
 
     fn turn_by(&mut self, movement: &TranslationRotation) {
-        match movement.rotation {
+        match &movement.rotation {
             Rotation::Clockwise(center) => {
-                let vector = *self - center;
+                let vector = &*self - center;
                 *self = center + vector.turned_clockwise();
             }
             Rotation::Counterclockwise(center) => {
-                let vector = *self - center;
+                let vector = &*self - center;
                 *self = center + vector.turned_counterclockwise();
             }
             Rotation::NoRotation => {}
@@ -88,15 +88,25 @@ impl Block {
 }
 
 impl Position {
-    pub(super) fn new(x: i8, y: i8) -> Self {
+    pub(super) const fn new(x: i8, y: i8) -> Self {
         Position { x, y }
     }
 
-    fn turned_clockwise(&self) -> Self {
+    // TODO create a const trait Arithmetic when it will be possible
+    #[allow(dead_code)]
+    pub(super) const fn neg(self) -> Position {
+        Position::new(-self.x, -self.y)
+    }
+
+    pub(super) const fn add(self, other: Position) -> Position {
+        Position::new(self.x + other.x, self.y + other.y)
+    }
+
+    pub(super) const fn turned_clockwise(&self) -> Self {
         Position::new(self.y, -self.x)
     }
 
-    fn turned_counterclockwise(&self) -> Self {
+    pub(super) const fn turned_counterclockwise(&self) -> Self {
         Position::new(-self.y, self.x)
     }
 }
@@ -110,22 +120,36 @@ impl Default for Block {
     }
 }
 
-impl std::ops::Add for Position {
+impl std::ops::Add<Position> for &Position {
     type Output = Position;
     fn add(self, other: Position) -> Self::Output {
         Position::new(self.x + other.x, self.y + other.y)
     }
 }
 
-impl std::ops::Sub for Position {
+impl std::ops::Sub<Position> for &Position {
     type Output = Position;
     fn sub(self, other: Position) -> Self::Output {
         Position::new(self.x - other.x, self.y - other.y)
     }
 }
 
-impl std::ops::AddAssign for Position {
-    fn add_assign(&mut self, other: Position) {
-        *self = *self + other;
+impl std::ops::Add for &Position {
+    type Output = Position;
+    fn add(self, other: &Position) -> Self::Output {
+        Position::new(self.x + other.x, self.y + other.y)
+    }
+}
+
+impl std::ops::Sub for &Position {
+    type Output = Position;
+    fn sub(self, other: &Position) -> Self::Output {
+        Position::new(self.x - other.x, self.y - other.y)
+    }
+}
+
+impl std::ops::AddAssign<&Position> for Position {
+    fn add_assign(&mut self, other: &Position) {
+        *self = &*self + other;
     }
 }
