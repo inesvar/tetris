@@ -1,7 +1,7 @@
 //! Defines the specificities of the 7 kinds of Tetromino pieces : colors, starting positions, wall-kicks.
 use super::{
-    spatial_primitives::Position, rotation_state::RotationState, translation_rotation::RotationType,
-    TetrominoKind,
+    rotation_state::RotationState, spatial_primitives::Position,
+    translation_rotation::RotationType, TetrominoKind,
 };
 use crate::assets::TetrisColor;
 
@@ -119,6 +119,7 @@ impl TetrominoKind {
                     Position::new(0, 1).add(Position::new(-1, 2)),
                     Position::new(0, 1).add(Position::new(2, -1)),
                 ],
+                (_, RotationType::HalfTurn) => todo!(),
             },
             _ => match (rotation_status, rtype) {
                 (RotationState::R0, RotationType::Clockwise) => [
@@ -177,6 +178,7 @@ impl TetrominoKind {
                     Position::new(0, -2),
                     Position::new(1, -2),
                 ],
+                (_, RotationType::HalfTurn) => todo!(),
             },
         }
     }

@@ -1,15 +1,15 @@
 //! Defines the back-end of the tetris game.
-mod spatial_primitives;
 mod render;
 mod rotation_state;
+mod spatial_primitives;
 mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;
 mod translation_rotation;
 
 use self::{
-    spatial_primitives::{Block, Position},
     rotation_state::RotationState,
+    spatial_primitives::{Block, Position},
     translation_rotation::Rotation,
 };
 use crate::assets::TetrisColor;

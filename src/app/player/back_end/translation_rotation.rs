@@ -1,10 +1,12 @@
-//! Defines composite movements needed to describe how a tetromino moves.
+//! Implements `struct` [TranslationRotation], defines `enum` [Rotation]
+//! and `enum` [RotationType].
 use super::{spatial_primitives::Position, TranslationRotation};
 
-/// Rotation movement.
+/// .
 pub(super) enum Rotation {
     Clockwise(Position),
     Counterclockwise(Position),
+    HalfTurn(Position),
     NoRotation,
 }
 
@@ -12,21 +14,25 @@ pub(super) enum Rotation {
 pub(super) enum RotationType {
     Clockwise,
     Counterclockwise,
+    #[allow(dead_code)]
+    HalfTurn,
 }
 
 impl Rotation {
     /// Constructor for non-null rotation movements.
-    fn new(rtype: RotationType, center: Position) -> Self {
-        match rtype {
+    fn new(rotation_type: RotationType, center: Position) -> Self {
+        match rotation_type {
             RotationType::Clockwise => Rotation::Clockwise(center),
             RotationType::Counterclockwise => Rotation::Counterclockwise(center),
+            RotationType::HalfTurn => Rotation::HalfTurn(center),
         }
     }
 }
 
 impl TranslationRotation {
+    // TODO make this pub(super)
     /// Returns a null movement.
-    pub fn null() -> Self {
+    pub(in crate::app::player) fn null() -> Self {
         TranslationRotation {
             translation: Position::new(0, 0),
             rotation: Rotation::NoRotation,
@@ -34,7 +40,7 @@ impl TranslationRotation {
     }
 
     /// Returns a translation one cell towards the bottom.
-    pub fn fall() -> Self {
+    pub(super) fn fall() -> Self {
         TranslationRotation::translation(Position::new(0, 1))
     }
 

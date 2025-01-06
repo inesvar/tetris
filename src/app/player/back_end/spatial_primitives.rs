@@ -48,6 +48,10 @@ impl ApplyTranslationRotation for Position {
                 let vector = &*self - center;
                 *self = center + vector.turned_counterclockwise();
             }
+            Rotation::HalfTurn(center) => {
+                let vector = &*self - center;
+                *self = center + vector.neg();
+            }
             Rotation::NoRotation => {}
         }
     }
@@ -96,7 +100,6 @@ impl Position {
     }
 
     // TODO create a const trait Arithmetic when it will be possible
-    #[allow(dead_code)]
     pub(super) const fn neg(self) -> Position {
         Position::new(-self.x, -self.y)
     }

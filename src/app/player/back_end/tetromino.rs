@@ -1,7 +1,7 @@
 //! Defines the implementation of [Tetromino](super::Tetromino).
 use super::{
-    spatial_primitives::{Block, Position},
     rotation_state::{RotationState, RotationStateUpdate},
+    spatial_primitives::{Block, Position},
     translation_rotation::{Rotation, RotationType},
     ApplyTranslationRotation, TetrisGrid, Tetromino, TetrominoKind, TranslationRotation,
 };
@@ -86,6 +86,7 @@ impl Tetromino {
         match movement.rotation {
             Rotation::Clockwise(_) => self.rotation_status.clockwise(),
             Rotation::Counterclockwise(_) => self.rotation_status.counterclockwise(),
+            Rotation::HalfTurn(_) => self.rotation_status.half_turn(),
             Rotation::NoRotation => {}
         };
         self.center.translate_by(movement);

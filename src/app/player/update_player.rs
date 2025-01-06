@@ -1,7 +1,7 @@
 //! Defines the update function of [LocalPlayer].
 //!
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
-use super::{back_end::TranslationRotation, LocalPlayer};
+use super::LocalPlayer;
 use crate::settings::Keybindings;
 
 impl LocalPlayer {
@@ -103,7 +103,7 @@ impl LocalPlayer {
             && self
                 .player_screen
                 .active_tetromino
-                .move_if_ok(&self.player_screen.grid, &TranslationRotation::fall())
+                .fall(&self.player_screen.grid)
                 .is_err()
         {
             match self
