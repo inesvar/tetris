@@ -1,6 +1,7 @@
 //! Defines `struct` [Block] and `struct` [Position].
 use super::{
-    translation_rotation::Rotation, ApplyTranslationRotation, TetrisGrid, TranslationRotation,
+    translation_rotation::{Rotation, RotationType},
+    ApplyTranslationRotation, TetrisGrid, TranslationRotation,
 };
 use crate::assets::TetrisColor;
 use delegate::delegate;
@@ -14,7 +15,7 @@ pub(super) struct Block {
 }
 
 /// Position on a discrete grid, serializable.
-#[derive(Clone, Copy, Serialize, Deserialize, Default)]
+#[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
 pub(super) struct Position {
     /// horizontal coordinate, from left to right
     x: i8,
@@ -158,4 +159,42 @@ impl std::ops::AddAssign<&Position> for Position {
     fn add_assign(&mut self, other: &Position) {
         *self = &*self + other;
     }
+}
+
+#[test]
+fn turns_around_origin_work() {
+    let three_oclock = Position::new(1, 0);
+    let six_oclock = Position::new(0, -1);
+    let nine_oclock = Position::new(-1, 0);
+    let twelve_oclock = Position::new(0, 1);
+
+    assert_eq!(three_oclock.turned_clockwise(), six_oclock);
+    assert_eq!(nine_oclock.turned_counterclockwise(), six_oclock);
+    assert_eq!(twelve_oclock.neg(), six_oclock);
+}
+
+#[test]
+fn arithmetic_implementations_are_equivalent() {
+    let a = Position::new(6, 3);
+    let b = Position::new(5, 4);
+
+    assert_eq!(&a + b, a.add(b));
+    assert_eq!(&a - b, a.add(b.neg()));
+
+    let mut sum = a;
+    sum += &b;
+
+    assert_eq!(sum, &a + b);
+}
+
+#[test]
+fn turns_around_arbitrary_center_work() {
+    let center = Position::new(4, 3);
+    let mut point = Position::new(-2, 1);
+    let vector = &point - &center;
+    let translation_rotation =
+        TranslationRotation::new(&Position::default(), RotationType::Clockwise, &center);
+
+    point.turn_by(&translation_rotation);
+    assert_eq!(point, center.add(vector.turned_clockwise()));
 }
