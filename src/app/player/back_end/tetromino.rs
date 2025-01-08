@@ -1,8 +1,7 @@
-//! Defines the implementation of [Tetromino](super::Tetromino).
+//! Defines the implementation of [Tetromino].
 use super::{
-    rotation_state::{RotationState, RotationStateUpdate},
     spatial_primitives::{Block, Position},
-    translation_rotation::{Rotation, RotationType},
+    translation_rotation::{Direction, RotationType},
     ApplyTranslationRotation, TetrisGrid, Tetromino, TetrominoKind, TranslationRotation,
 };
 use core::fmt::Display;
@@ -42,7 +41,7 @@ impl Tetromino {
         let wall_kicks_translations = TetrominoKind::wall_kicks_translations(
             &self.kind,
             RotationType::Clockwise,
-            self.rotation_status,
+            self.direction,
         );
         for wall_kick in &wall_kicks_translations {
             let movement =
@@ -61,7 +60,7 @@ impl Tetromino {
         let wall_kicks_translations = TetrominoKind::wall_kicks_translations(
             &self.kind,
             RotationType::Counterclockwise,
-            self.rotation_status,
+            self.direction,
         );
         for wall_kick in &wall_kicks_translations {
             let movement =
@@ -83,12 +82,7 @@ impl Tetromino {
             *new_block = self.blocks[i].can_be_moved(grid, movement)?;
         }
         self.blocks = new_blocks;
-        match movement.rotation {
-            Rotation::Clockwise(_) => self.rotation_status.clockwise(),
-            Rotation::Counterclockwise(_) => self.rotation_status.counterclockwise(),
-            Rotation::HalfTurn(_) => self.rotation_status.half_turn(),
-            Rotation::NoRotation => {}
-        };
+        self.direction.update(&movement.rotation.rotation_type);
         self.center.translate_by(movement);
         Ok(())
     }
@@ -111,7 +105,7 @@ impl Tetromino {
                 Block::new(color, positions[6], positions[7]),
                 Block::new(color, positions[8], positions[9]),
             ],
-            rotation_status: RotationState::R0,
+            direction: Direction::default(),
             is_ghost: false,
         })
     }
@@ -129,7 +123,7 @@ impl Tetromino {
                 Block::new(color, positions[6], positions[7]),
                 Block::new(color, positions[8], positions[9]),
             ],
-            rotation_status: RotationState::R0,
+            direction: Direction::default(),
             is_ghost: false,
         }
     }
@@ -161,7 +155,7 @@ impl Default for Tetromino {
             kind: TetrominoKind::O,
             center: Position::default(),
             blocks: [Block::default(); 4],
-            rotation_status: RotationState::R0,
+            direction: Direction::default(),
             is_ghost: false,
         }
     }

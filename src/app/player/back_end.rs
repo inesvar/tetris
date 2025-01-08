@@ -1,6 +1,5 @@
 //! Defines the back-end of the tetris game.
 mod render;
-mod rotation_state;
 mod spatial_primitives;
 mod tetris_grid;
 mod tetromino;
@@ -8,9 +7,8 @@ mod tetromino_kind;
 mod translation_rotation;
 
 use self::{
-    rotation_state::RotationState,
     spatial_primitives::{Block, Position},
-    translation_rotation::Rotation,
+    translation_rotation::{Direction, Rotation},
 };
 use crate::assets::TetrisColor;
 use graphics::types::Matrix2d;
@@ -24,7 +22,7 @@ pub struct Tetromino {
     kind: TetrominoKind,
     center: Position,
     blocks: [Block; 4],
-    rotation_status: RotationState,
+    direction: Direction,
     pub(super) is_ghost: bool,
 }
 

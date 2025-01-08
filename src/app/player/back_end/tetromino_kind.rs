@@ -1,6 +1,6 @@
 //! Defines the specificities of the 7 kinds of Tetromino pieces : colors, starting positions, wall-kicks.
 use super::{
-    rotation_state::RotationState, spatial_primitives::Position,
+    spatial_primitives::Position, translation_rotation::Direction,
     translation_rotation::RotationType, TetrominoKind,
 };
 use crate::assets::TetrisColor;
@@ -51,7 +51,7 @@ impl TetrominoKind {
     pub(super) fn wall_kicks_translations(
         &self,
         rtype: RotationType,
-        rotation_status: RotationState,
+        rotation_status: Direction,
     ) -> [Position; 5] {
         // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
         match self {
@@ -63,122 +63,122 @@ impl TetrominoKind {
             // (the true position of the initial center is (4.5, 1) and not (4, 1) see line 32.)
             // (its due to the fact that the I piece doesn't have a 3x3 bounding box like the other rotating pieces)
             TetrominoKind::I => match (rotation_status, rtype) {
-                (RotationState::R0, RotationType::Clockwise) => [
+                (Direction::Up, RotationType::Clockwise) => [
                     Position::new(1, 0),
                     Position::new(1, 0).add(Position::new(-2, 0)),
                     Position::new(1, 0).add(Position::new(1, 0)),
                     Position::new(1, 0).add(Position::new(-2, -1)),
                     Position::new(1, 0).add(Position::new(1, 2)),
                 ],
-                (RotationState::R1, RotationType::Counterclockwise) => [
+                (Direction::Right, RotationType::Counterclockwise) => [
                     Position::new(-1, 0),
                     Position::new(-1, 0).add(Position::new(2, 0)),
                     Position::new(-1, 0).add(Position::new(-1, 0)),
                     Position::new(-1, 0).add(Position::new(2, 1)),
                     Position::new(-1, 0).add(Position::new(-1, -2)),
                 ],
-                (RotationState::R1, RotationType::Clockwise) => [
+                (Direction::Right, RotationType::Clockwise) => [
                     Position::new(0, 1),
                     Position::new(0, 1).add(Position::new(-1, 0)),
                     Position::new(0, 1).add(Position::new(2, 0)),
                     Position::new(0, 1).add(Position::new(-1, 2)),
                     Position::new(0, 1).add(Position::new(2, -1)),
                 ],
-                (RotationState::R2, RotationType::Counterclockwise) => [
+                (Direction::Down, RotationType::Counterclockwise) => [
                     Position::new(0, -1),
                     Position::new(0, -1).add(Position::new(1, 0)),
                     Position::new(0, -1).add(Position::new(-2, 0)),
                     Position::new(0, -1).add(Position::new(1, -2)),
                     Position::new(0, -1).add(Position::new(-2, 1)),
                 ],
-                (RotationState::R2, RotationType::Clockwise) => [
+                (Direction::Down, RotationType::Clockwise) => [
                     Position::new(-1, 0),
                     Position::new(-1, 0).add(Position::new(2, 0)),
                     Position::new(-1, 0).add(Position::new(-1, 0)),
                     Position::new(-1, 0).add(Position::new(2, 1)),
                     Position::new(-1, 0).add(Position::new(-1, -2)),
                 ],
-                (RotationState::R3, RotationType::Counterclockwise) => [
+                (Direction::Left, RotationType::Counterclockwise) => [
                     Position::new(1, 0),
                     Position::new(1, 0).add(Position::new(-2, 0)),
                     Position::new(1, 0).add(Position::new(1, 0)),
                     Position::new(1, 0).add(Position::new(-2, -1)),
                     Position::new(1, 0).add(Position::new(1, 2)),
                 ],
-                (RotationState::R3, RotationType::Clockwise) => [
+                (Direction::Left, RotationType::Clockwise) => [
                     Position::new(0, -1),
                     Position::new(0, -1).add(Position::new(1, 0)),
                     Position::new(0, -1).add(Position::new(-2, 0)),
                     Position::new(0, -1).add(Position::new(1, -2)),
                     Position::new(0, -1).add(Position::new(-2, 1)),
                 ],
-                (RotationState::R0, RotationType::Counterclockwise) => [
+                (Direction::Up, RotationType::Counterclockwise) => [
                     Position::new(0, 1),
                     Position::new(0, 1).add(Position::new(-1, 0)),
                     Position::new(0, 1).add(Position::new(2, 0)),
                     Position::new(0, 1).add(Position::new(-1, 2)),
                     Position::new(0, 1).add(Position::new(2, -1)),
                 ],
-                (_, RotationType::HalfTurn) => todo!(),
+                (_, _) => todo!(),
             },
             _ => match (rotation_status, rtype) {
-                (RotationState::R0, RotationType::Clockwise) => [
+                (Direction::Up, RotationType::Clockwise) => [
                     Position::new(0, 0),
                     Position::new(-1, 0),
                     Position::new(-1, 1),
                     Position::new(0, -2),
                     Position::new(-1, -2),
                 ],
-                (RotationState::R1, RotationType::Counterclockwise) => [
+                (Direction::Right, RotationType::Counterclockwise) => [
                     Position::new(0, 0),
                     Position::new(1, 0),
                     Position::new(1, -1),
                     Position::new(0, 2),
                     Position::new(1, 2),
                 ],
-                (RotationState::R1, RotationType::Clockwise) => [
+                (Direction::Right, RotationType::Clockwise) => [
                     Position::new(0, 0),
                     Position::new(1, 0),
                     Position::new(1, -1),
                     Position::new(0, 2),
                     Position::new(1, 2),
                 ],
-                (RotationState::R2, RotationType::Counterclockwise) => [
+                (Direction::Down, RotationType::Counterclockwise) => [
                     Position::new(0, 0),
                     Position::new(-1, 0),
                     Position::new(-1, 1),
                     Position::new(0, -2),
                     Position::new(-1, -2),
                 ],
-                (RotationState::R2, RotationType::Clockwise) => [
+                (Direction::Down, RotationType::Clockwise) => [
                     Position::new(0, 0),
                     Position::new(1, 0),
                     Position::new(1, 1),
                     Position::new(0, -2),
                     Position::new(1, -2),
                 ],
-                (RotationState::R3, RotationType::Counterclockwise) => [
+                (Direction::Left, RotationType::Counterclockwise) => [
                     Position::new(0, 0),
                     Position::new(-1, 0),
                     Position::new(-1, -1),
                     Position::new(0, 2),
                     Position::new(-1, 2),
                 ],
-                (RotationState::R3, RotationType::Clockwise) => [
+                (Direction::Left, RotationType::Clockwise) => [
                     Position::new(0, 0),
                     Position::new(-1, 0),
                     Position::new(-1, -1),
                     Position::new(0, 2),
                     Position::new(-1, 2),
                 ],
-                (RotationState::R0, RotationType::Counterclockwise) => [
+                (Direction::Up, RotationType::Counterclockwise) => [
                     Position::new(0, 0),
                     Position::new(1, 0),
                     Position::new(1, 1),
                     Position::new(0, -2),
                     Position::new(1, -2),
                 ],
-                (_, RotationType::HalfTurn) => todo!(),
+                (_, _) => todo!(),
             },
         }
     }

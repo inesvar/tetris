@@ -1,7 +1,6 @@
 //! Defines `struct` [Block] and `struct` [Position].
 use super::{
-    translation_rotation::{Rotation, RotationType},
-    ApplyTranslationRotation, TetrisGrid, TranslationRotation,
+    translation_rotation::RotationType, ApplyTranslationRotation, TetrisGrid, TranslationRotation,
 };
 use crate::assets::TetrisColor;
 use delegate::delegate;
@@ -40,20 +39,21 @@ impl ApplyTranslationRotation for Position {
     }
 
     fn turn_by(&mut self, movement: &TranslationRotation) {
-        match &movement.rotation {
-            Rotation::Clockwise(center) => {
+        let center: &Position = &movement.rotation.center;
+        match &movement.rotation.rotation_type {
+            RotationType::Clockwise => {
                 let vector = &*self - center;
                 *self = center + vector.turned_clockwise();
             }
-            Rotation::Counterclockwise(center) => {
+            RotationType::Counterclockwise => {
                 let vector = &*self - center;
                 *self = center + vector.turned_counterclockwise();
             }
-            Rotation::HalfTurn(center) => {
+            RotationType::HalfTurn => {
                 let vector = &*self - center;
                 *self = center + vector.neg();
             }
-            Rotation::NoRotation => {}
+            RotationType::None => {}
         }
     }
 }
