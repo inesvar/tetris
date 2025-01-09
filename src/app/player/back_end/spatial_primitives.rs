@@ -110,11 +110,11 @@ impl Position {
     }
 
     pub(super) const fn turned_clockwise(&self) -> Self {
-        Position::new(self.y, -self.x)
+        Position::new(-self.y, self.x)
     }
 
     pub(super) const fn turned_counterclockwise(&self) -> Self {
-        Position::new(-self.y, self.x)
+        Position::new(self.y, -self.x)
     }
 }
 
@@ -162,11 +162,12 @@ impl std::ops::AddAssign<&Position> for Position {
 }
 
 #[test]
-fn turns_around_origin_work() {
+fn turns_around_origin() {
+    // y increases from top to bottom...
     let three_oclock = Position::new(1, 0);
-    let six_oclock = Position::new(0, -1);
+    let six_oclock = Position::new(0, 1);
     let nine_oclock = Position::new(-1, 0);
-    let twelve_oclock = Position::new(0, 1);
+    let twelve_oclock = Position::new(0, -1);
 
     assert_eq!(three_oclock.turned_clockwise(), six_oclock);
     assert_eq!(nine_oclock.turned_counterclockwise(), six_oclock);
