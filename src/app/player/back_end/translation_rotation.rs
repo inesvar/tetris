@@ -1,19 +1,13 @@
-//! Implements `struct` [TranslationRotation], defines `struct` [Rotation], `enum` [RotationType] and `enum` [Direction].
+//! Implements `struct` [TranslationRotation], `enum` [RotationType] and `enum` [Direction].
 use super::spatial_primitives::Position;
 use serde::{Deserialize, Serialize};
 
 
-/// Movements composed by a translation, then a rotation.
+/// Movements composed by a rotation and a translation.
 pub(super) struct TranslationRotation {
     pub(super) translation: Position,
-    pub(super) rotation: Rotation,
-}
-
-/// Rotation of 90° around a center.
-#[derive(Default)]
-pub(super) struct Rotation {
     pub(super) rotation_type: RotationType,
-    pub(super) center: Position,
+    pub(super) rotation_center :Position,
 }
 
 /// 90° rotation types.
@@ -22,11 +16,12 @@ pub(super) enum RotationType {
     #[default]
     None = 0,
     Clockwise = 1,
-    #[allow(dead_code)]
+    #[allow(dead_code)] // TODO
     HalfTurn = 2,
     Counterclockwise = 3,
 }
 
+/// Four cardinal directions.
 #[derive(Clone, Copy, Default, Serialize, Deserialize)]
 pub(super) enum Direction {
     #[default]
@@ -36,48 +31,40 @@ pub(super) enum Direction {
     Left = 3,
 }
 
-impl Rotation {
-    /// Constructor for non-null rotation movements.
-    fn new(rotation_type: RotationType, center: Position) -> Self {
-        Rotation {
+impl TranslationRotation {
+    pub(super) fn new(translation: &Position, rotation_type: RotationType, center: &Position) -> Self {
+        TranslationRotation {
+            translation: *translation,
             rotation_type,
-            center,
+            // the rotation center is the center of the struct translated by translation
+            rotation_center: center + translation,
         }
     }
-}
 
-impl TranslationRotation {
-    /// Returns a translation one cell towards the bottom.
+    pub(super) fn translation(translation: Position) -> Self {
+        TranslationRotation {
+            translation,
+            rotation_type: RotationType::default(),
+            rotation_center: Position::default(),
+        }
+    }
+
     pub(super) fn fall() -> Self {
         TranslationRotation::translation(Position::new(0, 1))
     }
 
-    /// Returns a composite movement, translation then rotation (around the translated center).
-    /// For a pure translation, use translation method.
-    pub(super) fn new(translation: &Position, rtype: RotationType, center: &Position) -> Self {
-        TranslationRotation {
-            translation: *translation,
-            // the rotation center is the center of the struct translated by translation
-            rotation: Rotation::new(rtype, center + translation),
-        }
-    }
-
-    /// Returns a translation movement.
-    pub(super) fn translation(translation: Position) -> Self {
-        TranslationRotation {
-            translation,
-            rotation: Rotation::default(),
-        }
-    }
-
-    /// Returns a translation one cell to the right.
     pub(super) fn right() -> Self {
         TranslationRotation::translation(Position::new(1, 0))
     }
 
-    /// Returns a translation one cell to the left.
     pub(super) fn left() -> Self {
         TranslationRotation::translation(Position::new(-1, 0))
+    }
+}
+
+impl RotationType {
+    fn to_usize(&self) -> usize {
+        self.clone() as usize
     }
 }
 
@@ -100,11 +87,5 @@ impl Direction {
     // TODO maybe implement ApplyTranslationRotation for Direction?
     pub(super) fn update(&mut self, rotation_type: &RotationType) {
         *self = Self::ALL_VARIANTS[self.to_usize() + rotation_type.to_usize()]
-    }
-}
-
-impl RotationType {
-    fn to_usize(&self) -> usize {
-        self.clone() as usize
     }
 }

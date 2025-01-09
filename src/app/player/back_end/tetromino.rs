@@ -82,7 +82,7 @@ impl Tetromino {
             *new_block = self.blocks[i].can_be_moved(grid, movement)?;
         }
         self.blocks = new_blocks;
-        self.direction.update(&movement.rotation.rotation_type);
+        self.direction.update(&movement.rotation_type);
         self.center.translate_by(movement);
         Ok(())
     }

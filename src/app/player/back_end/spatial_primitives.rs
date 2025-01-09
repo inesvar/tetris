@@ -39,8 +39,8 @@ impl ApplyTranslationRotation for Position {
     }
 
     fn turn_by(&mut self, movement: &TranslationRotation) {
-        let center: &Position = &movement.rotation.center;
-        match &movement.rotation.rotation_type {
+        let center: &Position = &movement.rotation_center;
+        match &movement.rotation_type {
             RotationType::Clockwise => {
                 let vector = &*self - center;
                 *self = center + vector.turned_clockwise();
