@@ -128,6 +128,7 @@ impl Tetromino {
         }
     }
 
+    // TODO can't this cause a collision??
     /// Resets the Tetromino at its starting position.
     pub fn reset_position(&mut self) {
         let positions = self.kind.get_initial_position();
