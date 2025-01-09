@@ -8,7 +8,7 @@ mod translation_rotation;
 
 use self::{
     spatial_primitives::{Block, Position},
-    translation_rotation::{Direction, Rotation},
+    translation_rotation::{Direction, TranslationRotation},
 };
 use crate::assets::TetrisColor;
 use graphics::types::Matrix2d;
@@ -56,11 +56,6 @@ pub struct TetrisGrid {
     pub transform: Matrix2d<f64>,
 }
 
-/// Movements composed by a translation, then a rotation.
-pub(in crate::app::player) struct TranslationRotation {
-    pub(self) translation: Position,
-    pub(self) rotation: Rotation,
-}
 trait ApplyTranslationRotation {
     fn move_by(&mut self, movement: &TranslationRotation) {
         self.translate_by(movement);

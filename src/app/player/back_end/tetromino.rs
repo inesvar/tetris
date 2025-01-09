@@ -72,7 +72,7 @@ impl Tetromino {
     }
 
     /// Return whether the tetromino could be moved.
-    pub(in crate::app::player) fn move_if_ok(
+    pub(super) fn move_if_ok(
         &mut self,
         grid: &TetrisGrid,
         movement: &TranslationRotation,

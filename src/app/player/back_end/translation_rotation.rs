@@ -1,17 +1,26 @@
 //! Implements `struct` [TranslationRotation], defines `struct` [Rotation], `enum` [RotationType] and `enum` [Direction].
-use super::{spatial_primitives::Position, TranslationRotation};
+use super::spatial_primitives::Position;
 use serde::{Deserialize, Serialize};
 
+
+/// Movements composed by a translation, then a rotation.
+pub(super) struct TranslationRotation {
+    pub(super) translation: Position,
+    pub(super) rotation: Rotation,
+}
+
 /// Rotation of 90° around a center.
+#[derive(Default)]
 pub(super) struct Rotation {
     pub(super) rotation_type: RotationType,
     pub(super) center: Position,
 }
 
 /// 90° rotation types.
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub(super) enum RotationType {
-    None = 0, // TODO remove this variant
+    #[default]
+    None = 0,
     Clockwise = 1,
     #[allow(dead_code)]
     HalfTurn = 2,
@@ -35,23 +44,9 @@ impl Rotation {
             center,
         }
     }
-
-    // TODO remove this
-    fn null() -> Self {
-        Rotation::new(RotationType::None, Position::default())
-    }
 }
 
 impl TranslationRotation {
-    // TODO remove this
-    /// Returns a null movement.
-    pub(in crate::app::player) fn null() -> Self {
-        TranslationRotation {
-            translation: Position::default(),
-            rotation: Rotation::null(),
-        }
-    }
-
     /// Returns a translation one cell towards the bottom.
     pub(super) fn fall() -> Self {
         TranslationRotation::translation(Position::new(0, 1))
@@ -71,7 +66,7 @@ impl TranslationRotation {
     pub(super) fn translation(translation: Position) -> Self {
         TranslationRotation {
             translation,
-            rotation: Rotation::null(),
+            rotation: Rotation::default(),
         }
     }
 
