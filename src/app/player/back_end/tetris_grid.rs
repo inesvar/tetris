@@ -37,6 +37,16 @@ impl TetrisGrid {
         is_block_inside_grid && self.matrix[block.y() as usize][block.x() as usize].is_none()
     }
 
+    /// Returns true if the `tetromino` is inside the grid on empty slots.
+    pub(in crate::app::player) fn is_tetromino_valid(&self, tetromino: &Tetromino) -> bool {
+        for block in tetromino.blocks() {
+            if !self.is_block_available(block) {
+                return false;
+            }
+        }
+        true
+    }
+
     /// Push the Tetromino into the grid and return the number of lines completed.
     pub fn freeze_tetromino(&mut self, tetromino: &mut Tetromino) -> Option<u64> {
         let mut game_over = true;

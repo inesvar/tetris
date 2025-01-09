@@ -172,4 +172,8 @@ impl Tetromino {
     pub(super) fn split(&mut self) -> [Block; 4] {
         self.blocks
     }
+
+    pub(super) fn blocks(&self) -> &[Block] {
+        &self.blocks
+    }
 }

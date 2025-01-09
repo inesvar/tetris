@@ -1,5 +1,5 @@
 //! Defines the general implementation of [LocalPlayer].
-use super::back_end::{new_tetromino_bag, TetrisGrid, Tetromino, TranslationRotation};
+use super::back_end::{new_tetromino_bag, TetrisGrid, Tetromino};
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
 };
@@ -149,11 +149,8 @@ impl LocalPlayer {
         // Check if there's enough place on the grid for a new tetromino
         // TODO this should be done using the grid method and probably all other calls
         // using null()...
-        let mut possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
-        if possible_active
-            .move_if_ok(&self.player_screen.grid, &TranslationRotation::null())
-            .is_err()
-        {
+        let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
+        if !self.player_screen.grid.is_tetromino_valid(&possible_active) {
             // If not, it's a lock out situation
             // set the game_over flag and return the tetromino to the bag
             self.declare_game_over();
