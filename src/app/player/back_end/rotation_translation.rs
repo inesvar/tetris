@@ -1,6 +1,5 @@
 //! Implements `struct` [RotationTranslation], `enum` [RotationType] and `enum` [Direction].
-use super::spatial_primitives::Position;
-use serde::{Deserialize, Serialize};
+use super::{Deserialize, Position, Serialize};
 
 /// Movements composed by a 90° rotation then a translation.
 pub(super) struct RotationTranslation {

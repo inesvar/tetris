@@ -1,6 +1,5 @@
 //! Defines the implementation of a [TetrisGrid].
-use super::{Block, TetrisGrid, Tetromino};
-use crate::assets::TetrisColor;
+use super::{Block, TetrisColor, TetrisGrid, Tetromino};
 use crate::settings::BLOCK_SIZE;
 use graphics::types::Matrix2d;
 use rand::Rng;

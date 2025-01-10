@@ -1,6 +1,5 @@
 //! Defines `struct` [Block] and `struct` [Position].
-use crate::assets::TetrisColor;
-use serde::{Deserialize, Serialize};
+use super::{Deserialize, Serialize, TetrisColor};
 
 /// Block in a discrete grid, serializable.
 #[derive(Clone, Copy, Serialize, Deserialize)]
