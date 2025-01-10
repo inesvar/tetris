@@ -1,4 +1,5 @@
 //! Defines the back-end of the tetris game.
+#![doc = mermaid!("back_end/flowgraph.mmd")]
 mod moving_primitives;
 mod render;
 mod rotation_translation;
@@ -17,6 +18,7 @@ use graphics::types::Matrix2d;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
+use simple_mermaid::mermaid;
 
 /// Tetromino piece among the 7 kinds in the game positioned on the grid.
 #[derive(Clone, Copy, Serialize, Deserialize)]

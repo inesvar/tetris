@@ -2168,6 +2168,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "simple-mermaid"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "589144a964b4b30fe3a83b4bb1a09e2475aac194ec832a046a23e75bddf9eb29"
+
+[[package]]
 name = "slotmap"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2306,6 +2312,7 @@ dependencies = [
  "rand_pcg",
  "serde",
  "serde_cbor",
+ "simple-mermaid",
 ]
 
 [[package]]
