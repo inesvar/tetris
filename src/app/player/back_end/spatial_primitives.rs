@@ -189,7 +189,7 @@ fn arithmetic_implementations_are_equivalent() {
 }
 
 #[test]
-fn turns_around_arbitrary_center_work() {
+fn turns_around_arbitrary_center() {
     let center = Position::new(4, 3);
     let mut point = Position::new(-2, 1);
     let vector = &point - &center;

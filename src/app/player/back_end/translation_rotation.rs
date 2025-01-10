@@ -2,12 +2,11 @@
 use super::spatial_primitives::Position;
 use serde::{Deserialize, Serialize};
 
-
 /// Movements composed by a rotation and a translation.
 pub(super) struct TranslationRotation {
     pub(super) translation: Position,
     pub(super) rotation_type: RotationType,
-    pub(super) rotation_center :Position,
+    pub(super) rotation_center: Position,
 }
 
 /// 90° rotation types.
@@ -22,7 +21,7 @@ pub(super) enum RotationType {
 }
 
 /// Four cardinal directions.
-#[derive(Clone, Copy, Default, Serialize, Deserialize)]
+#[derive(Clone, Copy, Default, Serialize, Deserialize, Debug, PartialEq)]
 pub(super) enum Direction {
     #[default]
     Up = 0,
@@ -32,7 +31,11 @@ pub(super) enum Direction {
 }
 
 impl TranslationRotation {
-    pub(super) fn new(translation: &Position, rotation_type: RotationType, center: &Position) -> Self {
+    pub(super) fn new(
+        translation: &Position,
+        rotation_type: RotationType,
+        center: &Position,
+    ) -> Self {
         TranslationRotation {
             translation: *translation,
             rotation_type,
@@ -88,4 +91,21 @@ impl Direction {
     pub(super) fn update(&mut self, rotation_type: &RotationType) {
         *self = Self::ALL_VARIANTS[self.to_usize() + rotation_type.to_usize()]
     }
+}
+
+#[test]
+fn direction_update() {
+    let clockwise_turn = RotationType::Clockwise;
+    let half_turn = RotationType::HalfTurn;
+    let counterclockwise_turn = RotationType::Counterclockwise;
+
+    let mut direction = Direction::Up;
+    direction.update(&clockwise_turn);
+    assert_eq!(direction, Direction::Right);
+
+    direction.update(&half_turn);
+    assert_eq!(direction, Direction::Left);
+
+    direction.update(&counterclockwise_turn);
+    assert_eq!(direction, Direction::Down);
 }
