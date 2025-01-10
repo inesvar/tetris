@@ -1,7 +1,7 @@
 //! Defines the implementation of [Tetromino].
 use super::{
-    ApplyTranslationRotation, Block, Direction, Position, RotationType, TetrisGrid, Tetromino,
-    TetrominoKind, TranslationRotation,
+    ApplyRotationTranslation, Block, Direction, Position, RotationTranslation, RotationType,
+    TetrisGrid, Tetromino, TetrominoKind,
 };
 use core::fmt::Display;
 use std::fmt::Formatter;
@@ -9,7 +9,7 @@ use std::fmt::Formatter;
 impl Tetromino {
     /// Return whether the tetromino could be moved one cell down.
     pub fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()> {
-        let movement = TranslationRotation::fall();
+        let movement = RotationTranslation::fall();
         self.move_if_ok(grid, &movement)
     }
 
@@ -22,13 +22,13 @@ impl Tetromino {
 
     /// Move the tetromino one cell left if it's possible.
     pub fn left(&mut self, grid: &TetrisGrid) {
-        let movement = TranslationRotation::left();
+        let movement = RotationTranslation::left();
         let _ = self.move_if_ok(grid, &movement);
     }
 
     /// Move the tetromino one cell right if it's possible.
     pub fn right(&mut self, grid: &TetrisGrid) {
-        let movement = TranslationRotation::right();
+        let movement = RotationTranslation::right();
         let _ = self.move_if_ok(grid, &movement);
     }
 
@@ -44,7 +44,7 @@ impl Tetromino {
         );
         for wall_kick in &wall_kicks_translations {
             let movement =
-                TranslationRotation::new(wall_kick, RotationType::Clockwise, &self.center);
+                RotationTranslation::new(wall_kick, RotationType::Clockwise, &self.center);
             if self.move_if_ok(grid, &movement).is_ok() {
                 return;
             }
@@ -63,7 +63,7 @@ impl Tetromino {
         );
         for wall_kick in &wall_kicks_translations {
             let movement =
-                TranslationRotation::new(wall_kick, RotationType::Counterclockwise, &self.center);
+                RotationTranslation::new(wall_kick, RotationType::Counterclockwise, &self.center);
             if self.move_if_ok(grid, &movement).is_ok() {
                 return;
             }
@@ -74,7 +74,7 @@ impl Tetromino {
     pub(super) fn move_if_ok(
         &mut self,
         grid: &TetrisGrid,
-        movement: &TranslationRotation,
+        movement: &RotationTranslation,
     ) -> Result<(), ()> {
         let mut new_blocks = [Block::default(); 4];
         for (i, new_block) in new_blocks.iter_mut().enumerate() {

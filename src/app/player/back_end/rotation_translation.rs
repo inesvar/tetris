@@ -1,9 +1,9 @@
-//! Implements `struct` [TranslationRotation], `enum` [RotationType] and `enum` [Direction].
+//! Implements `struct` [RotationTranslation], `enum` [RotationType] and `enum` [Direction].
 use super::spatial_primitives::Position;
 use serde::{Deserialize, Serialize};
 
 /// Movements composed by a rotation and a translation.
-pub(super) struct TranslationRotation {
+pub(super) struct RotationTranslation {
     pub(super) translation: Position,
     pub(super) rotation_type: RotationType,
     pub(super) rotation_center: Position,
@@ -30,22 +30,22 @@ pub(super) enum Direction {
     Left = 3,
 }
 
-impl TranslationRotation {
+impl RotationTranslation {
     pub(super) fn new(
         translation: &Position,
         rotation_type: RotationType,
         center: &Position,
     ) -> Self {
-        TranslationRotation {
+        RotationTranslation {
             translation: *translation,
             rotation_type,
             // the rotation center is the center of the struct translated by translation
-            rotation_center: center + translation,
+            rotation_center: *center,
         }
     }
 
     pub(super) fn translation(translation: Position) -> Self {
-        TranslationRotation {
+        RotationTranslation {
             translation,
             rotation_type: RotationType::default(),
             rotation_center: Position::default(),
@@ -53,15 +53,15 @@ impl TranslationRotation {
     }
 
     pub(super) fn fall() -> Self {
-        TranslationRotation::translation(Position::new(0, 1))
+        RotationTranslation::translation(Position::new(0, 1))
     }
 
     pub(super) fn right() -> Self {
-        TranslationRotation::translation(Position::new(1, 0))
+        RotationTranslation::translation(Position::new(1, 0))
     }
 
     pub(super) fn left() -> Self {
-        TranslationRotation::translation(Position::new(-1, 0))
+        RotationTranslation::translation(Position::new(-1, 0))
     }
 }
 
@@ -87,7 +87,7 @@ impl Direction {
         Direction::Left,
     ];
 
-    // TODO maybe implement ApplyTranslationRotation for Direction?
+    // TODO maybe implement ApplyRotationTranslation for Direction?
     pub(super) fn update(&mut self, rotation_type: &RotationType) {
         *self = Self::ALL_VARIANTS[self.to_usize() + rotation_type.to_usize()]
     }

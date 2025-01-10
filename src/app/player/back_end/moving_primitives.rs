@@ -1,20 +1,20 @@
-use super::{Block, Position, RotationType, TetrisGrid, TranslationRotation};
+use super::{Block, Position, RotationTranslation, RotationType, TetrisGrid};
 use delegate::delegate;
 
-pub(super) trait ApplyTranslationRotation {
-    fn move_by(&mut self, movement: &TranslationRotation) {
-        self.translate_by(movement);
+pub(super) trait ApplyRotationTranslation {
+    fn move_by(&mut self, movement: &RotationTranslation) {
         self.turn_by(movement);
+        self.translate_by(movement);
     }
-    fn translate_by(&mut self, movement: &TranslationRotation);
-    fn turn_by(&mut self, movement: &TranslationRotation);
+    fn translate_by(&mut self, movement: &RotationTranslation);
+    fn turn_by(&mut self, movement: &RotationTranslation);
 }
 
 impl Block {
     pub(super) fn can_be_moved(
         &self,
         grid: &TetrisGrid,
-        movement: &TranslationRotation,
+        movement: &RotationTranslation,
     ) -> Result<Block, ()> {
         let mut copy = *self;
         copy.move_by(movement);
@@ -27,21 +27,21 @@ impl Block {
     }
 }
 
-impl ApplyTranslationRotation for Block {
+impl ApplyRotationTranslation for Block {
     delegate! {
         to self.position() {
-            fn translate_by(&mut self, movement: &TranslationRotation);
-            fn turn_by(&mut self, movement: &TranslationRotation);
+            fn translate_by(&mut self, movement: &RotationTranslation);
+            fn turn_by(&mut self, movement: &RotationTranslation);
         }
     }
 }
 
-impl ApplyTranslationRotation for Position {
-    fn translate_by(&mut self, movement: &TranslationRotation) {
+impl ApplyRotationTranslation for Position {
+    fn translate_by(&mut self, movement: &RotationTranslation) {
         *self += &movement.translation;
     }
 
-    fn turn_by(&mut self, movement: &TranslationRotation) {
+    fn turn_by(&mut self, movement: &RotationTranslation) {
         let center: &Position = &movement.rotation_center;
         match &movement.rotation_type {
             RotationType::Clockwise => {
@@ -66,23 +66,23 @@ fn turns_around_arbitrary_center() {
     let center = Position::new(4, 3);
     let mut point = Position::new(-2, 1);
     let vector = &point - &center;
-    let translation_rotation =
-        TranslationRotation::new(&Position::default(), RotationType::Clockwise, &center);
+    let rotation_translation =
+        RotationTranslation::new(&Position::default(), RotationType::Clockwise, &center);
 
-    point.turn_by(&translation_rotation);
+    point.turn_by(&rotation_translation);
     assert_eq!(point, center.add(vector.turned_clockwise()));
 }
 
 #[test]
-fn moves_by_translation_rotation() {
+fn moves_by_rotation_translation() {
     let center = Position::new(4, 3);
     let translation = Position::new(-3, 4);
     let mut point = Position::new(-2, 1);
     let vector = &point - &center;
-    let translation_rotation =
-        TranslationRotation::new(&translation, RotationType::Clockwise, &center);
+    let rotation_translation =
+        RotationTranslation::new(&translation, RotationType::Clockwise, &center);
 
-    point.move_by(&translation_rotation);
+    point.move_by(&rotation_translation);
     assert_eq!(
         point,
         center.add(vector.turned_clockwise()).add(translation)

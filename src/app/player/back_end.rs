@@ -1,16 +1,16 @@
 //! Defines the back-end of the tetris game.
 mod moving_primitives;
 mod render;
+mod rotation_translation;
 mod spatial_primitives;
 mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;
-mod translation_rotation;
 
 use self::{
-    moving_primitives::ApplyTranslationRotation,
+    moving_primitives::ApplyRotationTranslation,
+    rotation_translation::{Direction, RotationTranslation, RotationType},
     spatial_primitives::{Block, Position},
-    translation_rotation::{Direction, RotationType, TranslationRotation},
 };
 use crate::assets::TetrisColor;
 use graphics::types::Matrix2d;
