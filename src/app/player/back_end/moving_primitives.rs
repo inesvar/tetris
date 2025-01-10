@@ -1,6 +1,8 @@
+//! Defines `trait` [ApplyRotationTranslation] for [Position] and [Block].
 use super::{Block, Position, RotationTranslation, RotationType, TetrisGrid};
 use delegate::delegate;
 
+/// Applies a [RotationTranslation] to a spatial primitive.
 pub(super) trait ApplyRotationTranslation {
     fn move_by(&mut self, movement: &RotationTranslation) {
         self.turn_by(movement);

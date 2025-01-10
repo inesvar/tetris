@@ -2,7 +2,7 @@
 use super::spatial_primitives::Position;
 use serde::{Deserialize, Serialize};
 
-/// Movements composed by a rotation and a translation.
+/// Movements composed by a 90° rotation then a translation.
 pub(super) struct RotationTranslation {
     pub(super) translation: Position,
     pub(super) rotation_type: RotationType,
