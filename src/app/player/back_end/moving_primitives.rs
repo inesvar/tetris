@@ -12,6 +12,7 @@ pub(super) trait ApplyRotationTranslation {
     fn turn_by(&mut self, movement: &RotationTranslation);
 }
 
+// TODO create a trait (could be implemented for tetromino too) for this function
 impl Block {
     pub(super) fn can_be_moved(
         &self,

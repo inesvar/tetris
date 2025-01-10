@@ -28,7 +28,7 @@ impl TetrisGrid {
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
         outline_rect.draw(empty_dims, draw_state, self.transform, gl);
 
-        for (y, row) in self.matrix.iter().enumerate() {
+        /* for (y, row) in self.matrix.iter().enumerate() {
             for (x, _cell) in row.iter().enumerate() {
                 if y > 1 {
                     let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
@@ -40,7 +40,7 @@ impl TetrisGrid {
                     outline_rect.draw(outline_dims, draw_state, self.transform, gl);
                 }
             }
-        }
+        } */
         for (y, row) in self.matrix.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
                 if let Some(tetris_color) = cell {
