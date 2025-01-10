@@ -1,17 +1,26 @@
 ```mermaid
-graph TD;
-    Position[[**Position**:spatial_primitives]];
-    Block[[**Block**:spatial_primitives]];
-    TranslationRotation[[**TranslationRotation**:translation_rotation]];
-    RotationType[[**RotationType**:translation_rotation]];
-    applyTranslationRotation([ApplyTranslationRotation]);
-    Tetromino-->Position;
-    Tetromino-->Block;
-    Tetromino-->applyTranslationRotation;
+graph LR;
+    Position[Position];
+    Block[Block];
+    TranslationRotation[TranslationRotation];
+    RotationType[RotationType];
+    spatial_primitives[spatial_primitives];
+    translation_rotation[translation_rotation];
+    moving_primitives[moving_primitives];
+    subgraph spatial_primitives;
+    Block-->Position;
+    end;
+    subgraph translation_rotation;
+    TranslationRotation-->RotationType;
+    end;
+    TranslationRotation-->Position;
+    subgraph moving_primitives;
+    applyTranslationRotation;
+    end;
     applyTranslationRotation-->Position;
     applyTranslationRotation-->Block;
     applyTranslationRotation-->TranslationRotation;
-    TranslationRotation-->Position;
-    TranslationRotation-->RotationType;
-    Block-->Position;
+    Tetromino-->Position;
+    Tetromino-->Block;
+    Tetromino-->applyTranslationRotation;
 ```

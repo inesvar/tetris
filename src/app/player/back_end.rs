@@ -1,4 +1,5 @@
 //! Defines the back-end of the tetris game.
+mod moving_primitives;
 mod render;
 mod spatial_primitives;
 mod tetris_grid;
@@ -7,8 +8,9 @@ mod tetromino_kind;
 mod translation_rotation;
 
 use self::{
+    moving_primitives::ApplyTranslationRotation,
     spatial_primitives::{Block, Position},
-    translation_rotation::{Direction, TranslationRotation},
+    translation_rotation::{Direction, RotationType, TranslationRotation},
 };
 use crate::assets::TetrisColor;
 use graphics::types::Matrix2d;
@@ -54,15 +56,6 @@ pub struct TetrisGrid {
     pub visible_width: f64,
     pub visible_height: f64,
     pub transform: Matrix2d<f64>,
-}
-
-trait ApplyTranslationRotation {
-    fn move_by(&mut self, movement: &TranslationRotation) {
-        self.translate_by(movement);
-        self.turn_by(movement);
-    }
-    fn translate_by(&mut self, movement: &TranslationRotation);
-    fn turn_by(&mut self, movement: &TranslationRotation);
 }
 
 /// Returns a random bag of TetrominoKind of the specified size using the given rng.

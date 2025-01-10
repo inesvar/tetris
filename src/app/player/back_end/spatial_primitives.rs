@@ -1,9 +1,5 @@
 //! Defines `struct` [Block] and `struct` [Position].
-use super::{
-    translation_rotation::RotationType, ApplyTranslationRotation, TetrisGrid, TranslationRotation,
-};
 use crate::assets::TetrisColor;
-use delegate::delegate;
 use serde::{Deserialize, Serialize};
 
 /// Block in a discrete grid, serializable.
@@ -22,48 +18,16 @@ pub(super) struct Position {
     y: i8,
 }
 
-// TODO move to module moving_primitives
-impl ApplyTranslationRotation for Block {
-    delegate! {
-        to self.position {
-            fn translate_by(&mut self, movement: &TranslationRotation);
-            fn turn_by(&mut self, movement: &TranslationRotation);
-        }
-    }
-}
-
-// TODO move to module moving_primitives
-impl ApplyTranslationRotation for Position {
-    fn translate_by(&mut self, movement: &TranslationRotation) {
-        *self += &movement.translation;
-    }
-
-    fn turn_by(&mut self, movement: &TranslationRotation) {
-        let center: &Position = &movement.rotation_center;
-        match &movement.rotation_type {
-            RotationType::Clockwise => {
-                let vector = &*self - center;
-                *self = center + vector.turned_clockwise();
-            }
-            RotationType::Counterclockwise => {
-                let vector = &*self - center;
-                *self = center + vector.turned_counterclockwise();
-            }
-            RotationType::HalfTurn => {
-                let vector = &*self - center;
-                *self = center + vector.neg();
-            }
-            RotationType::None => {}
-        }
-    }
-}
-
 impl Block {
     pub(super) fn new(color: TetrisColor, x: i8, y: i8) -> Self {
         Block {
             position: Position::new(x, y),
             color,
         }
+    }
+
+    pub(super) fn position(&mut self) -> &mut Position {
+        &mut self.position
     }
 
     pub(super) fn x(&self) -> i8 {
@@ -76,22 +40,6 @@ impl Block {
 
     pub(super) fn color(&self) -> TetrisColor {
         self.color
-    }
-
-    // TODO move to module moving_primitives
-    pub(super) fn can_be_moved(
-        &self,
-        grid: &TetrisGrid,
-        movement: &TranslationRotation,
-    ) -> Result<Block, ()> {
-        let mut copy = *self;
-        copy.move_by(movement);
-        // Check if `copy` is inside `grid` and on an empty slot
-        if grid.is_block_available(&copy) {
-            Ok(copy)
-        } else {
-            Err(())
-        }
     }
 }
 
@@ -186,16 +134,4 @@ fn arithmetic_implementations_are_equivalent() {
     sum += &b;
 
     assert_eq!(sum, &a + b);
-}
-
-#[test]
-fn turns_around_arbitrary_center() {
-    let center = Position::new(4, 3);
-    let mut point = Position::new(-2, 1);
-    let vector = &point - &center;
-    let translation_rotation =
-        TranslationRotation::new(&Position::default(), RotationType::Clockwise, &center);
-
-    point.turn_by(&translation_rotation);
-    assert_eq!(point, center.add(vector.turned_clockwise()));
 }

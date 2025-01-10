@@ -1,8 +1,7 @@
 //! Defines the implementation of [Tetromino].
 use super::{
-    spatial_primitives::{Block, Position},
-    translation_rotation::{Direction, RotationType},
-    ApplyTranslationRotation, TetrisGrid, Tetromino, TetrominoKind, TranslationRotation,
+    ApplyTranslationRotation, Block, Direction, Position, RotationType, TetrisGrid, Tetromino,
+    TetrominoKind, TranslationRotation,
 };
 use core::fmt::Display;
 use std::fmt::Formatter;
