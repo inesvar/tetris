@@ -7,7 +7,7 @@ use graphics::types::{Matrix2d, Rectangle, Scalar};
 use graphics::{rectangle, DrawState, Image};
 use opengl_graphics::GlGraphics;
 
-/// Draws a tetris object at the given position.
+/// Draw a tetris object at the given position.
 pub(in crate::app::player) trait Render {
     fn render(
         &self,
@@ -19,10 +19,10 @@ pub(in crate::app::player) trait Render {
 }
 
 impl Render for TetrisGrid {
-    /// Render the TetrisGrid and its contents.
+    /// Draw a [TetrisGrid] and its contents at the given `grid_position`.
     fn render(
         &self,
-        transform: Matrix2d,
+        grid_position: Matrix2d,
         draw_state: &DrawState,
         gl: &mut GlGraphics,
         assets: &Assets,
@@ -33,9 +33,9 @@ impl Render for TetrisGrid {
             self.visible_width,
             self.visible_height,
         ];
-        rectangle(GRID_BG_COLOR, empty_dims, transform, gl);
+        rectangle(GRID_BG_COLOR, empty_dims, grid_position, gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
-        outline_rect.draw(empty_dims, draw_state, transform, gl);
+        outline_rect.draw(empty_dims, draw_state, grid_position, gl);
 
         /* for (y, row) in self.matrix.iter().enumerate() {
             for (x, _cell) in row.iter().enumerate() {
@@ -53,7 +53,7 @@ impl Render for TetrisGrid {
         for (y, row) in self.matrix.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
                 if let Some(tetris_color) = cell {
-                    tetris_color.render(x, y, transform, draw_state, gl, assets);
+                    tetris_color.render(x, y, grid_position, draw_state, gl, assets);
                 }
             }
         }
@@ -61,10 +61,10 @@ impl Render for TetrisGrid {
 }
 
 impl Render for Tetromino {
-    /// Render the Tetromino, and eventually the ghost Tetromino.
+    /// Draw a [Tetromino] (eventually a ghost) at the given `tetromino_position`.
     fn render(
         &self,
-        transform: Matrix2d,
+        grid_position: Matrix2d,
         draw_state: &DrawState,
         gl: &mut GlGraphics,
         assets: &Assets,
@@ -75,16 +75,16 @@ impl Render for Tetromino {
             *draw_state
         };
         for i in 0..4 {
-            self.blocks[i].render(transform, &draw_state, gl, assets);
+            self.blocks[i].render(grid_position, &draw_state, gl, assets);
         }
     }
 }
 
 impl Render for Block {
-    /// Render the Block using the texture from assets.
+    /// Draw a [Block] using its position and the given `grid_position`.
     fn render(
         &self,
-        transform: Matrix2d,
+        grid_position: Matrix2d,
         draw_state: &DrawState,
         gl: &mut GlGraphics,
         assets: &Assets,
@@ -98,19 +98,19 @@ impl Render for Block {
         Image::new().rect(dims).draw(
             assets.texture_from_tetris_color(&self.color()),
             draw_state,
-            transform,
+            grid_position,
             gl,
         );
     }
 }
 
 impl TetrisColor {
-    /// Render the Block using the texture from assets.
+    /// Draw a [Block] using the specified [TetrisColor], `x` and `y` coordinates and `grid_position`.
     pub fn render(
         &self,
         x: usize,
         y: usize,
-        transform: Matrix2d,
+        grid_position: Matrix2d,
         draw_state: &DrawState,
         gl: &mut GlGraphics,
         assets: &Assets,
@@ -124,7 +124,7 @@ impl TetrisColor {
         Image::new().rect(dims).draw(
             assets.texture_from_tetris_color(self),
             draw_state,
-            transform,
+            grid_position,
             gl,
         );
     }
