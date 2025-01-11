@@ -1,4 +1,4 @@
-//! Defines handle_key functions of [LocalPlayer].
+//! Define handle_key functions of [LocalPlayer].
 //!
 //! [handle_key_press()](LocalPlayer::handle_key_press()) is called when a key is pressed.
 //! [handle_key_release()](LocalPlayer::handle_key_release()) is called when a key is released.

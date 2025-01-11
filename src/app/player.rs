@@ -1,4 +1,4 @@
-//! Defines the mecanism of the game relative to one player.
+//! Define the mecanism of the game relative to one player.
 //!
 //! This module uses [back_end] to make the tetromino move according to the player's commands.
 //! It also generates new tetromino pieces and handles the queue of next pieces.

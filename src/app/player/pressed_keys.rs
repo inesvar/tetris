@@ -1,4 +1,4 @@
-//! Defines [PressedKeys] that stores the pressed keys and the last pressed key.
+//! Define [PressedKeys] that stores the pressed keys and the last pressed key.
 use crate::settings::KEY_REPEAT_DELAY;
 use piston::Key;
 use serde::{Deserialize, Serialize};

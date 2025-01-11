@@ -1,4 +1,4 @@
-//! Defines the general implementation of [LocalPlayer].
+//! Define the general implementation of [LocalPlayer].
 use super::back_end::{new_tetromino_bag, TetrisGrid, Tetromino};
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,

@@ -1,4 +1,4 @@
-//! Defines the back-end of the tetris game.
+//! Define the back-end of the tetris game.
 #![doc = mermaid!("back_end/flowgraph.mmd")]
 mod moving_primitives;
 mod render;

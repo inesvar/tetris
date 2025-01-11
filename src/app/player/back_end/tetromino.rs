@@ -1,4 +1,4 @@
-//! Defines the implementation of [Tetromino].
+//! Define the implementation of [Tetromino].
 use super::{
     ApplyRotationTranslation, Block, Direction, Position, RotationTranslation, RotationType,
     TetrisGrid, Tetromino, TetrominoKind,

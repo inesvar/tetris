@@ -1,4 +1,4 @@
-//! Defines `trait` [ApplyRotationTranslation] for [Position] and [Block].
+//! Define `trait` [ApplyRotationTranslation] for [Position] and [Block].
 use super::{Block, Position, RotationTranslation, RotationType, TetrisGrid};
 use delegate::delegate;
 

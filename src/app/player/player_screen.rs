@@ -1,4 +1,4 @@
-//! Defines the [render()](PlayerScreen::render()) and [constructor](PlayerScreen::empty()) of [PlayerScreen].
+//! Define the [render()](PlayerScreen::render()) and [constructor](PlayerScreen::empty()) of [PlayerScreen].
 use super::back_end::{TetrisGrid, Tetromino};
 use super::{CircularBuffer, PlayerScreen};
 use crate::assets::Assets;

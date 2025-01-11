@@ -1,4 +1,4 @@
-//! Defines custom Serialize for [Settings] and [PlayerScreen].
+//! Define custom Serialize for [Settings] and [PlayerScreen].
 //!
 //! PlayerScreen can be serialized as [MessageType::PlayerScreenMsg](super::MessageType::PlayerScreenMsg).
 //! Settings can be serialized as [MessageType::SettingsMsg](super::MessageType::SettingsMsg).

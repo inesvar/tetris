@@ -1,4 +1,4 @@
-//! Defines the remote components for multi-player mode.
+//! Define the remote components for multi-player mode.
 //!
 //! There's a listener thread devoted for each remote player updating a remote player stub with a render method.
 mod custom_serialize_as_msg;

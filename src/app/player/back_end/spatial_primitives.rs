@@ -1,4 +1,4 @@
-//! Defines `struct` [Block] and `struct` [Position].
+//! Define `struct` [Block] and `struct` [Position].
 use super::{Deserialize, Serialize, TetrisColor};
 
 /// Block in a discrete grid, serializable.

@@ -1,4 +1,4 @@
-//! Implements `struct` [RotationTranslation], `enum` [RotationType] and `enum` [Direction].
+//! Define `struct` [RotationTranslation], `enum` [RotationType] and `enum` [Direction].
 use super::{Deserialize, Position, Serialize};
 
 /// Movements composed by a 90° rotation then a translation.

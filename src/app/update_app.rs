@@ -1,4 +1,4 @@
-//! Defines the update function of [App].
+//! Define the update function of [App].
 //!
 //! [update()](App::update()) is called before each render when the game is active.
 use super::{remote::MessageType, App, Countdown, PlayerConfig, RunningState, ViewState};

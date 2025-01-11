@@ -1,4 +1,4 @@
-//! Defines the specificities of the 7 kinds of Tetromino pieces : colors, starting positions, wall-kicks.
+//! Define the specificities of the 7 kinds of Tetromino pieces : colors, starting positions, wall-kicks.
 use super::{Direction, Position, RotationType, TetrisColor, TetrominoKind};
 
 impl TetrominoKind {

@@ -1,4 +1,4 @@
-//! Defines the implementation of a [TetrisGrid].
+//! Define the implementation of a [TetrisGrid].
 use super::{Block, TetrisColor, TetrisGrid, Tetromino};
 use crate::settings::BLOCK_SIZE;
 use graphics::types::Matrix2d;

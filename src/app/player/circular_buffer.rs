@@ -1,4 +1,4 @@
-//! Defines [CircularBuffer] and methods to use it.
+//! Define [CircularBuffer] and methods to use it.
 use core::fmt::Display;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
