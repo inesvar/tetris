@@ -19,8 +19,8 @@ use piston::{
     window::WindowSettings,
     AdvancedWindow, {Button, MouseCursorEvent, PressEvent, ReleaseEvent, TextEvent},
 };
-use std::time::SystemTime;
 use piston_window::PistonWindow;
+use std::time::SystemTime;
 
 mod app;
 mod assets;
@@ -45,7 +45,6 @@ fn main() {
 
     // Start the event loop.
     let mut events = Events::new(EventSettings::new());
-
 
     let mut now = SystemTime::now();
 
@@ -99,7 +98,7 @@ fn main() {
 
         if let Some(args) = e.render_args() {
             if let Ok(elapsed) = now.elapsed() {
-                    println!("{}", elapsed.as_nanos());
+                println!("{}", elapsed.as_nanos());
             }
             now = SystemTime::now();
             app.render(&args);

@@ -13,7 +13,7 @@ use std::net::TcpStream;
 
 impl LocalPlayer {
     pub fn new(player_config: &PlayerConfig) -> Self {
-        let grid = TetrisGrid::new(DEFAULT_GRID_X, DEFAULT_GRID_Y, NB_COLUMNS, NB_ROWS);
+        let grid = TetrisGrid::new(NB_COLUMNS, NB_ROWS);
         let rng = Pcg32::seed_from_u64(0);
         let bag_of_tetromino = Vec::new();
         let first_tetromino = Tetromino::default();

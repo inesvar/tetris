@@ -8,32 +8,32 @@ use std::fmt::Formatter;
 
 impl Tetromino {
     /// Return whether the tetromino could be moved one cell down.
-    pub fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()> {
+    pub(in crate::app::player) fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()> {
         let movement = RotationTranslation::fall();
         self.move_if_ok(grid, &movement)
     }
 
     /// Move the tetromino down until it's not possible anymore.
-    pub fn hard_drop(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn hard_drop(&mut self, grid: &TetrisGrid) {
         if self.fall(grid).is_ok() {
             self.hard_drop(grid);
         }
     }
 
     /// Move the tetromino one cell left if it's possible.
-    pub fn left(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn left(&mut self, grid: &TetrisGrid) {
         let movement = RotationTranslation::left();
         let _ = self.move_if_ok(grid, &movement);
     }
 
     /// Move the tetromino one cell right if it's possible.
-    pub fn right(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn right(&mut self, grid: &TetrisGrid) {
         let movement = RotationTranslation::right();
         let _ = self.move_if_ok(grid, &movement);
     }
 
     /// Turn the tetromino clockwise if it's possible, eventually using wall-kicks.
-    pub fn turn_clockwise(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn turn_clockwise(&mut self, grid: &TetrisGrid) {
         if self.kind == TetrominoKind::O {
             return;
         };
@@ -52,7 +52,7 @@ impl Tetromino {
     }
 
     /// Turn the tetromino counterclockwise if it's possible, eventually using wall-kicks.
-    pub fn turn_counterclockwise(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn turn_counterclockwise(&mut self, grid: &TetrisGrid) {
         if self.kind == TetrominoKind::O {
             return;
         };
@@ -87,7 +87,7 @@ impl Tetromino {
     }
 
     /// Returns an Option eventually containing a Tetromino if its starting position is empty.
-    pub fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Tetromino> {
+    pub(in crate::app::player) fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Tetromino> {
         let positions = kind.get_initial_position();
         let color = kind.get_color();
         for i in 1..5 {

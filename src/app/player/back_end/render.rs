@@ -1,32 +1,41 @@
-//! Defines the render functions of types [Block](super::render::Block::render()), [Tetromino](super::Tetromino::render()) and [TetrisGrid](super::TetrisGrid::render()).
+//! Define `trait` [Render] for [Block], [Tetromino] and [TetrisGrid].
 use super::{Block, TetrisColor, TetrisGrid, Tetromino};
 use crate::assets::Assets;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
+use graphics::draw_state::Blend;
 use graphics::types::{Matrix2d, Rectangle, Scalar};
-use graphics::{draw_state::Blend, Transformed};
 use graphics::{rectangle, DrawState, Image};
 use opengl_graphics::GlGraphics;
 
-impl TetrisGrid {
+/// Draws a tetris object at the given position.
+pub(in crate::app::player) trait Render {
+    fn render(
+        &self,
+        transform: Matrix2d,
+        draw_state: &DrawState,
+        gl: &mut GlGraphics,
+        assets: &Assets,
+    );
+}
+
+impl Render for TetrisGrid {
     /// Render the TetrisGrid and its contents.
-    pub fn render(
-        &mut self,
+    fn render(
+        &self,
         transform: Matrix2d,
         draw_state: &DrawState,
         gl: &mut GlGraphics,
         assets: &Assets,
     ) {
-        self.transform = transform.trans(self.x, self.y);
-
         let empty_dims: Rectangle = [
             0.0,
             self.total_height - self.visible_height,
             self.visible_width,
             self.visible_height,
         ];
-        rectangle(GRID_BG_COLOR, empty_dims, self.transform, gl);
+        rectangle(GRID_BG_COLOR, empty_dims, transform, gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
-        outline_rect.draw(empty_dims, draw_state, self.transform, gl);
+        outline_rect.draw(empty_dims, draw_state, transform, gl);
 
         /* for (y, row) in self.matrix.iter().enumerate() {
             for (x, _cell) in row.iter().enumerate() {
@@ -44,16 +53,16 @@ impl TetrisGrid {
         for (y, row) in self.matrix.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
                 if let Some(tetris_color) = cell {
-                    tetris_color.render(x, y, self.transform, draw_state, gl, assets);
+                    tetris_color.render(x, y, transform, draw_state, gl, assets);
                 }
             }
         }
     }
 }
 
-impl Tetromino {
+impl Render for Tetromino {
     /// Render the Tetromino, and eventually the ghost Tetromino.
-    pub fn render(
+    fn render(
         &self,
         transform: Matrix2d,
         draw_state: &DrawState,
@@ -71,10 +80,9 @@ impl Tetromino {
     }
 }
 
-// TODO : make all the render signature the same so it can become a trait
-impl Block {
+impl Render for Block {
     /// Render the Block using the texture from assets.
-    pub fn render(
+    fn render(
         &self,
         transform: Matrix2d,
         draw_state: &DrawState,

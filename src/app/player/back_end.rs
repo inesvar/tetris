@@ -1,7 +1,7 @@
 //! Define the back-end of the tetris game.
 #![doc = mermaid!("back_end/flowgraph.mmd")]
 mod moving_primitives;
-mod render;
+pub(in crate::app::player) mod render;
 mod rotation_translation;
 mod spatial_primitives;
 mod tetris_grid;
@@ -14,11 +14,12 @@ use self::{
     spatial_primitives::{Block, Position},
 };
 use crate::assets::TetrisColor;
-use graphics::types::Matrix2d;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
 use simple_mermaid::mermaid;
+
+pub(in crate::app::player) use render::Render;
 
 /// Tetromino piece among the 7 kinds in the game positioned on the grid.
 #[derive(Clone, Copy, Serialize, Deserialize)]
@@ -46,18 +47,15 @@ type GridLine = Vec<Option<TetrisColor>>;
 
 /// Tetris grid containing blocks. It actually ontly contains their color as the coordinates of the blocks are given by their index in the matrix.
 #[derive(Serialize, Deserialize)]
-pub struct TetrisGrid {
-    pub x: f64,
-    pub y: f64,
+pub(in crate::app) struct TetrisGrid {
     nb_columns: u32,
     nb_rows: u32,
-    pub(self) matrix: Vec<GridLine>,
+    matrix: Vec<GridLine>,
     line_sum: Vec<u8>,
     pub total_width: f64,
     pub total_height: f64,
     pub visible_width: f64,
     pub visible_height: f64,
-    pub transform: Matrix2d<f64>,
 }
 
 /// Returns a random bag of TetrominoKind of the specified size using the given rng.

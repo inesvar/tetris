@@ -56,7 +56,7 @@ pub struct LocalPlayer {
 #[derive(Deserialize)]
 pub struct PlayerScreen {
     /// Tetris grid.
-    pub grid: TetrisGrid,
+    pub(in crate::app) grid: TetrisGrid,
     /// Number of lines cleared.
     pub score: u64,
     /// Indicates if the game is lost by the current player.

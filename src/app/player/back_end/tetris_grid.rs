@@ -1,11 +1,10 @@
 //! Define the implementation of a [TetrisGrid].
 use super::{Block, TetrisColor, TetrisGrid, Tetromino};
 use crate::settings::BLOCK_SIZE;
-use graphics::types::Matrix2d;
 use rand::Rng;
 
 impl TetrisGrid {
-    pub fn new(x: f64, y: f64, nb_columns: u32, nb_rows: u32) -> TetrisGrid {
+    pub(in crate::app::player) fn new(nb_columns: u32, nb_rows: u32) -> TetrisGrid {
         let mut matrix = Vec::with_capacity(nb_rows as usize);
         for _ in 0..nb_rows {
             matrix.push(vec![None; nb_columns as usize]);
@@ -13,8 +12,6 @@ impl TetrisGrid {
 
         let line_sum = vec![0; nb_rows as usize];
         TetrisGrid {
-            x,
-            y,
             nb_columns,
             nb_rows,
             matrix,
@@ -23,7 +20,6 @@ impl TetrisGrid {
             total_height: nb_rows as f64 * BLOCK_SIZE,
             visible_width: nb_columns as f64 * BLOCK_SIZE,
             visible_height: (nb_rows - 2) as f64 * BLOCK_SIZE,
-            transform: Matrix2d::default(),
         }
     }
 
@@ -47,7 +43,10 @@ impl TetrisGrid {
     }
 
     /// Push the Tetromino into the grid and return the number of lines completed.
-    pub fn freeze_tetromino(&mut self, tetromino: &mut Tetromino) -> Option<u64> {
+    pub(in crate::app::player) fn freeze_tetromino(
+        &mut self,
+        tetromino: &mut Tetromino,
+    ) -> Option<u64> {
         let mut game_over = true;
         let mut blocks = tetromino.split();
         for block in &mut blocks {
@@ -77,7 +76,7 @@ impl TetrisGrid {
     }
 
     /// Adds the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
-    pub fn add_garbage(&mut self, completed_lines: u64) {
+    pub(in crate::app::player) fn add_garbage(&mut self, completed_lines: u64) {
         if completed_lines < 2 {
             return;
         }
@@ -120,7 +119,7 @@ impl TetrisGrid {
     }
 
     /// Empty the grid.
-    pub fn null(&mut self) {
+    pub(in crate::app::player) fn null(&mut self) {
         for row in self.matrix.iter_mut() {
             for cell in row.iter_mut() {
                 *cell = None;
