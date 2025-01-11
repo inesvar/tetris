@@ -55,3 +55,12 @@ You can build your crate easily with:
 ## You want to export a convenient zip?
 
 See `export_exe.sh` and `export_linux.sh`.
+
+## Mermaid legend
+
+```mermaid
+graph LR
+trait([trait]) -.->|is implemented for| struct[[struct]]
+struct6[[struct]] --o|contains| enum(enum)
+obj[object] -->|uses| obj2[other]
+```
