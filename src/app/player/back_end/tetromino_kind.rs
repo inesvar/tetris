@@ -7,11 +7,11 @@ impl TetrominoKind {
         match self {
             TetrominoKind::I => "I".to_owned(),
             TetrominoKind::O => "O".to_owned(),
-            TetrominoKind::Z => "Z".to_owned(),
+            TetrominoKind::T => "T".to_owned(),
             TetrominoKind::J => "J".to_owned(),
             TetrominoKind::L => "L".to_owned(),
-            TetrominoKind::T => "T".to_owned(),
             TetrominoKind::S => "S".to_owned(),
+            TetrominoKind::Z => "Z".to_owned(),
         }
     }
 
@@ -22,11 +22,11 @@ impl TetrominoKind {
             // in order : center_x, center_y, first_block_x, first_block_y, second_block_x, second_block_y...
             TetrominoKind::I => [4, 1, 3, 1, 4, 1, 5, 1, 6, 1],
             TetrominoKind::O => [5, 1, 4, 0, 4, 1, 5, 0, 5, 1],
-            TetrominoKind::Z => [4, 1, 3, 0, 4, 0, 4, 1, 5, 1],
+            TetrominoKind::T => [4, 1, 5, 1, 3, 1, 4, 1, 4, 0],
             TetrominoKind::J => [4, 1, 3, 0, 3, 1, 4, 1, 5, 1],
             TetrominoKind::L => [4, 1, 3, 1, 4, 1, 5, 1, 5, 0],
-            TetrominoKind::T => [4, 1, 5, 1, 3, 1, 4, 1, 4, 0],
             TetrominoKind::S => [4, 1, 3, 1, 4, 1, 4, 0, 5, 0],
+            TetrominoKind::Z => [4, 1, 3, 0, 4, 0, 4, 1, 5, 1],
         }
     }
 
@@ -35,11 +35,11 @@ impl TetrominoKind {
         match self {
             TetrominoKind::I => TetrisColor::Cyan,
             TetrominoKind::O => TetrisColor::Yellow,
-            TetrominoKind::Z => TetrisColor::Red,
+            TetrominoKind::T => TetrisColor::Purple,
             TetrominoKind::J => TetrisColor::Blue,
             TetrominoKind::L => TetrisColor::Orange,
-            TetrominoKind::T => TetrisColor::Purple,
             TetrominoKind::S => TetrisColor::Green,
+            TetrominoKind::Z => TetrisColor::Red,
         }
     }
 

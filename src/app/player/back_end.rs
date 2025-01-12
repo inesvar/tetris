@@ -37,10 +37,10 @@ pub enum TetrominoKind {
     I,
     O,
     T,
-    S,
-    Z,
     J,
     L,
+    S,
+    Z,
 }
 
 type GridLine = Vec<Option<TetrisColor>>;
