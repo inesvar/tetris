@@ -64,30 +64,35 @@ impl ApplyRotationTranslation for Position {
     }
 }
 
-#[test]
-fn turns_around_arbitrary_center() {
-    let center = Position::new(4, 3);
-    let mut point = Position::new(-2, 1);
-    let vector = &point - &center;
-    let rotation_translation =
-        RotationTranslation::new(&Position::default(), RotationType::Clockwise, &center);
+#[cfg(test)]
+mod tests {
+    use super::{ApplyRotationTranslation, Position, RotationTranslation, RotationType};
 
-    point.turn_by(&rotation_translation);
-    assert_eq!(point, center.add(vector.turned_clockwise()));
-}
+    #[test]
+    fn turns_around_arbitrary_center() {
+        let center = Position::new(4, 3);
+        let mut point = Position::new(-2, 1);
+        let vector = &point - &center;
+        let rotation_translation =
+            RotationTranslation::new(&Position::default(), RotationType::Clockwise, &center);
 
-#[test]
-fn moves_by_rotation_translation() {
-    let center = Position::new(4, 3);
-    let translation = Position::new(-3, 4);
-    let mut point = Position::new(-2, 1);
-    let vector = &point - &center;
-    let rotation_translation =
-        RotationTranslation::new(&translation, RotationType::Clockwise, &center);
+        point.turn_by(&rotation_translation);
+        assert_eq!(point, center.add(vector.turned_clockwise()));
+    }
 
-    point.move_by(&rotation_translation);
-    assert_eq!(
-        point,
-        center.add(vector.turned_clockwise()).add(translation)
-    );
+    #[test]
+    fn moves_by_rotation_translation() {
+        let center = Position::new(4, 3);
+        let translation = Position::new(-3, 4);
+        let mut point = Position::new(-2, 1);
+        let vector = &point - &center;
+        let rotation_translation =
+            RotationTranslation::new(&translation, RotationType::Clockwise, &center);
+
+        point.move_by(&rotation_translation);
+        assert_eq!(
+            point,
+            center.add(vector.turned_clockwise()).add(translation)
+        );
+    }
 }

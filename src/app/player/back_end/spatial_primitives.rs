@@ -108,29 +108,34 @@ impl std::ops::AddAssign<&Position> for Position {
     }
 }
 
-#[test]
-fn turns_around_origin() {
-    // y increases from top to bottom...
-    let three_oclock = Position::new(1, 0);
-    let six_oclock = Position::new(0, 1);
-    let nine_oclock = Position::new(-1, 0);
-    let twelve_oclock = Position::new(0, -1);
+#[cfg(test)]
+mod tests {
+    use super::Position;
 
-    assert_eq!(three_oclock.turned_clockwise(), six_oclock);
-    assert_eq!(nine_oclock.turned_counterclockwise(), six_oclock);
-    assert_eq!(twelve_oclock.neg(), six_oclock);
-}
+    #[test]
+    fn turns_around_origin() {
+        // y increases from top to bottom...
+        let three_oclock = Position::new(1, 0);
+        let six_oclock = Position::new(0, 1);
+        let nine_oclock = Position::new(-1, 0);
+        let twelve_oclock = Position::new(0, -1);
 
-#[test]
-fn arithmetic_implementations_are_equivalent() {
-    let a = Position::new(6, 3);
-    let b = Position::new(5, 4);
+        assert_eq!(three_oclock.turned_clockwise(), six_oclock);
+        assert_eq!(nine_oclock.turned_counterclockwise(), six_oclock);
+        assert_eq!(twelve_oclock.neg(), six_oclock);
+    }
 
-    assert_eq!(&a + b, a.add(b));
-    assert_eq!(&a - b, a.add(b.neg()));
+    #[test]
+    fn arithmetic_implementations_are_equivalent() {
+        let a = Position::new(6, 3);
+        let b = Position::new(5, 4);
 
-    let mut sum = a;
-    sum += &b;
+        assert_eq!(&a + b, a.add(b));
+        assert_eq!(&a - b, a.add(b.neg()));
 
-    assert_eq!(sum, &a + b);
+        let mut sum = a;
+        sum += &b;
+
+        assert_eq!(sum, &a + b);
+    }
 }

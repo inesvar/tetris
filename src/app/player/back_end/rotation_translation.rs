@@ -92,19 +92,24 @@ impl Direction {
     }
 }
 
-#[test]
-fn direction_update() {
-    let clockwise_turn = RotationType::Clockwise;
-    let half_turn = RotationType::HalfTurn;
-    let counterclockwise_turn = RotationType::Counterclockwise;
+#[cfg(test)]
+mod tests {
+    use super::{Direction, RotationType};
 
-    let mut direction = Direction::Up;
-    direction.update(&clockwise_turn);
-    assert_eq!(direction, Direction::Right);
+    #[test]
+    fn direction_update() {
+        let clockwise_turn = RotationType::Clockwise;
+        let half_turn = RotationType::HalfTurn;
+        let counterclockwise_turn = RotationType::Counterclockwise;
 
-    direction.update(&half_turn);
-    assert_eq!(direction, Direction::Left);
+        let mut direction = Direction::Up;
+        direction.update(&clockwise_turn);
+        assert_eq!(direction, Direction::Right);
 
-    direction.update(&counterclockwise_turn);
-    assert_eq!(direction, Direction::Down);
+        direction.update(&half_turn);
+        assert_eq!(direction, Direction::Left);
+
+        direction.update(&counterclockwise_turn);
+        assert_eq!(direction, Direction::Down);
+    }
 }
