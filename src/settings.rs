@@ -71,21 +71,21 @@ pub static TEXT_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
 /*          GAME KEYBINDINGS            */
 /****************************************/
 
-static FALL_KEYS_1P: [Key; 1] = [Key::Down];
-static HARD_DROP_KEYS_1P: [Key; 1] = [Key::Space];
-static RIGHT_KEYS_1P: [Key; 1] = [Key::Right];
-static LEFT_KEYS_1P: [Key; 1] = [Key::Left];
-static ROTATE_CLOCKWISE_KEYS_1P: [Key; 1] = [Key::Up];
-static ROTATE_COUNTERCLOCKWISE_KEYS_1P: [Key; 1] = [Key::NumPad0];
-static HOLD_TETROMINO_KEYS_1P: [Key; 1] = [Key::C];
+static FALL_KEYS_1P: [Key; 2] = [Key::Down, Key::NumPad2];
+static HARD_DROP_KEYS_1P: [Key; 2] = [Key::Space, Key::NumPad8];
+static RIGHT_KEYS_1P: [Key; 2] = [Key::Right, Key::NumPad6];
+static LEFT_KEYS_1P: [Key; 2] = [Key::Left, Key::NumPad4];
+static ROTATE_CLOCKWISE_KEYS_1P: [Key; 2] = [Key::Up, Key::NumPad5];
+static ROTATE_COUNTERCLOCKWISE_KEYS_1P: [Key; 2] = [Key::NumPad0, Key::NumPad7];
+static HOLD_TETROMINO_KEYS_1P: [Key; 2] = [Key::C, Key::NumPadEnter];
 
-static FALL_KEYS_2P: [Key; 2] = [Key::S, Key::NumPad5];
-static HARD_DROP_KEYS_2P: [Key; 2] = [Key::LCtrl, Key::NumPad0];
+static FALL_KEYS_2P: [Key; 2] = [Key::X, Key::NumPad2];
+static HARD_DROP_KEYS_2P: [Key; 2] = [Key::Z, Key::NumPad8];
 static RIGHT_KEYS_2P: [Key; 2] = [Key::D, Key::NumPad6];
 static LEFT_KEYS_2P: [Key; 2] = [Key::A, Key::NumPad4];
-static ROTATE_CLOCKWISE_KEYS_2P: [Key; 2] = [Key::W, Key::NumPad8];
-static ROTATE_COUNTERCLOCKWISE_KEYS_2P: [Key; 2] = [Key::E, Key::NumPad9];
-static HOLD_TETROMINO_KEYS_2P: [Key; 2] = [Key::C, Key::NumPadPlus];
+static ROTATE_CLOCKWISE_KEYS_2P: [Key; 2] = [Key::S, Key::NumPad5];
+static ROTATE_COUNTERCLOCKWISE_KEYS_2P: [Key; 2] = [Key::Q, Key::NumPad7];
+static HOLD_TETROMINO_KEYS_2P: [Key; 2] = [Key::Space, Key::NumPadEnter];
 
 pub struct Keybindings {
     pub fall_keys: Vec<Key>,
