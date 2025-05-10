@@ -51,7 +51,7 @@ pub(in crate::app) struct TetrisGrid {
     nb_columns: u32,
     nb_rows: u32,
     matrix: Vec<GridLine>,
-    line_sum: Vec<u8>,
+    line_sum: Vec<u32>,
     pub total_width: f64,
     pub total_height: f64,
     pub visible_width: f64,

@@ -16,7 +16,7 @@ impl TetrominoKind {
     }
 
     /// Returns the initial position of the center and the blocks of a tetromino.
-    pub(super) fn get_initial_position(&self) -> [i8; 10] {
+    pub(super) fn get_initial_position(&self) -> [i32; 10] {
         // cf https://tetris.fandom.com/wiki/SRS#Spawn_Orientation_and_Location
         match self {
             // in order : center_x, center_y, first_block_x, first_block_y, second_block_x, second_block_y...

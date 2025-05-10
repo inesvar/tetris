@@ -12,13 +12,13 @@ pub(super) struct Block {
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
 pub(super) struct Position {
     /// horizontal coordinate, from left to right
-    x: i8,
+    x: i32,
     /// vertical coordinate, *from top to bottom*
-    y: i8,
+    y: i32,
 }
 
 impl Block {
-    pub(super) fn new(color: TetrisColor, x: i8, y: i8) -> Self {
+    pub(super) fn new(color: TetrisColor, x: i32, y: i32) -> Self {
         Block {
             position: Position::new(x, y),
             color,
@@ -29,11 +29,11 @@ impl Block {
         &mut self.position
     }
 
-    pub(super) fn x(&self) -> i8 {
+    pub(super) fn x(&self) -> i32 {
         self.position.x
     }
 
-    pub(super) fn y(&self) -> i8 {
+    pub(super) fn y(&self) -> i32 {
         self.position.y
     }
 
@@ -43,7 +43,7 @@ impl Block {
 }
 
 impl Position {
-    pub(super) const fn new(x: i8, y: i8) -> Self {
+    pub(super) const fn new(x: i32, y: i32) -> Self {
         Position { x, y }
     }
 

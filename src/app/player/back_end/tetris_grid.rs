@@ -62,7 +62,7 @@ impl TetrisGrid {
         }
         let mut score = 0;
         for y in 0..self.nb_rows {
-            if self.line_sum[y as usize] == self.nb_columns as u8 {
+            if self.line_sum[y as usize] == self.nb_columns {
                 // TODO neatly separate this in a private function
                 self.matrix.remove(y as usize);
                 self.matrix.insert(0, vec![None; self.nb_columns as usize]);
@@ -101,7 +101,7 @@ impl TetrisGrid {
         for _ in 0..lines_to_add {
             // move the matrix and line_sum one line up
             self.line_sum
-                .insert(self.nb_rows as usize, (self.nb_columns - 1) as u8);
+                .insert(self.nb_rows as usize, self.nb_columns - 1);
             self.line_sum.remove(0);
 
             self.matrix
