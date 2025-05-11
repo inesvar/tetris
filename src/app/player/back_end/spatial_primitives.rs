@@ -30,6 +30,7 @@ impl Block {
         &mut self.position
     }
 
+    // Is this really useful ?
     pub(super) fn x(&self) -> i32 {
         self.position.x
     }

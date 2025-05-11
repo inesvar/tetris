@@ -1,15 +1,16 @@
 //! Define `struct` [RotationTranslation], `enum` [RotationType] and `enum` [Direction].
 use super::{Deserialize, Position, Serialize};
 
-/// Movements composed by a 90° rotation then a translation.
+/// Movement composed by a rotation then a translation.
+#[derive(Default)]
 pub(super) struct RotationTranslation {
-    pub(super) translation: Position,
     pub(super) rotation_type: RotationType,
     pub(super) rotation_center: Position,
+    pub(super) translation: Position,
 }
 
-/// 90° rotation types.
-#[derive(Clone, Default)]
+/// Four rotation types.
+#[derive(Clone, Copy, Default)]
 pub(super) enum RotationType {
     #[default]
     None = 0,
@@ -33,21 +34,19 @@ impl RotationTranslation {
     pub(super) fn new(
         translation: &Position,
         rotation_type: RotationType,
-        center: &Position,
+        rotation_center: &Position,
     ) -> Self {
-        RotationTranslation {
+        Self {
             translation: *translation,
             rotation_type,
-            // the rotation center is the center of the struct translated by translation
-            rotation_center: *center,
+            rotation_center: *rotation_center,
         }
     }
 
     pub(super) fn translation(translation: Position) -> Self {
-        RotationTranslation {
+        Self {
             translation,
-            rotation_type: RotationType::default(),
-            rotation_center: Position::default(),
+            ..Self::default()
         }
     }
 
@@ -66,13 +65,13 @@ impl RotationTranslation {
 
 impl RotationType {
     fn to_usize(&self) -> usize {
-        self.clone() as usize
+        *self as usize
     }
 }
 
 impl Direction {
-    fn to_usize(self) -> usize {
-        self as usize
+    fn to_usize(&self) -> usize {
+        *self as usize
     }
 
     const ALL_VARIANTS: [Direction; 8] = [
@@ -87,6 +86,7 @@ impl Direction {
     ];
 
     // TODO maybe implement ApplyRotationTranslation for Direction?
+    // Why not implementing Add ? or TryInto ?
     pub(super) fn update(&mut self, rotation_type: &RotationType) {
         *self = Self::ALL_VARIANTS[self.to_usize() + rotation_type.to_usize()]
     }
