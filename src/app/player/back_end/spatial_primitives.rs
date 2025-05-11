@@ -25,6 +25,7 @@ impl Block {
         }
     }
 
+    // This is used to delegate to the `position` field.
     pub(super) fn position(&mut self) -> &mut Position {
         &mut self.position
     }
@@ -47,12 +48,13 @@ impl Position {
         Position { x, y }
     }
 
+    // Using `const` is useful here so that well-kicks can be evaluated at compile-time in the future.
     // TODO create a const trait Arithmetic when it will be possible
-    pub(super) const fn neg(self) -> Position {
+    pub(super) const fn neg(self) -> Self {
         Position::new(-self.x, -self.y)
     }
 
-    pub(super) const fn add(self, other: Position) -> Position {
+    pub(super) const fn add(self, other: Position) -> Self {
         Position::new(self.x + other.x, self.y + other.y)
     }
 
@@ -65,46 +67,33 @@ impl Position {
     }
 }
 
+// Needed to use a circular buffer.
 impl Default for Block {
     fn default() -> Self {
         Block {
             position: Position::default(),
-            color: TetrisColor::Yellow,
+            color: TetrisColor::Yellow, // arbitrary
         }
     }
 }
 
-impl std::ops::Add<Position> for &Position {
+impl std::ops::Add for Position {
     type Output = Position;
     fn add(self, other: Position) -> Self::Output {
         Position::new(self.x + other.x, self.y + other.y)
     }
 }
 
-impl std::ops::Sub<Position> for &Position {
+impl std::ops::Sub for Position {
     type Output = Position;
     fn sub(self, other: Position) -> Self::Output {
         Position::new(self.x - other.x, self.y - other.y)
     }
 }
 
-impl std::ops::Add for &Position {
-    type Output = Position;
-    fn add(self, other: &Position) -> Self::Output {
-        Position::new(self.x + other.x, self.y + other.y)
-    }
-}
-
-impl std::ops::Sub for &Position {
-    type Output = Position;
-    fn sub(self, other: &Position) -> Self::Output {
-        Position::new(self.x - other.x, self.y - other.y)
-    }
-}
-
-impl std::ops::AddAssign<&Position> for Position {
-    fn add_assign(&mut self, other: &Position) {
-        *self = &*self + other;
+impl std::ops::AddAssign for Position {
+    fn add_assign(&mut self, other: Position) {
+        *self = *self + other;
     }
 }
 
@@ -113,7 +102,7 @@ mod tests {
     use super::Position;
 
     #[test]
-    fn turns_around_origin() {
+    fn arithmetic_implementation_is_correct() {
         // y increases from top to bottom...
         let three_oclock = Position::new(1, 0);
         let six_oclock = Position::new(0, 1);
@@ -130,12 +119,12 @@ mod tests {
         let a = Position::new(6, 3);
         let b = Position::new(5, 4);
 
-        assert_eq!(&a + b, a.add(b));
-        assert_eq!(&a - b, a.add(b.neg()));
+        assert_eq!(a + b, a.add(b));
+        assert_eq!(a - b, a.add(b.neg()));
 
         let mut sum = a;
-        sum += &b;
+        sum += b;
 
-        assert_eq!(sum, &a + b);
+        assert_eq!(sum, a + b);
     }
 }

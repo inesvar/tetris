@@ -2,7 +2,7 @@
 use super::{Block, Position, RotationTranslation, RotationType, TetrisGrid};
 use delegate::delegate;
 
-/// Applies a [RotationTranslation] to a spatial primitive.
+/// Apply a [RotationTranslation] to a spatial primitive.
 pub(super) trait ApplyRotationTranslation {
     fn move_by(&mut self, movement: &RotationTranslation) {
         self.turn_by(movement);
@@ -12,8 +12,9 @@ pub(super) trait ApplyRotationTranslation {
     fn turn_by(&mut self, movement: &RotationTranslation);
 }
 
-// TODO create a trait (could be implemented for tetromino too) for this function
+// TODO create a trait (could be implemented for tetromino too) for this function.
 impl Block {
+    /// Move `self` by `movement` and return new position if it's available in `grid`.
     pub(super) fn can_be_moved(
         &self,
         grid: &TetrisGrid,
@@ -21,7 +22,7 @@ impl Block {
     ) -> Result<Block, ()> {
         let mut copy = *self;
         copy.move_by(movement);
-        // Check if `copy` is inside `grid` and on an empty slot
+        // Check if `copy` is inside `grid` and on an empty slot.
         if grid.is_block_available(&copy) {
             Ok(copy)
         } else {
@@ -41,22 +42,22 @@ impl ApplyRotationTranslation for Block {
 
 impl ApplyRotationTranslation for Position {
     fn translate_by(&mut self, movement: &RotationTranslation) {
-        *self += &movement.translation;
+        *self += movement.translation;
     }
 
     fn turn_by(&mut self, movement: &RotationTranslation) {
-        let center: &Position = &movement.rotation_center;
-        match &movement.rotation_type {
+        let center: Position = movement.rotation_center;
+        match movement.rotation_type {
             RotationType::Clockwise => {
-                let vector = &*self - center;
+                let vector = *self - center;
                 *self = center + vector.turned_clockwise();
             }
             RotationType::Counterclockwise => {
-                let vector = &*self - center;
+                let vector = *self - center;
                 *self = center + vector.turned_counterclockwise();
             }
             RotationType::HalfTurn => {
-                let vector = &*self - center;
+                let vector = *self - center;
                 *self = center + vector.neg();
             }
             RotationType::None => {}
@@ -69,10 +70,10 @@ mod tests {
     use super::{ApplyRotationTranslation, Position, RotationTranslation, RotationType};
 
     #[test]
-    fn turns_around_arbitrary_center() {
+    fn rotation_is_correct() {
         let center = Position::new(4, 3);
         let mut point = Position::new(-2, 1);
-        let vector = &point - &center;
+        let vector = point - center;
         let rotation_translation =
             RotationTranslation::new(&Position::default(), RotationType::Clockwise, &center);
 
@@ -81,11 +82,11 @@ mod tests {
     }
 
     #[test]
-    fn moves_by_rotation_translation() {
+    fn rotation_translation_is_correct() {
         let center = Position::new(4, 3);
         let translation = Position::new(-3, 4);
         let mut point = Position::new(-2, 1);
-        let vector = &point - &center;
+        let vector = point - center;
         let rotation_translation =
             RotationTranslation::new(&translation, RotationType::Clockwise, &center);
 
