@@ -60,7 +60,7 @@ See `export_exe.sh` and `export_linux.sh`.
 
 ```mermaid
 graph LR
-trait([trait]) -.->|is implemented for| struct[[struct]]
-struct6[[struct]] --o|contains| enum(enum)
-obj[object] -->|uses| obj2[other]
+trait([trait]) ===|is implemented for| struct[[struct]]
+struct2[[struct]] --o|contains| enum[enum]
+obj@{ shape: text, label: "any" } -.->|uses| obj2@{ shape: text, label: "any" }
 ```
