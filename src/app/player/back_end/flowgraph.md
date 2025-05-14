@@ -33,7 +33,7 @@ graph LR
         ApplyRotationTranslation
     end
 
-    ApplyRotationTranslation === Position & Block
+    ApplyRotationTranslation === Position & Block & Direction
     ApplyRotationTranslation -.-> RotationTranslation
 
     subgraph tetromino

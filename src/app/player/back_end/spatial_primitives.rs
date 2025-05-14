@@ -17,8 +17,12 @@ pub(super) struct Position {
     y: i32,
 }
 
+pub(super) const FALL: Position = Position::new(0, 1);
+pub(super) const RIGHT: Position = Position::new(1, 0);
+pub(super) const LEFT: Position = Position::new(-1, 0);
+
 impl Block {
-    pub(super) fn new(color: TetrisColor, x: i32, y: i32) -> Self {
+    pub(super) const fn new(color: TetrisColor, x: i32, y: i32) -> Self {
         Block {
             position: Position::new(x, y),
             color,

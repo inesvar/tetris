@@ -1,5 +1,8 @@
 //! Define `struct` [RotationTranslation], `enum` [RotationType] and `enum` [Direction].
-use super::{Deserialize, Position, Serialize};
+use super::{
+    spatial_primitives::{FALL, LEFT, RIGHT},
+    Deserialize, Position, Serialize,
+};
 
 /// Movement composed by a rotation then a translation.
 #[derive(Default)]
@@ -13,21 +16,22 @@ pub(super) struct RotationTranslation {
 #[derive(Clone, Copy, Default)]
 pub(super) enum RotationType {
     #[default]
-    None = 0,
-    Clockwise = 1,
+    None,
+    Clockwise,
     #[allow(dead_code)] // TODO
-    HalfTurn = 2,
-    Counterclockwise = 3,
+    HalfTurn,
+    Counterclockwise,
 }
 
 /// Four cardinal directions.
 #[derive(Clone, Copy, Default, Serialize, Deserialize, Debug, PartialEq)]
+#[cfg_attr(test, derive(enum_iterator::Sequence))]
 pub(super) enum Direction {
     #[default]
-    Up = 0,
-    Right = 1,
-    Down = 2,
-    Left = 3,
+    Up,
+    Right,
+    Down,
+    Left,
 }
 
 impl RotationTranslation {
@@ -51,65 +55,58 @@ impl RotationTranslation {
     }
 
     pub(super) fn fall() -> Self {
-        RotationTranslation::translation(Position::new(0, 1))
+        RotationTranslation::translation(FALL)
     }
 
     pub(super) fn right() -> Self {
-        RotationTranslation::translation(Position::new(1, 0))
+        RotationTranslation::translation(RIGHT)
     }
 
     pub(super) fn left() -> Self {
-        RotationTranslation::translation(Position::new(-1, 0))
-    }
-}
-
-impl RotationType {
-    fn to_usize(&self) -> usize {
-        *self as usize
+        RotationTranslation::translation(LEFT)
     }
 }
 
 impl Direction {
-    fn to_usize(&self) -> usize {
-        *self as usize
+    pub(super) fn turn_clockwise(&mut self) {
+        match self {
+            Direction::Up => *self = Direction::Right,
+            Direction::Right => *self = Direction::Down,
+            Direction::Down => *self = Direction::Left,
+            Direction::Left => *self = Direction::Up,
+        }
     }
 
-    const ALL_VARIANTS: [Direction; 8] = [
-        Direction::Up,
-        Direction::Right,
-        Direction::Down,
-        Direction::Left,
-        Direction::Up,
-        Direction::Right,
-        Direction::Down,
-        Direction::Left,
-    ];
-
-    // TODO maybe implement ApplyRotationTranslation for Direction?
-    // Why not implementing Add ? or TryInto ?
-    pub(super) fn update(&mut self, rotation_type: &RotationType) {
-        *self = Self::ALL_VARIANTS[self.to_usize() + rotation_type.to_usize()]
+    pub(super) fn turn_counterclockwise(&mut self) {
+        match self {
+            Direction::Up => *self = Direction::Left,
+            Direction::Left => *self = Direction::Down,
+            Direction::Down => *self = Direction::Right,
+            Direction::Right => *self = Direction::Up,
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Direction, RotationType};
+    use super::Direction;
+    use enum_iterator::{next_cycle, previous_cycle};
 
     #[test]
     fn direction_update() {
-        let clockwise_turn = RotationType::Clockwise;
-        let half_turn = RotationType::HalfTurn;
-        let counterclockwise_turn = RotationType::Counterclockwise;
-
         let mut direction = Direction::Up;
-        direction.update(&clockwise_turn);
-        assert_eq!(direction, Direction::Right);
+        let mut direction_copy = direction;
 
-        direction.update(&half_turn);
-        assert_eq!(direction, Direction::Left);
+        for _ in 0..4 {
+            direction.turn_clockwise();
+            direction_copy = next_cycle(&direction_copy);
+            assert_eq!(direction, direction_copy);
+        }
 
-        direction.update(&counterclockwise_turn);
-        assert_eq!(direction, Direction::Down);
+        for _ in 0..4 {
+            direction.turn_counterclockwise();
+            direction_copy = previous_cycle(&direction_copy);
+            assert_eq!(direction, direction_copy);
+        }
     }
 }

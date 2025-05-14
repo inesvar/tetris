@@ -1,5 +1,5 @@
 //! Define `trait` [ApplyRotationTranslation] for [Position] and [Block].
-use super::{Block, Position, RotationTranslation, RotationType, TetrisGrid};
+use super::{Block, Direction, Position, RotationTranslation, RotationType, TetrisGrid};
 use delegate::delegate;
 
 /// Apply a [RotationTranslation] to a spatial primitive.
@@ -27,6 +27,26 @@ impl Block {
             Ok(copy)
         } else {
             Err(())
+        }
+    }
+}
+
+impl ApplyRotationTranslation for Direction {
+    fn translate_by(&mut self, _movement: &RotationTranslation) {}
+
+    fn turn_by(&mut self, movement: &RotationTranslation) {
+        match movement.rotation_type {
+            RotationType::Clockwise => {
+                self.turn_clockwise();
+            }
+            RotationType::Counterclockwise => {
+                self.turn_counterclockwise();
+            }
+            RotationType::HalfTurn => {
+                self.turn_clockwise();
+                self.turn_clockwise();
+            }
+            RotationType::None => {}
         }
     }
 }

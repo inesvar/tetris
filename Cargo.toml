@@ -19,6 +19,7 @@ arboard = "3.4.1"
 include_assets = "1.0.0"
 delegate = "0.13.1"
 simple-mermaid = "0.2.0"
+enum-iterator = "2.1.0"
 
 [dependencies.pistoncore-glfw_window]
 git = "https://github.com/PistonDevelopers/glfw_window"
