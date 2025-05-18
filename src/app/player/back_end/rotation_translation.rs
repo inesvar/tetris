@@ -5,7 +5,7 @@ use super::{
 };
 
 /// Movement composed by a rotation then a translation.
-#[derive(Default)]
+#[derive(Clone, Copy, Default)]
 pub(super) struct RotationTranslation {
     pub(super) rotation_type: RotationType,
     pub(super) rotation_center: Position,

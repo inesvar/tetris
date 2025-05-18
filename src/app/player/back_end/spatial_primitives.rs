@@ -2,7 +2,7 @@
 use super::{Deserialize, Serialize, TetrisColor};
 
 /// Block in a discrete grid, serializable.
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub(super) struct Block {
     position: Position,
     color: TetrisColor,

@@ -1,4 +1,6 @@
 //! Define the implementation of [Tetromino].
+#[cfg(test)]
+use super::spatial_primitives::{FALL, LEFT, RIGHT, RISE};
 use super::{
     ApplyRotationTranslation, Block, Direction, Position, RotationTranslation, RotationType,
     TetrisGrid, Tetromino, TetrominoKind,
@@ -177,5 +179,93 @@ impl Tetromino {
 
     pub(super) fn blocks(&self) -> &[Block] {
         &self.blocks
+    }
+
+    #[cfg(test)]
+    fn i_tetromino_rotation_correction(&mut self, movement: &RotationTranslation) -> Position {
+        match (self.direction, movement.rotation_type) {
+            (Direction::Up, RotationType::Clockwise) => RIGHT,
+            (Direction::Right, RotationType::Counterclockwise) => LEFT,
+            (Direction::Right, RotationType::Clockwise) => FALL,
+            (Direction::Down, RotationType::Counterclockwise) => RISE,
+            (Direction::Down, RotationType::Clockwise) => LEFT,
+            (Direction::Left, RotationType::Counterclockwise) => RIGHT,
+            (Direction::Left, RotationType::Clockwise) => RISE,
+            (Direction::Up, RotationType::Counterclockwise) => FALL,
+            (_, _) => todo!(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::settings::{NB_COLUMNS, NB_ROWS};
+
+    #[test]
+    fn i_tetromino_rotation_is_correct() {
+        let empty_grid = TetrisGrid::new(NB_COLUMNS, NB_ROWS);
+        let mut i_tetromino = Tetromino::new_unchecked(TetrominoKind::I);
+        let mut naive_i_tetromino = Tetromino::new_unchecked(TetrominoKind::I);
+        // regular rotation will be used for tetromino T
+        naive_i_tetromino.kind = TetrominoKind::T;
+
+        println!(
+            "{:?}\n{:?}\n{:?}\n{:?}",
+            i_tetromino.blocks,
+            naive_i_tetromino.blocks,
+            i_tetromino.center,
+            naive_i_tetromino.center
+        );
+        assert_eq!(i_tetromino.blocks, naive_i_tetromino.blocks);
+
+        for _ in 0..4 {
+            let rotation = RotationTranslation {
+                rotation_type: RotationType::Clockwise,
+                rotation_center: naive_i_tetromino.center,
+                translation: Position::new(0, 0),
+            };
+
+            let translation = naive_i_tetromino.i_tetromino_rotation_correction(&rotation);
+            let mut corrected_rotation = rotation;
+            corrected_rotation.translation = translation;
+            let _ = naive_i_tetromino.move_if_ok(&empty_grid, &corrected_rotation);
+
+            let _ = i_tetromino.turn_clockwise(&empty_grid);
+
+            println!(
+                "{:?}\n{:?}\n{:?}\n{:?}",
+                i_tetromino.blocks,
+                naive_i_tetromino.blocks,
+                i_tetromino.center,
+                naive_i_tetromino.center
+            );
+
+            assert_eq!(i_tetromino.blocks, naive_i_tetromino.blocks);
+        }
+
+        for _ in 0..4 {
+            let rotation = RotationTranslation {
+                rotation_type: RotationType::Counterclockwise,
+                rotation_center: naive_i_tetromino.center,
+                translation: Position::new(0, 0),
+            };
+            let translation = naive_i_tetromino.i_tetromino_rotation_correction(&rotation);
+            let mut corrected_rotation = rotation;
+            corrected_rotation.translation = translation;
+            let _ = naive_i_tetromino.move_if_ok(&empty_grid, &corrected_rotation);
+
+            let _ = i_tetromino.turn_counterclockwise(&empty_grid);
+
+            println!(
+                "{:?}\n{:?}\n{:?}\n{:?}",
+                i_tetromino.blocks,
+                naive_i_tetromino.blocks,
+                i_tetromino.center,
+                naive_i_tetromino.center
+            );
+
+            assert_eq!(i_tetromino.blocks, naive_i_tetromino.blocks);
+        }
     }
 }

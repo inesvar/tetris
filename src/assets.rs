@@ -3,7 +3,7 @@ use include_assets::NamedArchive;
 use opengl_graphics::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum TetrisColor {
     Cyan,
     Yellow,
