@@ -65,12 +65,10 @@ impl Position {
         Position::new(-self.x, -self.y)
     }
 
-    #[cfg(test)]
     pub(super) const fn mirror_x(self) -> Self {
         Position::new(-self.x, self.y)
     }
 
-    #[cfg(test)]
     pub(super) const fn mirror_y(self) -> Self {
         Position::new(self.x, -self.y)
     }

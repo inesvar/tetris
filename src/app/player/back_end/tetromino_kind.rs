@@ -4,6 +4,30 @@ use super::{
     Direction, Position, RotationType, TetrisColor, TetrominoKind,
 };
 
+macro_rules! const_map {
+    ($array:expr, $func:ident) => {
+        [
+            $array[0].$func(),
+            $array[1].$func(),
+            $array[2].$func(),
+            $array[3].$func(),
+            $array[4].$func(),
+        ]
+    };
+}
+
+const UP_TO_RIGHT_WALL_KICKS: [Position; 5] = [
+    Position::new(0, 0),
+    Position::new(-1, 0),
+    Position::new(-1, 1),
+    Position::new(0, -2),
+    Position::new(-1, -2),
+];
+
+const RIGHT_TO_UP_WALL_KICKS: [Position; 5] = const_map!(UP_TO_RIGHT_WALL_KICKS, neg);
+const DOWN_TO_LEFT_WALL_KICKS: [Position; 5] = const_map!(UP_TO_RIGHT_WALL_KICKS, mirror_x);
+const LEFT_TO_DOWN_WALL_KICKS: [Position; 5] = const_map!(UP_TO_RIGHT_WALL_KICKS, mirror_y);
+
 const fn init(x: i32, y: i32) -> Position {
     match (x, y) {
         (x @ 0..4, y @ 0..4) => Position::new(3 + x, y),
@@ -40,7 +64,7 @@ impl TetrominoKind {
         }
     }
 
-    // the rotation of the I and O that should be tweaked, for better clarity. hummm yes but it's practical...
+    // the rotation of the I and O should be tweaked, for better clarity. hummm yes but it's practical...
     // BUT before changing everything, unit tests need to be written ! yay !
     /// Return an array of the 5 SRS wall-kick translations.
     pub(super) fn wall_kick_translations(
@@ -126,62 +150,14 @@ impl TetrominoKind {
     ) -> [Position; 5] {
         // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
         match (rotation_status, rtype) {
-            (Direction::Up, RotationType::Clockwise) => [
-                Position::new(0, 0),
-                Position::new(-1, 0),
-                Position::new(-1, 1),
-                Position::new(0, -2),
-                Position::new(-1, -2),
-            ],
-            (Direction::Right, RotationType::Counterclockwise) => [
-                Position::new(0, 0),
-                Position::new(1, 0),
-                Position::new(1, -1),
-                Position::new(0, 2),
-                Position::new(1, 2), // neg
-            ],
-            (Direction::Right, RotationType::Clockwise) => [
-                Position::new(0, 0),
-                Position::new(1, 0),
-                Position::new(1, -1),
-                Position::new(0, 2),
-                Position::new(1, 2), // neg
-            ],
-            (Direction::Down, RotationType::Counterclockwise) => [
-                Position::new(0, 0),
-                Position::new(-1, 0),
-                Position::new(-1, 1),
-                Position::new(0, -2),
-                Position::new(-1, -2), // none
-            ],
-            (Direction::Down, RotationType::Clockwise) => [
-                Position::new(0, 0),
-                Position::new(1, 0),
-                Position::new(1, 1),
-                Position::new(0, -2),
-                Position::new(1, -2), // none
-            ],
-            (Direction::Left, RotationType::Counterclockwise) => [
-                Position::new(0, 0),
-                Position::new(-1, 0),
-                Position::new(-1, -1),
-                Position::new(0, 2),
-                Position::new(-1, 2), // neg
-            ],
-            (Direction::Left, RotationType::Clockwise) => [
-                Position::new(0, 0),
-                Position::new(-1, 0),
-                Position::new(-1, -1),
-                Position::new(0, 2),
-                Position::new(-1, 2), // neg
-            ],
-            (Direction::Up, RotationType::Counterclockwise) => [
-                Position::new(0, 0),
-                Position::new(1, 0),
-                Position::new(1, 1),
-                Position::new(0, -2),
-                Position::new(1, -2), // none
-            ],
+            (Direction::Up, RotationType::Clockwise) => UP_TO_RIGHT_WALL_KICKS,
+            (Direction::Right, RotationType::Counterclockwise) => RIGHT_TO_UP_WALL_KICKS,
+            (Direction::Right, RotationType::Clockwise) => RIGHT_TO_UP_WALL_KICKS,
+            (Direction::Down, RotationType::Counterclockwise) => UP_TO_RIGHT_WALL_KICKS,
+            (Direction::Down, RotationType::Clockwise) => DOWN_TO_LEFT_WALL_KICKS,
+            (Direction::Left, RotationType::Counterclockwise) => LEFT_TO_DOWN_WALL_KICKS,
+            (Direction::Left, RotationType::Clockwise) => LEFT_TO_DOWN_WALL_KICKS,
+            (Direction::Up, RotationType::Counterclockwise) => DOWN_TO_LEFT_WALL_KICKS,
             (_, _) => todo!(),
         }
     }
@@ -191,117 +167,50 @@ impl TetrominoKind {
 mod tests {
     use super::{Direction, Position, RotationType, TetrominoKind};
 
+    macro_rules! positions {
+        ($(($x:expr, $y:expr)),+ $(,)?) => {
+            [$( Position::new($x, $y) ),+]
+        };
+    }
+
     #[test]
     fn spawn_positions_are_correct() {
         assert_eq!(
             TetrominoKind::I.get_initial_position(),
-            [
-                Position::new(4, 1),
-                Position::new(3, 1),
-                Position::new(4, 1),
-                Position::new(5, 1),
-                Position::new(6, 1),
-            ]
+            positions!((4, 1), (3, 1), (4, 1), (5, 1), (6, 1))
         );
+
         assert_eq!(
             TetrominoKind::O.get_initial_position(),
-            [
-                Position::new(5, 1),
-                Position::new(4, 0),
-                Position::new(5, 0),
-                Position::new(4, 1),
-                Position::new(5, 1),
-            ]
+            positions!((5, 1), (4, 0), (5, 0), (4, 1), (5, 1))
         );
         assert_eq!(
             TetrominoKind::T.get_initial_position(),
-            [
-                Position::new(4, 1),
-                Position::new(4, 0),
-                Position::new(3, 1),
-                Position::new(4, 1),
-                Position::new(5, 1),
-            ]
+            positions!((4, 1), (4, 0), (3, 1), (4, 1), (5, 1))
         );
         assert_eq!(
             TetrominoKind::J.get_initial_position(),
-            [
-                Position::new(4, 1),
-                Position::new(3, 0),
-                Position::new(3, 1),
-                Position::new(4, 1),
-                Position::new(5, 1),
-            ]
+            positions!((4, 1), (3, 0), (3, 1), (4, 1), (5, 1))
         );
         assert_eq!(
             TetrominoKind::L.get_initial_position(),
-            [
-                Position::new(4, 1),
-                Position::new(5, 0),
-                Position::new(3, 1),
-                Position::new(4, 1),
-                Position::new(5, 1),
-            ]
+            positions!((4, 1), (5, 0), (3, 1), (4, 1), (5, 1))
         );
         assert_eq!(
             TetrominoKind::S.get_initial_position(),
-            [
-                Position::new(4, 1),
-                Position::new(4, 0),
-                Position::new(5, 0),
-                Position::new(3, 1),
-                Position::new(4, 1),
-            ]
+            positions!((4, 1), (4, 0), (5, 0), (3, 1), (4, 1))
         );
         assert_eq!(
             TetrominoKind::Z.get_initial_position(),
-            [
-                Position::new(4, 1),
-                Position::new(3, 0),
-                Position::new(4, 0),
-                Position::new(4, 1),
-                Position::new(5, 1),
-            ]
+            positions!((4, 1), (3, 0), (4, 0), (4, 1), (5, 1))
         );
     }
-
-    const UP_TO_RIGHT_WALL_KICKS: [Position; 5] = [
-        Position::new(0, 0),
-        Position::new(-1, 0),
-        Position::new(-1, 1),
-        Position::new(0, -2),
-        Position::new(-1, -2),
-    ];
-
-    const RIGHT_TO_UP_WALL_KICKS: [Position; 5] = [
-        UP_TO_RIGHT_WALL_KICKS[0].neg(),
-        UP_TO_RIGHT_WALL_KICKS[1].neg(),
-        UP_TO_RIGHT_WALL_KICKS[2].neg(),
-        UP_TO_RIGHT_WALL_KICKS[3].neg(),
-        UP_TO_RIGHT_WALL_KICKS[4].neg(),
-    ];
-
-    const DOWN_TO_LEFT_WALL_KICKS: [Position; 5] = [
-        UP_TO_RIGHT_WALL_KICKS[0].mirror_x(),
-        UP_TO_RIGHT_WALL_KICKS[1].mirror_x(),
-        UP_TO_RIGHT_WALL_KICKS[2].mirror_x(),
-        UP_TO_RIGHT_WALL_KICKS[3].mirror_x(),
-        UP_TO_RIGHT_WALL_KICKS[4].mirror_x(),
-    ];
-
-    const LEFT_TO_DOWN_WALL_KICKS: [Position; 5] = [
-        UP_TO_RIGHT_WALL_KICKS[0].mirror_y(),
-        UP_TO_RIGHT_WALL_KICKS[1].mirror_y(),
-        UP_TO_RIGHT_WALL_KICKS[2].mirror_y(),
-        UP_TO_RIGHT_WALL_KICKS[3].mirror_y(),
-        UP_TO_RIGHT_WALL_KICKS[4].mirror_y(),
-    ];
 
     #[test]
     fn generic_wall_kicks_are_correct() {
         assert_eq!(
             TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::Up),
-            UP_TO_RIGHT_WALL_KICKS,
+            positions!((0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2))
         );
 
         assert_eq!(
@@ -309,7 +218,7 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::Right
             ),
-            RIGHT_TO_UP_WALL_KICKS,
+            positions!((0, 0), (1, 0), (1, -1), (0, 2), (1, 2))
         );
 
         assert_eq!(
@@ -317,7 +226,7 @@ mod tests {
                 RotationType::Clockwise,
                 Direction::Right
             ),
-            RIGHT_TO_UP_WALL_KICKS,
+            positions!((0, 0), (1, 0), (1, -1), (0, 2), (1, 2))
         );
 
         assert_eq!(
@@ -325,12 +234,12 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::Down
             ),
-            UP_TO_RIGHT_WALL_KICKS,
+            positions!((0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2))
         );
 
         assert_eq!(
             TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::Down),
-            DOWN_TO_LEFT_WALL_KICKS,
+            positions!((0, 0), (1, 0), (1, 1), (0, -2), (1, -2))
         );
 
         assert_eq!(
@@ -338,12 +247,12 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::Left
             ),
-            LEFT_TO_DOWN_WALL_KICKS,
+            positions!((0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2))
         );
 
         assert_eq!(
             TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::Left),
-            LEFT_TO_DOWN_WALL_KICKS,
+            positions!((0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2))
         );
 
         assert_eq!(
@@ -351,7 +260,7 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::Up
             ),
-            DOWN_TO_LEFT_WALL_KICKS,
+            positions!((0, 0), (1, 0), (1, 1), (0, -2), (1, -2))
         );
     }
 }
