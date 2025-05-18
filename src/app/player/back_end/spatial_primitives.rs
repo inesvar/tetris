@@ -12,21 +12,27 @@ pub(super) struct Block {
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
 pub(super) struct Position {
     /// horizontal coordinate, from left to right
-    x: i32,
+    pub(super) x: i32,
     /// vertical coordinate, *from top to bottom*
-    y: i32,
+    pub(super) y: i32,
 }
 
 pub(super) const FALL: Position = Position::new(0, 1);
+pub(super) const RISE: Position = Position::new(0, -1);
 pub(super) const RIGHT: Position = Position::new(1, 0);
 pub(super) const LEFT: Position = Position::new(-1, 0);
 
 impl Block {
+    // TODO remove if really unused
     pub(super) const fn new(color: TetrisColor, x: i32, y: i32) -> Self {
         Block {
             position: Position::new(x, y),
             color,
         }
+    }
+
+    pub(super) const fn from(color: TetrisColor, position: Position) -> Self {
+        Block { position, color }
     }
 
     // This is used to delegate to the `position` field.
@@ -57,6 +63,16 @@ impl Position {
     // TODO create a const trait Arithmetic when it will be possible
     pub(super) const fn neg(self) -> Self {
         Position::new(-self.x, -self.y)
+    }
+
+    #[cfg(test)]
+    pub(super) const fn mirror_x(self) -> Self {
+        Position::new(-self.x, self.y)
+    }
+
+    #[cfg(test)]
+    pub(super) const fn mirror_y(self) -> Self {
+        Position::new(self.x, -self.y)
     }
 
     pub(super) const fn add(self, other: Position) -> Self {

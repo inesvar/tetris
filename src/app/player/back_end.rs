@@ -32,7 +32,7 @@ pub struct Tetromino {
 }
 
 /// TetrominoKind describes the 7 types of Tetromino.
-#[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum TetrominoKind {
     I,
     O,

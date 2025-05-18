@@ -37,7 +37,7 @@ impl Tetromino {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let wall_kicks_translations = TetrominoKind::wall_kicks_translations(
+        let wall_kicks_translations = TetrominoKind::wall_kick_translations(
             &self.kind,
             RotationType::Clockwise,
             self.direction,
@@ -56,7 +56,7 @@ impl Tetromino {
         if self.kind == TetrominoKind::O {
             return;
         };
-        let wall_kicks_translations = TetrominoKind::wall_kicks_translations(
+        let wall_kicks_translations = TetrominoKind::wall_kick_translations(
             &self.kind,
             RotationType::Counterclockwise,
             self.direction,
@@ -90,19 +90,19 @@ impl Tetromino {
     pub(in crate::app::player) fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Tetromino> {
         let positions = kind.get_initial_position();
         let color = kind.get_color();
-        for i in 1..5 {
-            if grid.matrix[positions[2 * i + 1] as usize][positions[2 * i] as usize].is_some() {
+        for position in positions {
+            if grid.matrix[position.x as usize][position.y as usize].is_some() {
                 return None;
             }
         }
         Some(Tetromino {
             kind,
-            center: Position::new(positions[0], positions[1]),
+            center: positions[0],
             blocks: [
-                Block::new(color, positions[2], positions[3]),
-                Block::new(color, positions[4], positions[5]),
-                Block::new(color, positions[6], positions[7]),
-                Block::new(color, positions[8], positions[9]),
+                Block::from(color, positions[1]),
+                Block::from(color, positions[2]),
+                Block::from(color, positions[3]),
+                Block::from(color, positions[4]),
             ],
             direction: Direction::default(),
             is_ghost: false,
@@ -115,12 +115,12 @@ impl Tetromino {
         let color = kind.get_color();
         Tetromino {
             kind,
-            center: Position::new(positions[0], positions[1]),
+            center: positions[0],
             blocks: [
-                Block::new(color, positions[2], positions[3]),
-                Block::new(color, positions[4], positions[5]),
-                Block::new(color, positions[6], positions[7]),
-                Block::new(color, positions[8], positions[9]),
+                Block::from(color, positions[1]),
+                Block::from(color, positions[2]),
+                Block::from(color, positions[3]),
+                Block::from(color, positions[4]),
             ],
             direction: Direction::default(),
             is_ghost: false,
@@ -128,16 +128,17 @@ impl Tetromino {
     }
 
     // TODO can't this cause a collision??
+    // TODO the direction is not reset ??? => test this but using new_unchecked seems better
     /// Resets the Tetromino at its starting position.
     pub fn reset_position(&mut self) {
         let positions = self.kind.get_initial_position();
         let color = self.kind.get_color();
-        self.center = Position::new(positions[0], positions[1]);
+        self.center = positions[0];
         self.blocks = [
-            Block::new(color, positions[2], positions[3]),
-            Block::new(color, positions[4], positions[5]),
-            Block::new(color, positions[6], positions[7]),
-            Block::new(color, positions[8], positions[9]),
+            Block::from(color, positions[1]),
+            Block::from(color, positions[2]),
+            Block::from(color, positions[3]),
+            Block::from(color, positions[4]),
         ];
     }
 
@@ -161,9 +162,10 @@ impl Default for Tetromino {
     }
 }
 
+// Required by `CircularBuffer`.
 impl Display for Tetromino {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "{}", self.kind.get())
+        write!(f, "{:?}", self.kind)
     }
 }
 

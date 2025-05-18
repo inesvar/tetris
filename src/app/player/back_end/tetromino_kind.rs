@@ -1,36 +1,33 @@
-//! Define the specificities of the 7 kinds of Tetromino pieces : colors, starting positions, wall-kicks.
-use super::{Direction, Position, RotationType, TetrisColor, TetrominoKind};
+//! Implement [TetrominoKind].
+use super::{
+    spatial_primitives::{FALL, LEFT, RIGHT, RISE},
+    Direction, Position, RotationType, TetrisColor, TetrominoKind,
+};
+
+const fn init(x: i32, y: i32) -> Position {
+    match (x, y) {
+        (x @ 0..4, y @ 0..4) => Position::new(3 + x, y),
+        _ => panic!("x and y should be between 0 and 4 excluded"),
+    }
+}
 
 impl TetrominoKind {
-    /// Returns the name of the TetrominoKind variant.
-    pub(super) fn get(&self) -> String {
-        match self {
-            TetrominoKind::I => "I".to_owned(),
-            TetrominoKind::O => "O".to_owned(),
-            TetrominoKind::T => "T".to_owned(),
-            TetrominoKind::J => "J".to_owned(),
-            TetrominoKind::L => "L".to_owned(),
-            TetrominoKind::S => "S".to_owned(),
-            TetrominoKind::Z => "Z".to_owned(),
-        }
-    }
-
-    /// Returns the initial position of the center and the blocks of a tetromino.
-    pub(super) fn get_initial_position(&self) -> [i32; 10] {
+    /// Return the initial position of the center and the blocks.
+    pub(super) fn get_initial_position(&self) -> [Position; 5] {
         // cf https://tetris.fandom.com/wiki/SRS#Spawn_Orientation_and_Location
         match self {
             // in order : center_x, center_y, first_block_x, first_block_y, second_block_x, second_block_y...
-            TetrominoKind::I => [4, 1, 3, 1, 4, 1, 5, 1, 6, 1],
-            TetrominoKind::O => [5, 1, 4, 0, 4, 1, 5, 0, 5, 1],
-            TetrominoKind::T => [4, 1, 5, 1, 3, 1, 4, 1, 4, 0],
-            TetrominoKind::J => [4, 1, 3, 0, 3, 1, 4, 1, 5, 1],
-            TetrominoKind::L => [4, 1, 3, 1, 4, 1, 5, 1, 5, 0],
-            TetrominoKind::S => [4, 1, 3, 1, 4, 1, 4, 0, 5, 0],
-            TetrominoKind::Z => [4, 1, 3, 0, 4, 0, 4, 1, 5, 1],
+            TetrominoKind::I => [init(1, 1), init(0, 1), init(1, 1), init(2, 1), init(3, 1)],
+            TetrominoKind::O => [init(2, 1), init(1, 0), init(2, 0), init(1, 1), init(2, 1)],
+            TetrominoKind::T => [init(1, 1), init(1, 0), init(0, 1), init(1, 1), init(2, 1)],
+            TetrominoKind::J => [init(1, 1), init(0, 0), init(0, 1), init(1, 1), init(2, 1)],
+            TetrominoKind::L => [init(1, 1), init(2, 0), init(0, 1), init(1, 1), init(2, 1)],
+            TetrominoKind::S => [init(1, 1), init(1, 0), init(2, 0), init(0, 1), init(1, 1)],
+            TetrominoKind::Z => [init(1, 1), init(0, 0), init(1, 0), init(1, 1), init(2, 1)],
         }
     }
 
-    /// Returns the color associated with the TetrominoKind.
+    /// Return the associated color.
     pub(super) fn get_color(&self) -> TetrisColor {
         match self {
             TetrominoKind::I => TetrisColor::Cyan,
@@ -43,8 +40,10 @@ impl TetrominoKind {
         }
     }
 
-    /// Returns an array of the 5 SRS wall-kick translations.
-    pub(super) fn wall_kicks_translations(
+    // the rotation of the I and O that should be tweaked, for better clarity. hummm yes but it's practical...
+    // BUT before changing everything, unit tests need to be written ! yay !
+    /// Return an array of the 5 SRS wall-kick translations.
+    pub(super) fn wall_kick_translations(
         &self,
         rtype: RotationType,
         rotation_status: Direction,
@@ -60,122 +59,299 @@ impl TetrominoKind {
             // (its due to the fact that the I piece doesn't have a 3x3 bounding box like the other rotating pieces)
             TetrominoKind::I => match (rotation_status, rtype) {
                 (Direction::Up, RotationType::Clockwise) => [
-                    Position::new(1, 0),
-                    Position::new(1, 0).add(Position::new(-2, 0)),
-                    Position::new(1, 0).add(Position::new(1, 0)),
-                    Position::new(1, 0).add(Position::new(-2, -1)),
-                    Position::new(1, 0).add(Position::new(1, 2)),
+                    RIGHT,
+                    RIGHT.add(Position::new(-2, 0)),
+                    RIGHT.add(Position::new(1, 0)),
+                    RIGHT.add(Position::new(-2, -1)),
+                    RIGHT.add(Position::new(1, 2)),
                 ],
                 (Direction::Right, RotationType::Counterclockwise) => [
-                    Position::new(-1, 0),
-                    Position::new(-1, 0).add(Position::new(2, 0)),
-                    Position::new(-1, 0).add(Position::new(-1, 0)),
-                    Position::new(-1, 0).add(Position::new(2, 1)),
-                    Position::new(-1, 0).add(Position::new(-1, -2)),
+                    LEFT,
+                    LEFT.add(Position::new(2, 0)),
+                    LEFT.add(Position::new(-1, 0)),
+                    LEFT.add(Position::new(2, 1)),
+                    LEFT.add(Position::new(-1, -2)), // neg neg
                 ],
                 (Direction::Right, RotationType::Clockwise) => [
-                    Position::new(0, 1),
-                    Position::new(0, 1).add(Position::new(-1, 0)),
-                    Position::new(0, 1).add(Position::new(2, 0)),
-                    Position::new(0, 1).add(Position::new(-1, 2)),
-                    Position::new(0, 1).add(Position::new(2, -1)),
+                    FALL,
+                    FALL.add(Position::new(-1, 0)),
+                    FALL.add(Position::new(2, 0)),
+                    FALL.add(Position::new(-1, 2)),
+                    FALL.add(Position::new(2, -1)),
                 ],
                 (Direction::Down, RotationType::Counterclockwise) => [
-                    Position::new(0, -1),
-                    Position::new(0, -1).add(Position::new(1, 0)),
-                    Position::new(0, -1).add(Position::new(-2, 0)),
-                    Position::new(0, -1).add(Position::new(1, -2)),
-                    Position::new(0, -1).add(Position::new(-2, 1)),
+                    RISE,
+                    RISE.add(Position::new(1, 0)),
+                    RISE.add(Position::new(-2, 0)),
+                    RISE.add(Position::new(1, -2)),
+                    RISE.add(Position::new(-2, 1)),
                 ],
                 (Direction::Down, RotationType::Clockwise) => [
-                    Position::new(-1, 0),
-                    Position::new(-1, 0).add(Position::new(2, 0)),
-                    Position::new(-1, 0).add(Position::new(-1, 0)),
-                    Position::new(-1, 0).add(Position::new(2, 1)),
-                    Position::new(-1, 0).add(Position::new(-1, -2)),
+                    LEFT,
+                    LEFT.add(Position::new(2, 0)),
+                    LEFT.add(Position::new(-1, 0)),
+                    LEFT.add(Position::new(2, 1)),
+                    LEFT.add(Position::new(-1, -2)),
                 ],
                 (Direction::Left, RotationType::Counterclockwise) => [
-                    Position::new(1, 0),
-                    Position::new(1, 0).add(Position::new(-2, 0)),
-                    Position::new(1, 0).add(Position::new(1, 0)),
-                    Position::new(1, 0).add(Position::new(-2, -1)),
-                    Position::new(1, 0).add(Position::new(1, 2)),
+                    RIGHT,
+                    RIGHT.add(Position::new(-2, 0)),
+                    RIGHT.add(Position::new(1, 0)),
+                    RIGHT.add(Position::new(-2, -1)),
+                    RIGHT.add(Position::new(1, 2)),
                 ],
                 (Direction::Left, RotationType::Clockwise) => [
-                    Position::new(0, -1),
-                    Position::new(0, -1).add(Position::new(1, 0)),
-                    Position::new(0, -1).add(Position::new(-2, 0)),
-                    Position::new(0, -1).add(Position::new(1, -2)),
-                    Position::new(0, -1).add(Position::new(-2, 1)),
+                    RISE,
+                    RISE.add(Position::new(1, 0)),
+                    RISE.add(Position::new(-2, 0)),
+                    RISE.add(Position::new(1, -2)),
+                    RISE.add(Position::new(-2, 1)),
                 ],
                 (Direction::Up, RotationType::Counterclockwise) => [
-                    Position::new(0, 1),
-                    Position::new(0, 1).add(Position::new(-1, 0)),
-                    Position::new(0, 1).add(Position::new(2, 0)),
-                    Position::new(0, 1).add(Position::new(-1, 2)),
-                    Position::new(0, 1).add(Position::new(2, -1)),
+                    FALL,
+                    FALL.add(Position::new(-1, 0)),
+                    FALL.add(Position::new(2, 0)),
+                    FALL.add(Position::new(-1, 2)),
+                    FALL.add(Position::new(2, -1)),
                 ],
                 (_, _) => todo!(),
             },
-            _ => match (rotation_status, rtype) {
-                (Direction::Up, RotationType::Clockwise) => [
-                    Position::new(0, 0),
-                    Position::new(-1, 0),
-                    Position::new(-1, 1),
-                    Position::new(0, -2),
-                    Position::new(-1, -2),
-                ],
-                (Direction::Right, RotationType::Counterclockwise) => [
-                    Position::new(0, 0),
-                    Position::new(1, 0),
-                    Position::new(1, -1),
-                    Position::new(0, 2),
-                    Position::new(1, 2),
-                ],
-                (Direction::Right, RotationType::Clockwise) => [
-                    Position::new(0, 0),
-                    Position::new(1, 0),
-                    Position::new(1, -1),
-                    Position::new(0, 2),
-                    Position::new(1, 2),
-                ],
-                (Direction::Down, RotationType::Counterclockwise) => [
-                    Position::new(0, 0),
-                    Position::new(-1, 0),
-                    Position::new(-1, 1),
-                    Position::new(0, -2),
-                    Position::new(-1, -2),
-                ],
-                (Direction::Down, RotationType::Clockwise) => [
-                    Position::new(0, 0),
-                    Position::new(1, 0),
-                    Position::new(1, 1),
-                    Position::new(0, -2),
-                    Position::new(1, -2),
-                ],
-                (Direction::Left, RotationType::Counterclockwise) => [
-                    Position::new(0, 0),
-                    Position::new(-1, 0),
-                    Position::new(-1, -1),
-                    Position::new(0, 2),
-                    Position::new(-1, 2),
-                ],
-                (Direction::Left, RotationType::Clockwise) => [
-                    Position::new(0, 0),
-                    Position::new(-1, 0),
-                    Position::new(-1, -1),
-                    Position::new(0, 2),
-                    Position::new(-1, 2),
-                ],
-                (Direction::Up, RotationType::Counterclockwise) => [
-                    Position::new(0, 0),
-                    Position::new(1, 0),
-                    Position::new(1, 1),
-                    Position::new(0, -2),
-                    Position::new(1, -2),
-                ],
-                (_, _) => todo!(),
-            },
+            _ => Self::generic_wall_kick_translations(rtype, rotation_status),
         }
+    }
+
+    fn generic_wall_kick_translations(
+        rtype: RotationType,
+        rotation_status: Direction,
+    ) -> [Position; 5] {
+        // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
+        match (rotation_status, rtype) {
+            (Direction::Up, RotationType::Clockwise) => [
+                Position::new(0, 0),
+                Position::new(-1, 0),
+                Position::new(-1, 1),
+                Position::new(0, -2),
+                Position::new(-1, -2),
+            ],
+            (Direction::Right, RotationType::Counterclockwise) => [
+                Position::new(0, 0),
+                Position::new(1, 0),
+                Position::new(1, -1),
+                Position::new(0, 2),
+                Position::new(1, 2), // neg
+            ],
+            (Direction::Right, RotationType::Clockwise) => [
+                Position::new(0, 0),
+                Position::new(1, 0),
+                Position::new(1, -1),
+                Position::new(0, 2),
+                Position::new(1, 2), // neg
+            ],
+            (Direction::Down, RotationType::Counterclockwise) => [
+                Position::new(0, 0),
+                Position::new(-1, 0),
+                Position::new(-1, 1),
+                Position::new(0, -2),
+                Position::new(-1, -2), // none
+            ],
+            (Direction::Down, RotationType::Clockwise) => [
+                Position::new(0, 0),
+                Position::new(1, 0),
+                Position::new(1, 1),
+                Position::new(0, -2),
+                Position::new(1, -2), // none
+            ],
+            (Direction::Left, RotationType::Counterclockwise) => [
+                Position::new(0, 0),
+                Position::new(-1, 0),
+                Position::new(-1, -1),
+                Position::new(0, 2),
+                Position::new(-1, 2), // neg
+            ],
+            (Direction::Left, RotationType::Clockwise) => [
+                Position::new(0, 0),
+                Position::new(-1, 0),
+                Position::new(-1, -1),
+                Position::new(0, 2),
+                Position::new(-1, 2), // neg
+            ],
+            (Direction::Up, RotationType::Counterclockwise) => [
+                Position::new(0, 0),
+                Position::new(1, 0),
+                Position::new(1, 1),
+                Position::new(0, -2),
+                Position::new(1, -2), // none
+            ],
+            (_, _) => todo!(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Direction, Position, RotationType, TetrominoKind};
+
+    #[test]
+    fn spawn_positions_are_correct() {
+        assert_eq!(
+            TetrominoKind::I.get_initial_position(),
+            [
+                Position::new(4, 1),
+                Position::new(3, 1),
+                Position::new(4, 1),
+                Position::new(5, 1),
+                Position::new(6, 1),
+            ]
+        );
+        assert_eq!(
+            TetrominoKind::O.get_initial_position(),
+            [
+                Position::new(5, 1),
+                Position::new(4, 0),
+                Position::new(5, 0),
+                Position::new(4, 1),
+                Position::new(5, 1),
+            ]
+        );
+        assert_eq!(
+            TetrominoKind::T.get_initial_position(),
+            [
+                Position::new(4, 1),
+                Position::new(4, 0),
+                Position::new(3, 1),
+                Position::new(4, 1),
+                Position::new(5, 1),
+            ]
+        );
+        assert_eq!(
+            TetrominoKind::J.get_initial_position(),
+            [
+                Position::new(4, 1),
+                Position::new(3, 0),
+                Position::new(3, 1),
+                Position::new(4, 1),
+                Position::new(5, 1),
+            ]
+        );
+        assert_eq!(
+            TetrominoKind::L.get_initial_position(),
+            [
+                Position::new(4, 1),
+                Position::new(5, 0),
+                Position::new(3, 1),
+                Position::new(4, 1),
+                Position::new(5, 1),
+            ]
+        );
+        assert_eq!(
+            TetrominoKind::S.get_initial_position(),
+            [
+                Position::new(4, 1),
+                Position::new(4, 0),
+                Position::new(5, 0),
+                Position::new(3, 1),
+                Position::new(4, 1),
+            ]
+        );
+        assert_eq!(
+            TetrominoKind::Z.get_initial_position(),
+            [
+                Position::new(4, 1),
+                Position::new(3, 0),
+                Position::new(4, 0),
+                Position::new(4, 1),
+                Position::new(5, 1),
+            ]
+        );
+    }
+
+    const UP_TO_RIGHT_WALL_KICKS: [Position; 5] = [
+        Position::new(0, 0),
+        Position::new(-1, 0),
+        Position::new(-1, 1),
+        Position::new(0, -2),
+        Position::new(-1, -2),
+    ];
+
+    const RIGHT_TO_UP_WALL_KICKS: [Position; 5] = [
+        UP_TO_RIGHT_WALL_KICKS[0].neg(),
+        UP_TO_RIGHT_WALL_KICKS[1].neg(),
+        UP_TO_RIGHT_WALL_KICKS[2].neg(),
+        UP_TO_RIGHT_WALL_KICKS[3].neg(),
+        UP_TO_RIGHT_WALL_KICKS[4].neg(),
+    ];
+
+    const DOWN_TO_LEFT_WALL_KICKS: [Position; 5] = [
+        UP_TO_RIGHT_WALL_KICKS[0].mirror_x(),
+        UP_TO_RIGHT_WALL_KICKS[1].mirror_x(),
+        UP_TO_RIGHT_WALL_KICKS[2].mirror_x(),
+        UP_TO_RIGHT_WALL_KICKS[3].mirror_x(),
+        UP_TO_RIGHT_WALL_KICKS[4].mirror_x(),
+    ];
+
+    const LEFT_TO_DOWN_WALL_KICKS: [Position; 5] = [
+        UP_TO_RIGHT_WALL_KICKS[0].mirror_y(),
+        UP_TO_RIGHT_WALL_KICKS[1].mirror_y(),
+        UP_TO_RIGHT_WALL_KICKS[2].mirror_y(),
+        UP_TO_RIGHT_WALL_KICKS[3].mirror_y(),
+        UP_TO_RIGHT_WALL_KICKS[4].mirror_y(),
+    ];
+
+    #[test]
+    fn generic_wall_kicks_are_correct() {
+        assert_eq!(
+            TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::Up),
+            UP_TO_RIGHT_WALL_KICKS,
+        );
+
+        assert_eq!(
+            TetrominoKind::generic_wall_kick_translations(
+                RotationType::Counterclockwise,
+                Direction::Right
+            ),
+            RIGHT_TO_UP_WALL_KICKS,
+        );
+
+        assert_eq!(
+            TetrominoKind::generic_wall_kick_translations(
+                RotationType::Clockwise,
+                Direction::Right
+            ),
+            RIGHT_TO_UP_WALL_KICKS,
+        );
+
+        assert_eq!(
+            TetrominoKind::generic_wall_kick_translations(
+                RotationType::Counterclockwise,
+                Direction::Down
+            ),
+            UP_TO_RIGHT_WALL_KICKS,
+        );
+
+        assert_eq!(
+            TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::Down),
+            DOWN_TO_LEFT_WALL_KICKS,
+        );
+
+        assert_eq!(
+            TetrominoKind::generic_wall_kick_translations(
+                RotationType::Counterclockwise,
+                Direction::Left
+            ),
+            LEFT_TO_DOWN_WALL_KICKS,
+        );
+
+        assert_eq!(
+            TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::Left),
+            LEFT_TO_DOWN_WALL_KICKS,
+        );
+
+        assert_eq!(
+            TetrominoKind::generic_wall_kick_translations(
+                RotationType::Counterclockwise,
+                Direction::Up
+            ),
+            DOWN_TO_LEFT_WALL_KICKS,
+        );
     }
 }
