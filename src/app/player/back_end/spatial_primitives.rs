@@ -4,6 +4,7 @@ use super::{Deserialize, Serialize, TetrisColor};
 /// Block in a discrete grid, serializable.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub(super) struct Block {
+    /// Block center.
     position: Position,
     color: TetrisColor,
 }
@@ -11,9 +12,9 @@ pub(super) struct Block {
 /// Position on a discrete grid, serializable.
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
 pub(super) struct Position {
-    /// horizontal coordinate, from left to right
+    /// Horizontal coordinate, from left to right.
     pub(super) x: i32,
-    /// vertical coordinate, *from top to bottom*
+    /// Vertical coordinate, *from top to bottom*.
     pub(super) y: i32,
 }
 
@@ -23,14 +24,6 @@ pub(super) const RIGHT: Position = Position::new(1, 0);
 pub(super) const LEFT: Position = Position::new(-1, 0);
 
 impl Block {
-    // TODO remove if really unused
-    pub(super) const fn new(color: TetrisColor, x: i32, y: i32) -> Self {
-        Block {
-            position: Position::new(x, y),
-            color,
-        }
-    }
-
     pub(super) const fn from(color: TetrisColor, position: Position) -> Self {
         Block { position, color }
     }
@@ -71,10 +64,6 @@ impl Position {
 
     pub(super) const fn mirror_y(self) -> Self {
         Position::new(self.x, -self.y)
-    }
-
-    pub(super) const fn add(self, other: Position) -> Self {
-        Position::new(self.x + other.x, self.y + other.y)
     }
 
     pub(super) const fn turned_clockwise(&self) -> Self {
@@ -134,12 +123,12 @@ mod tests {
     }
 
     #[test]
-    fn arithmetic_implementations_are_equivalent() {
+    fn add_sub_implementation_is_correct() {
         let a = Position::new(6, 3);
         let b = Position::new(5, 4);
 
-        assert_eq!(a + b, a.add(b));
-        assert_eq!(a - b, a.add(b.neg()));
+        assert_eq!(a + b, Position::new(11, 7));
+        assert_eq!(a - b, Position::new(1, -1));
 
         let mut sum = a;
         sum += b;

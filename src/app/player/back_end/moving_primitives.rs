@@ -8,8 +8,13 @@ pub(super) trait ApplyRotationTranslation {
         self.turn_by(movement);
         self.translate_by(movement);
     }
+    fn move_by_with_offset(&mut self, movement: &RotationTranslation) {
+        self.turn_by_with_offset(movement);
+        self.translate_by(movement);
+    }
     fn translate_by(&mut self, movement: &RotationTranslation);
     fn turn_by(&mut self, movement: &RotationTranslation);
+    fn turn_by_with_offset(&mut self, movement: &RotationTranslation);
 }
 
 // TODO create a trait (could be implemented for tetromino too) for this function.
@@ -19,12 +24,17 @@ impl Block {
         &self,
         grid: &TetrisGrid,
         movement: &RotationTranslation,
+        rotation_center_is_on_block_center: bool,
     ) -> Result<Block, ()> {
-        let mut copy = *self;
-        copy.move_by(movement);
+        let mut block = *self;
+        if rotation_center_is_on_block_center {
+            block.move_by(movement);
+        } else {
+            block.move_by_with_offset(movement);
+        }
         // Check if `copy` is inside `grid` and on an empty slot.
-        if grid.is_block_available(&copy) {
-            Ok(copy)
+        if grid.is_block_available(&block) {
+            Ok(block)
         } else {
             Err(())
         }
@@ -49,6 +59,10 @@ impl ApplyRotationTranslation for Direction {
             RotationType::None => {}
         }
     }
+
+    fn turn_by_with_offset(&mut self, movement: &RotationTranslation) {
+        self.turn_by(movement);
+    }
 }
 
 impl ApplyRotationTranslation for Block {
@@ -56,6 +70,7 @@ impl ApplyRotationTranslation for Block {
         to self.position() {
             fn translate_by(&mut self, movement: &RotationTranslation);
             fn turn_by(&mut self, movement: &RotationTranslation);
+            fn turn_by_with_offset(&mut self, movement: &RotationTranslation);
         }
     }
 }
@@ -83,6 +98,48 @@ impl ApplyRotationTranslation for Position {
             RotationType::None => {}
         }
     }
+
+    fn turn_by_with_offset(&mut self, movement: &RotationTranslation) {
+        self.zoom_in_from_center();
+        let mut offset_movement = *movement;
+        offset_movement.rotation_center.zoom_in_from_intersection();
+        self.turn_by(&offset_movement);
+        self.zoom_out();
+    }
+}
+
+/// Scale the coordinate system to support different rotation centers.
+///
+/// Most tetromino rotations are performed around the center of a block.
+/// However, the I tetromino rotates around the intersection between blocks,
+/// which lies at the midpoint between standard coordinates.
+///
+/// Zooming in scale x2 and zooming out scale x0.5.
+/// The bottom right block intersection is considered to have the same zoomed-out coordinates as the block center.
+trait ZoomInAndOut {
+    /// Maps block centers to even coordinates.
+    fn zoom_in_from_center(&mut self);
+    /// Maps block intersections to odd coordinates.
+    fn zoom_in_from_intersection(&mut self);
+    /// Maps zoomed-in coordinates to regular coordinates.
+    fn zoom_out(&mut self);
+}
+
+impl ZoomInAndOut for Position {
+    fn zoom_in_from_center(&mut self) {
+        self.x *= 2;
+        self.y *= 2;
+    }
+
+    fn zoom_in_from_intersection(&mut self) {
+        self.x = 2 * self.x + 1;
+        self.y = 2 * self.y + 1;
+    }
+
+    fn zoom_out(&mut self) {
+        self.x /= 2;
+        self.y /= 2;
+    }
 }
 
 #[cfg(test)]
@@ -98,7 +155,7 @@ mod tests {
             RotationTranslation::new(&Position::default(), RotationType::Clockwise, &center);
 
         point.turn_by(&rotation_translation);
-        assert_eq!(point, center.add(vector.turned_clockwise()));
+        assert_eq!(point, center + vector.turned_clockwise());
     }
 
     #[test]
@@ -111,9 +168,6 @@ mod tests {
             RotationTranslation::new(&translation, RotationType::Clockwise, &center);
 
         point.move_by(&rotation_translation);
-        assert_eq!(
-            point,
-            center.add(vector.turned_clockwise()).add(translation)
-        );
+        assert_eq!(point, center + vector.turned_clockwise() + translation);
     }
 }

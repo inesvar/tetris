@@ -64,6 +64,11 @@ impl TetrominoKind {
         }
     }
 
+    /// Return if the rotation center is on a block center.
+    pub(super) fn is_rotation_center_on_block_center(&self) -> bool {
+        *self != TetrominoKind::I
+    }
+
     // the rotation of the I and O should be tweaked, for better clarity. hummm yes but it's practical...
     // BUT before changing everything, unit tests need to be written ! yay !
     /// Return an array of the 5 SRS wall-kick translations.
@@ -83,60 +88,60 @@ impl TetrominoKind {
             // (its due to the fact that the I piece doesn't have a 3x3 bounding box like the other rotating pieces)
             TetrominoKind::I => match (rotation_status, rtype) {
                 (Direction::Up, RotationType::Clockwise) => [
-                    RIGHT,
-                    RIGHT.add(Position::new(-2, 0)),
-                    RIGHT.add(Position::new(1, 0)),
-                    RIGHT.add(Position::new(-2, -1)),
-                    RIGHT.add(Position::new(1, 2)),
+                    Position::new(0, 0),
+                    Position::new(-2, 0),
+                    Position::new(1, 0),
+                    Position::new(-2, -1),
+                    Position::new(1, 2),
                 ],
                 (Direction::Right, RotationType::Counterclockwise) => [
-                    LEFT,
-                    LEFT.add(Position::new(2, 0)),
-                    LEFT.add(Position::new(-1, 0)),
-                    LEFT.add(Position::new(2, 1)),
-                    LEFT.add(Position::new(-1, -2)), // neg neg
+                    Position::new(0, 0),
+                    Position::new(2, 0),
+                    Position::new(-1, 0),
+                    Position::new(2, 1),
+                    Position::new(-1, -2), // neg neg
                 ],
                 (Direction::Right, RotationType::Clockwise) => [
-                    FALL,
-                    FALL.add(Position::new(-1, 0)),
-                    FALL.add(Position::new(2, 0)),
-                    FALL.add(Position::new(-1, 2)),
-                    FALL.add(Position::new(2, -1)),
+                    Position::new(0, 0),
+                    Position::new(-1, 0),
+                    Position::new(2, 0),
+                    Position::new(-1, 2),
+                    Position::new(2, -1),
                 ],
                 (Direction::Down, RotationType::Counterclockwise) => [
-                    RISE,
-                    RISE.add(Position::new(1, 0)),
-                    RISE.add(Position::new(-2, 0)),
-                    RISE.add(Position::new(1, -2)),
-                    RISE.add(Position::new(-2, 1)),
+                    Position::new(0, 0),
+                    Position::new(1, 0),
+                    Position::new(-2, 0),
+                    Position::new(1, -2),
+                    Position::new(-2, 1),
                 ],
                 (Direction::Down, RotationType::Clockwise) => [
-                    LEFT,
-                    LEFT.add(Position::new(2, 0)),
-                    LEFT.add(Position::new(-1, 0)),
-                    LEFT.add(Position::new(2, 1)),
-                    LEFT.add(Position::new(-1, -2)),
+                    Position::new(0, 0),
+                    Position::new(2, 0),
+                    Position::new(-1, 0),
+                    Position::new(2, 1),
+                    Position::new(-1, -2),
                 ],
                 (Direction::Left, RotationType::Counterclockwise) => [
-                    RIGHT,
-                    RIGHT.add(Position::new(-2, 0)),
-                    RIGHT.add(Position::new(1, 0)),
-                    RIGHT.add(Position::new(-2, -1)),
-                    RIGHT.add(Position::new(1, 2)),
+                    Position::new(0, 0),
+                    Position::new(-2, 0),
+                    Position::new(1, 0),
+                    Position::new(-2, -1),
+                    Position::new(1, 2),
                 ],
                 (Direction::Left, RotationType::Clockwise) => [
-                    RISE,
-                    RISE.add(Position::new(1, 0)),
-                    RISE.add(Position::new(-2, 0)),
-                    RISE.add(Position::new(1, -2)),
-                    RISE.add(Position::new(-2, 1)),
+                    Position::new(0, 0),
+                    Position::new(1, 0),
+                    Position::new(-2, 0),
+                    Position::new(1, -2),
+                    Position::new(-2, 1),
                 ],
                 (Direction::Up, RotationType::Counterclockwise) => [
-                    FALL,
-                    FALL.add(Position::new(-1, 0)),
-                    FALL.add(Position::new(2, 0)),
-                    FALL.add(Position::new(-1, 2)),
-                    FALL.add(Position::new(2, -1)),
+                    Position::new(0, 0),
+                    Position::new(-1, 0),
+                    Position::new(2, 0),
+                    Position::new(-1, 2),
+                    Position::new(2, -1),
                 ],
                 (_, _) => todo!(),
             },

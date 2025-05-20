@@ -1,6 +1,6 @@
 //! Define `struct` [RotationTranslation], `enum` [RotationType] and `enum` [Direction].
 use super::{
-    spatial_primitives::{FALL, LEFT, RIGHT},
+    spatial_primitives::{FALL, LEFT, RIGHT, RISE},
     Deserialize, Position, Serialize,
 };
 
@@ -83,6 +83,17 @@ impl Direction {
             Direction::Left => *self = Direction::Down,
             Direction::Down => *self = Direction::Right,
             Direction::Right => *self = Direction::Up,
+        }
+    }
+}
+
+impl From<Direction> for Position {
+    fn from(dir: Direction) -> Self {
+        match dir {
+            Direction::Up => RISE,
+            Direction::Right => RIGHT,
+            Direction::Down => FALL,
+            Direction::Left => LEFT,
         }
     }
 }

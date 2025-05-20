@@ -78,12 +78,16 @@ impl Tetromino {
         grid: &TetrisGrid,
         movement: &RotationTranslation,
     ) -> Result<(), ()> {
-        let mut new_blocks = [Block::default(); 4];
+        let mut new_blocks = self.blocks;
         for (i, new_block) in new_blocks.iter_mut().enumerate() {
-            *new_block = self.blocks[i].can_be_moved(grid, movement)?;
+            *new_block = self.blocks[i].can_be_moved(
+                grid,
+                movement,
+                self.kind.is_rotation_center_on_block_center(),
+            )?;
         }
         self.blocks = new_blocks;
-        self.direction.move_by(movement);
+        self.direction.turn_by(movement);
         self.center.translate_by(movement);
         Ok(())
     }
