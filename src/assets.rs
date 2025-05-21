@@ -49,7 +49,8 @@ impl<'a> Assets<'a> {
         let green_texture = Texture::from_bytes(green_bytes, &TextureSettings::new()).unwrap();
         let red_texture = Texture::from_bytes(red_bytes, &TextureSettings::new()).unwrap();
         let grey_texture = Texture::from_bytes(grey_bytes, &TextureSettings::new()).unwrap();
-        let sprite_sheet_texture = Texture::from_bytes(sprite_sheet_bytes, &TextureSettings::new()).unwrap();
+        let sprite_sheet_texture =
+            Texture::from_bytes(sprite_sheet_bytes, &TextureSettings::new()).unwrap();
 
         let tetris_font_bytes = assets
             .get("fonts/tetris-blocks-font/TetrisBlocks-P99g.ttf")

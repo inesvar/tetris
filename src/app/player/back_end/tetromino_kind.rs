@@ -1,8 +1,5 @@
 //! Implement [TetrominoKind].
-use super::{
-    spatial_primitives::{FALL, LEFT, RIGHT, RISE},
-    Direction, Position, RotationType, TetrisColor, TetrominoKind,
-};
+use super::{Direction, Position, RotationType, TetrisColor, TetrominoKind};
 
 macro_rules! const_map {
     ($array:expr, $func:ident) => {

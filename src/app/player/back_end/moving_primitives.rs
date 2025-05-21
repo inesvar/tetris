@@ -4,17 +4,44 @@ use delegate::delegate;
 
 /// Apply a [RotationTranslation] to a spatial primitive.
 pub(super) trait ApplyRotationTranslation {
+    /// Turn then translate as described by `movement`.
     fn move_by(&mut self, movement: &RotationTranslation) {
         self.turn_by(movement);
         self.translate_by(movement);
     }
+    /// Like [ApplyRotationTranslation::move_by()], except `movement.rotation_center`
+    /// is understood as the bottom right block intersection, not a block center
+    /// (the implementation relies on [ZoomInAndOut]).
     fn move_by_with_offset(&mut self, movement: &RotationTranslation) {
         self.turn_by_with_offset(movement);
         self.translate_by(movement);
     }
+    /// Translate by `movement.translation`.
     fn translate_by(&mut self, movement: &RotationTranslation);
+    /// Turn around `movement.rotation_center` by `movement.rotation_type`.
     fn turn_by(&mut self, movement: &RotationTranslation);
+    /// Like [ApplyRotationTranslation::turn_by()], except `movement.rotation_center`
+    /// is understood as the bottom right block intersection, not a block center
+    /// (the implementation relies on [ZoomInAndOut]).
     fn turn_by_with_offset(&mut self, movement: &RotationTranslation);
+}
+
+/// Scale coordinates to support rotations around block intersections,
+/// not just around block centers.
+///
+/// While most tetromino rotations are performed around the center of a block,
+/// the I tetromino rotates around the intersection between blocks,
+/// which lies at the midpoint between standard coordinates.
+///
+/// This trait provides zooming in functions that scale x2 and a zooming out function that scales x0.5.
+/// A block center has the same 'regular' (or zoomed-out) coordinates as the bottom right block intersection.
+trait ZoomInAndOut {
+    /// Map block centers to even coordinates.
+    fn zoom_in_from_center(&mut self);
+    /// Map block intersections to odd coordinates.
+    fn zoom_in_from_intersection(&mut self);
+    /// Map zoomed-in coordinates to regular coordinates.
+    fn zoom_out(&mut self);
 }
 
 // TODO create a trait (could be implemented for tetromino too) for this function.
@@ -38,30 +65,6 @@ impl Block {
         } else {
             Err(())
         }
-    }
-}
-
-impl ApplyRotationTranslation for Direction {
-    fn translate_by(&mut self, _movement: &RotationTranslation) {}
-
-    fn turn_by(&mut self, movement: &RotationTranslation) {
-        match movement.rotation_type {
-            RotationType::Clockwise => {
-                self.turn_clockwise();
-            }
-            RotationType::Counterclockwise => {
-                self.turn_counterclockwise();
-            }
-            RotationType::HalfTurn => {
-                self.turn_clockwise();
-                self.turn_clockwise();
-            }
-            RotationType::None => {}
-        }
-    }
-
-    fn turn_by_with_offset(&mut self, movement: &RotationTranslation) {
-        self.turn_by(movement);
     }
 }
 
@@ -108,21 +111,28 @@ impl ApplyRotationTranslation for Position {
     }
 }
 
-/// Scale the coordinate system to support different rotation centers.
-///
-/// Most tetromino rotations are performed around the center of a block.
-/// However, the I tetromino rotates around the intersection between blocks,
-/// which lies at the midpoint between standard coordinates.
-///
-/// Zooming in scale x2 and zooming out scale x0.5.
-/// The bottom right block intersection is considered to have the same zoomed-out coordinates as the block center.
-trait ZoomInAndOut {
-    /// Maps block centers to even coordinates.
-    fn zoom_in_from_center(&mut self);
-    /// Maps block intersections to odd coordinates.
-    fn zoom_in_from_intersection(&mut self);
-    /// Maps zoomed-in coordinates to regular coordinates.
-    fn zoom_out(&mut self);
+impl ApplyRotationTranslation for Direction {
+    fn translate_by(&mut self, _movement: &RotationTranslation) {}
+
+    fn turn_by(&mut self, movement: &RotationTranslation) {
+        match movement.rotation_type {
+            RotationType::Clockwise => {
+                self.turn_clockwise();
+            }
+            RotationType::Counterclockwise => {
+                self.turn_counterclockwise();
+            }
+            RotationType::HalfTurn => {
+                self.turn_clockwise();
+                self.turn_clockwise();
+            }
+            RotationType::None => {}
+        }
+    }
+
+    fn turn_by_with_offset(&mut self, movement: &RotationTranslation) {
+        self.turn_by(movement);
+    }
 }
 
 impl ZoomInAndOut for Position {
