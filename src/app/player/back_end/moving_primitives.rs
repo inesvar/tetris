@@ -1,6 +1,8 @@
-//! Define `trait` [ApplyRotationTranslation] for [Position] and [Block].
+//! Define `trait` [ApplyRotationTranslation] for [Position], [Block] and [Direction].
+#![doc = mermaid!("moving_primitives_flowgraph.mmd")]
 use super::{Block, Direction, Position, RotationTranslation, RotationType, TetrisGrid};
 use delegate::delegate;
+use simple_mermaid::mermaid;
 
 /// Apply a [RotationTranslation] to a spatial primitive.
 pub(super) trait ApplyRotationTranslation {

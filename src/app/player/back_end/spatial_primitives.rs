@@ -1,4 +1,4 @@
-//! Define `struct` [Block] and `struct` [Position].
+//! Define `struct` [Block], `struct` [Position] and `enum` [Direction].
 use super::{Deserialize, Serialize, TetrisColor};
 
 /// Block in a discrete grid, serializable.
@@ -22,6 +22,17 @@ pub(super) const FALL: Position = Position::new(0, 1);
 pub(super) const RISE: Position = Position::new(0, -1);
 pub(super) const RIGHT: Position = Position::new(1, 0);
 pub(super) const LEFT: Position = Position::new(-1, 0);
+
+/// Four cardinal directions.
+#[derive(Clone, Copy, Default, Serialize, Deserialize, Debug, PartialEq)]
+#[cfg_attr(test, derive(enum_iterator::Sequence))]
+pub(super) enum Direction {
+    #[default]
+    Up,
+    Right,
+    Down,
+    Left,
+}
 
 impl Block {
     pub(super) const fn from(color: TetrisColor, position: Position) -> Self {
@@ -75,6 +86,37 @@ impl Position {
     }
 }
 
+impl Direction {
+    pub(super) fn turn_clockwise(&mut self) {
+        match self {
+            Direction::Up => *self = Direction::Right,
+            Direction::Right => *self = Direction::Down,
+            Direction::Down => *self = Direction::Left,
+            Direction::Left => *self = Direction::Up,
+        }
+    }
+
+    pub(super) fn turn_counterclockwise(&mut self) {
+        match self {
+            Direction::Up => *self = Direction::Left,
+            Direction::Left => *self = Direction::Down,
+            Direction::Down => *self = Direction::Right,
+            Direction::Right => *self = Direction::Up,
+        }
+    }
+}
+
+impl From<Direction> for Position {
+    fn from(dir: Direction) -> Self {
+        match dir {
+            Direction::Up => RISE,
+            Direction::Right => RIGHT,
+            Direction::Down => FALL,
+            Direction::Left => LEFT,
+        }
+    }
+}
+
 // Needed to use a circular buffer.
 impl Default for Block {
     fn default() -> Self {
@@ -107,7 +149,8 @@ impl std::ops::AddAssign for Position {
 
 #[cfg(test)]
 mod tests {
-    use super::Position;
+    use super::{Direction, Position};
+    use enum_iterator::{next_cycle, previous_cycle};
 
     #[test]
     fn arithmetic_implementation_is_correct() {
@@ -134,5 +177,23 @@ mod tests {
         sum += b;
 
         assert_eq!(sum, a + b);
+    }
+
+    #[test]
+    fn direction_update() {
+        let mut direction = Direction::Up;
+        let mut direction_copy = direction;
+
+        for _ in 0..4 {
+            direction.turn_clockwise();
+            direction_copy = next_cycle(&direction_copy);
+            assert_eq!(direction, direction_copy);
+        }
+
+        for _ in 0..4 {
+            direction.turn_counterclockwise();
+            direction_copy = previous_cycle(&direction_copy);
+            assert_eq!(direction, direction_copy);
+        }
     }
 }

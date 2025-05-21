@@ -1,5 +1,5 @@
 //! Define the back-end of the tetris game.
-#![doc = mermaid!("back_end/flowgraph.mmd")]
+#![doc = mermaid!("back_end/back_end_flowgraph.mmd")]
 mod moving_primitives;
 pub(in crate::app::player) mod render;
 mod rotation_translation;
@@ -10,8 +10,8 @@ mod tetromino_kind;
 
 use self::{
     moving_primitives::ApplyRotationTranslation,
-    rotation_translation::{Direction, RotationTranslation, RotationType},
-    spatial_primitives::{Block, Position},
+    rotation_translation::{RotationTranslation, RotationType},
+    spatial_primitives::{Block, Direction, Position},
 };
 use crate::assets::TetrisColor;
 use rand::seq::SliceRandom;

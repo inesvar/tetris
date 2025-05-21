@@ -5,9 +5,9 @@ graph LR
     %% objects
     Position[[Position]]
     Block[[Block]]
+    Direction[Direction]
     RotationTranslation[[RotationTranslation]]
     RotationType[RotationType]
-    Direction[Direction]
     ApplyRotationTranslation([ApplyRotationTranslation])
     Tetromino[[Tetromino]]
     TetrominoMove([TetrominoMove])
@@ -20,11 +20,11 @@ graph LR
 
     subgraph spatial_primitives
         Block --o Position
+        Direction
     end
 
     subgraph rotation_translation
         RotationTranslation --o RotationType
-        Direction
     end
 
     RotationTranslation --o Position
@@ -33,13 +33,50 @@ graph LR
         ApplyRotationTranslation
     end
 
-    ApplyRotationTranslation === Position & Block & Direction
+    ApplyRotationTranslation === spatial_primitives
     ApplyRotationTranslation -.-> RotationTranslation
 
     subgraph tetromino
         TetrominoMove === Tetromino
     end
 
-    Tetromino --o Position & Block & Direction
+    Tetromino --o spatial_primitives
     Tetromino -.-> ApplyRotationTranslation
+```
+
+```mermaid
+graph LR
+    %% objects
+    Position[[Position]]
+    Block[[Block]]
+    Direction[Direction]
+    RotationTranslation[[RotationTranslation]]
+    ApplyRotationTranslation([ApplyRotationTranslation])
+    ZoomInAndOut([ZoomInAndOut])
+
+    %% modules
+    rotation_translation[rotation_translation]
+    spatial_primitives[spatial_primitives]
+    moving_primitives[moving_primitives]
+
+    subgraph spatial_primitives
+        Block --o Position
+        Direction
+    end
+
+    subgraph rotation_translation
+        RotationTranslation
+    end
+
+    subgraph moving_primitives
+        ApplyRotationTranslation
+        ZoomInAndOut
+    end
+
+    ZoomInAndOut === Position
+    ApplyRotationTranslation === Position & Block & Direction
+    ApplyRotationTranslation -.-> RotationTranslation
+    ApplyRotationTranslation -.-> ZoomInAndOut
+
+    ZoomInAndOut ~~~ Block & Direction & RotationTranslation
 ```
