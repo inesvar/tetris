@@ -44,7 +44,7 @@ impl Tetromino {
             RotationType::Clockwise,
             self.direction,
         );
-        for wall_kick in &wall_kicks_translations {
+        for wall_kick in wall_kicks_translations {
             let movement =
                 RotationTranslation::new(wall_kick, RotationType::Clockwise, &self.center);
             if self.move_if_ok(grid, &movement).is_ok() {
@@ -63,7 +63,7 @@ impl Tetromino {
             RotationType::Counterclockwise,
             self.direction,
         );
-        for wall_kick in &wall_kicks_translations {
+        for wall_kick in wall_kicks_translations {
             let movement =
                 RotationTranslation::new(wall_kick, RotationType::Counterclockwise, &self.center);
             if self.move_if_ok(grid, &movement).is_ok() {

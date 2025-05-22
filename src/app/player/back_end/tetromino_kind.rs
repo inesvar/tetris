@@ -44,6 +44,8 @@ const RIGHT_TO_BOTTOM_I_WALL_KICKS: [Position; 5] = [
 const RIGHT_TO_UP_I_WALL_KICKS: [Position; 5] = const_map!(UP_TO_RIGHT_I_WALL_KICKS, neg);
 const BOTTOM_TO_RIGHT_I_WALL_KICKS: [Position; 5] = const_map!(RIGHT_TO_BOTTOM_I_WALL_KICKS, neg);
 
+const NO_WALL_KICKS: [Position; 1] = [Position::new(0, 0)];
+
 const fn init(x: i32, y: i32) -> Position {
     match (x, y) {
         (x @ 0..4, y @ 0..4) => Position::new(3 + x, y),
@@ -90,46 +92,48 @@ impl TetrominoKind {
         &self,
         rtype: RotationType,
         rotation_status: Direction,
-    ) -> [Position; 5] {
+    ) -> &'static [Position] {
         // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
         match self {
-            // since the O piece doesn't even rotate
-            TetrominoKind::O => unreachable!(),
+            TetrominoKind::O => unreachable!(), // the O piece doesn't even rotate
             TetrominoKind::I => Self::i_wall_kick_translations(rtype, rotation_status),
             _ => Self::generic_wall_kick_translations(rtype, rotation_status),
         }
     }
 
-    fn i_wall_kick_translations(rtype: RotationType, rotation_status: Direction) -> [Position; 5] {
+    fn i_wall_kick_translations(
+        rtype: RotationType,
+        rotation_status: Direction,
+    ) -> &'static [Position] {
         // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
         match (rotation_status, rtype) {
-            (Direction::Up, RotationType::Clockwise) => UP_TO_RIGHT_I_WALL_KICKS,
-            (Direction::Right, RotationType::Counterclockwise) => RIGHT_TO_UP_I_WALL_KICKS,
-            (Direction::Right, RotationType::Clockwise) => RIGHT_TO_BOTTOM_I_WALL_KICKS,
-            (Direction::Down, RotationType::Counterclockwise) => BOTTOM_TO_RIGHT_I_WALL_KICKS,
-            (Direction::Down, RotationType::Clockwise) => RIGHT_TO_UP_I_WALL_KICKS,
-            (Direction::Left, RotationType::Counterclockwise) => UP_TO_RIGHT_I_WALL_KICKS,
-            (Direction::Left, RotationType::Clockwise) => BOTTOM_TO_RIGHT_I_WALL_KICKS,
-            (Direction::Up, RotationType::Counterclockwise) => RIGHT_TO_BOTTOM_I_WALL_KICKS,
-            (_, _) => todo!(),
+            (Direction::Up, RotationType::Clockwise) => &UP_TO_RIGHT_I_WALL_KICKS,
+            (Direction::Right, RotationType::Counterclockwise) => &RIGHT_TO_UP_I_WALL_KICKS,
+            (Direction::Right, RotationType::Clockwise) => &RIGHT_TO_BOTTOM_I_WALL_KICKS,
+            (Direction::Down, RotationType::Counterclockwise) => &BOTTOM_TO_RIGHT_I_WALL_KICKS,
+            (Direction::Down, RotationType::Clockwise) => &RIGHT_TO_UP_I_WALL_KICKS,
+            (Direction::Left, RotationType::Counterclockwise) => &UP_TO_RIGHT_I_WALL_KICKS,
+            (Direction::Left, RotationType::Clockwise) => &BOTTOM_TO_RIGHT_I_WALL_KICKS,
+            (Direction::Up, RotationType::Counterclockwise) => &RIGHT_TO_BOTTOM_I_WALL_KICKS,
+            (_, _) => &NO_WALL_KICKS,
         }
     }
 
     fn generic_wall_kick_translations(
         rtype: RotationType,
         rotation_status: Direction,
-    ) -> [Position; 5] {
+    ) -> &'static [Position] {
         // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
         match (rotation_status, rtype) {
-            (Direction::Up, RotationType::Clockwise) => UP_TO_RIGHT_WALL_KICKS,
-            (Direction::Right, RotationType::Counterclockwise) => RIGHT_TO_UP_WALL_KICKS,
-            (Direction::Right, RotationType::Clockwise) => RIGHT_TO_UP_WALL_KICKS,
-            (Direction::Down, RotationType::Counterclockwise) => UP_TO_RIGHT_WALL_KICKS,
-            (Direction::Down, RotationType::Clockwise) => DOWN_TO_LEFT_WALL_KICKS,
-            (Direction::Left, RotationType::Counterclockwise) => LEFT_TO_DOWN_WALL_KICKS,
-            (Direction::Left, RotationType::Clockwise) => LEFT_TO_DOWN_WALL_KICKS,
-            (Direction::Up, RotationType::Counterclockwise) => DOWN_TO_LEFT_WALL_KICKS,
-            (_, _) => todo!(),
+            (Direction::Up, RotationType::Clockwise) => &UP_TO_RIGHT_WALL_KICKS,
+            (Direction::Right, RotationType::Counterclockwise) => &RIGHT_TO_UP_WALL_KICKS,
+            (Direction::Right, RotationType::Clockwise) => &RIGHT_TO_UP_WALL_KICKS,
+            (Direction::Down, RotationType::Counterclockwise) => &UP_TO_RIGHT_WALL_KICKS,
+            (Direction::Down, RotationType::Clockwise) => &DOWN_TO_LEFT_WALL_KICKS,
+            (Direction::Left, RotationType::Counterclockwise) => &LEFT_TO_DOWN_WALL_KICKS,
+            (Direction::Left, RotationType::Clockwise) => &LEFT_TO_DOWN_WALL_KICKS,
+            (Direction::Up, RotationType::Counterclockwise) => &DOWN_TO_LEFT_WALL_KICKS,
+            (_, _) => &NO_WALL_KICKS,
         }
     }
 }
