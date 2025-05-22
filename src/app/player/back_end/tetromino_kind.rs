@@ -69,19 +69,6 @@ impl TetrominoKind {
         }
     }
 
-    /// Return the associated color.
-    pub(super) fn get_color(&self) -> TetrisColor {
-        match self {
-            TetrominoKind::I => TetrisColor::Cyan,
-            TetrominoKind::O => TetrisColor::Yellow,
-            TetrominoKind::T => TetrisColor::Purple,
-            TetrominoKind::J => TetrisColor::Blue,
-            TetrominoKind::L => TetrisColor::Orange,
-            TetrominoKind::S => TetrisColor::Green,
-            TetrominoKind::Z => TetrisColor::Red,
-        }
-    }
-
     /// Return if the rotation center is on a block center.
     pub(super) fn is_rotation_center_on_block_center(&self) -> bool {
         *self != TetrominoKind::I
@@ -134,6 +121,20 @@ impl TetrominoKind {
             (Direction::Left, RotationType::Clockwise) => &LEFT_TO_DOWN_WALL_KICKS,
             (Direction::Up, RotationType::Counterclockwise) => &DOWN_TO_LEFT_WALL_KICKS,
             (_, _) => &NO_WALL_KICKS,
+        }
+    }
+}
+
+impl From<TetrominoKind> for TetrisColor {
+    fn from(kind: TetrominoKind) -> Self {
+        match kind {
+            TetrominoKind::I => TetrisColor::Cyan,
+            TetrominoKind::O => TetrisColor::Yellow,
+            TetrominoKind::T => TetrisColor::Purple,
+            TetrominoKind::J => TetrisColor::Blue,
+            TetrominoKind::L => TetrisColor::Orange,
+            TetrominoKind::S => TetrisColor::Green,
+            TetrominoKind::Z => TetrisColor::Red,
         }
     }
 }

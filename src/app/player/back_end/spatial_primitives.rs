@@ -5,7 +5,7 @@ use super::{Deserialize, Serialize, TetrisColor};
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub(super) struct Block {
     /// Block center.
-    position: Position,
+    pub(super) position: Position,
     color: TetrisColor,
 }
 
@@ -37,11 +37,6 @@ pub(super) enum Direction {
 impl Block {
     pub(super) const fn from(color: TetrisColor, position: Position) -> Self {
         Block { position, color }
-    }
-
-    // This is used to delegate to the `position` field.
-    pub(super) fn position(&mut self) -> &mut Position {
-        &mut self.position
     }
 
     // Is this really useful ?

@@ -2,8 +2,8 @@
 #[cfg(test)]
 use super::spatial_primitives::{FALL, LEFT, RIGHT, RISE};
 use super::{
-    ApplyRotationTranslation, Block, Direction, Position, RotationTranslation, RotationType,
-    TetrisGrid, Tetromino, TetrominoKind,
+    moving_primitives::BackEndError, ApplyRotationTranslation, Block, Direction, Position,
+    RotationTranslation, RotationType, TetrisGrid, Tetromino, TetrominoKind,
 };
 use core::fmt::Display;
 use std::fmt::Formatter;
@@ -12,7 +12,7 @@ impl Tetromino {
     /// Return whether the tetromino could be moved one cell down.
     pub(in crate::app::player) fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()> {
         let movement = RotationTranslation::fall();
-        self.move_if_ok(grid, &movement)
+        self.try_move(grid, &movement).map_err(|_err| ())
     }
 
     /// Move the tetromino down until it's not possible anymore.
@@ -25,13 +25,13 @@ impl Tetromino {
     /// Move the tetromino one cell left if it's possible.
     pub(in crate::app::player) fn left(&mut self, grid: &TetrisGrid) {
         let movement = RotationTranslation::left();
-        let _ = self.move_if_ok(grid, &movement);
+        let _ = self.try_move(grid, &movement);
     }
 
     /// Move the tetromino one cell right if it's possible.
     pub(in crate::app::player) fn right(&mut self, grid: &TetrisGrid) {
         let movement = RotationTranslation::right();
-        let _ = self.move_if_ok(grid, &movement);
+        let _ = self.try_move(grid, &movement);
     }
 
     /// Turn the tetromino clockwise if it's possible, eventually using wall-kicks.
@@ -47,7 +47,7 @@ impl Tetromino {
         for wall_kick in wall_kicks_translations {
             let movement =
                 RotationTranslation::new(wall_kick, RotationType::Clockwise, &self.center);
-            if self.move_if_ok(grid, &movement).is_ok() {
+            if self.try_move(grid, &movement).is_ok() {
                 return;
             }
         }
@@ -66,21 +66,21 @@ impl Tetromino {
         for wall_kick in wall_kicks_translations {
             let movement =
                 RotationTranslation::new(wall_kick, RotationType::Counterclockwise, &self.center);
-            if self.move_if_ok(grid, &movement).is_ok() {
+            if self.try_move(grid, &movement).is_ok() {
                 return;
             }
         }
     }
 
     /// Return whether the tetromino could be moved.
-    pub(super) fn move_if_ok(
+    pub(super) fn try_move(
         &mut self,
         grid: &TetrisGrid,
         movement: &RotationTranslation,
-    ) -> Result<(), ()> {
+    ) -> Result<(), BackEndError> {
         let mut new_blocks = self.blocks;
-        for (i, new_block) in new_blocks.iter_mut().enumerate() {
-            *new_block = self.blocks[i].can_be_moved(
+        for new_block in new_blocks.iter_mut() {
+            new_block.try_move(
                 grid,
                 movement,
                 self.kind.is_rotation_center_on_block_center(),
@@ -95,7 +95,7 @@ impl Tetromino {
     /// Returns an Option eventually containing a Tetromino if its starting position is empty.
     pub(in crate::app::player) fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Tetromino> {
         let positions = kind.get_initial_position();
-        let color = kind.get_color();
+        let color = kind.into();
         for position in positions {
             if grid.matrix[position.x as usize][position.y as usize].is_some() {
                 return None;
@@ -118,7 +118,7 @@ impl Tetromino {
     /// Returns a Tetromino at its starting position without checking that this place is empty.
     pub fn new_unchecked(kind: TetrominoKind) -> Tetromino {
         let positions = kind.get_initial_position();
-        let color = kind.get_color();
+        let color = kind.into();
         Tetromino {
             kind,
             center: positions[0],
@@ -138,7 +138,7 @@ impl Tetromino {
     /// Resets the Tetromino at its starting position.
     pub fn reset_position(&mut self) {
         let positions = self.kind.get_initial_position();
-        let color = self.kind.get_color();
+        let color = self.kind.into();
         self.center = positions[0];
         self.blocks = [
             Block::from(color, positions[1]),
@@ -204,14 +204,16 @@ impl Tetromino {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::settings::{NB_COLUMNS, NB_ROWS};
+    use crate::{
+        assets::TetrisColor,
+        settings::{NB_COLUMNS, NB_ROWS},
+    };
 
     #[test]
     fn i_tetromino_rotation_is_correct() {
         let empty_grid = TetrisGrid::new(NB_COLUMNS, NB_ROWS);
         let mut i_tetromino = Tetromino::new_unchecked(TetrominoKind::I);
         let mut naive_i_tetromino = Tetromino::new_unchecked(TetrominoKind::I);
-        // regular rotation will be used for tetromino T
         naive_i_tetromino.kind = TetrominoKind::T;
 
         println!(
@@ -233,7 +235,7 @@ mod tests {
             let translation = naive_i_tetromino.i_tetromino_rotation_correction(&rotation);
             let mut corrected_rotation = rotation;
             corrected_rotation.translation = translation;
-            let _ = naive_i_tetromino.move_if_ok(&empty_grid, &corrected_rotation);
+            let _ = naive_i_tetromino.try_move(&empty_grid, &corrected_rotation);
 
             let _ = i_tetromino.turn_clockwise(&empty_grid);
 
@@ -257,7 +259,7 @@ mod tests {
             let translation = naive_i_tetromino.i_tetromino_rotation_correction(&rotation);
             let mut corrected_rotation = rotation;
             corrected_rotation.translation = translation;
-            let _ = naive_i_tetromino.move_if_ok(&empty_grid, &corrected_rotation);
+            let _ = naive_i_tetromino.try_move(&empty_grid, &corrected_rotation);
 
             let _ = i_tetromino.turn_counterclockwise(&empty_grid);
 

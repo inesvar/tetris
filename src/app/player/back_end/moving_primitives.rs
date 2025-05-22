@@ -28,6 +28,13 @@ pub(super) trait ApplyRotationTranslation {
     fn turn_by_with_offset(&mut self, movement: &RotationTranslation);
 }
 
+#[derive(Debug, PartialEq)]
+pub enum BackEndError {
+    // same visibility as TetrominoKind and TetrisColor
+    TriedToMoveOutsideOfGrid,
+    TriedToMoveToUnavailableBlock,
+}
+
 /// Scale coordinates to support rotations around block intersections,
 /// not just around block centers.
 ///
@@ -46,33 +53,28 @@ trait ZoomInAndOut {
     fn zoom_out(&mut self);
 }
 
-// TODO create a trait (could be implemented for tetromino too) for this function.
 impl Block {
-    /// Move `self` by `movement` and return new position if it's available in `grid`.
-    pub(super) fn can_be_moved(
-        &self,
+    /// Try to apply a [RotationTranslation] in a [TetrisGrid].
+    /// Move `self` by `movement` and return whether it's valid on `grid`.
+    pub(super) fn try_move(
+        &mut self,
         grid: &TetrisGrid,
         movement: &RotationTranslation,
-        rotation_center_is_on_block_center: bool,
-    ) -> Result<Block, ()> {
-        let mut block = *self;
-        if rotation_center_is_on_block_center {
-            block.move_by(movement);
+        is_rotation_center_on_block_center: bool,
+    ) -> Result<(), BackEndError> {
+        if is_rotation_center_on_block_center {
+            self.move_by(movement);
         } else {
-            block.move_by_with_offset(movement);
+            self.move_by_with_offset(movement);
         }
         // Check if `copy` is inside `grid` and on an empty slot.
-        if grid.is_block_available(&block) {
-            Ok(block)
-        } else {
-            Err(())
-        }
+        grid.is_block_available(self)
     }
 }
 
 impl ApplyRotationTranslation for Block {
     delegate! {
-        to self.position() {
+        to self.position {
             fn translate_by(&mut self, movement: &RotationTranslation);
             fn turn_by(&mut self, movement: &RotationTranslation);
             fn turn_by_with_offset(&mut self, movement: &RotationTranslation);
