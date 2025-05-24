@@ -1,7 +1,7 @@
-//! Define `struct` [Tetromino], `struct` [TetrisGrid], `enum` [TetrominoKind] and `trait` [UseTetromino]
+//! Define `trait` [UseTetromino], re-export `trait` [Render], `struct` [Tetromino], `struct` [TetrisGrid] and `enum` [TetrominoKind].
 #![doc = mermaid!("back_end/back_end_flowgraph.mmd")]
 mod moving_primitives;
-pub(in crate::app::player) mod render;
+mod render;
 mod rotation_translation;
 mod spatial_primitives;
 mod tetris_grid;
@@ -19,43 +19,9 @@ use serde::{Deserialize, Serialize};
 use simple_mermaid::mermaid;
 
 pub(in crate::app::player) use render::Render;
-
-/// Tetromino.
-#[derive(Clone, Copy, Serialize, Deserialize)]
-pub(crate) struct Tetromino {
-    kind: TetrominoKind,
-    center: Position,
-    blocks: [Block; 4],
-    direction: Direction,
-    pub(super) is_ghost: bool,
-}
-
-/// Seven types of Tetromino.
-#[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
-pub(in crate::app::player) enum TetrominoKind {
-    I,
-    O,
-    T,
-    J,
-    L,
-    S,
-    Z,
-}
-
-type GridLine = Vec<Option<TetrisColor>>;
-
-/// Tetris grid.
-#[derive(Serialize, Deserialize)]
-pub(in crate::app) struct TetrisGrid {
-    nb_columns: u32,
-    nb_rows: u32,
-    matrix: Vec<GridLine>,
-    line_sum: Vec<u32>,
-    pub total_width: f64,
-    pub total_height: f64,
-    pub visible_width: f64,
-    pub visible_height: f64,
-}
+pub(in crate::app) use tetris_grid::TetrisGrid;
+pub(crate) use tetromino::Tetromino;
+pub(in crate::app::player) use tetromino_kind::TetrominoKind;
 
 /// Move or create a [Tetromino] on a [TetrisGrid].
 pub(in crate::app::player) trait UseTetromino: Sized {

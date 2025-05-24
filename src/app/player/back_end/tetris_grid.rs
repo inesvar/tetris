@@ -1,7 +1,24 @@
-//! Define the implementation of a [TetrisGrid].
-use super::{moving_primitives::BackEndError, Block, TetrisColor, TetrisGrid, Tetromino};
+//! Define `struct` [TetrisGrid].
+use super::{
+    moving_primitives::BackEndError, Block, Deserialize, Serialize, TetrisColor, Tetromino,
+};
 use crate::settings::BLOCK_SIZE;
 use rand::Rng;
+
+type GridLine = Vec<Option<TetrisColor>>;
+
+/// Tetris grid.
+#[derive(Serialize, Deserialize)]
+pub(in crate::app) struct TetrisGrid {
+    nb_columns: u32,
+    nb_rows: u32,
+    pub(super) matrix: Vec<GridLine>,
+    line_sum: Vec<u32>,
+    pub total_width: f64, // TODO implement the grid render here and make these fields private
+    pub total_height: f64,
+    pub visible_width: f64,
+    pub visible_height: f64,
+}
 
 impl TetrisGrid {
     pub(in crate::app::player) fn new(nb_columns: u32, nb_rows: u32) -> TetrisGrid {

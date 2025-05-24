@@ -1,5 +1,17 @@
-//! Implement [TetrominoKind].
-use super::{Direction, Position, RotationType, TetrisColor, TetrominoKind};
+//! Define `enum` [TetrominoKind].
+use super::{Deserialize, Direction, Position, RotationType, Serialize, TetrisColor};
+
+/// Seven types of Tetromino.
+#[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
+pub(in crate::app::player) enum TetrominoKind {
+    I,
+    O,
+    T,
+    J,
+    L,
+    S,
+    Z,
+}
 
 macro_rules! const_map {
     ($array:expr, $func:ident) => {

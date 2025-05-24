@@ -2,13 +2,23 @@
 #[cfg(test)]
 use super::spatial_primitives::{FALL, LEFT, RIGHT, RISE};
 use super::{
-    moving_primitives::BackEndError, ApplyRotationTranslation, Block, Direction, Position,
-    RotationTranslation, RotationType, TetrisGrid, Tetromino, TetrominoKind, UseTetromino,
+    moving_primitives::BackEndError, ApplyRotationTranslation, Block, Deserialize, Direction,
+    Pcg32, Position, RotationTranslation, RotationType, Serialize, TetrisGrid, TetrominoKind,
+    UseTetromino,
 };
 use core::fmt::Display;
 use rand::seq::SliceRandom;
-use rand_pcg::Pcg32;
 use std::fmt::Formatter;
+
+/// Tetromino.
+#[derive(Clone, Copy, Serialize, Deserialize)]
+pub(crate) struct Tetromino {
+    kind: TetrominoKind,
+    center: Position,
+    pub(super) blocks: [Block; 4],
+    direction: Direction,
+    pub(super) is_ghost: bool,
+}
 
 impl UseTetromino for Tetromino {
     fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()> {

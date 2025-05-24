@@ -1,8 +1,7 @@
 //! Define `trait` [ApplyRotationTranslation] for [Position], [Block] and [Direction].
 #![doc = mermaid!("moving_primitives_flowgraph.mmd")]
-use super::{Block, Direction, Position, RotationTranslation, RotationType, TetrisGrid};
+use super::{mermaid, Block, Direction, Position, RotationTranslation, RotationType, TetrisGrid};
 use delegate::delegate;
-use simple_mermaid::mermaid;
 
 /// Apply a [RotationTranslation] to a spatial primitive.
 pub(super) trait ApplyRotationTranslation {
@@ -30,7 +29,7 @@ pub(super) trait ApplyRotationTranslation {
 
 #[derive(Debug, PartialEq)]
 pub enum BackEndError {
-    // same visibility as TetrominoKind and TetrisColor
+    // same visibility as TetrisColor
     TriedToMoveOutsideOfGrid,
     TriedToMoveToUnavailableBlock,
 }
