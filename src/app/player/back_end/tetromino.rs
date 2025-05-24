@@ -3,39 +3,34 @@
 use super::spatial_primitives::{FALL, LEFT, RIGHT, RISE};
 use super::{
     moving_primitives::BackEndError, ApplyRotationTranslation, Block, Direction, Position,
-    RotationTranslation, RotationType, TetrisGrid, Tetromino, TetrominoKind,
+    RotationTranslation, RotationType, TetrisGrid, Tetromino, TetrominoKind, UseTetromino,
 };
 use core::fmt::Display;
 use std::fmt::Formatter;
 
-impl Tetromino {
-    /// Return whether the tetromino could be moved one cell down.
-    pub(in crate::app::player) fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()> {
+impl UseTetromino for Tetromino {
+    fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()> {
         let movement = RotationTranslation::fall();
         self.try_move(grid, &movement).map_err(|_err| ())
     }
 
-    /// Move the tetromino down until it's not possible anymore.
-    pub(in crate::app::player) fn hard_drop(&mut self, grid: &TetrisGrid) {
+    fn hard_drop(&mut self, grid: &TetrisGrid) {
         if self.fall(grid).is_ok() {
             self.hard_drop(grid);
         }
     }
 
-    /// Move the tetromino one cell left if it's possible.
-    pub(in crate::app::player) fn left(&mut self, grid: &TetrisGrid) {
+    fn left(&mut self, grid: &TetrisGrid) {
         let movement = RotationTranslation::left();
         let _ = self.try_move(grid, &movement);
     }
 
-    /// Move the tetromino one cell right if it's possible.
-    pub(in crate::app::player) fn right(&mut self, grid: &TetrisGrid) {
+    fn right(&mut self, grid: &TetrisGrid) {
         let movement = RotationTranslation::right();
         let _ = self.try_move(grid, &movement);
     }
 
-    /// Turn the tetromino clockwise if it's possible, eventually using wall-kicks.
-    pub(in crate::app::player) fn turn_clockwise(&mut self, grid: &TetrisGrid) {
+    fn turn_clockwise(&mut self, grid: &TetrisGrid) {
         if self.kind == TetrominoKind::O {
             return;
         };
@@ -53,8 +48,7 @@ impl Tetromino {
         }
     }
 
-    /// Turn the tetromino counterclockwise if it's possible, eventually using wall-kicks.
-    pub(in crate::app::player) fn turn_counterclockwise(&mut self, grid: &TetrisGrid) {
+    fn turn_counterclockwise(&mut self, grid: &TetrisGrid) {
         if self.kind == TetrominoKind::O {
             return;
         };
@@ -72,28 +66,7 @@ impl Tetromino {
         }
     }
 
-    /// Return whether the tetromino could be moved.
-    pub(super) fn try_move(
-        &mut self,
-        grid: &TetrisGrid,
-        movement: &RotationTranslation,
-    ) -> Result<(), BackEndError> {
-        let mut new_blocks = self.blocks;
-        for new_block in new_blocks.iter_mut() {
-            new_block.try_move(
-                grid,
-                movement,
-                self.kind.is_rotation_center_on_block_center(),
-            )?;
-        }
-        self.blocks = new_blocks;
-        self.direction.turn_by(movement);
-        self.center.translate_by(movement);
-        Ok(())
-    }
-
-    /// Returns an Option eventually containing a Tetromino if its starting position is empty.
-    pub(in crate::app::player) fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Tetromino> {
+    fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Tetromino> {
         let positions = kind.get_initial_position();
         let color = kind.into();
         for position in positions {
@@ -115,8 +88,7 @@ impl Tetromino {
         })
     }
 
-    /// Returns a Tetromino at its starting position without checking that this place is empty.
-    pub fn new_unchecked(kind: TetrominoKind) -> Tetromino {
+    fn new_unchecked(kind: TetrominoKind) -> Tetromino {
         let positions = kind.get_initial_position();
         let color = kind.into();
         Tetromino {
@@ -133,10 +105,7 @@ impl Tetromino {
         }
     }
 
-    // TODO can't this cause a collision??
-    // TODO the direction is not reset ??? => test this but using new_unchecked seems better
-    /// Resets the Tetromino at its starting position.
-    pub fn reset_position(&mut self) {
+    fn reset_position(&mut self) {
         let positions = self.kind.get_initial_position();
         let color = self.kind.into();
         self.center = positions[0];
@@ -148,11 +117,32 @@ impl Tetromino {
         ];
     }
 
-    /// Returns a ghost copy of the Tetromino.
-    pub fn make_ghost_copy(&mut self) -> Tetromino {
+    fn make_ghost_copy(&mut self) -> Tetromino {
         let mut ghost = *self;
         ghost.is_ghost = true;
         ghost
+    }
+}
+
+impl Tetromino {
+    /// Return whether the tetromino could be moved.
+    pub(super) fn try_move(
+        &mut self,
+        grid: &TetrisGrid,
+        movement: &RotationTranslation,
+    ) -> Result<(), BackEndError> {
+        let mut new_blocks = self.blocks;
+        for new_block in new_blocks.iter_mut() {
+            new_block.try_move(
+                grid,
+                movement,
+                self.kind.is_rotation_center_on_block_center(),
+            )?;
+        }
+        self.blocks = new_blocks;
+        self.direction.turn_by(movement);
+        self.center.translate_by(movement);
+        Ok(())
     }
 }
 
@@ -204,10 +194,7 @@ impl Tetromino {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        assets::TetrisColor,
-        settings::{NB_COLUMNS, NB_ROWS},
-    };
+    use crate::settings::{NB_COLUMNS, NB_ROWS};
 
     #[test]
     fn i_tetromino_rotation_is_correct() {
@@ -237,7 +224,7 @@ mod tests {
             corrected_rotation.translation = translation;
             let _ = naive_i_tetromino.try_move(&empty_grid, &corrected_rotation);
 
-            let _ = i_tetromino.turn_clockwise(&empty_grid);
+            i_tetromino.turn_clockwise(&empty_grid);
 
             println!(
                 "{:?}\n{:?}\n{:?}\n{:?}",
@@ -261,7 +248,7 @@ mod tests {
             corrected_rotation.translation = translation;
             let _ = naive_i_tetromino.try_move(&empty_grid, &corrected_rotation);
 
-            let _ = i_tetromino.turn_counterclockwise(&empty_grid);
+            i_tetromino.turn_counterclockwise(&empty_grid);
 
             println!(
                 "{:?}\n{:?}\n{:?}\n{:?}",

@@ -23,7 +23,7 @@ pub(in crate::app::player) use render::Render;
 
 /// Tetromino piece among the 7 kinds in the game positioned on the grid.
 #[derive(Clone, Copy, Serialize, Deserialize)]
-pub struct Tetromino {
+pub(crate) struct Tetromino {
     kind: TetrominoKind,
     center: Position,
     blocks: [Block; 4],
@@ -33,7 +33,7 @@ pub struct Tetromino {
 
 /// TetrominoKind describes the 7 types of Tetromino.
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
-pub enum TetrominoKind {
+pub(in crate::app::player) enum TetrominoKind {
     I,
     O,
     T,
@@ -56,6 +56,41 @@ pub(in crate::app) struct TetrisGrid {
     pub total_height: f64,
     pub visible_width: f64,
     pub visible_height: f64,
+}
+
+pub(in crate::app::player) trait UseTetromino: Sized {
+    /// Return whether the tetromino could be moved one cell down.
+    fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()>;
+
+    /// Move the tetromino down until it's not possible anymore.
+    fn hard_drop(&mut self, grid: &TetrisGrid);
+
+    /// Move the tetromino one cell to the left if it's possible.
+    fn left(&mut self, grid: &TetrisGrid);
+
+    /// Move the tetromino one cell to the right if it's possible.
+    fn right(&mut self, grid: &TetrisGrid);
+
+    /// Turn the tetromino clockwise if it's possible, eventually using wall-kicks.
+    fn turn_clockwise(&mut self, grid: &TetrisGrid);
+
+    /// Turn the tetromino counterclockwise if it's possible, eventually using wall-kicks.
+    fn turn_counterclockwise(&mut self, grid: &TetrisGrid);
+
+    // Return an Option eventually containing a Tetromino if its starting position is empty.
+    fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Self>;
+
+    // Return a Tetromino at its starting position without checking that this place is empty.
+    fn new_unchecked(kind: TetrominoKind) -> Self;
+
+    // TODO can't this cause a collision??
+    // TODO the direction is not reset ??? => test this but using new_unchecked seems better
+    /// Reset the Tetromino at its starting position.
+    fn reset_position(&mut self);
+
+    // TODO so it's hard dropped separately? it could be hard droped here !
+    /// Return a ghost copy of the Tetromino.
+    fn make_ghost_copy(&mut self) -> Self;
 }
 
 /// Returns a random bag of TetrominoKind of the specified size using the given rng.

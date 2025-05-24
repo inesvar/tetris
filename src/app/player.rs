@@ -10,7 +10,7 @@ mod player_screen;
 mod pressed_keys;
 mod update_player;
 
-pub use self::back_end::Tetromino;
+pub(in crate::app::player) use self::back_end::{Tetromino, UseTetromino};
 use self::{
     back_end::{TetrisGrid, TetrominoKind},
     circular_buffer::CircularBuffer,

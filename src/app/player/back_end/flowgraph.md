@@ -10,7 +10,7 @@ graph LR
     RotationType[RotationType]
     ApplyRotationTranslation([ApplyRotationTranslation])
     Tetromino[[Tetromino]]
-    TetrominoMove([TetrominoMove])
+    UseTetromino([UseTetromino])
 
     %% modules
     spatial_primitives[spatial_primitives]
@@ -37,7 +37,7 @@ graph LR
     ApplyRotationTranslation -.-> RotationTranslation
 
     subgraph tetromino
-        TetrominoMove === Tetromino
+        UseTetromino === Tetromino
     end
 
     Tetromino --o spatial_primitives

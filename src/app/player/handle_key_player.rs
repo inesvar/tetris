@@ -2,7 +2,7 @@
 //!
 //! [handle_key_press()](LocalPlayer::handle_key_press()) is called when a key is pressed.
 //! [handle_key_release()](LocalPlayer::handle_key_release()) is called when a key is released.
-use super::LocalPlayer;
+use super::{LocalPlayer, UseTetromino};
 use crate::{
     app::GameFlowChange,
     app::RunningState,

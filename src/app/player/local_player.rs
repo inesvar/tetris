@@ -2,6 +2,7 @@
 use super::back_end::{new_tetromino_bag, TetrisGrid, Tetromino};
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
+    UseTetromino,
 };
 use crate::{app::Countdown, app::PlayerConfig, assets::Assets, once, settings::*};
 use graphics::types::Matrix2d;
