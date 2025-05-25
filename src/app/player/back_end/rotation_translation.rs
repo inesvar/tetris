@@ -18,7 +18,6 @@ pub(super) enum RotationType {
     #[default]
     None,
     Clockwise,
-    #[allow(dead_code)] // TODO
     HalfTurn,
     Counterclockwise,
 }
@@ -53,5 +52,13 @@ impl RotationTranslation {
 
     pub(super) fn left() -> Self {
         RotationTranslation::translation(LEFT)
+    }
+
+    pub(super) fn rotation(rotation_type: RotationType, rotation_center: &Position) -> Self {
+        Self {
+            rotation_type,
+            rotation_center: *rotation_center,
+            ..Self::default()
+        }
     }
 }

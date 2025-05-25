@@ -37,6 +37,9 @@ pub(in crate::app::player) trait UseTetromino: Sized {
     /// Move the tetromino one cell to the right if it's possible.
     fn right(&mut self, grid: &TetrisGrid);
 
+    /// Turn the tetromino 180° if it's possible.
+    fn turn_half_turn(&mut self, grid: &TetrisGrid);
+
     /// Turn the tetromino clockwise if it's possible, eventually using wall-kicks.
     fn turn_clockwise(&mut self, grid: &TetrisGrid);
 

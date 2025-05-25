@@ -48,6 +48,7 @@ pub enum TetrisCommand {
     Left(Vec<Key>),
     RotateClockwise(Vec<Key>),
     RotateCounterclockwise(Vec<Key>),
+    RotateHalfTurn(Vec<Key>),
     HoldTetromino(Vec<Key>),
 }
 
@@ -192,9 +193,18 @@ impl InteractiveWidgetManager {
             "Rotate Counterclockwise Keys :",
         );
 
-        let hold_tetromino_keys_input = KeyInput::new_with_info(
+        let rotate_half_turn_keys_input = KeyInput::new_with_info(
             DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0 + player_x,
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
+            DEFAULT_KEY_INPUT_WIDTH,
+            DEFAULT_KEY_INPUT_HEIGHT,
+            &settings.rotate_half_turn_keys,
+            "Rotate Half Turn Keys :",
+        );
+
+        let hold_tetromino_keys_input = KeyInput::new_with_info(
+            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0 + player_x,
+            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
             &settings.hold_tetromino_keys,
@@ -279,6 +289,10 @@ impl InteractiveWidgetManager {
         key_inputs.insert(
             TetrisCommand::RotateCounterclockwise(rotate_counterclockwise_keys_input.keys.clone()),
             rotate_counterclockwise_keys_input,
+        );
+        key_inputs.insert(
+            TetrisCommand::RotateHalfTurn(rotate_half_turn_keys_input.keys.clone()),
+            rotate_half_turn_keys_input,
         );
         key_inputs.insert(
             TetrisCommand::HoldTetromino(hold_tetromino_keys_input.keys.clone()),

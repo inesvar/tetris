@@ -77,6 +77,7 @@ static RIGHT_KEYS_1P: [Key; 2] = [Key::Right, Key::NumPad6];
 static LEFT_KEYS_1P: [Key; 2] = [Key::Left, Key::NumPad4];
 static ROTATE_CLOCKWISE_KEYS_1P: [Key; 2] = [Key::Up, Key::NumPad5];
 static ROTATE_COUNTERCLOCKWISE_KEYS_1P: [Key; 2] = [Key::NumPad0, Key::NumPad7];
+static ROTATE_HALF_TURN_1P: [Key; 1] = [Key::A];
 static HOLD_TETROMINO_KEYS_1P: [Key; 2] = [Key::C, Key::NumPadEnter];
 
 static FALL_KEYS_2P: [Key; 2] = [Key::X, Key::NumPad2];
@@ -85,6 +86,7 @@ static RIGHT_KEYS_2P: [Key; 2] = [Key::D, Key::NumPad6];
 static LEFT_KEYS_2P: [Key; 2] = [Key::A, Key::NumPad4];
 static ROTATE_CLOCKWISE_KEYS_2P: [Key; 2] = [Key::S, Key::NumPad5];
 static ROTATE_COUNTERCLOCKWISE_KEYS_2P: [Key; 2] = [Key::Q, Key::NumPad7];
+static ROTATE_HALF_TURN_2P: [Key; 2] = [Key::CapsLock, Key::NumPadPlus];
 static HOLD_TETROMINO_KEYS_2P: [Key; 2] = [Key::Space, Key::NumPadEnter];
 
 pub struct Keybindings {
@@ -94,6 +96,7 @@ pub struct Keybindings {
     pub left_keys: Vec<Key>,
     pub rotate_clockwise_keys: Vec<Key>,
     pub rotate_counterclockwise_keys: Vec<Key>,
+    pub rotate_half_turn_keys: Vec<Key>,
     pub hold_tetromino_keys: Vec<Key>,
 }
 
@@ -106,6 +109,7 @@ impl Keybindings {
         let left_keys = LEFT_KEYS_1P.to_vec();
         let rotate_clockwise_keys = ROTATE_CLOCKWISE_KEYS_1P.to_vec();
         let rotate_counterclockwise_keys = ROTATE_COUNTERCLOCKWISE_KEYS_1P.to_vec();
+        let rotate_half_turn_keys = ROTATE_HALF_TURN_1P.to_vec();
         let hold_tetromino_keys = HOLD_TETROMINO_KEYS_1P.to_vec();
 
         Keybindings {
@@ -115,6 +119,7 @@ impl Keybindings {
             left_keys,
             rotate_clockwise_keys,
             rotate_counterclockwise_keys,
+            rotate_half_turn_keys,
             hold_tetromino_keys,
         }
     }
@@ -127,6 +132,7 @@ impl Keybindings {
             let left_keys = vec![LEFT_KEYS_2P[0]];
             let rotate_clockwise_keys = vec![ROTATE_CLOCKWISE_KEYS_2P[0]];
             let rotate_counterclockwise_keys = vec![ROTATE_COUNTERCLOCKWISE_KEYS_2P[0]];
+            let rotate_half_turn_keys = vec![ROTATE_HALF_TURN_2P[0]];
             let hold_tetromino_keys = vec![HOLD_TETROMINO_KEYS_2P[0]];
 
             Keybindings {
@@ -136,6 +142,7 @@ impl Keybindings {
                 left_keys,
                 rotate_clockwise_keys,
                 rotate_counterclockwise_keys,
+                rotate_half_turn_keys,
                 hold_tetromino_keys,
             }
         } else {
@@ -145,6 +152,7 @@ impl Keybindings {
             let left_keys = vec![LEFT_KEYS_2P[1]];
             let rotate_clockwise_keys = vec![ROTATE_CLOCKWISE_KEYS_2P[1]];
             let rotate_counterclockwise_keys = vec![ROTATE_COUNTERCLOCKWISE_KEYS_2P[1]];
+            let rotate_half_turn_keys = vec![ROTATE_HALF_TURN_2P[1]];
             let hold_tetromino_keys = vec![HOLD_TETROMINO_KEYS_2P[1]];
 
             Keybindings {
@@ -154,6 +162,7 @@ impl Keybindings {
                 left_keys,
                 rotate_clockwise_keys,
                 rotate_counterclockwise_keys,
+                rotate_half_turn_keys,
                 hold_tetromino_keys,
             }
         }
@@ -169,6 +178,7 @@ impl Keybindings {
             TetrisCommand::RotateCounterclockwise(_) => {
                 self.rotate_counterclockwise_keys = new_keys
             }
+            TetrisCommand::RotateHalfTurn(_) => self.rotate_half_turn_keys = new_keys,
             TetrisCommand::HoldTetromino(_) => self.hold_tetromino_keys = new_keys,
         }
     }

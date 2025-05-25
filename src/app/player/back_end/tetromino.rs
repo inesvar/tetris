@@ -42,6 +42,14 @@ impl UseTetromino for Tetromino {
         let _ = self.try_move(grid, &movement);
     }
 
+    fn turn_half_turn(&mut self, grid: &TetrisGrid) {
+        if self.kind == TetrominoKind::O {
+            return;
+        };
+        let movement = RotationTranslation::rotation(RotationType::HalfTurn, &self.center);
+        let _ = self.try_move(grid, &movement).is_ok();
+    }
+
     fn turn_clockwise(&mut self, grid: &TetrisGrid) {
         if self.kind == TetrominoKind::O {
             return;

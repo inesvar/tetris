@@ -94,6 +94,16 @@ impl LocalPlayer {
 
         if self
             .keyboard
+            .is_any_last_pressed(&keybindings.rotate_half_turn_keys)
+        {
+            // rotate once the tetromino
+            self.player_screen
+                .active_tetromino
+                .turn_half_turn(&self.player_screen.grid);
+        }
+
+        if self
+            .keyboard
             .is_any_last_pressed(&keybindings.hold_tetromino_keys)
         {
             // hold the tetromino
