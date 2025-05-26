@@ -1,5 +1,18 @@
-Tetromino should implement a trait TetrisMoves with the possible TetrisMoves
+- fix paths for Windows in assets.rs
+- press key s open settings
+- assets load bug when too low in filesystem
+- re-implement clipboard copy/paste button using arboard (https://crates.io/crates/arboard/3.4.1) 
 
 
-profiling should be done to find the best integer size for Point
+# not  the priority
 
+instantiate the grid render:
+group all the block textures in one
+OR use `tri_list_uv_c`
+
+
+add a bench for the grid render
+
+the grid should contain a [f; 4] color for all blocks
+outwardly the user interacts with a TetrisColor,
+but actually there would be a color
