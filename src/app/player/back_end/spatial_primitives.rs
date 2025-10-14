@@ -1,6 +1,12 @@
 //! Define `struct` [Block], `struct` [Position] and `enum` [Direction].
 use super::{Deserialize, Serialize, TetrisColor};
 
+// y increases from top to bottom
+pub(super) const FALL: Position = Position::new(0, 1);
+pub(super) const RISE: Position = Position::new(0, -1);
+pub(super) const RIGHT: Position = Position::new(1, 0);
+pub(super) const LEFT: Position = Position::new(-1, 0);
+
 /// Block in a discrete grid, serializable.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub(super) struct Block {
@@ -18,11 +24,6 @@ pub(super) struct Position {
     pub(super) y: i32,
 }
 
-pub(super) const FALL: Position = Position::new(0, 1);
-pub(super) const RISE: Position = Position::new(0, -1);
-pub(super) const RIGHT: Position = Position::new(1, 0);
-pub(super) const LEFT: Position = Position::new(-1, 0);
-
 /// Four cardinal directions.
 #[derive(Clone, Copy, Default, Serialize, Deserialize, Debug, PartialEq)]
 #[cfg_attr(test, derive(enum_iterator::Sequence))]
@@ -34,32 +35,14 @@ pub(super) enum Direction {
     Left,
 }
 
-impl Block {
-    pub(super) const fn from(color: TetrisColor, position: Position) -> Self {
-        Block { position, color }
-    }
-
-    // Is this really useful ?
-    pub(super) fn x(&self) -> i32 {
-        self.position.x
-    }
-
-    pub(super) fn y(&self) -> i32 {
-        self.position.y
-    }
-
-    pub(super) fn color(&self) -> TetrisColor {
-        self.color
-    }
-}
-
 impl Position {
     pub(super) const fn new(x: i32, y: i32) -> Self {
         Position { x, y }
     }
 
     // Using `const` is useful here so that well-kicks can be evaluated at compile-time in the future.
-    // TODO create a const trait Arithmetic when it will be possible
+    // TODO create a const trait PositionArithmetic when it will be possible
+    // TODO why are some using references and not the others ??
     pub(super) const fn neg(self) -> Self {
         Position::new(-self.x, -self.y)
     }
@@ -112,6 +95,25 @@ impl From<Direction> for Position {
     }
 }
 
+impl Block {
+    pub(super) const fn from(color: TetrisColor, position: Position) -> Self {
+        Block { position, color }
+    }
+
+    // Is this really useful ?
+    pub(super) fn x(&self) -> i32 {
+        self.position.x
+    }
+
+    pub(super) fn y(&self) -> i32 {
+        self.position.y
+    }
+
+    pub(super) fn color(&self) -> TetrisColor {
+        self.color
+    }
+}
+
 // Needed to use a circular buffer.
 impl Default for Block {
     fn default() -> Self {
@@ -144,51 +146,126 @@ impl std::ops::AddAssign for Position {
 
 #[cfg(test)]
 mod tests {
-    use super::{Direction, Position};
-    use enum_iterator::{next_cycle, previous_cycle};
+    use super::*;
 
     #[test]
-    fn arithmetic_implementation_is_correct() {
-        // y increases from top to bottom...
-        let three_oclock = Position::new(1, 0);
-        let six_oclock = Position::new(0, 1);
-        let nine_oclock = Position::new(-1, 0);
-        let twelve_oclock = Position::new(0, -1);
-
-        assert_eq!(three_oclock.turned_clockwise(), six_oclock);
-        assert_eq!(nine_oclock.turned_counterclockwise(), six_oclock);
-        assert_eq!(twelve_oclock.neg(), six_oclock);
+    fn position_arithmetic_neg_is_correct() {
+        assert_eq!(RIGHT.neg(), LEFT);
+        assert_eq!(FALL.neg(), RISE);
+        assert_eq!(LEFT.neg(), RIGHT);
+        assert_eq!(RISE.neg(), FALL);
     }
 
     #[test]
-    fn add_sub_implementation_is_correct() {
-        let a = Position::new(6, 3);
-        let b = Position::new(5, 4);
-
-        assert_eq!(a + b, Position::new(11, 7));
-        assert_eq!(a - b, Position::new(1, -1));
-
-        let mut sum = a;
-        sum += b;
-
-        assert_eq!(sum, a + b);
+    fn position_arithmetic_mirror_x_is_correct() {
+        assert_eq!(RIGHT.mirror_x(), LEFT);
+        assert_eq!(FALL.mirror_x(), FALL);
+        assert_eq!(LEFT.mirror_x(), RIGHT);
+        assert_eq!(RISE.mirror_x(), RISE);
     }
 
     #[test]
-    fn direction_update() {
-        let mut direction = Direction::Up;
-        let mut direction_copy = direction;
+    fn position_arithmetic_mirror_y_is_correct() {
+        assert_eq!(RIGHT.mirror_y(), RIGHT);
+        assert_eq!(FALL.mirror_y(), RISE);
+        assert_eq!(LEFT.mirror_y(), LEFT);
+        assert_eq!(RISE.mirror_y(), FALL);
+    }
 
-        for _ in 0..4 {
-            direction.turn_clockwise();
-            direction_copy = next_cycle(&direction_copy);
-            assert_eq!(direction, direction_copy);
+    #[test]
+    fn position_arithmetic_turned_clockwise_is_correct() {
+        assert_eq!(RIGHT.turned_clockwise(), FALL);
+        assert_eq!(FALL.turned_clockwise(), LEFT);
+        assert_eq!(LEFT.turned_clockwise(), RISE);
+        assert_eq!(RISE.turned_clockwise(), RIGHT);
+    }
+
+    #[test]
+    fn position_arithmetic_turned_counterclockwise_is_correct() {
+        assert_eq!(RIGHT.turned_counterclockwise(), RISE);
+        assert_eq!(FALL.turned_counterclockwise(), RIGHT);
+        assert_eq!(LEFT.turned_counterclockwise(), FALL);
+        assert_eq!(RISE.turned_counterclockwise(), LEFT);
+    }
+
+    #[test]
+    fn direction_turn_clockwise_is_correct() {
+        let mut clock = Direction::Up;
+
+        clock.turn_clockwise();
+        assert_eq!(clock, Direction::Right);
+
+        clock.turn_clockwise();
+        assert_eq!(clock, Direction::Down);
+
+        clock.turn_clockwise();
+        assert_eq!(clock, Direction::Left);
+    }
+
+    #[test]
+    fn direction_turn_counterclockwise_is_correct() {
+        let mut clock = Direction::Up;
+
+        clock.turn_counterclockwise();
+        assert_eq!(clock, Direction::Left);
+
+        clock.turn_counterclockwise();
+        assert_eq!(clock, Direction::Down);
+
+        clock.turn_counterclockwise();
+        assert_eq!(clock, Direction::Right);
+    }
+
+    const TEST_VALUES: [i32; 5] = [1, -1, 0, 42, 77];
+
+    #[test]
+    fn position_add_is_correct() {
+        for a in TEST_VALUES {
+            for b in TEST_VALUES {
+                let a_pos = Position::new(a, 0);
+                let b_pos = Position::new(b, 0);
+
+                assert_eq!((a_pos + b_pos).x, a + b);
+
+                let a_pos = Position::new(0, a);
+                let b_pos = Position::new(0, b);
+
+                assert_eq!((a_pos + b_pos).y, a + b);
+            }
         }
+    }
 
-        for _ in 0..4 {
-            direction.turn_counterclockwise();
-            direction_copy = previous_cycle(&direction_copy);
-            assert_eq!(direction, direction_copy);
+    #[test]
+    fn position_sub_is_correct() {
+        for a in TEST_VALUES {
+            for b in TEST_VALUES {
+                let a_pos = Position::new(a, 0);
+                let b_pos = Position::new(b, 0);
+
+                assert_eq!((a_pos - b_pos).x, a - b);
+
+                let a_pos = Position::new(0, a);
+                let b_pos = Position::new(0, b);
+
+                assert_eq!((a_pos - b_pos).y, a - b);
+            }
+        }
+    }
+
+    #[test]
+    fn position_add_assign_is_correct() {
+        for a in TEST_VALUES {
+            for b in TEST_VALUES {
+                let mut a_pos = Position::new(a, 0);
+                a_pos += Position::new(b, 0);
+
+                assert_eq!(a_pos.x, a + b);
+
+                let mut a_pos = Position::new(0, a);
+                a_pos += Position::new(0, b);
+
+                assert_eq!(a_pos.y, a + b);
+            }
         }
     }
 }

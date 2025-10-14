@@ -79,4 +79,5 @@ graph LR
     ApplyRotationTranslation -.-> ZoomInAndOut
 
     ZoomInAndOut ~~~ Block & Direction & RotationTranslation
+    Block ~~~ Direction
 ```
