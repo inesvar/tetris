@@ -1,18 +1,11 @@
-//! Define `struct` [Block], `struct` [Position] and `enum` [Direction].
-use super::{Deserialize, Serialize, TetrisColor};
+//! Define `struct` [Position] and `enum` [Direction].
+use super::{Deserialize, Serialize};
 
 // y increases from top to bottom
 pub(super) const FALL: Position = Position::new(0, 1);
 pub(super) const RISE: Position = Position::new(0, -1);
 pub(super) const RIGHT: Position = Position::new(1, 0);
 pub(super) const LEFT: Position = Position::new(-1, 0);
-
-/// Block in a discrete grid, serializable.
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
-pub(super) struct Block {
-    pub(super) center: Position,
-    color: TetrisColor,
-}
 
 /// Position on a discrete grid, serializable.
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
@@ -78,35 +71,6 @@ impl Direction {
             Direction::Left => *self = Direction::Down,
             Direction::Down => *self = Direction::Right,
             Direction::Right => *self = Direction::Up,
-        }
-    }
-}
-
-impl Block {
-    pub(super) const fn from(color: TetrisColor, position: Position) -> Self {
-        Block { center: position, color }
-    }
-
-    // Is this really useful ?
-    pub(super) fn x(&self) -> i32 {
-        self.center.x
-    }
-
-    pub(super) fn y(&self) -> i32 {
-        self.center.y
-    }
-
-    pub(super) fn color(&self) -> TetrisColor {
-        self.color
-    }
-}
-
-// Needed to use a circular buffer.
-impl Default for Block {
-    fn default() -> Self {
-        Block {
-            center: Position::default(),
-            color: TetrisColor::Yellow, // arbitrary
         }
     }
 }

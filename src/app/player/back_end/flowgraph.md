@@ -9,6 +9,7 @@ graph LR
     RotationTranslation[[RotationTranslation]]
     RotationType[RotationType]
     ApplyRotationTranslation([ApplyRotationTranslation])
+    TetrisGrid[[TetrisGrid]]
     Tetromino[[Tetromino]]
     UseTetromino([UseTetromino])
 
@@ -19,9 +20,9 @@ graph LR
     tetromino[tetromino]
 
     subgraph spatial_primitives
-        Block --o Position
-        Direction
+        Direction ~~~ Position
     end
+    
 
     subgraph rotation_translation
         RotationTranslation --o RotationType
@@ -33,14 +34,24 @@ graph LR
         ApplyRotationTranslation
     end
 
-    ApplyRotationTranslation === spatial_primitives
+    ApplyRotationTranslation === Position & Direction
     ApplyRotationTranslation -.-> RotationTranslation
+    
+    subgraph tetris_block
+        Block
+    end
+
+    subgraph tetris_grid
+        TetrisGrid
+    end
+
+    Block -.-> ApplyRotationTranslation & TetrisGrid
 
     subgraph tetromino
         UseTetromino === Tetromino
     end
 
-    Tetromino --o spatial_primitives
+    Tetromino --o spatial_primitives & Block
     Tetromino -.-> ApplyRotationTranslation
 ```
 
@@ -48,7 +59,6 @@ graph LR
 graph LR
     %% objects
     Position[[Position]]
-    Block[[Block]]
     Direction[Direction]
     RotationTranslation[[RotationTranslation]]
     ApplyRotationTranslation([ApplyRotationTranslation])
@@ -60,7 +70,7 @@ graph LR
     moving_primitives[moving_primitives]
 
     subgraph spatial_primitives
-        Block --o Position
+        Position
         Direction
     end
 
@@ -78,6 +88,5 @@ graph LR
     ApplyRotationTranslation -.-> RotationTranslation
     ApplyRotationTranslation -.-> ZoomInAndOut
 
-    ZoomInAndOut ~~~ Block & Direction & RotationTranslation
-    Block ~~~ Direction
+    ZoomInAndOut ~~~ Direction & RotationTranslation
 ```

@@ -1,25 +1,6 @@
 //! Define `trait` [ApplyRotationTranslation] for [super::spatial_primitives].
 #![doc = mermaid!("moving_primitives_flowgraph.mmd")]
-use super::{mermaid, Block, Direction, Position, RotationTranslation, RotationType, TetrisGrid, BackendError};
-
-impl Block {
-    /// Try to apply a [RotationTranslation] in a [TetrisGrid].
-    /// Move `self` by `movement` and return whether it's valid on `grid`.
-    pub(super) fn try_move(
-        &mut self,
-        grid: &TetrisGrid,
-        movement: &RotationTranslation,
-        is_rotation_center_on_block_center: bool,
-    ) -> Result<(), BackendError> {
-        if is_rotation_center_on_block_center {
-            self.center.move_by(movement);
-        } else {
-            self.center.move_by_with_offset(movement);
-        }
-        // Check if `copy` is inside `grid` and on an empty slot.
-        grid.is_block_available(self)
-    }
-}
+use super::{mermaid, Direction, Position, RotationTranslation, RotationType};
 
 /// Apply a [RotationTranslation] to a [super::spatial_primitives].
 pub(super) trait ApplyRotationTranslation {
@@ -63,7 +44,6 @@ trait ZoomInAndOut {
     /// Map zoomed-in coordinates to regular coordinates.
     fn zoom_out(&mut self);
 }
-
 
 impl ApplyRotationTranslation for Position {
     fn translate_by(&mut self, movement: &RotationTranslation) {

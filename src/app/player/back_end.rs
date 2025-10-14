@@ -4,6 +4,7 @@ mod moving_primitives;
 mod render;
 mod rotation_translation;
 mod spatial_primitives;
+mod tetris_block;
 mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;
@@ -11,7 +12,8 @@ mod tetromino_kind;
 use self::{
     moving_primitives::ApplyRotationTranslation,
     rotation_translation::{RotationTranslation, RotationType},
-    spatial_primitives::{Block, Direction, Position},
+    spatial_primitives::{Direction, Position},
+    tetris_block::Block,
     tetris_grid::BackendError,
 };
 use crate::assets::TetrisColor;

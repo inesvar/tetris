@@ -2,9 +2,8 @@
 #[cfg(test)]
 use super::spatial_primitives::{FALL, LEFT, RIGHT, RISE};
 use super::{
-    BackendError, ApplyRotationTranslation, Block, Deserialize, Direction,
-    Pcg32, Position, RotationTranslation, RotationType, Serialize, TetrisGrid, TetrominoKind,
-    UseTetromino,
+    ApplyRotationTranslation, BackendError, Block, Deserialize, Direction, Pcg32, Position,
+    RotationTranslation, RotationType, Serialize, TetrisGrid, TetrominoKind, UseTetromino,
 };
 use core::fmt::Display;
 use rand::seq::SliceRandom;
