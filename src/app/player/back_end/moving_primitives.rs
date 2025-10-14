@@ -1,9 +1,27 @@
-//! Define `trait` [ApplyRotationTranslation] for [Position], [Block] and [Direction].
+//! Define `trait` [ApplyRotationTranslation] for [super::spatial_primitives].
 #![doc = mermaid!("moving_primitives_flowgraph.mmd")]
-use super::{mermaid, Block, Direction, Position, RotationTranslation, RotationType, TetrisGrid};
-use delegate::delegate;
+use super::{mermaid, Block, Direction, Position, RotationTranslation, RotationType, TetrisGrid, BackendError};
 
-/// Apply a [RotationTranslation] to a spatial primitive.
+impl Block {
+    /// Try to apply a [RotationTranslation] in a [TetrisGrid].
+    /// Move `self` by `movement` and return whether it's valid on `grid`.
+    pub(super) fn try_move(
+        &mut self,
+        grid: &TetrisGrid,
+        movement: &RotationTranslation,
+        is_rotation_center_on_block_center: bool,
+    ) -> Result<(), BackendError> {
+        if is_rotation_center_on_block_center {
+            self.center.move_by(movement);
+        } else {
+            self.center.move_by_with_offset(movement);
+        }
+        // Check if `copy` is inside `grid` and on an empty slot.
+        grid.is_block_available(self)
+    }
+}
+
+/// Apply a [RotationTranslation] to a [super::spatial_primitives].
 pub(super) trait ApplyRotationTranslation {
     /// Turn then translate as described by `movement`.
     fn move_by(&mut self, movement: &RotationTranslation) {
@@ -11,34 +29,28 @@ pub(super) trait ApplyRotationTranslation {
         self.translate_by(movement);
     }
     /// Like [ApplyRotationTranslation::move_by()], except `movement.rotation_center`
-    /// is understood as the bottom right block intersection, not a block center
+    /// is understood as the bottom right block corner, not the block center
     /// (the implementation relies on [ZoomInAndOut]).
     fn move_by_with_offset(&mut self, movement: &RotationTranslation) {
         self.turn_by_with_offset(movement);
         self.translate_by(movement);
     }
+
     /// Translate by `movement.translation`.
     fn translate_by(&mut self, movement: &RotationTranslation);
     /// Turn around `movement.rotation_center` by `movement.rotation_type`.
     fn turn_by(&mut self, movement: &RotationTranslation);
     /// Like [ApplyRotationTranslation::turn_by()], except `movement.rotation_center`
-    /// is understood as the bottom right block intersection, not a block center
+    /// is understood as the bottom right block corner, not the block center
     /// (the implementation relies on [ZoomInAndOut]).
     fn turn_by_with_offset(&mut self, movement: &RotationTranslation);
-}
-
-#[derive(Debug, PartialEq)]
-pub enum BackEndError {
-    // same visibility as TetrisColor
-    TriedToMoveOutsideOfGrid,
-    TriedToMoveToUnavailableBlock,
 }
 
 /// Scale coordinates to support rotations around block intersections,
 /// not just around block centers.
 ///
-/// While most tetromino rotations are performed around the center of a block,
-/// the I tetromino rotates around the intersection between blocks,
+/// While most tetromino rotations are performed around a block center,
+/// the I tetromino rotates around a block intersection,
 /// which lies at the midpoint between standard coordinates.
 ///
 /// This trait provides zooming in functions that scale x2 and a zooming out function that scales x0.5.
@@ -52,34 +64,6 @@ trait ZoomInAndOut {
     fn zoom_out(&mut self);
 }
 
-impl Block {
-    /// Try to apply a [RotationTranslation] in a [TetrisGrid].
-    /// Move `self` by `movement` and return whether it's valid on `grid`.
-    pub(super) fn try_move(
-        &mut self,
-        grid: &TetrisGrid,
-        movement: &RotationTranslation,
-        is_rotation_center_on_block_center: bool,
-    ) -> Result<(), BackEndError> {
-        if is_rotation_center_on_block_center {
-            self.move_by(movement);
-        } else {
-            self.move_by_with_offset(movement);
-        }
-        // Check if `copy` is inside `grid` and on an empty slot.
-        grid.is_block_available(self)
-    }
-}
-
-impl ApplyRotationTranslation for Block {
-    delegate! {
-        to self.position {
-            fn translate_by(&mut self, movement: &RotationTranslation);
-            fn turn_by(&mut self, movement: &RotationTranslation);
-            fn turn_by_with_offset(&mut self, movement: &RotationTranslation);
-        }
-    }
-}
 
 impl ApplyRotationTranslation for Position {
     fn translate_by(&mut self, movement: &RotationTranslation) {
@@ -157,7 +141,9 @@ impl ZoomInAndOut for Position {
 
 #[cfg(test)]
 mod tests {
-    use super::{ApplyRotationTranslation, Position, RotationTranslation, RotationType};
+    use super::*;
+
+    // TODO: clean unit tests
 
     #[test]
     fn rotation_is_correct() {

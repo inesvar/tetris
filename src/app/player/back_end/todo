@@ -1,3 +1,13 @@
+- Block should be in its own module
+
+
+
+
+
+
+
+
+
 - fix paths for Windows in assets.rs
 - press key s open settings
 - assets load bug when too low in filesystem

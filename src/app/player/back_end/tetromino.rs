@@ -2,7 +2,7 @@
 #[cfg(test)]
 use super::spatial_primitives::{FALL, LEFT, RIGHT, RISE};
 use super::{
-    moving_primitives::BackEndError, ApplyRotationTranslation, Block, Deserialize, Direction,
+    BackendError, ApplyRotationTranslation, Block, Deserialize, Direction,
     Pcg32, Position, RotationTranslation, RotationType, Serialize, TetrisGrid, TetrominoKind,
     UseTetromino,
 };
@@ -185,7 +185,7 @@ impl Tetromino {
         &mut self,
         grid: &TetrisGrid,
         movement: &RotationTranslation,
-    ) -> Result<(), BackEndError> {
+    ) -> Result<(), BackendError> {
         let mut new_blocks = self.blocks;
         for new_block in new_blocks.iter_mut() {
             new_block.try_move(

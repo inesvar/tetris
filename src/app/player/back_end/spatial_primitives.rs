@@ -10,8 +10,7 @@ pub(super) const LEFT: Position = Position::new(-1, 0);
 /// Block in a discrete grid, serializable.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub(super) struct Block {
-    /// Block center.
-    pub(super) position: Position,
+    pub(super) center: Position,
     color: TetrisColor,
 }
 
@@ -42,16 +41,15 @@ impl Position {
 
     // Using `const` is useful here so that well-kicks can be evaluated at compile-time in the future.
     // TODO create a const trait PositionArithmetic when it will be possible
-    // TODO why are some using references and not the others ??
-    pub(super) const fn neg(self) -> Self {
+    pub(super) const fn neg(&self) -> Self {
         Position::new(-self.x, -self.y)
     }
 
-    pub(super) const fn mirror_x(self) -> Self {
+    pub(super) const fn mirror_x(&self) -> Self {
         Position::new(-self.x, self.y)
     }
 
-    pub(super) const fn mirror_y(self) -> Self {
+    pub(super) const fn mirror_y(&self) -> Self {
         Position::new(self.x, -self.y)
     }
 
@@ -84,29 +82,18 @@ impl Direction {
     }
 }
 
-impl From<Direction> for Position {
-    fn from(dir: Direction) -> Self {
-        match dir {
-            Direction::Up => RISE,
-            Direction::Right => RIGHT,
-            Direction::Down => FALL,
-            Direction::Left => LEFT,
-        }
-    }
-}
-
 impl Block {
     pub(super) const fn from(color: TetrisColor, position: Position) -> Self {
-        Block { position, color }
+        Block { center: position, color }
     }
 
     // Is this really useful ?
     pub(super) fn x(&self) -> i32 {
-        self.position.x
+        self.center.x
     }
 
     pub(super) fn y(&self) -> i32 {
-        self.position.y
+        self.center.y
     }
 
     pub(super) fn color(&self) -> TetrisColor {
@@ -118,7 +105,7 @@ impl Block {
 impl Default for Block {
     fn default() -> Self {
         Block {
-            position: Position::default(),
+            center: Position::default(),
             color: TetrisColor::Yellow, // arbitrary
         }
     }

@@ -1,6 +1,6 @@
 //! Define `struct` [TetrisGrid].
 use super::{
-    moving_primitives::BackEndError, Block, Deserialize, Serialize, TetrisColor, Tetromino,
+    Block, Deserialize, Serialize, TetrisColor, Tetromino,
 };
 use crate::settings::BLOCK_SIZE;
 use rand::Rng;
@@ -18,6 +18,13 @@ pub(in crate::app) struct TetrisGrid {
     pub total_height: f64,
     pub visible_width: f64,
     pub visible_height: f64,
+}
+
+// same visibility as TetrisColor
+#[derive(Debug, PartialEq)]
+pub enum BackendError {
+    TriedToMoveOutsideOfGrid,
+    TriedToMoveToUnavailableBlock,
 }
 
 impl TetrisGrid {
@@ -41,20 +48,20 @@ impl TetrisGrid {
     }
 
     /// Returns true if the `block` is inside the grid in an empty slot.
-    pub(super) fn is_block_available(&self, block: &Block) -> Result<(), BackEndError> {
+    pub(super) fn is_block_available(&self, block: &Block) -> Result<(), BackendError> {
         let is_block_inside_grid = block.x() >= 0
             && block.y() >= 0
             && (block.x() as u32) < self.nb_columns
             && (block.y() as u32) < self.nb_rows;
 
         if !is_block_inside_grid {
-            return Err(BackEndError::TriedToMoveOutsideOfGrid);
+            return Err(BackendError::TriedToMoveOutsideOfGrid);
         }
 
         let is_block_available = self.matrix[block.y() as usize][block.x() as usize].is_none();
 
         if !is_block_available {
-            return Err(BackEndError::TriedToMoveToUnavailableBlock);
+            return Err(BackendError::TriedToMoveToUnavailableBlock);
         }
 
         Ok(())

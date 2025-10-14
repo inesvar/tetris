@@ -12,6 +12,7 @@ use self::{
     moving_primitives::ApplyRotationTranslation,
     rotation_translation::{RotationTranslation, RotationType},
     spatial_primitives::{Block, Direction, Position},
+    tetris_grid::BackendError,
 };
 use crate::assets::TetrisColor;
 use rand_pcg::Pcg32;

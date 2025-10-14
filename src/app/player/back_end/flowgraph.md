@@ -74,7 +74,7 @@ graph LR
     end
 
     ZoomInAndOut === Position
-    ApplyRotationTranslation === Position & Block & Direction
+    ApplyRotationTranslation === Position & Direction
     ApplyRotationTranslation -.-> RotationTranslation
     ApplyRotationTranslation -.-> ZoomInAndOut
 

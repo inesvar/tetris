@@ -4,7 +4,7 @@ use super::{
     Position,
 };
 
-/// Movement composed by a rotation then a translation.
+/// Movement (first a rotation, then a translation).
 #[derive(Clone, Copy, Default)]
 pub(super) struct RotationTranslation {
     pub(super) rotation_type: RotationType,
@@ -12,7 +12,7 @@ pub(super) struct RotationTranslation {
     pub(super) translation: Position,
 }
 
-/// Four rotation types.
+/// Four 90° rotation types.
 #[derive(Clone, Copy, Default)]
 pub(super) enum RotationType {
     #[default]
