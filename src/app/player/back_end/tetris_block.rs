@@ -1,7 +1,8 @@
 //! Define `struct` [Block].
 use super::{
-    ApplyRotationTranslation, BackendError, Deserialize, Position, RotationTranslation, Serialize,
-    TetrisColor, TetrisGrid,
+    moving_primitives::ApplyRotationTranslation, rotation_translation::RotationTranslation,
+    spatial_primitives::Position, tetris_grid::BackendError, Deserialize, Serialize, TetrisColor,
+    TetrisGrid,
 };
 
 /// Block in a discrete grid, serializable.
@@ -11,10 +12,19 @@ pub(super) struct Block {
     color: TetrisColor,
 }
 
-impl Block {
-    /// Try to apply a [RotationTranslation] in a [TetrisGrid].
+/// Try to apply a [RotationTranslation] in a [TetrisGrid].
+pub(super) trait TryMoveBlock {
     /// Move `self` by `movement` and return whether it's valid on `grid`.
-    pub(super) fn try_move(
+    fn try_move(
+        &mut self,
+        grid: &TetrisGrid,
+        movement: &RotationTranslation,
+        is_rotation_center_on_block_center: bool,
+    ) -> Result<(), BackendError>;
+}
+
+impl TryMoveBlock for Block {
+    fn try_move(
         &mut self,
         grid: &TetrisGrid,
         movement: &RotationTranslation,

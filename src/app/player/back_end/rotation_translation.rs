@@ -1,8 +1,5 @@
 //! Define `struct` [RotationTranslation] and `enum` [RotationType].
-use super::{
-    spatial_primitives::{FALL, LEFT, RIGHT},
-    Position,
-};
+use super::spatial_primitives::{Position, FALL, LEFT, RIGHT};
 
 /// Movement (first a rotation, then a translation).
 #[derive(Clone, Copy, Default)]

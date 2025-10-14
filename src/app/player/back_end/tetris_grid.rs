@@ -1,5 +1,5 @@
 //! Define `struct` [TetrisGrid].
-use super::{Block, Deserialize, Serialize, TetrisColor, Tetromino};
+use super::{tetris_block::Block, Deserialize, Serialize, TetrisColor, Tetromino};
 use crate::settings::BLOCK_SIZE;
 use rand::Rng;
 

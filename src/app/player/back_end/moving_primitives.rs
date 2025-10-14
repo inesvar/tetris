@@ -1,6 +1,10 @@
 //! Define `trait` [ApplyRotationTranslation] for [super::spatial_primitives].
 #![doc = mermaid!("moving_primitives_flowgraph.mmd")]
-use super::{mermaid, Direction, Position, RotationTranslation, RotationType};
+use super::{
+    mermaid,
+    rotation_translation::{RotationTranslation, RotationType},
+    spatial_primitives::{Direction, Position},
+};
 
 /// Apply a [RotationTranslation] to a [super::spatial_primitives].
 pub(super) trait ApplyRotationTranslation {

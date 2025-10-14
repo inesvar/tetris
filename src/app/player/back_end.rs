@@ -9,13 +9,6 @@ mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;
 
-use self::{
-    moving_primitives::ApplyRotationTranslation,
-    rotation_translation::{RotationTranslation, RotationType},
-    spatial_primitives::{Direction, Position},
-    tetris_block::Block,
-    tetris_grid::BackendError,
-};
 use crate::assets::TetrisColor;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
