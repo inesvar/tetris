@@ -62,7 +62,7 @@ impl PlayerScreen {
         // drawing a border for the hold piece
         let transform2 = grid_transform.trans(
             -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
-            self.grid.total_height() - self.grid.visible_height(),
+            self.grid.hidden_height(),
         );
         let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
@@ -83,7 +83,7 @@ impl PlayerScreen {
         // drawing a border for the fifo of next pieces
         let transform4 = grid_transform.trans(
             self.grid.total_width() * (NB_COLUMNS + 1) as f64 / NB_COLUMNS as f64,
-            self.grid.total_height() - self.grid.visible_height(),
+            self.grid.hidden_height(),
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;

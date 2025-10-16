@@ -29,7 +29,7 @@ impl Render for TetrisGrid {
     ) {
         let empty_dims: Rectangle = [
             0.0,
-            self.total_height() - self.visible_height(),
+            self.hidden_height(),
             self.total_width(),
             self.visible_height(),
         ];
