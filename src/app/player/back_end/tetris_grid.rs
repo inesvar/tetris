@@ -220,10 +220,6 @@ impl TetrisGrid {
         self.nb_rows as f64 * BLOCK_SIZE
     }
 
-    pub(in crate::app::player) fn visible_width(&self) -> f64 {
-        self.nb_columns as f64 * BLOCK_SIZE // same as total_width
-    }
-
     pub(in crate::app::player) fn visible_height(&self) -> f64 {
         (self.nb_rows - self.nb_hidden_rows) as f64 * BLOCK_SIZE
     }

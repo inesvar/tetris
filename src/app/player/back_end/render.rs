@@ -30,7 +30,7 @@ impl Render for TetrisGrid {
         let empty_dims: Rectangle = [
             0.0,
             self.total_height() - self.visible_height(),
-            self.visible_width(),
+            self.total_width(),
             self.visible_height(),
         ];
         rectangle(GRID_BG_COLOR, empty_dims, grid_position, gl);
