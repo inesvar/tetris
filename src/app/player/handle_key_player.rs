@@ -143,8 +143,8 @@ impl LocalPlayer {
                 .hard_drop(&self.player_screen.grid);
             match self
                 .player_screen
-                .grid
-                .freeze_tetromino(&mut self.player_screen.active_tetromino)
+                .active_tetromino
+                .freeze_in(&mut self.player_screen.grid)
             {
                 Some(completed_lines) => {
                     self.player_screen.new_completed_lines = completed_lines;

@@ -108,8 +108,8 @@ impl LocalPlayer {
         {
             match self
                 .player_screen
-                .grid
-                .freeze_tetromino(&mut self.player_screen.active_tetromino)
+                .active_tetromino
+                .freeze_in(&mut self.player_screen.grid)
             {
                 // if lines were clearing by freezing the tetromino, set the attribute new_completed_lines
                 Some(completed_lines) => {

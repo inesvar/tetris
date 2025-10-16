@@ -203,12 +203,16 @@ impl Tetromino {
         Ok(())
     }
 
-    pub(in crate::app::player) fn is_valid_on(&self, grid: &TetrisGrid) -> bool {
+    pub(in crate::app::player) fn is_valid_in(&self, grid: &TetrisGrid) -> bool {
         grid.are_blocks_available(&self.blocks)
     }
 
     pub(in crate::app::player) fn get_tetris_color(&self) -> TetrisColor {
         self.blocks[0].color()
+    }
+
+    pub(in crate::app::player) fn freeze_in(self, grid: &mut TetrisGrid) -> Option<u64> {
+        grid.add_blocks(&self.blocks)
     }
 }
 
@@ -231,13 +235,8 @@ impl Display for Tetromino {
     }
 }
 
+#[cfg(test)]
 impl Tetromino {
-    /// Returns the 4 Blocks of the Tetromino.
-    pub(super) fn split(&mut self) -> [Block; 4] {
-        self.blocks
-    }
-
-    #[cfg(test)]
     fn i_tetromino_rotation_correction(&mut self, movement: &RotationTranslation) -> Position {
         match (self.direction, movement.rotation_type) {
             (Direction::Up, RotationType::Clockwise) => RIGHT,

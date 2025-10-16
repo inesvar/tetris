@@ -1,5 +1,5 @@
 //! Define `struct` [TetrisGrid].
-use super::{tetris_block::Block, Deserialize, Serialize, TetrisColor, Tetromino};
+use super::{tetris_block::Block, Deserialize, Serialize, TetrisColor};
 use crate::settings::BLOCK_SIZE;
 use rand::Rng;
 use std::ops::{Index, IndexMut};
@@ -91,37 +91,44 @@ impl TetrisGrid {
         blocks.iter().all(|b| self.is_block_available(b).is_ok())
     }
 
+    fn pop_row(&mut self, row: usize) {
+        self.matrix.remove(row);
+        self.matrix.insert(0, vec![None; self.nb_columns as usize]);
+
+        self.line_sum.remove(row);
+        self.line_sum.insert(0, 0);
+    }
+
+    fn solve_and_compute_score(&mut self) -> u64 {
+        let mut score = 0;
+        for y in 0..self.nb_rows as usize {
+            if self.line_sum[y] == self.nb_columns {
+                self.pop_row(y);
+                score += 1;
+            }
+        }
+        score
+    }
+
+    fn add_block(&mut self, block: &Block) {
+        self[block] = Some(block.color());
+        self.line_sum[block.y() as usize] += 1;
+    }
+
     /// Push the Tetromino into the grid and return the number of lines completed.
-    pub(in crate::app::player) fn freeze_tetromino(
-        &mut self,
-        tetromino: &mut Tetromino,
-    ) -> Option<u64> {
+    pub(super) fn add_blocks(&mut self, blocks: &[Block]) -> Option<u64> {
         let mut game_over = true;
-        let mut blocks = tetromino.split();
-        for block in &mut blocks {
-            self[block] = Some(block.color());
-            self.line_sum[block.y() as usize] += 1;
+        for block in blocks {
+            self.add_block(block);
             // if there's a block below the top of the visible grid, continue playing
-            if block.y() as usize > 1 {
+            if block.y() >= self.nb_hidden_rows as i32 {
                 game_over = false;
             }
         }
         if game_over {
             return None;
         }
-        let mut score = 0;
-        for y in 0..self.nb_rows {
-            if self.line_sum[y as usize] == self.nb_columns {
-                // TODO neatly separate this in a private function
-                self.matrix.remove(y as usize);
-                self.matrix.insert(0, vec![None; self.nb_columns as usize]);
-
-                self.line_sum.remove(y as usize);
-                self.line_sum.insert(0, 0);
-                score += 1;
-            }
-        }
-        Some(score)
+        Some(self.solve_and_compute_score())
     }
 
     /// Adds the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
