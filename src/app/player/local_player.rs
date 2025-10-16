@@ -157,7 +157,7 @@ impl LocalPlayer {
         // TODO this should be done using the grid method and probably all other calls
         // using null()...
         let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
-        if !self.player_screen.grid.is_tetromino_valid(&possible_active) {
+        if !possible_active.is_valid_on(&self.player_screen.grid) {
             // If not, it's a lock out situation
             // set the game_over flag and return the tetromino to the bag
             self.declare_game_over();

@@ -203,6 +203,10 @@ impl Tetromino {
         Ok(())
     }
 
+    pub(in crate::app::player) fn is_valid_on(&self, grid: &TetrisGrid) -> bool {
+        grid.are_blocks_available(&self.blocks)
+    }
+
     pub(in crate::app::player) fn get_tetris_color(&self) -> TetrisColor {
         self.blocks[0].color()
     }
@@ -231,10 +235,6 @@ impl Tetromino {
     /// Returns the 4 Blocks of the Tetromino.
     pub(super) fn split(&mut self) -> [Block; 4] {
         self.blocks
-    }
-
-    pub(super) fn blocks(&self) -> &[Block] {
-        &self.blocks
     }
 
     #[cfg(test)]

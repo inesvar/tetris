@@ -86,14 +86,9 @@ impl TetrisGrid {
         self.is_block_empty(block)
     }
 
-    /// Returns true if the `tetromino` is inside the grid on empty slots.
-    pub(in crate::app::player) fn is_tetromino_valid(&self, tetromino: &Tetromino) -> bool {
-        for block in tetromino.blocks() {
-            if self.is_block_available(block).is_err() {
-                return false;
-            }
-        }
-        true
+    /// Returns true if the `blocks` are inside the grid on empty slots.
+    pub(super) fn are_blocks_available(&self, blocks: &[Block]) -> bool {
+        blocks.iter().all(|b| self.is_block_available(b).is_ok())
     }
 
     /// Push the Tetromino into the grid and return the number of lines completed.
