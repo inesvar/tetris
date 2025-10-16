@@ -29,9 +29,9 @@ impl Render for TetrisGrid {
     ) {
         let empty_dims: Rectangle = [
             0.0,
-            self.total_height - self.visible_height,
-            self.visible_width,
-            self.visible_height,
+            self.total_height() - self.visible_height(),
+            self.visible_width(),
+            self.visible_height(),
         ];
         rectangle(GRID_BG_COLOR, empty_dims, grid_position, gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);

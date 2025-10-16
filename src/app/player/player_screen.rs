@@ -62,7 +62,7 @@ impl PlayerScreen {
         // drawing a border for the hold piece
         let transform2 = grid_transform.trans(
             -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
-            self.grid.total_height - self.grid.visible_height,
+            self.grid.total_height() - self.grid.visible_height(),
         );
         let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
@@ -74,7 +74,7 @@ impl PlayerScreen {
         // drawing the hold piece
         if let Some(saved) = self.saved_tetromino {
             let transform3 = grid_transform.trans(
-                -self.grid.total_width * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
+                -self.grid.total_width() * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
                 TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
             );
             saved.render(transform3, &ctx.draw_state, gl, assets);
@@ -82,8 +82,8 @@ impl PlayerScreen {
 
         // drawing a border for the fifo of next pieces
         let transform4 = grid_transform.trans(
-            self.grid.total_width * (NB_COLUMNS + 1) as f64 / NB_COLUMNS as f64,
-            self.grid.total_height - self.grid.visible_height,
+            self.grid.total_width() * (NB_COLUMNS + 1) as f64 / NB_COLUMNS as f64,
+            self.grid.total_height() - self.grid.visible_height(),
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;
@@ -95,7 +95,7 @@ impl PlayerScreen {
         // drawing the next pieces
         for i in 0..NB_NEXT_TETROMINO {
             let transform5 = grid_transform.trans(
-                self.grid.total_width * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
+                self.grid.total_width() * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
             if let Some(tetromino) = self.fifo_next_tetromino.get(i) {

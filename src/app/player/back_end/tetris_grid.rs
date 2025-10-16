@@ -13,10 +13,6 @@ pub(in crate::app) struct TetrisGrid {
     nb_hidden_rows: u32,
     pub(super) matrix: Vec<GridLine>,
     line_sum: Vec<u32>,
-    pub total_width: f64, // TODO implement the grid render here and make these fields private
-    pub total_height: f64,
-    pub visible_width: f64,
-    pub visible_height: f64,
 }
 
 // same visibility as TetrisColor
@@ -44,10 +40,6 @@ impl TetrisGrid {
             nb_hidden_rows,
             matrix,
             line_sum,
-            total_width: nb_columns as f64 * BLOCK_SIZE,
-            total_height: nb_rows as f64 * BLOCK_SIZE,
-            visible_width: nb_columns as f64 * BLOCK_SIZE,
-            visible_height: (nb_rows - 2) as f64 * BLOCK_SIZE,
         }
     }
 
@@ -218,5 +210,21 @@ impl TetrisGrid {
         self.matrix[12][6] = Some(tetris_color);
         self.matrix[13][4] = Some(tetris_color);
         self.matrix[13][5] = Some(tetris_color);
+    }
+
+    pub(in crate::app::player) fn total_width(&self) -> f64 {
+        self.nb_columns as f64 * BLOCK_SIZE
+    }
+
+    pub(in crate::app::player) fn total_height(&self) -> f64 {
+        self.nb_rows as f64 * BLOCK_SIZE
+    }
+
+    pub(in crate::app::player) fn visible_width(&self) -> f64 {
+        self.nb_columns as f64 * BLOCK_SIZE // same as total_width
+    }
+
+    pub(in crate::app::player) fn visible_height(&self) -> f64 {
+        (self.nb_rows - self.nb_hidden_rows) as f64 * BLOCK_SIZE
     }
 }
