@@ -124,18 +124,24 @@ impl LocalPlayer {
 
     pub(in crate::app) fn countdown(&mut self, i: &Countdown) {
         match i {
-            Countdown::One => self
-                .player_screen
-                .grid
-                .one(self.player_screen.fifo_next_tetromino.get(1).unwrap()),
-            Countdown::Two => self
-                .player_screen
-                .grid
-                .two(self.player_screen.fifo_next_tetromino.get(0).unwrap()),
+            Countdown::One => self.player_screen.grid.one(
+                self.player_screen
+                    .fifo_next_tetromino
+                    .get(1)
+                    .unwrap()
+                    .get_tetris_color(),
+            ),
+            Countdown::Two => self.player_screen.grid.two(
+                self.player_screen
+                    .fifo_next_tetromino
+                    .get(0)
+                    .unwrap()
+                    .get_tetris_color(),
+            ),
             Countdown::Three => self
                 .player_screen
                 .grid
-                .three(self.player_screen.active_tetromino),
+                .three(self.player_screen.active_tetromino.get_tetris_color()),
         }
     }
 }

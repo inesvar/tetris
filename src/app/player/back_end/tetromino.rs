@@ -7,7 +7,7 @@ use super::{
     spatial_primitives::{Direction, Position},
     tetris_block::{Block, TryMoveBlock},
     tetris_grid::BackendError,
-    Deserialize, Pcg32, Serialize, TetrisGrid, TetrominoKind, UseTetromino,
+    Deserialize, Pcg32, Serialize, TetrisColor, TetrisGrid, TetrominoKind, UseTetromino,
 };
 use core::fmt::Display;
 use rand::seq::SliceRandom;
@@ -201,6 +201,10 @@ impl Tetromino {
         self.direction.turn_by(movement);
         self.center.translate_by(movement);
         Ok(())
+    }
+
+    pub(in crate::app::player) fn get_tetris_color(&self) -> TetrisColor {
+        self.blocks[0].color()
     }
 }
 
