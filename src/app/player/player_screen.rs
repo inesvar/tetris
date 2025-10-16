@@ -4,8 +4,8 @@ use super::{CircularBuffer, PlayerScreen};
 use crate::assets::Assets;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_FONT_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
-    GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS,
-    TETROMINO_MAX_HEIGHT, TETROMINO_MAX_WIDTH, TEXT_COLOR,
+    GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_COLUMNS, NB_HIDDEN_ROWS, NB_NEXT_TETROMINO,
+    NB_ROWS, TETROMINO_MAX_HEIGHT, TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
 use crate::ui::text::Text;
 use graphics::{
@@ -17,7 +17,7 @@ use opengl_graphics::GlGraphics;
 impl PlayerScreen {
     pub fn empty() -> Self {
         PlayerScreen {
-            grid: TetrisGrid::new(NB_COLUMNS, NB_ROWS), //FIXME: this will not always be the case
+            grid: TetrisGrid::new(NB_COLUMNS, NB_ROWS, NB_HIDDEN_ROWS), //FIXME: this will not always be the case
             score: 0,
             game_over: false,
             new_completed_lines: 0,

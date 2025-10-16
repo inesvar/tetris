@@ -10,6 +10,7 @@ type GridLine = Vec<Option<TetrisColor>>;
 pub(in crate::app) struct TetrisGrid {
     nb_columns: u32,
     nb_rows: u32,
+    nb_hidden_rows: u32,
     pub(super) matrix: Vec<GridLine>,
     line_sum: Vec<u32>,
     pub total_width: f64, // TODO implement the grid render here and make these fields private
@@ -26,7 +27,11 @@ pub enum BackendError {
 }
 
 impl TetrisGrid {
-    pub(in crate::app::player) fn new(nb_columns: u32, nb_rows: u32) -> TetrisGrid {
+    pub(in crate::app::player) fn new(
+        nb_columns: u32,
+        nb_rows: u32,
+        nb_hidden_rows: u32,
+    ) -> TetrisGrid {
         let mut matrix = Vec::with_capacity(nb_rows as usize);
         for _ in 0..nb_rows {
             matrix.push(vec![None; nb_columns as usize]);
@@ -36,6 +41,7 @@ impl TetrisGrid {
         TetrisGrid {
             nb_columns,
             nb_rows,
+            nb_hidden_rows,
             matrix,
             line_sum,
             total_width: nb_columns as f64 * BLOCK_SIZE,

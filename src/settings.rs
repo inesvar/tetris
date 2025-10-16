@@ -16,6 +16,7 @@ pub static OPENGL_VERSION: OpenGL = OpenGL::V4_5;
 
 pub static NB_COLUMNS: u32 = 10;
 pub static NB_ROWS: u32 = 22;
+pub static NB_HIDDEN_ROWS: u32 = 2;
 
 /****************************************/
 /* POSITIONS IN SINGLE PLAYER GAME VIEW */
