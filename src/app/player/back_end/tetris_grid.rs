@@ -2,6 +2,7 @@
 use super::{tetris_block::Block, Deserialize, Serialize, TetrisColor, Tetromino};
 use crate::settings::BLOCK_SIZE;
 use rand::Rng;
+use std::ops::{Index, IndexMut};
 
 type GridLine = Vec<Option<TetrisColor>>;
 
@@ -20,6 +21,20 @@ pub(in crate::app) struct TetrisGrid {
 pub enum BackendError {
     TriedToMoveOutsideOfGrid,
     TriedToMoveToUnavailableBlock,
+}
+
+impl Index<&Block> for TetrisGrid {
+    type Output = Option<TetrisColor>;
+
+    fn index(&self, block: &Block) -> &<Self as Index<&Block>>::Output {
+        &self.matrix[block.y() as usize][block.x() as usize]
+    }
+}
+
+impl IndexMut<&Block> for TetrisGrid {
+    fn index_mut(&mut self, block: &Block) -> &mut <Self as Index<&Block>>::Output {
+        &mut self.matrix[block.y() as usize][block.x() as usize]
+    }
 }
 
 impl TetrisGrid {
@@ -57,9 +72,7 @@ impl TetrisGrid {
     }
 
     fn is_block_empty(&self, block: &Block) -> Result<(), BackendError> {
-        let is_block_available = self.matrix[block.y() as usize][block.x() as usize].is_none();
-
-        if is_block_available {
+        if self[block].is_none() {
             Ok(())
         } else {
             Err(BackendError::TriedToMoveToUnavailableBlock)
@@ -91,7 +104,7 @@ impl TetrisGrid {
         let mut game_over = true;
         let mut blocks = tetromino.split();
         for block in &mut blocks {
-            self.matrix[block.y() as usize][block.x() as usize] = Some(block.color());
+            self[block] = Some(block.color());
             self.line_sum[block.y() as usize] += 1;
             // if there's a block below the top of the visible grid, continue playing
             if block.y() as usize > 1 {
