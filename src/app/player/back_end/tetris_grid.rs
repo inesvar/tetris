@@ -43,24 +43,34 @@ impl TetrisGrid {
         }
     }
 
-    /// Returns true if the `block` is inside the grid in an empty slot.
-    pub(super) fn is_block_available(&self, block: &Block) -> Result<(), BackendError> {
+    fn is_block_inside_grid(&self, block: &Block) -> Result<(), BackendError> {
         let is_block_inside_grid = block.x() >= 0
             && block.y() >= 0
             && (block.x() as u32) < self.nb_columns
             && (block.y() as u32) < self.nb_rows;
 
-        if !is_block_inside_grid {
-            return Err(BackendError::TriedToMoveOutsideOfGrid);
+        if is_block_inside_grid {
+            Ok(())
+        } else {
+            Err(BackendError::TriedToMoveOutsideOfGrid)
         }
+    }
 
+    fn is_block_empty(&self, block: &Block) -> Result<(), BackendError> {
         let is_block_available = self.matrix[block.y() as usize][block.x() as usize].is_none();
 
-        if !is_block_available {
-            return Err(BackendError::TriedToMoveToUnavailableBlock);
+        if is_block_available {
+            Ok(())
+        } else {
+            Err(BackendError::TriedToMoveToUnavailableBlock)
         }
+    }
 
-        Ok(())
+    /// Returns true if the `block` is inside the grid in an empty slot.
+    pub(super) fn is_block_available(&self, block: &Block) -> Result<(), BackendError> {
+        self.is_block_inside_grid(block)?;
+
+        self.is_block_empty(block)
     }
 
     /// Returns true if the `tetromino` is inside the grid on empty slots.
@@ -214,10 +224,6 @@ impl TetrisGrid {
 
     pub(in crate::app::player) fn total_width(&self) -> f64 {
         self.nb_columns as f64 * BLOCK_SIZE
-    }
-
-    pub(in crate::app::player) fn total_height(&self) -> f64 {
-        self.nb_rows as f64 * BLOCK_SIZE
     }
 
     pub(in crate::app::player) fn visible_height(&self) -> f64 {
