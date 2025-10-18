@@ -80,7 +80,7 @@ impl TetrisGrid {
         }
     }
 
-    fn is_block_empty(&self, block: &Position) -> Result<(), BackendError> {
+    pub(super) fn is_block_empty(&self, block: &Position) -> Result<(), BackendError> {
         if self[block].is_none() {
             Ok(())
         } else {

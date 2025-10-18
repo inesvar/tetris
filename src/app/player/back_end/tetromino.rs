@@ -91,17 +91,14 @@ impl UseTetromino for Tetromino {
 
     fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Tetromino> {
         let positions = kind.get_initial_position();
-        let color = kind.into();
         for position in positions {
-            if grid.matrix[position.x as usize][position.y as usize].is_some() {
-                return None;
-            }
+            grid.is_block_empty(&position).ok()?;
         }
         Some(Tetromino {
             kind,
             center: positions[0],
             blocks: [positions[1], positions[2], positions[3], positions[4]],
-            color,
+            color: kind.into(),
             direction: Direction::default(),
             is_ghost: false,
         })
@@ -109,17 +106,17 @@ impl UseTetromino for Tetromino {
 
     fn new_unchecked(kind: TetrominoKind) -> Tetromino {
         let positions = kind.get_initial_position();
-        let color = kind.into();
         Tetromino {
             kind,
             center: positions[0],
             blocks: [positions[1], positions[2], positions[3], positions[4]],
-            color,
+            color: kind.into(),
             direction: Direction::default(),
             is_ghost: false,
         }
     }
 
+    // TODO: is direction reset during stash ?
     fn reset_position(&mut self) {
         let positions = self.kind.get_initial_position();
         self.center = positions[0];
@@ -170,7 +167,7 @@ impl UseTetromino for Tetromino {
 
 impl Tetromino {
     /// Return whether the tetromino could be moved.
-    pub(super) fn try_move(
+    fn try_move(
         &mut self,
         grid: &TetrisGrid,
         movement: &RotationTranslation,
