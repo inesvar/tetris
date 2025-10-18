@@ -211,8 +211,11 @@ impl Tetromino {
         self.blocks[0].color()
     }
 
-    pub(in crate::app::player) fn freeze_in(self, grid: &mut TetrisGrid) -> Option<u64> {
-        grid.add_blocks(&self.blocks)
+    pub(in crate::app::player) fn lock_down(
+        self,
+        grid: &mut TetrisGrid,
+    ) -> Result<u64, BackendError> {
+        grid.add_blocks(&self.blocks, self.get_tetris_color())
     }
 }
 

@@ -18,9 +18,11 @@ pub(in crate::app) struct TetrisGrid {
 
 // same visibility as TetrisColor
 #[derive(Debug, PartialEq)]
-pub enum BackendError {
+pub(in crate::app) enum BackendError {
     TriedToMoveOutsideOfGrid,
     TriedToMoveToUnavailableBlock,
+    /// cf Guidelines 10.6. : when a whole tetromino locks down above the skyline
+    LockOut,
 }
 
 impl Index<&Block> for TetrisGrid {
@@ -110,26 +112,30 @@ impl TetrisGrid {
         score
     }
 
-    fn add_block(&mut self, block: &Block) {
-        self[block] = Some(block.color());
+    fn add_block(&mut self, block: &Block, tetris_color: TetrisColor) {
+        self[block] = Some(tetris_color);
         self.line_sum[block.y() as usize] += 1;
     }
 
-    /// Push the Tetromino into the grid and return the number of lines completed.
-    pub(super) fn add_blocks(&mut self, blocks: &[Block]) -> Option<u64> {
-        // TODO: devrait etre un Result
-        let mut game_over = true;
+    /// Push the blocks into the grid and return the number of lines completed.
+    pub(super) fn add_blocks(
+        &mut self,
+        blocks: &[Block],
+        tetris_color: TetrisColor,
+    ) -> Result<u64, BackendError> {
+        let mut no_block_below_skyline = true;
         for block in blocks {
-            self.add_block(block);
-            // if there's a block below the top of the visible grid, continue playing
+            self.add_block(block, tetris_color);
             if block.y() >= self.nb_hidden_rows as i32 {
-                game_over = false;
+                no_block_below_skyline = false;
             }
         }
-        if game_over {
-            return None;
+        // Only continue playing if there's a block below the skyline
+        if no_block_below_skyline {
+            Err(BackendError::LockOut)
+        } else {
+            Ok(self.solve_and_compute_score())
         }
-        Some(self.solve_and_compute_score())
     }
 
     /// Adds the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
