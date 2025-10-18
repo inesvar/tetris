@@ -1,5 +1,5 @@
 //! Define `struct` [TetrisGrid].
-use super::{tetris_block::Block, Deserialize, Serialize, TetrisColor};
+use super::{spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
 use rand::Rng;
 use std::ops::{Index, IndexMut};
 
@@ -8,11 +8,11 @@ type GridLine = Vec<Option<TetrisColor>>;
 /// Tetris grid.
 #[derive(Serialize, Deserialize)]
 pub(in crate::app) struct TetrisGrid {
-    pub(super) nb_columns: u32,
-    pub(super) nb_rows: u32,
-    pub(super) nb_hidden_rows: u32,
+    pub(super) nb_columns: i32,
+    pub(super) nb_rows: i32,
+    pub(super) nb_hidden_rows: i32,
     pub(super) matrix: Vec<GridLine>,
-    line_sum: Vec<u32>,
+    line_sum: Vec<i32>,
 }
 
 // same visibility as TetrisColor
@@ -24,17 +24,17 @@ pub(in crate::app) enum BackendError {
     LockOut,
 }
 
-impl Index<&Block> for TetrisGrid {
+impl Index<&Position> for TetrisGrid {
     type Output = Option<TetrisColor>;
 
-    fn index(&self, block: &Block) -> &<Self as Index<&Block>>::Output {
-        &self.matrix[block.y() as usize][block.x() as usize]
+    fn index(&self, block: &Position) -> &<Self as Index<&Position>>::Output {
+        &self.matrix[block.y as usize][block.x as usize]
     }
 }
 
-impl IndexMut<&Block> for TetrisGrid {
-    fn index_mut(&mut self, block: &Block) -> &mut <Self as Index<&Block>>::Output {
-        &mut self.matrix[block.y() as usize][block.x() as usize]
+impl IndexMut<&Position> for TetrisGrid {
+    fn index_mut(&mut self, block: &Position) -> &mut <Self as Index<&Position>>::Output {
+        &mut self.matrix[block.y as usize][block.x as usize]
     }
 }
 
@@ -44,6 +44,16 @@ impl TetrisGrid {
         nb_rows: u32,
         nb_hidden_rows: u32,
     ) -> TetrisGrid {
+        let nb_columns: i32 = nb_columns
+            .try_into()
+            .expect("nb_columns should be representable as i32");
+        let nb_rows: i32 = nb_rows
+            .try_into()
+            .expect("nb_rows should be representable as i32");
+        let nb_hidden_rows: i32 = nb_hidden_rows
+            .try_into()
+            .expect("nb_hidden_rows should be representable as i32");
+
         let mut matrix = Vec::with_capacity(nb_rows as usize);
         for _ in 0..nb_rows {
             matrix.push(vec![None; nb_columns as usize]);
@@ -59,11 +69,9 @@ impl TetrisGrid {
         }
     }
 
-    fn is_block_inside_grid(&self, block: &Block) -> Result<(), BackendError> {
-        let is_block_inside_grid = block.x() >= 0
-            && block.y() >= 0
-            && (block.x() as u32) < self.nb_columns
-            && (block.y() as u32) < self.nb_rows;
+    fn is_block_inside_grid(&self, block: &Position) -> Result<(), BackendError> {
+        let is_block_inside_grid =
+            block.x >= 0 && block.y >= 0 && block.x < self.nb_columns && block.y < self.nb_rows;
 
         if is_block_inside_grid {
             Ok(())
@@ -72,7 +80,7 @@ impl TetrisGrid {
         }
     }
 
-    fn is_block_empty(&self, block: &Block) -> Result<(), BackendError> {
+    fn is_block_empty(&self, block: &Position) -> Result<(), BackendError> {
         if self[block].is_none() {
             Ok(())
         } else {
@@ -81,14 +89,14 @@ impl TetrisGrid {
     }
 
     /// Returns true if the `block` is inside the grid in an empty slot.
-    pub(super) fn is_block_available(&self, block: &Block) -> Result<(), BackendError> {
+    pub(super) fn is_block_available(&self, block: &Position) -> Result<(), BackendError> {
         self.is_block_inside_grid(block)?;
 
         self.is_block_empty(block)
     }
 
     /// Returns true if the `blocks` are inside the grid on empty slots.
-    pub(super) fn are_blocks_available(&self, blocks: &[Block]) -> bool {
+    pub(super) fn are_blocks_available(&self, blocks: &[Position]) -> bool {
         blocks.iter().all(|b| self.is_block_available(b).is_ok())
     }
 
@@ -111,21 +119,21 @@ impl TetrisGrid {
         score
     }
 
-    fn add_block(&mut self, block: &Block, tetris_color: TetrisColor) {
+    fn add_block(&mut self, block: &Position, tetris_color: TetrisColor) {
         self[block] = Some(tetris_color);
-        self.line_sum[block.y() as usize] += 1;
+        self.line_sum[block.y as usize] += 1;
     }
 
     /// Push the blocks into the grid and return the number of lines completed.
     pub(super) fn add_blocks(
         &mut self,
-        blocks: &[Block],
+        blocks: &[Position],
         tetris_color: TetrisColor,
     ) -> Result<u64, BackendError> {
         let mut no_block_below_skyline = true;
         for block in blocks {
             self.add_block(block, tetris_color);
-            if block.y() >= self.nb_hidden_rows as i32 {
+            if block.y >= self.nb_hidden_rows {
                 no_block_below_skyline = false;
             }
         }
@@ -158,7 +166,7 @@ impl TetrisGrid {
 
         // store the column index that will be empty
         let mut rng = rand::thread_rng();
-        let empty = rng.gen::<u32>() % self.nb_columns;
+        let empty = rng.gen_range(0..self.nb_columns);
 
         for _ in 0..lines_to_add {
             // move the matrix and line_sum one line up

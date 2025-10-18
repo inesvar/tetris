@@ -4,7 +4,6 @@ mod moving_primitives;
 mod render;
 mod rotation_translation;
 mod spatial_primitives;
-mod tetris_block;
 mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;

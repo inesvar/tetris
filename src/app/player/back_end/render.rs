@@ -1,7 +1,5 @@
 //! Define `trait` [Render] for [Block], [Tetromino] and [TetrisGrid].
-use super::{
-    spatial_primitives::Position, tetris_block::Block, TetrisColor, TetrisGrid, Tetromino,
-};
+use super::{spatial_primitives::Position, TetrisColor, TetrisGrid, Tetromino};
 use crate::assets::Assets;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
 use graphics::draw_state::Blend;
@@ -33,7 +31,7 @@ impl TetrisGrid {
         self.nb_hidden_rows as f64 * BLOCK_SIZE
     }
 
-    fn draw_on_empty_grid(&mut self, blocks: &[Block], tetris_color: TetrisColor) {
+    fn draw_on_empty_grid(&mut self, blocks: &[Position], tetris_color: TetrisColor) {
         self.null();
 
         for block in blocks {
@@ -41,41 +39,41 @@ impl TetrisGrid {
         }
     }
 
-    const ONE: [Block; 9] = [
-        Block::from(TetrisColor::Yellow, Position::new(5, 9)),
-        Block::from(TetrisColor::Yellow, Position::new(4, 10)),
-        Block::from(TetrisColor::Yellow, Position::new(5, 10)),
-        Block::from(TetrisColor::Yellow, Position::new(5, 11)),
-        Block::from(TetrisColor::Yellow, Position::new(5, 12)),
-        Block::from(TetrisColor::Yellow, Position::new(3, 13)),
-        Block::from(TetrisColor::Yellow, Position::new(4, 13)),
-        Block::from(TetrisColor::Yellow, Position::new(5, 13)),
-        Block::from(TetrisColor::Yellow, Position::new(6, 13)),
+    const ONE: [Position; 9] = [
+        Position::new(5, 9),
+        Position::new(4, 10),
+        Position::new(5, 10),
+        Position::new(5, 11),
+        Position::new(5, 12),
+        Position::new(3, 13),
+        Position::new(4, 13),
+        Position::new(5, 13),
+        Position::new(6, 13),
     ];
 
-    const TWO: [Block; 10] = [
-        Block::from(TetrisColor::Yellow, Position::new(4, 9)),
-        Block::from(TetrisColor::Yellow, Position::new(5, 9)),
-        Block::from(TetrisColor::Yellow, Position::new(3, 10)),
-        Block::from(TetrisColor::Yellow, Position::new(6, 10)),
-        Block::from(TetrisColor::Yellow, Position::new(5, 11)),
-        Block::from(TetrisColor::Yellow, Position::new(4, 12)),
-        Block::from(TetrisColor::Yellow, Position::new(3, 13)),
-        Block::from(TetrisColor::Yellow, Position::new(4, 13)),
-        Block::from(TetrisColor::Yellow, Position::new(5, 13)),
-        Block::from(TetrisColor::Yellow, Position::new(6, 13)),
+    const TWO: [Position; 10] = [
+        Position::new(4, 9),
+        Position::new(5, 9),
+        Position::new(3, 10),
+        Position::new(6, 10),
+        Position::new(5, 11),
+        Position::new(4, 12),
+        Position::new(3, 13),
+        Position::new(4, 13),
+        Position::new(5, 13),
+        Position::new(6, 13),
     ];
 
-    const THREE: [Block; 9] = [
-        Block::from(TetrisColor::Yellow, Position::new(4, 9)),
-        Block::from(TetrisColor::Yellow, Position::new(5, 9)),
-        Block::from(TetrisColor::Yellow, Position::new(3, 10)),
-        Block::from(TetrisColor::Yellow, Position::new(6, 10)),
-        Block::from(TetrisColor::Yellow, Position::new(5, 11)),
-        Block::from(TetrisColor::Yellow, Position::new(3, 12)),
-        Block::from(TetrisColor::Yellow, Position::new(6, 12)),
-        Block::from(TetrisColor::Yellow, Position::new(4, 13)),
-        Block::from(TetrisColor::Yellow, Position::new(5, 13)),
+    const THREE: [Position; 9] = [
+        Position::new(4, 9),
+        Position::new(5, 9),
+        Position::new(3, 10),
+        Position::new(6, 10),
+        Position::new(5, 11),
+        Position::new(3, 12),
+        Position::new(6, 12),
+        Position::new(4, 13),
+        Position::new(5, 13),
     ];
 
     /// Draw a 1 with blocks of the same color as tetromino.
@@ -150,33 +148,16 @@ impl Render for Tetromino {
         } else {
             *draw_state
         };
-        for i in 0..4 {
-            self.blocks[i].render(grid_position, &draw_state, gl, assets);
+        for block in self.blocks {
+            self.color.render(
+                block.x as usize,
+                block.y as usize,
+                grid_position,
+                &draw_state,
+                gl,
+                assets,
+            );
         }
-    }
-}
-
-impl Render for Block {
-    /// Draw a [Block] using its position and the given `grid_position`.
-    fn render(
-        &self,
-        grid_position: Matrix2d,
-        draw_state: &DrawState,
-        gl: &mut GlGraphics,
-        assets: &Assets,
-    ) {
-        let dims = rectangle::square(
-            self.x() as Scalar * BLOCK_SIZE,
-            self.y() as Scalar * BLOCK_SIZE,
-            BLOCK_SIZE,
-        );
-
-        Image::new().rect(dims).draw(
-            assets.texture_from_tetris_color(&self.color()),
-            draw_state,
-            grid_position,
-            gl,
-        );
     }
 }
 

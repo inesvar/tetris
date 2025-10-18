@@ -5,7 +5,6 @@ use super::{
     moving_primitives::ApplyRotationTranslation,
     rotation_translation::{RotationTranslation, RotationType},
     spatial_primitives::{Direction, Position},
-    tetris_block::{Block, TryMoveBlock},
     tetris_grid::BackendError,
     Deserialize, Pcg32, Serialize, TetrisColor, TetrisGrid, TetrominoKind, UseTetromino,
 };
@@ -18,7 +17,8 @@ use std::fmt::Formatter;
 pub(crate) struct Tetromino {
     kind: TetrominoKind,
     center: Position,
-    pub(super) blocks: [Block; 4],
+    pub(super) blocks: [Position; 4],
+    pub(in crate::app::player) color: TetrisColor,
     direction: Direction,
     pub(super) is_ghost: bool,
 }
@@ -100,12 +100,8 @@ impl UseTetromino for Tetromino {
         Some(Tetromino {
             kind,
             center: positions[0],
-            blocks: [
-                Block::from(color, positions[1]),
-                Block::from(color, positions[2]),
-                Block::from(color, positions[3]),
-                Block::from(color, positions[4]),
-            ],
+            blocks: [positions[1], positions[2], positions[3], positions[4]],
+            color,
             direction: Direction::default(),
             is_ghost: false,
         })
@@ -117,12 +113,8 @@ impl UseTetromino for Tetromino {
         Tetromino {
             kind,
             center: positions[0],
-            blocks: [
-                Block::from(color, positions[1]),
-                Block::from(color, positions[2]),
-                Block::from(color, positions[3]),
-                Block::from(color, positions[4]),
-            ],
+            blocks: [positions[1], positions[2], positions[3], positions[4]],
+            color,
             direction: Direction::default(),
             is_ghost: false,
         }
@@ -130,14 +122,8 @@ impl UseTetromino for Tetromino {
 
     fn reset_position(&mut self) {
         let positions = self.kind.get_initial_position();
-        let color = self.kind.into();
         self.center = positions[0];
-        self.blocks = [
-            Block::from(color, positions[1]),
-            Block::from(color, positions[2]),
-            Block::from(color, positions[3]),
-            Block::from(color, positions[4]),
-        ];
+        self.blocks = [positions[1], positions[2], positions[3], positions[4]];
     }
 
     fn make_ghost_copy(&mut self) -> Tetromino {
@@ -191,11 +177,13 @@ impl Tetromino {
     ) -> Result<(), BackendError> {
         let mut new_blocks = self.blocks;
         for new_block in new_blocks.iter_mut() {
-            new_block.try_move(
-                grid,
-                movement,
-                self.kind.is_rotation_center_on_block_center(),
-            )?;
+            if self.kind.is_rotation_center_on_block_center() {
+                new_block.move_by(movement);
+            } else {
+                new_block.move_by_with_offset(movement);
+            }
+            // Check if `copy` is inside `grid` and on an empty slot.
+            grid.is_block_available(new_block)?;
         }
         self.blocks = new_blocks;
         self.direction.turn_by(movement);
@@ -207,15 +195,11 @@ impl Tetromino {
         grid.are_blocks_available(&self.blocks)
     }
 
-    pub(in crate::app::player) fn get_tetris_color(&self) -> TetrisColor {
-        self.blocks[0].color()
-    }
-
     pub(in crate::app::player) fn lock_down(
         self,
         grid: &mut TetrisGrid,
     ) -> Result<u64, BackendError> {
-        grid.add_blocks(&self.blocks, self.get_tetris_color())
+        grid.add_blocks(&self.blocks, self.color)
     }
 }
 
@@ -224,7 +208,8 @@ impl Default for Tetromino {
         Tetromino {
             kind: TetrominoKind::O,
             center: Position::default(),
-            blocks: [Block::default(); 4],
+            blocks: [Position::default(); 4],
+            color: TetrisColor::Yellow,
             direction: Direction::default(),
             is_ghost: false,
         }
