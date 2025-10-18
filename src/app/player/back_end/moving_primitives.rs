@@ -31,19 +31,19 @@ pub(super) trait ApplyRotationTranslation {
     fn turn_by_with_offset(&mut self, movement: &RotationTranslation);
 }
 
-/// Convert between regular coordinates and 2x zoomed coordinates.
+/// Convert block coordinates to 2x zoomed coordinates and the other way around.
 /// In 2x zoomed coordinates, block centers lie at even coordinates
-/// while block intersections lie at odd coordinates.
+/// while block corners lie at odd coordinates.
 ///
 /// This trait is useful to rotate the I tetromino, which unlike the other
-/// tetrominos rotates around a block intersection, and not a block center.
+/// tetrominos rotates around a block corner and not a block center.
 trait ZoomInAndOut {
-    /// Map coordinates to zoomed-in even coordinates (scales x2).
-    fn zoom_in_on_block_center(&mut self);
-    /// Map coordinates to zoomed-in odd coordinates (scales x2, add 1).
-    fn zoom_in_on_bottom_right_block_intersection(&mut self);
-    /// Map zoomed-in coordinates back to regular coordinates (divide by 2, round towards -infinite).
-    fn zoom_out(&mut self);
+    /// Map block coordinates to zoomed-in even coordinates (scales x2).
+    fn get_block_center_coordinates(&self) -> Self;
+    /// Map block coordinates to zoomed-in odd coordinates (scales x2, add 1).
+    fn get_block_bottom_right_corner(&self) -> Self;
+    /// Map zoomed-in coordinates to block coordinates (divide by 2, round towards -infinite).
+    fn get_block_coordinates(&self) -> Self;
 }
 
 impl ApplyRotationTranslation for Position {
@@ -71,13 +71,13 @@ impl ApplyRotationTranslation for Position {
     }
 
     fn turn_by_with_offset(&mut self, movement: &RotationTranslation) {
-        self.zoom_in_on_block_center();
-        let mut offset_movement = *movement;
-        offset_movement
+        let mut zoomed = self.get_block_center_coordinates();
+        let mut zoomed_rotation = *movement;
+        zoomed_rotation.rotation_center = zoomed_rotation
             .rotation_center
-            .zoom_in_on_bottom_right_block_intersection();
-        self.turn_by(&offset_movement);
-        self.zoom_out();
+            .get_block_bottom_right_corner();
+        zoomed.turn_by(&zoomed_rotation);
+        *self = zoomed.get_block_coordinates();
     }
 }
 
@@ -106,19 +106,16 @@ impl ApplyRotationTranslation for Direction {
 }
 
 impl ZoomInAndOut for Position {
-    fn zoom_in_on_block_center(&mut self) {
-        self.x *= 2;
-        self.y *= 2;
+    fn get_block_center_coordinates(&self) -> Self {
+        Self::new(2 * self.x, 2 * self.y)
     }
 
-    fn zoom_in_on_bottom_right_block_intersection(&mut self) {
-        self.x = 2 * self.x + 1;
-        self.y = 2 * self.y + 1;
+    fn get_block_bottom_right_corner(&self) -> Self {
+        Self::new(2 * self.x + 1, 2 * self.y + 1)
     }
 
-    fn zoom_out(&mut self) {
-        self.x = self.x.div_euclid(2);
-        self.y = self.y.div_euclid(2);
+    fn get_block_coordinates(&self) -> Self {
+        Self::new(self.x.div_euclid(2), self.y.div_euclid(2))
     }
 }
 
@@ -129,32 +126,32 @@ mod tests {
 
     #[test]
     fn zoom_in_from_center_is_correct() {
-        let mut pos = Position::new(5, -2);
+        let pos = Position::new(5, -2);
         let expected = Position::new(10, -4);
 
-        pos.zoom_in_on_block_center();
+        let actual = pos.get_block_center_coordinates();
 
-        assert_eq!(pos, expected);
+        assert_eq!(actual, expected);
     }
 
     #[test]
     fn zoom_in_from_intersection_is_correct() {
-        let mut pos = Position::new(-4, 3);
+        let pos = Position::new(-4, 3);
         let expected = Position::new(-7, 7);
 
-        pos.zoom_in_on_bottom_right_block_intersection();
+        let actual = pos.get_block_bottom_right_corner();
 
-        assert_eq!(pos, expected);
+        assert_eq!(actual, expected);
     }
 
     #[test]
     fn zoom_out_is_correct() {
-        let mut pos = Position::new(-5, 5);
+        let pos = Position::new(-5, 5);
         let expected = Position::new(-3, 2);
 
-        pos.zoom_out();
+        let actual = pos.get_block_coordinates();
 
-        assert_eq!(pos, expected);
+        assert_eq!(actual, expected);
     }
 
     #[test]
@@ -164,12 +161,11 @@ mod tests {
             Position::new(-5, 2),
             Position::new(-4, 3),
         ] {
-            let mut pos = expected;
+            let actual = expected
+                .get_block_center_coordinates()
+                .get_block_coordinates();
 
-            pos.zoom_in_on_block_center();
-            pos.zoom_out();
-
-            assert_eq!(pos, expected);
+            assert_eq!(actual, expected);
         }
     }
 
@@ -180,12 +176,11 @@ mod tests {
             Position::new(-5, 2),
             Position::new(-4, 3),
         ] {
-            let mut pos = expected;
+            let actual = expected
+                .get_block_bottom_right_corner()
+                .get_block_coordinates();
 
-            pos.zoom_in_on_bottom_right_block_intersection();
-            pos.zoom_out();
-
-            assert_eq!(pos, expected);
+            assert_eq!(actual, expected);
         }
     }
 
