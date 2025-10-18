@@ -7,88 +7,88 @@ use opengl_graphics::OpenGL;
 use piston::Key;
 use serde::Deserialize;
 
-static SCALE_FACTOR: f64 = 1.0;
-pub static HOST_PORT: &str = ":26000";
-pub static GUEST_PORT: &str = ":26005";
+const SCALE_FACTOR: f64 = 1.0;
+pub const HOST_PORT: &str = ":26000";
+pub const GUEST_PORT: &str = ":26005";
 
 // Change this to OpenGL::V2_1 if not working.
-pub static OPENGL_VERSION: OpenGL = OpenGL::V4_5;
+pub const OPENGL_VERSION: OpenGL = OpenGL::V4_5;
 
-pub static NB_COLUMNS: u32 = 10;
-pub static NB_ROWS: u32 = 22;
-pub static NB_HIDDEN_ROWS: u32 = 2;
+pub const NB_COLUMNS: u32 = 10;
+pub const NB_ROWS: u32 = 22;
+pub const NB_HIDDEN_ROWS: u32 = 2;
 
 /****************************************/
 /* POSITIONS IN SINGLE PLAYER GAME VIEW */
 /****************************************/
 
-pub static DEFAULT_WINDOW_WIDTH: u32 = (650.0 * SCALE_FACTOR) as u32;
-pub static DEFAULT_WINDOW_HEIGHT: u32 = (800.0 * SCALE_FACTOR) as u32;
+pub const DEFAULT_WINDOW_WIDTH: u32 = (650.0 * SCALE_FACTOR) as u32;
+pub const DEFAULT_WINDOW_HEIGHT: u32 = (800.0 * SCALE_FACTOR) as u32;
 
 // coordinates of the top left corner of the grid
 // changing this moves everything in the single-player view except the title
-pub static DEFAULT_GRID_X: f64 = 200.0 * SCALE_FACTOR;
-pub static DEFAULT_GRID_Y: f64 = 160.0 * SCALE_FACTOR;
+pub const DEFAULT_GRID_X: f64 = 200.0 * SCALE_FACTOR;
+pub const DEFAULT_GRID_Y: f64 = 160.0 * SCALE_FACTOR;
 
 // height of the title "Tetris" and "Press R to (re)start"
-pub static DEFAULT_TITLE_Y: f64 = 100.0 * SCALE_FACTOR;
+pub const DEFAULT_TITLE_Y: f64 = 100.0 * SCALE_FACTOR;
 // height of the text on the left side indicating the score
-pub static DEFAULT_SCORE_TEXT_Y: f64 = DEFAULT_GRID_Y + 8.0 * BLOCK_SIZE;
+pub const DEFAULT_SCORE_TEXT_Y: f64 = DEFAULT_GRID_Y + 8.0 * BLOCK_SIZE;
 
-pub static BLOCK_SIZE: f64 = 25.0 * SCALE_FACTOR;
-pub static TETROMINO_MAX_WIDTH: f64 = 4.0 * BLOCK_SIZE;
-pub static TETROMINO_MAX_HEIGHT: f64 = 2.0 * BLOCK_SIZE;
-pub static GRID_THICKNESS: f64 = 0.5;
+pub const BLOCK_SIZE: f64 = 25.0 * SCALE_FACTOR;
+pub const TETROMINO_MAX_WIDTH: f64 = 4.0 * BLOCK_SIZE;
+pub const TETROMINO_MAX_HEIGHT: f64 = 2.0 * BLOCK_SIZE;
+pub const GRID_THICKNESS: f64 = 0.5;
 
 /****************************************/
 /*      POSITIONS IN MAIN MENU VIEW     */
 /****************************************/
 
 // size of the buttons
-pub static DEFAULT_BUTTON_WIDTH: f64 = 300.0 * SCALE_FACTOR;
-pub static DEFAULT_BUTTON_HEIGHT: f64 = 50.0 * SCALE_FACTOR;
-pub static DEFAULT_BUTTON_Y_SPACING: f64 = 100.0 * SCALE_FACTOR;
+pub const DEFAULT_BUTTON_WIDTH: f64 = 300.0 * SCALE_FACTOR;
+pub const DEFAULT_BUTTON_HEIGHT: f64 = 50.0 * SCALE_FACTOR;
+pub const DEFAULT_BUTTON_Y_SPACING: f64 = 100.0 * SCALE_FACTOR;
 // size of the text
-pub static DEFAULT_FONT_SIZE: u32 = (16.0 * SCALE_FACTOR) as u32;
+pub const DEFAULT_FONT_SIZE: u32 = (16.0 * SCALE_FACTOR) as u32;
 
 /****************************************/
 /*      POSITIONS IN SETTINGS VIEW      */
 /****************************************/
 
 // size of the buttons
-pub static DEFAULT_KEY_INPUT_WIDTH: f64 = 200.0 * SCALE_FACTOR;
-pub static DEFAULT_KEY_INPUT_HEIGHT: f64 = 50.0 * SCALE_FACTOR;
+pub const DEFAULT_KEY_INPUT_WIDTH: f64 = 200.0 * SCALE_FACTOR;
+pub const DEFAULT_KEY_INPUT_HEIGHT: f64 = 50.0 * SCALE_FACTOR;
 
 /****************************************/
 /*               COLORS                 */
 /****************************************/
 
-pub static BG_COLOR: graphics::types::Color = [0.0, 0.3, 0.1, 1.0];
-pub static GRID_BG_COLOR: graphics::types::Color = [0.3, 0.3, 0.3, 1.0];
-pub static GRID_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
-pub static TEXT_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
+pub const BG_COLOR: graphics::types::Color = [0.0, 0.3, 0.1, 1.0];
+pub const GRID_BG_COLOR: graphics::types::Color = [0.3, 0.3, 0.3, 1.0];
+pub const GRID_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
+pub const TEXT_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
 
 /****************************************/
 /*          GAME KEYBINDINGS            */
 /****************************************/
 
-static FALL_KEYS_1P: [Key; 2] = [Key::Down, Key::NumPad2];
-static HARD_DROP_KEYS_1P: [Key; 2] = [Key::Space, Key::NumPad8];
-static RIGHT_KEYS_1P: [Key; 2] = [Key::Right, Key::NumPad6];
-static LEFT_KEYS_1P: [Key; 2] = [Key::Left, Key::NumPad4];
-static ROTATE_CLOCKWISE_KEYS_1P: [Key; 2] = [Key::Up, Key::NumPad5];
-static ROTATE_COUNTERCLOCKWISE_KEYS_1P: [Key; 2] = [Key::NumPad0, Key::NumPad7];
-static ROTATE_HALF_TURN_1P: [Key; 1] = [Key::A];
-static HOLD_TETROMINO_KEYS_1P: [Key; 2] = [Key::C, Key::NumPadEnter];
+const FALL_KEYS_1P: [Key; 2] = [Key::Down, Key::NumPad2];
+const HARD_DROP_KEYS_1P: [Key; 2] = [Key::Space, Key::NumPad8];
+const RIGHT_KEYS_1P: [Key; 2] = [Key::Right, Key::NumPad6];
+const LEFT_KEYS_1P: [Key; 2] = [Key::Left, Key::NumPad4];
+const ROTATE_CLOCKWISE_KEYS_1P: [Key; 2] = [Key::Up, Key::NumPad5];
+const ROTATE_COUNTERCLOCKWISE_KEYS_1P: [Key; 2] = [Key::NumPad0, Key::NumPad7];
+const ROTATE_HALF_TURN_1P: [Key; 1] = [Key::A];
+const HOLD_TETROMINO_KEYS_1P: [Key; 2] = [Key::C, Key::NumPadEnter];
 
-static FALL_KEYS_2P: [Key; 2] = [Key::X, Key::NumPad2];
-static HARD_DROP_KEYS_2P: [Key; 2] = [Key::Z, Key::NumPad8];
-static RIGHT_KEYS_2P: [Key; 2] = [Key::D, Key::NumPad6];
-static LEFT_KEYS_2P: [Key; 2] = [Key::A, Key::NumPad4];
-static ROTATE_CLOCKWISE_KEYS_2P: [Key; 2] = [Key::S, Key::NumPad5];
-static ROTATE_COUNTERCLOCKWISE_KEYS_2P: [Key; 2] = [Key::Q, Key::NumPad7];
-static ROTATE_HALF_TURN_2P: [Key; 2] = [Key::CapsLock, Key::NumPadPlus];
-static HOLD_TETROMINO_KEYS_2P: [Key; 2] = [Key::Space, Key::NumPadEnter];
+const FALL_KEYS_2P: [Key; 2] = [Key::X, Key::NumPad2];
+const HARD_DROP_KEYS_2P: [Key; 2] = [Key::Z, Key::NumPad8];
+const RIGHT_KEYS_2P: [Key; 2] = [Key::D, Key::NumPad6];
+const LEFT_KEYS_2P: [Key; 2] = [Key::A, Key::NumPad4];
+const ROTATE_CLOCKWISE_KEYS_2P: [Key; 2] = [Key::S, Key::NumPad5];
+const ROTATE_COUNTERCLOCKWISE_KEYS_2P: [Key; 2] = [Key::Q, Key::NumPad7];
+const ROTATE_HALF_TURN_2P: [Key; 2] = [Key::CapsLock, Key::NumPadPlus];
+const HOLD_TETROMINO_KEYS_2P: [Key; 2] = [Key::Space, Key::NumPadEnter];
 
 pub struct Keybindings {
     pub fall_keys: Vec<Key>,
@@ -210,10 +210,9 @@ impl Keybindings {
 pub const FALL_SPEED_DIVIDE: u64 = 50;
 pub const FREEZE: u64 = 50;
 // not setable in the UI
-// TODO: these should be const
 pub const RESTART_KEYS: [Key; 1] = [Key::R];
-pub static PAUSE_KEYS: [Key; 1] = [Key::P];
-pub static KEY_REPEAT_DELAY: u64 = 20;
+pub const PAUSE_KEYS: [Key; 1] = [Key::P];
+pub const KEY_REPEAT_DELAY: u64 = 20;
 
 /// Settings represents parameters that need to be common between players in multiplayer mode.
 ///
@@ -279,7 +278,7 @@ impl Settings {
 }
 
 // TODO: this could be in the tetris back-end library
-pub static BAG_SIZE: u32 = 14;
+pub const BAG_SIZE: u32 = 14;
 // typical sizes are 7 and 14, 1 is entirely random
 // for size 7 * n + k, k < 7, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
 pub const NB_NEXT_TETROMINO: usize = 6;
