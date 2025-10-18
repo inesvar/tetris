@@ -1,5 +1,7 @@
 //! Define `trait` [Render] for [Block], [Tetromino] and [TetrisGrid].
-use super::{tetris_block::Block, TetrisColor, TetrisGrid, Tetromino};
+use super::{
+    spatial_primitives::Position, tetris_block::Block, TetrisColor, TetrisGrid, Tetromino,
+};
 use crate::assets::Assets;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
 use graphics::draw_state::Blend;
@@ -29,6 +31,66 @@ impl TetrisGrid {
 
     pub(in crate::app::player) fn hidden_height(&self) -> f64 {
         self.nb_hidden_rows as f64 * BLOCK_SIZE
+    }
+
+    fn draw_on_empty_grid(&mut self, blocks: &[Block], tetris_color: TetrisColor) {
+        self.null();
+
+        for block in blocks {
+            self[block] = Some(tetris_color);
+        }
+    }
+
+    const ONE: [Block; 9] = [
+        Block::from(TetrisColor::Yellow, Position::new(5, 9)),
+        Block::from(TetrisColor::Yellow, Position::new(4, 10)),
+        Block::from(TetrisColor::Yellow, Position::new(5, 10)),
+        Block::from(TetrisColor::Yellow, Position::new(5, 11)),
+        Block::from(TetrisColor::Yellow, Position::new(5, 12)),
+        Block::from(TetrisColor::Yellow, Position::new(3, 13)),
+        Block::from(TetrisColor::Yellow, Position::new(4, 13)),
+        Block::from(TetrisColor::Yellow, Position::new(5, 13)),
+        Block::from(TetrisColor::Yellow, Position::new(6, 13)),
+    ];
+
+    const TWO: [Block; 10] = [
+        Block::from(TetrisColor::Yellow, Position::new(4, 9)),
+        Block::from(TetrisColor::Yellow, Position::new(5, 9)),
+        Block::from(TetrisColor::Yellow, Position::new(3, 10)),
+        Block::from(TetrisColor::Yellow, Position::new(6, 10)),
+        Block::from(TetrisColor::Yellow, Position::new(5, 11)),
+        Block::from(TetrisColor::Yellow, Position::new(4, 12)),
+        Block::from(TetrisColor::Yellow, Position::new(3, 13)),
+        Block::from(TetrisColor::Yellow, Position::new(4, 13)),
+        Block::from(TetrisColor::Yellow, Position::new(5, 13)),
+        Block::from(TetrisColor::Yellow, Position::new(6, 13)),
+    ];
+
+    const THREE: [Block; 9] = [
+        Block::from(TetrisColor::Yellow, Position::new(4, 9)),
+        Block::from(TetrisColor::Yellow, Position::new(5, 9)),
+        Block::from(TetrisColor::Yellow, Position::new(3, 10)),
+        Block::from(TetrisColor::Yellow, Position::new(6, 10)),
+        Block::from(TetrisColor::Yellow, Position::new(5, 11)),
+        Block::from(TetrisColor::Yellow, Position::new(3, 12)),
+        Block::from(TetrisColor::Yellow, Position::new(6, 12)),
+        Block::from(TetrisColor::Yellow, Position::new(4, 13)),
+        Block::from(TetrisColor::Yellow, Position::new(5, 13)),
+    ];
+
+    /// Draw a 1 with blocks of the same color as tetromino.
+    pub(in crate::app::player) fn one(&mut self, tetris_color: TetrisColor) {
+        self.draw_on_empty_grid(&Self::ONE, tetris_color);
+    }
+
+    /// Draw a 2 with blocks of the same color as tetromino.
+    pub(in crate::app::player) fn two(&mut self, tetris_color: TetrisColor) {
+        self.draw_on_empty_grid(&Self::TWO, tetris_color);
+    }
+
+    /// Draw a 3 with blocks of the same color as tetromino.
+    pub(in crate::app::player) fn three(&mut self, tetris_color: TetrisColor) {
+        self.draw_on_empty_grid(&Self::THREE, tetris_color);
     }
 }
 
