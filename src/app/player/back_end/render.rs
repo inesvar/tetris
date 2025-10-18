@@ -18,6 +18,20 @@ pub(in crate::app::player) trait Render {
     );
 }
 
+impl TetrisGrid {
+    pub(in crate::app::player) fn total_width(&self) -> f64 {
+        self.nb_columns as f64 * BLOCK_SIZE
+    }
+
+    pub(in crate::app::player) fn visible_height(&self) -> f64 {
+        (self.nb_rows - self.nb_hidden_rows) as f64 * BLOCK_SIZE
+    }
+
+    pub(in crate::app::player) fn hidden_height(&self) -> f64 {
+        self.nb_hidden_rows as f64 * BLOCK_SIZE
+    }
+}
+
 impl Render for TetrisGrid {
     /// Draw a [TetrisGrid] and its contents at the given `grid_position`.
     fn render(
