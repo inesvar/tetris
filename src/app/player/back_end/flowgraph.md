@@ -8,8 +8,6 @@ graph LR
     RotationTranslation[[RotationTranslation]]
     RotationType[RotationType]
     ApplyRotationTranslation([ApplyRotationTranslation])
-    Block[[Block]]
-    TryMoveBlock([TryMoveBlock])
     TetrisGrid[[TetrisGrid]]
     Tetromino[[Tetromino]]
     UseTetromino([UseTetromino])
@@ -37,23 +35,17 @@ graph LR
 
     ApplyRotationTranslation ==> Position & Direction
     ApplyRotationTranslation -.-> RotationTranslation
-    
-    subgraph tetris_block
-        TryMoveBlock ==> Block
-    end
 
     subgraph tetris_grid
         TetrisGrid
     end
 
-    Block -.-> ApplyRotationTranslation & TetrisGrid
-
     subgraph tetromino
         UseTetromino ==> Tetromino
     end
 
-    Tetromino --o spatial_primitives & Block
-    Tetromino -.-> ApplyRotationTranslation & TryMoveBlock
+    Tetromino --o spatial_primitives
+    Tetromino -.-> ApplyRotationTranslation & TetrisGrid
 ```
 
 ```mermaid
