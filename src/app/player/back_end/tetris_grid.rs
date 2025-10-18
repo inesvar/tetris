@@ -108,7 +108,8 @@ impl TetrisGrid {
         self.line_sum.insert(0, 0);
     }
 
-    fn solve_and_compute_score(&mut self) -> u64 {
+    /// Clear lines, return number of cleared lines.
+    fn clear_lines(&mut self) -> u64 {
         let mut score = 0;
         for y in 0..self.nb_rows as usize {
             if self.line_sum[y] == self.nb_columns {
@@ -141,7 +142,7 @@ impl TetrisGrid {
         if no_block_below_skyline {
             Err(BackendError::LockOut)
         } else {
-            Ok(self.solve_and_compute_score())
+            Ok(self.clear_lines())
         }
     }
 
