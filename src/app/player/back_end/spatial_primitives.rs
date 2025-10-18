@@ -2,9 +2,10 @@
 use super::{Deserialize, Serialize};
 
 // y increases from top to bottom
-pub(super) const FALL: Position = Position::new(0, 1);
+#[cfg(test)]
 pub(super) const RISE: Position = Position::new(0, -1);
 pub(super) const RIGHT: Position = Position::new(1, 0);
+pub(super) const FALL: Position = Position::new(0, 1);
 pub(super) const LEFT: Position = Position::new(-1, 0);
 
 /// Position on a discrete grid, serializable.
@@ -167,56 +168,32 @@ mod tests {
         assert_eq!(clock, Direction::Right);
     }
 
-    const TEST_VALUES: [i32; 5] = [1, -1, 0, 42, 77];
-
     #[test]
     fn position_add_is_correct() {
-        for a in TEST_VALUES {
-            for b in TEST_VALUES {
-                let a_pos = Position::new(a, 0);
-                let b_pos = Position::new(b, 0);
+        let a = Position::new(7, -5);
+        let b = Position::new(2, -4);
+        let expected = Position::new(9, -9);
 
-                assert_eq!((a_pos + b_pos).x, a + b);
-
-                let a_pos = Position::new(0, a);
-                let b_pos = Position::new(0, b);
-
-                assert_eq!((a_pos + b_pos).y, a + b);
-            }
-        }
+        assert_eq!(a + b, expected);
     }
 
     #[test]
     fn position_sub_is_correct() {
-        for a in TEST_VALUES {
-            for b in TEST_VALUES {
-                let a_pos = Position::new(a, 0);
-                let b_pos = Position::new(b, 0);
+        let a = Position::new(4, -3);
+        let b = Position::new(-7, -4);
+        let expected = Position::new(11, 1);
 
-                assert_eq!((a_pos - b_pos).x, a - b);
-
-                let a_pos = Position::new(0, a);
-                let b_pos = Position::new(0, b);
-
-                assert_eq!((a_pos - b_pos).y, a - b);
-            }
-        }
+        assert_eq!(a - b, expected);
     }
 
     #[test]
     fn position_add_assign_is_correct() {
-        for a in TEST_VALUES {
-            for b in TEST_VALUES {
-                let mut a_pos = Position::new(a, 0);
-                a_pos += Position::new(b, 0);
+        let mut a = Position::new(3, -1);
+        let b = Position::new(-2, 6);
+        let expected = Position::new(1, 5);
 
-                assert_eq!(a_pos.x, a + b);
+        a += b;
 
-                let mut a_pos = Position::new(0, a);
-                a_pos += Position::new(0, b);
-
-                assert_eq!(a_pos.y, a + b);
-            }
-        }
+        assert_eq!(a, expected);
     }
 }

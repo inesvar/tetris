@@ -20,7 +20,7 @@ pub(super) enum RotationType {
 }
 
 impl RotationTranslation {
-    pub(super) fn new(
+    pub(super) const fn new(
         translation: &Position,
         rotation_type: RotationType,
         rotation_center: &Position,
@@ -32,30 +32,40 @@ impl RotationTranslation {
         }
     }
 
-    pub(super) fn translation(translation: Position) -> Self {
+    // TODO: remove when const traits are allowed
+    const fn const_default() -> Self {
+        Self::new(
+            &Position::new(0, 0),
+            RotationType::None,
+            &Position::new(0, 0),
+        )
+    }
+
+    // why not by reference ?
+    pub(super) const fn translation(translation: Position) -> Self {
         Self {
             translation,
-            ..Self::default()
+            ..Self::const_default()
         }
     }
 
-    pub(super) fn fall() -> Self {
+    pub(super) const fn fall() -> Self {
         RotationTranslation::translation(FALL)
     }
 
-    pub(super) fn right() -> Self {
+    pub(super) const fn right() -> Self {
         RotationTranslation::translation(RIGHT)
     }
 
-    pub(super) fn left() -> Self {
+    pub(super) const fn left() -> Self {
         RotationTranslation::translation(LEFT)
     }
 
-    pub(super) fn rotation(rotation_type: RotationType, rotation_center: &Position) -> Self {
+    pub(super) const fn rotation(rotation_type: RotationType, rotation_center: &Position) -> Self {
         Self {
             rotation_type,
             rotation_center: *rotation_center,
-            ..Self::default()
+            ..Self::const_default()
         }
     }
 }
