@@ -31,21 +31,18 @@ pub(super) trait ApplyRotationTranslation {
     fn turn_by_with_offset(&mut self, movement: &RotationTranslation);
 }
 
-/// Scale coordinates to support rotations around block intersections,
-/// not just around block centers.
+/// Convert between regular coordinates and 2x zoomed coordinates.
+/// In 2x zoomed coordinates, block centers lie at even coordinates
+/// while block intersections lie at odd coordinates.
 ///
-/// While most tetromino rotations are performed around a block center,
-/// the I tetromino rotates around a block intersection,
-/// which lies at the midpoint between standard coordinates.
-///
-/// This trait provides zooming in functions that scale x2 and a zooming out function that scales x0.5.
-/// A block center has the same 'regular' (or zoomed-out) coordinates as the bottom right block intersection.
+/// This trait is useful to rotate the I tetromino, which unlike the other
+/// tetrominos rotates around a block intersection, and not a block center.
 trait ZoomInAndOut {
-    /// Map block centers to even coordinates.
-    fn zoom_in_from_center(&mut self);
-    /// Map block intersections to odd coordinates.
-    fn zoom_in_from_intersection(&mut self);
-    /// Map zoomed-in coordinates to regular coordinates.
+    /// Map coordinates to zoomed-in even coordinates (scales x2).
+    fn zoom_in_on_block_center(&mut self);
+    /// Map coordinates to zoomed-in odd coordinates (scales x2, add 1).
+    fn zoom_in_on_bottom_right_block_intersection(&mut self);
+    /// Map zoomed-in coordinates back to regular coordinates (divide by 2, round towards -infinite).
     fn zoom_out(&mut self);
 }
 
@@ -74,9 +71,11 @@ impl ApplyRotationTranslation for Position {
     }
 
     fn turn_by_with_offset(&mut self, movement: &RotationTranslation) {
-        self.zoom_in_from_center();
+        self.zoom_in_on_block_center();
         let mut offset_movement = *movement;
-        offset_movement.rotation_center.zoom_in_from_intersection();
+        offset_movement
+            .rotation_center
+            .zoom_in_on_bottom_right_block_intersection();
         self.turn_by(&offset_movement);
         self.zoom_out();
     }
@@ -107,12 +106,12 @@ impl ApplyRotationTranslation for Direction {
 }
 
 impl ZoomInAndOut for Position {
-    fn zoom_in_from_center(&mut self) {
+    fn zoom_in_on_block_center(&mut self) {
         self.x *= 2;
         self.y *= 2;
     }
 
-    fn zoom_in_from_intersection(&mut self) {
+    fn zoom_in_on_bottom_right_block_intersection(&mut self) {
         self.x = 2 * self.x + 1;
         self.y = 2 * self.y + 1;
     }
@@ -133,7 +132,7 @@ mod tests {
         let mut pos = Position::new(5, -2);
         let expected = Position::new(10, -4);
 
-        pos.zoom_in_from_center();
+        pos.zoom_in_on_block_center();
 
         assert_eq!(pos, expected);
     }
@@ -143,7 +142,7 @@ mod tests {
         let mut pos = Position::new(-4, 3);
         let expected = Position::new(-7, 7);
 
-        pos.zoom_in_from_intersection();
+        pos.zoom_in_on_bottom_right_block_intersection();
 
         assert_eq!(pos, expected);
     }
@@ -167,7 +166,7 @@ mod tests {
         ] {
             let mut pos = expected;
 
-            pos.zoom_in_from_center();
+            pos.zoom_in_on_block_center();
             pos.zoom_out();
 
             assert_eq!(pos, expected);
@@ -183,7 +182,7 @@ mod tests {
         ] {
             let mut pos = expected;
 
-            pos.zoom_in_from_intersection();
+            pos.zoom_in_on_bottom_right_block_intersection();
             pos.zoom_out();
 
             assert_eq!(pos, expected);

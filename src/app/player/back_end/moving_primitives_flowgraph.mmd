@@ -1,7 +1,6 @@
 graph LR
     %% objects
     Position[[Position]]
-    Block[[Block]]
     Direction[Direction]
     RotationTranslation[[RotationTranslation]]
     ApplyRotationTranslation([ApplyRotationTranslation])
@@ -13,8 +12,8 @@ graph LR
     moving_primitives[moving_primitives]
 
     subgraph spatial_primitives
-        Block --o Position
         Direction
+        Position
     end
 
     subgraph rotation_translation
@@ -26,9 +25,9 @@ graph LR
         ZoomInAndOut
     end
 
-    ZoomInAndOut === Position
-    ApplyRotationTranslation === Position & Block & Direction
     ApplyRotationTranslation -.-> RotationTranslation
-    ApplyRotationTranslation -.-> ZoomInAndOut
+    ApplyRotationTranslation ==> Direction
+    ApplyRotationTranslation === ZoomInAndOut
+    ZoomInAndOut ==> Position
 
-    ZoomInAndOut ~~~ Block & Direction & RotationTranslation
+    ZoomInAndOut ~~~ Direction
