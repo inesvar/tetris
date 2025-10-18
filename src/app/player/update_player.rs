@@ -126,6 +126,12 @@ impl LocalPlayer {
                 // if the tetromino froze above the visible grid, it's game over !
                 None => self.declare_game_over(),
             }
+
+            // Adds garbage to the grid
+            self.player_screen
+                .grid
+                .add_garbage(self.garbage_to_be_added);
+            self.garbage_to_be_added = 0;
         }
 
         /**********************************
@@ -141,12 +147,6 @@ impl LocalPlayer {
         let mut ghost = self.player_screen.active_tetromino.make_ghost_copy();
         ghost.hard_drop(&self.player_screen.grid);
         self.player_screen.ghost_tetromino = Some(ghost);
-
-        // Adds garbage to the grid
-        self.player_screen
-            .grid
-            .add_garbage(self.garbage_to_be_added);
-        self.garbage_to_be_added = 0;
 
         // Send the player_screen data if necessary
         if self.sender {

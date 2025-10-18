@@ -117,6 +117,7 @@ impl TetrisGrid {
 
     /// Push the Tetromino into the grid and return the number of lines completed.
     pub(super) fn add_blocks(&mut self, blocks: &[Block]) -> Option<u64> {
+        // TODO: devrait etre un Result
         let mut game_over = true;
         for block in blocks {
             self.add_block(block);
