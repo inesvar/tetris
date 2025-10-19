@@ -4,7 +4,7 @@
 //! [handle_key_release()](LocalPlayer::handle_key_release()) is called when a key is released.
 use super::{LocalPlayer, UseTetromino};
 use crate::{
-    app::{player::back_end::BackendError, GameFlowChange, RunningState},
+    app::{GameFlowChange, RunningState},
     settings::{Keybindings, PAUSE_KEYS, RESTART_KEYS},
 };
 use piston::Key;
@@ -140,27 +140,8 @@ impl LocalPlayer {
             self.player_screen
                 .active_tetromino
                 .hard_drop(&self.player_screen.grid);
-            match self
-                .player_screen
-                .active_tetromino
-                .lock_down(&mut self.player_screen.grid)
-            {
-                Ok(completed_lines) => {
-                    self.player_screen.new_completed_lines = completed_lines;
-                    if self.player_screen.new_completed_lines != 0 {
-                        println!(
-                            "{} lines were completed",
-                            self.player_screen.new_completed_lines
-                        );
-                    }
-                    self.player_screen.score += self.player_screen.new_completed_lines;
-                    self.get_new_tetromino();
-                }
-                Err(BackendError::LockOut) => {
-                    self.declare_game_over();
-                    return GameFlowChange::GameOver;
-                }
-                _ => unreachable!(),
+            if self.lock_down_tetromino().is_err() {
+                return GameFlowChange::GameOver;
             }
         }
         GameFlowChange::Other

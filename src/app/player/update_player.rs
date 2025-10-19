@@ -2,7 +2,7 @@
 //!
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
 use super::{LocalPlayer, UseTetromino};
-use crate::{app::player::back_end::BackendError, settings::Keybindings};
+use crate::settings::Keybindings;
 
 impl LocalPlayer {
     /// update is called before each render so that the informations on the screen are as recent as possible.
@@ -106,33 +106,7 @@ impl LocalPlayer {
                 .fall(&self.player_screen.grid)
                 .is_err()
         {
-            match self
-                .player_screen
-                .active_tetromino
-                .lock_down(&mut self.player_screen.grid)
-            {
-                // if lines were clearing by freezing the tetromino, set the attribute new_completed_lines
-                Ok(completed_lines) => {
-                    self.player_screen.new_completed_lines = completed_lines;
-                    if self.player_screen.new_completed_lines != 0 {
-                        println!(
-                            "{} lines were completed",
-                            self.player_screen.new_completed_lines
-                        );
-                    }
-                    self.player_screen.score += self.player_screen.new_completed_lines;
-                    self.get_new_tetromino();
-                }
-                // if the tetromino froze above the visible grid, it's game over !
-                Err(BackendError::LockOut) => self.declare_game_over(),
-                _ => unreachable!(),
-            }
-
-            // Adds garbage to the grid
-            self.player_screen
-                .grid
-                .add_garbage(self.garbage_to_be_added);
-            self.garbage_to_be_added = 0;
+            let _ = self.lock_down_tetromino();
         }
 
         /**********************************

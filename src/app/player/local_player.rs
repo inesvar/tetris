@@ -4,6 +4,7 @@ use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
     UseTetromino,
 };
+use crate::app::player::back_end::BackendError;
 use crate::{app::Countdown, app::PlayerConfig, assets::Assets, once, settings::*};
 use graphics::types::Matrix2d;
 use opengl_graphics::GlGraphics;
@@ -185,5 +186,41 @@ impl LocalPlayer {
             );
             self.player_screen.new_completed_lines = 0;
         }
+    }
+
+    pub(super) fn lock_down_tetromino(&mut self) -> Result<(), ()> {
+        println!("Locking down the active tetromino");
+        let res = self
+            .player_screen
+            .active_tetromino
+            .lock_down(&mut self.player_screen.grid);
+        match res {
+            // if lines were clearing by freezing the tetromino, set the attribute new_completed_lines
+            Ok(completed_lines) => {
+                self.player_screen.new_completed_lines = completed_lines;
+                if self.player_screen.new_completed_lines != 0 {
+                    println!(
+                        "{} lines were completed",
+                        self.player_screen.new_completed_lines
+                    );
+                }
+                self.player_screen.score += self.player_screen.new_completed_lines;
+                self.get_new_tetromino();
+            }
+            // if the tetromino froze above the visible grid, it's game over !
+            Err(BackendError::LockOut) => {
+                self.declare_game_over();
+                return Err(());
+            }
+            _ => unreachable!(),
+        }
+
+        // Adds garbage to the grid
+        self.player_screen
+            .grid
+            .add_garbage(self.garbage_to_be_added);
+        self.garbage_to_be_added = 0;
+
+        Ok(())
     }
 }
