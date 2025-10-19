@@ -36,6 +36,7 @@ impl PlayerScreen {
         ctx: &Context,
         gl: &mut GlGraphics,
         assets: &mut Assets,
+        display_active_tetromino: bool,
     ) {
         let score_text = Text::new(
             format!("Score: {}", self.score).as_str(),
@@ -56,8 +57,10 @@ impl PlayerScreen {
             ghost.render(grid_transform, &ctx.draw_state, gl, assets);
         }
 
-        self.active_tetromino
-            .render(grid_transform, &ctx.draw_state, gl, assets);
+        if display_active_tetromino {
+            self.active_tetromino
+                .render(grid_transform, &ctx.draw_state, gl, assets);
+        }
 
         // drawing a border for the hold piece
         let transform2 = grid_transform.trans(

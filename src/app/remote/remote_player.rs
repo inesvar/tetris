@@ -84,13 +84,14 @@ impl RemotePlayer {
         ctx: &Context,
         gl: &mut GlGraphics,
         assets: &mut Assets,
+        display_active_tetromino: bool,
     ) {
         if !*self.first_screen_received.lock().unwrap() {
             return;
         }
         {
             let mut screen = self.screen.lock().unwrap();
-            screen.render(transform, ctx, gl, assets);
+            screen.render(transform, ctx, gl, assets, display_active_tetromino);
         }
         once!("render was done");
     }

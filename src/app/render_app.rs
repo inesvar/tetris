@@ -78,6 +78,7 @@ impl App<'_> {
                             &ctx,
                             gl,
                             &mut self.assets,
+                            self.running != RunningState::NotRunning,
                         );
                         nb_players += 1;
                     }
@@ -88,6 +89,7 @@ impl App<'_> {
                             &ctx,
                             gl,
                             &mut self.assets,
+                            self.running != RunningState::NotRunning,
                         );
                         nb_players += 1;
                     }

@@ -118,8 +118,10 @@ impl LocalPlayer {
         ctx: &Context,
         gl: &mut GlGraphics,
         assets: &mut Assets,
+        display_active_tetromino: bool,
     ) {
-        self.player_screen.render(transform, ctx, gl, assets);
+        self.player_screen
+            .render(transform, ctx, gl, assets, display_active_tetromino);
     }
 
     pub(in crate::app) fn countdown(&mut self, i: &Countdown) {
