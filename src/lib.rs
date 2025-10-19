@@ -97,9 +97,6 @@ pub fn event_loop() {
         }
 
         if let Some(args) = e.render_args() {
-            if let Ok(elapsed) = now.elapsed() {
-                println!("{}", elapsed.as_nanos());
-            }
             now = SystemTime::now();
             app.render(&args);
         }

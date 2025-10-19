@@ -26,7 +26,7 @@ impl Serialize for Settings {
                 let mut a = self.serialize_as_msg.borrow_mut();
                 *a = false;
             }
-            let s = serializer.serialize_newtype_variant("MessageType", 1, "SettingsMsg", self);
+            let s = serializer.serialize_newtype_variant("MessageType", 1, "Settings", self);
             {
                 let mut a = self.serialize_as_msg.borrow_mut();
                 *a = true;
@@ -61,7 +61,7 @@ impl Serialize for PlayerScreen {
                 let mut a = self.serialize_as_msg.borrow_mut();
                 *a = false;
             }
-            let s = serializer.serialize_newtype_variant("MessageType", 0, "PlayerScreenMsg", self);
+            let s = serializer.serialize_newtype_variant("MessageType", 0, "PlayerScreen", self);
             {
                 let mut a = self.serialize_as_msg.borrow_mut();
                 *a = true;
