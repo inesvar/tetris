@@ -46,7 +46,7 @@ pub fn event_loop() {
     // Start the event loop.
     let mut events = Events::new(EventSettings::new());
 
-    let mut now = SystemTime::now();
+    let mut _now = SystemTime::now();
 
     while let Some(e) = events.next(&mut window) {
         // Handle the local user(s) input.
@@ -97,7 +97,7 @@ pub fn event_loop() {
         }
 
         if let Some(args) = e.render_args() {
-            now = SystemTime::now();
+            _now = SystemTime::now();
             app.render(&args);
         }
     }
