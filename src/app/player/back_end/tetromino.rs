@@ -116,11 +116,11 @@ impl UseTetromino for Tetromino {
         }
     }
 
-    // TODO: is direction reset during stash ?
     fn reset_position(&mut self) {
         let positions = self.kind.get_initial_position();
         self.center = positions[0];
         self.blocks = [positions[1], positions[2], positions[3], positions[4]];
+        self.direction = Direction::Up;
     }
 
     fn make_ghost_copy(&mut self) -> Tetromino {
@@ -163,6 +163,14 @@ impl UseTetromino for Tetromino {
         }
         tetromino_bag
     }
+
+    fn is_valid_in(&self, grid: &TetrisGrid) -> bool {
+        grid.are_blocks_available(&self.blocks)
+    }
+
+    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, BackendError> {
+        grid.add_blocks(&self.blocks, self.color)
+    }
 }
 
 impl Tetromino {
@@ -186,17 +194,6 @@ impl Tetromino {
         self.direction.turn_by(movement);
         self.center.translate_by(movement);
         Ok(())
-    }
-
-    pub(in crate::app::player) fn is_valid_in(&self, grid: &TetrisGrid) -> bool {
-        grid.are_blocks_available(&self.blocks)
-    }
-
-    pub(in crate::app::player) fn lock_down(
-        self,
-        grid: &mut TetrisGrid,
-    ) -> Result<u64, BackendError> {
-        grid.add_blocks(&self.blocks, self.color)
     }
 }
 

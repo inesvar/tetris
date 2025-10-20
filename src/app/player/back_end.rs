@@ -41,6 +41,10 @@ pub(in crate::app::player) trait UseTetromino: Sized {
     /// Turn the tetromino counterclockwise if it's possible, eventually using wall-kicks.
     fn turn_counterclockwise(&mut self, grid: &TetrisGrid);
 
+    fn is_valid_in(&self, grid: &TetrisGrid) -> bool;
+
+    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, BackendError>;
+
     // Return an Option eventually containing a Tetromino if its starting position is empty.
     fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Self>;
 
