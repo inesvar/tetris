@@ -18,9 +18,13 @@ pub(in crate::app) struct TetrisGrid {
 // same visibility as TetrisColor
 #[derive(Debug, PartialEq)]
 pub(in crate::app) enum BackendError {
-    TriedToMoveOutsideOfGrid,
-    TriedToMoveToUnavailableBlock,
-    /// cf Guidelines 10.6. : when a whole tetromino locks down above the skyline
+    /// Tried to move outside of the grid.
+    OutsideOfGrid,
+    /// Tried to move/spawn to unavailable block.
+    UnavailableBlock,
+    /// Tried to spawn to unavailable block.
+    BlockOut,
+    /// Locked down fully above the skyline (cf Guidelines 10.6.).
     LockOut,
 }
 
@@ -76,7 +80,7 @@ impl TetrisGrid {
         if is_block_inside_grid {
             Ok(())
         } else {
-            Err(BackendError::TriedToMoveOutsideOfGrid)
+            Err(BackendError::OutsideOfGrid)
         }
     }
 
@@ -84,20 +88,20 @@ impl TetrisGrid {
         if self[block].is_none() {
             Ok(())
         } else {
-            Err(BackendError::TriedToMoveToUnavailableBlock)
+            Err(BackendError::UnavailableBlock)
         }
     }
 
     /// Returns true if the `block` is inside the grid in an empty slot.
     pub(super) fn is_block_available(&self, block: &Position) -> Result<(), BackendError> {
         self.is_block_inside_grid(block)?;
-
         self.is_block_empty(block)
     }
 
-    /// Returns true if the `blocks` are inside the grid on empty slots.
-    pub(super) fn are_blocks_available(&self, blocks: &[Position]) -> bool {
-        blocks.iter().all(|b| self.is_block_available(b).is_ok())
+    /// Returns true if `blocks` can enter the grid.
+    pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<(), BackendError> {
+        let can_spawn = blocks.iter().try_for_each(|b| self.is_block_empty(b));
+        can_spawn.map_err(|_| BackendError::BlockOut)
     }
 
     fn pop_row(&mut self, row: usize) {

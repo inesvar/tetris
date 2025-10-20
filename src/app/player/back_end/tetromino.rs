@@ -101,7 +101,7 @@ impl UseTetromino for Tetromino {
         }
     }
 
-    fn reset_position(&mut self) {
+    fn reset(&mut self) {
         let positions = self.kind.get_initial_position();
         self.center = positions[0];
         self.blocks = [positions[1], positions[2], positions[3], positions[4]];
@@ -149,8 +149,8 @@ impl UseTetromino for Tetromino {
         tetromino_bag
     }
 
-    fn is_valid_in(&self, grid: &TetrisGrid) -> bool {
-        grid.are_blocks_available(&self.blocks)
+    fn can_enter_grid(&self, grid: &TetrisGrid) -> bool {
+        grid.can_blocks_spawn_on(&self.blocks).is_ok()
     }
 
     fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, BackendError> {

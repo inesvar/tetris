@@ -62,8 +62,7 @@ impl LocalPlayer {
         self.player_screen.ghost_tetromino = None;
         self.rng = Pcg32::seed_from_u64(seed);
         self.bag_of_tetromino = Tetromino::new_tetromino_bag(BAG_SIZE, &mut self.rng);
-        self.player_screen.active_tetromino =
-            Tetromino::new(self.bag_of_tetromino.pop().unwrap());
+        self.player_screen.active_tetromino = Tetromino::new(self.bag_of_tetromino.pop().unwrap());
         self.player_screen.fifo_next_tetromino =
             CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
         for _ in 0..NB_NEXT_TETROMINO {
@@ -151,9 +150,9 @@ impl LocalPlayer {
         // TODO this should be done using the grid method and probably all other calls
         // using null()...
         let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
-        if !possible_active.is_valid_in(&self.player_screen.grid) {
-            // If not, it's a block out situation
-            // set the game_over flag and return the tetromino to the bag
+        if !possible_active.can_enter_grid(&self.player_screen.grid) {
+            // This is a block out situation.
+            // Set the game_over flag and return the tetromino to the bag.
             self.declare_game_over();
             self.player_screen
                 .fifo_next_tetromino
@@ -163,9 +162,7 @@ impl LocalPlayer {
         // Add a new tetromino to the file to replace the one that was taken
         self.player_screen
             .fifo_next_tetromino
-            .push(Tetromino::new(
-                self.bag_of_tetromino.pop().unwrap(),
-            ));
+            .push(Tetromino::new(self.bag_of_tetromino.pop().unwrap()));
         self.player_screen.active_tetromino = possible_active;
     }
 

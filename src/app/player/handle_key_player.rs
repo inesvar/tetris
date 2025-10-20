@@ -107,12 +107,12 @@ impl LocalPlayer {
         {
             // hold the tetromino
             if let Some(mut saved) = self.player_screen.saved_tetromino {
-                self.player_screen.active_tetromino.reset_position();
+                self.player_screen.active_tetromino.reset();
 
                 std::mem::swap(&mut saved, &mut self.player_screen.active_tetromino);
                 self.player_screen.saved_tetromino = Some(saved);
             } else {
-                self.player_screen.active_tetromino.reset_position();
+                self.player_screen.active_tetromino.reset();
 
                 self.player_screen.saved_tetromino = Some(self.player_screen.active_tetromino);
                 self.get_new_tetromino();

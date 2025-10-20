@@ -41,17 +41,18 @@ pub(in crate::app::player) trait UseTetromino: Sized {
     /// Turn the tetromino counterclockwise if it's possible, eventually using wall-kicks.
     fn turn_counterclockwise(&mut self, grid: &TetrisGrid);
 
-    fn is_valid_in(&self, grid: &TetrisGrid) -> bool;
-
-    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, BackendError>;
-
     /// Return a new Tetromino at its starting position.
     fn new(kind: TetrominoKind) -> Self;
 
-    // TODO can't this cause a collision??
-    // TODO the direction is not reset ??? => test this but using new_unchecked seems better
     /// Reset the Tetromino at its starting position.
-    fn reset_position(&mut self);
+    fn reset(&mut self);
+
+    /// Check whether the Tetromino can enter the grid.
+    fn can_enter_grid(&self, grid: &TetrisGrid) -> bool;
+
+    /// Lock down in the grid.
+    /// Return error on LockOut and number of completed lines on success.
+    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, BackendError>;
 
     // TODO so it's hard dropped separately? it could be hard droped here !
     /// Return a ghost copy of the Tetromino.
