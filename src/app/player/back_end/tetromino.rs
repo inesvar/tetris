@@ -89,7 +89,7 @@ impl UseTetromino for Tetromino {
         }
     }
 
-    fn new_unchecked(kind: TetrominoKind) -> Tetromino {
+    fn new(kind: TetrominoKind) -> Tetromino {
         let positions = kind.get_initial_position();
         Tetromino {
             kind,
@@ -227,8 +227,8 @@ mod tests {
     #[test]
     fn i_tetromino_rotation_is_correct() {
         let empty_grid = TetrisGrid::new(NB_COLUMNS, NB_ROWS, NB_HIDDEN_ROWS);
-        let mut i_tetromino = Tetromino::new_unchecked(TetrominoKind::I);
-        let mut naive_i_tetromino = Tetromino::new_unchecked(TetrominoKind::I);
+        let mut i_tetromino = Tetromino::new(TetrominoKind::I);
+        let mut naive_i_tetromino = Tetromino::new(TetrominoKind::I);
         naive_i_tetromino.kind = TetrominoKind::T;
 
         println!(

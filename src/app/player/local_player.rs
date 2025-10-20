@@ -63,20 +63,20 @@ impl LocalPlayer {
         self.rng = Pcg32::seed_from_u64(seed);
         self.bag_of_tetromino = Tetromino::new_tetromino_bag(BAG_SIZE, &mut self.rng);
         self.player_screen.active_tetromino =
-            Tetromino::new_unchecked(self.bag_of_tetromino.pop().unwrap());
+            Tetromino::new(self.bag_of_tetromino.pop().unwrap());
         self.player_screen.fifo_next_tetromino =
             CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
         for _ in 0..NB_NEXT_TETROMINO {
             if let Some(t) = self.bag_of_tetromino.pop() {
                 self.player_screen
                     .fifo_next_tetromino
-                    .push(Tetromino::new_unchecked(t));
+                    .push(Tetromino::new(t));
             } else {
                 self.bag_of_tetromino = Tetromino::new_tetromino_bag(BAG_SIZE, &mut self.rng);
                 if let Some(t) = self.bag_of_tetromino.pop() {
                     self.player_screen
                         .fifo_next_tetromino
-                        .push(Tetromino::new_unchecked(t));
+                        .push(Tetromino::new(t));
                 } else {
                     unreachable!();
                 }
@@ -163,7 +163,7 @@ impl LocalPlayer {
         // Add a new tetromino to the file to replace the one that was taken
         self.player_screen
             .fifo_next_tetromino
-            .push(Tetromino::new_unchecked(
+            .push(Tetromino::new(
                 self.bag_of_tetromino.pop().unwrap(),
             ));
         self.player_screen.active_tetromino = possible_active;

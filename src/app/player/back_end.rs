@@ -45,8 +45,8 @@ pub(in crate::app::player) trait UseTetromino: Sized {
 
     fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, BackendError>;
 
-    // Return a Tetromino at its starting position without checking that this place is empty.
-    fn new_unchecked(kind: TetrominoKind) -> Self;
+    /// Return a new Tetromino at its starting position.
+    fn new(kind: TetrominoKind) -> Self;
 
     // TODO can't this cause a collision??
     // TODO the direction is not reset ??? => test this but using new_unchecked seems better
