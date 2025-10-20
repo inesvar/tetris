@@ -62,11 +62,8 @@ impl LocalPlayer {
         self.player_screen.ghost_tetromino = None;
         self.rng = Pcg32::seed_from_u64(seed);
         self.bag_of_tetromino = Tetromino::new_tetromino_bag(BAG_SIZE, &mut self.rng);
-        self.player_screen.active_tetromino = Tetromino::new(
-            self.bag_of_tetromino.pop().unwrap(),
-            &self.player_screen.grid,
-        )
-        .unwrap();
+        self.player_screen.active_tetromino =
+            Tetromino::new_unchecked(self.bag_of_tetromino.pop().unwrap());
         self.player_screen.fifo_next_tetromino =
             CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
         for _ in 0..NB_NEXT_TETROMINO {

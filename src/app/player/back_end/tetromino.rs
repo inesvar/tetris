@@ -89,21 +89,6 @@ impl UseTetromino for Tetromino {
         }
     }
 
-    fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Tetromino> {
-        let positions = kind.get_initial_position();
-        for position in positions {
-            grid.is_block_empty(&position).ok()?;
-        }
-        Some(Tetromino {
-            kind,
-            center: positions[0],
-            blocks: [positions[1], positions[2], positions[3], positions[4]],
-            color: kind.into(),
-            direction: Direction::default(),
-            is_ghost: false,
-        })
-    }
-
     fn new_unchecked(kind: TetrominoKind) -> Tetromino {
         let positions = kind.get_initial_position();
         Tetromino {

@@ -45,9 +45,6 @@ pub(in crate::app::player) trait UseTetromino: Sized {
 
     fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, BackendError>;
 
-    // Return an Option eventually containing a Tetromino if its starting position is empty.
-    fn new(kind: TetrominoKind, grid: &TetrisGrid) -> Option<Self>;
-
     // Return a Tetromino at its starting position without checking that this place is empty.
     fn new_unchecked(kind: TetrominoKind) -> Self;
 
