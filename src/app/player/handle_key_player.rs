@@ -69,6 +69,27 @@ impl LocalPlayer {
         /******************************
          *         ACTIVE GAME        *
          ******************************/
+        self.move_active_tetromino(keybindings)
+    }
+
+    fn move_active_tetromino(&mut self, keybindings: &Keybindings) -> GameFlowChange {
+        if self
+            .keyboard
+            .is_any_last_pressed(&keybindings.hold_tetromino_keys)
+        {
+            // hold the tetromino
+            if let Some(mut saved) = self.player_screen.saved_tetromino {
+                self.player_screen.active_tetromino.reset();
+
+                std::mem::swap(&mut saved, &mut self.player_screen.active_tetromino);
+                self.player_screen.saved_tetromino = Some(saved);
+            } else {
+                self.player_screen.active_tetromino.reset();
+
+                self.player_screen.saved_tetromino = Some(self.player_screen.active_tetromino);
+                self.get_new_tetromino();
+            }
+        }
 
         // Pressed once events
         if self
@@ -99,24 +120,6 @@ impl LocalPlayer {
             self.player_screen
                 .active_tetromino
                 .turn_half_turn(&self.player_screen.grid);
-        }
-
-        if self
-            .keyboard
-            .is_any_last_pressed(&keybindings.hold_tetromino_keys)
-        {
-            // hold the tetromino
-            if let Some(mut saved) = self.player_screen.saved_tetromino {
-                self.player_screen.active_tetromino.reset();
-
-                std::mem::swap(&mut saved, &mut self.player_screen.active_tetromino);
-                self.player_screen.saved_tetromino = Some(saved);
-            } else {
-                self.player_screen.active_tetromino.reset();
-
-                self.player_screen.saved_tetromino = Some(self.player_screen.active_tetromino);
-                self.get_new_tetromino();
-            }
         }
 
         // move the tetromino left or right
