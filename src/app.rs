@@ -64,7 +64,7 @@ pub enum GameFlowChange {
     GameOver,
     Sync(Settings),
     Hello(String),
-    Other,
+    NoChange,
 }
 
 /// View state indicates what is on screen.
@@ -265,7 +265,7 @@ impl<'a> App<'a> {
     }
 
     pub fn handle_key_press(&mut self, key: Key) {
-        let mut game_key_press = GameFlowChange::Other;
+        let mut game_key_press = GameFlowChange::NoChange;
         match &self.view_state {
             ViewState::MainMenu => self.widget_manager[0].handle_key_press(key),
             ViewState::Settings => {
@@ -294,7 +294,7 @@ impl<'a> App<'a> {
     // TODO: add doc
     pub fn handle_remote(&mut self) {
         once!("handle remote was called");
-        let mut game_flow_change: GameFlowChange = GameFlowChange::Other;
+        let mut game_flow_change: GameFlowChange = GameFlowChange::NoChange;
         for player in &self.remote_player {
             // supposing there's only one player
             // TODO : change this for multiple remote players

@@ -31,7 +31,7 @@ impl LocalPlayer {
          ******************************/
         // the starting game doesn't listen to anything
         if running == RunningState::Starting {
-            return GameFlowChange::Other;
+            return GameFlowChange::NoChange;
         }
 
         self.keyboard.set_pressed(key);
@@ -45,7 +45,7 @@ impl LocalPlayer {
             if self.keyboard.is_any_last_pressed(&RESTART_KEYS) {
                 return GameFlowChange::Restart;
             } else {
-                return GameFlowChange::Other;
+                return GameFlowChange::NoChange;
             }
         }
 
@@ -58,7 +58,7 @@ impl LocalPlayer {
             if self.keyboard.is_any_last_pressed(&PAUSE_KEYS) {
                 return GameFlowChange::Resume;
             } else {
-                return GameFlowChange::Other;
+                return GameFlowChange::NoChange;
             }
         // the game pauses if PAUSE_KEYS are pressed
         } else if running == RunningState::Running && self.keyboard.is_any_last_pressed(&PAUSE_KEYS)
@@ -144,7 +144,8 @@ impl LocalPlayer {
                 return GameFlowChange::GameOver;
             }
         }
-        GameFlowChange::Other
+
+        GameFlowChange::NoChange
     }
 
     pub fn handle_key_release(&mut self, key: Key) {

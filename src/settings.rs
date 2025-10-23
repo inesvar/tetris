@@ -81,6 +81,7 @@ const ROTATE_COUNTERCLOCKWISE_KEYS_1P: [Key; 2] = [Key::NumPad0, Key::NumPad7];
 const ROTATE_HALF_TURN_1P: [Key; 1] = [Key::A];
 const HOLD_TETROMINO_KEYS_1P: [Key; 2] = [Key::C, Key::NumPadEnter];
 
+// First value is for the player on the left, second value for the player on the right
 const FALL_KEYS_2P: [Key; 2] = [Key::X, Key::NumPad2];
 const HARD_DROP_KEYS_2P: [Key; 2] = [Key::Z, Key::NumPad8];
 const RIGHT_KEYS_2P: [Key; 2] = [Key::D, Key::NumPad6];
