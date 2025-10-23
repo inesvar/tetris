@@ -278,7 +278,7 @@ impl Settings {
 }
 
 // TODO: this could be in the tetris back-end library
-pub const BAG_SIZE: u32 = 14;
+pub const BAG_SIZE: u32 = 7;
 // typical sizes are 7 and 14, 1 is entirely random
 // for size 7 * n + k, k < 7, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
 pub const NB_NEXT_TETROMINO: usize = 6;
