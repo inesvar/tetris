@@ -44,7 +44,7 @@ impl LocalPlayer {
 
         // Translate the tetromino down on a key press
         if frame_counter % 5 == 0 {
-            if self.keyboard.is_any_delay_pressed(&keybindings.fall_keys)
+            if self.keyboard.is_long_pressed(&keybindings.fall_keys)
                 && self
                     .player_screen
                     .active_tetromino
@@ -56,15 +56,15 @@ impl LocalPlayer {
                 self.freeze_frame = frame_counter + freeze;
             }
             // Translate the tetromino right or left on a long key press
-            if self.keyboard.is_any_delay_pressed(&keybindings.left_keys)
-                && !self.keyboard.is_any_delay_pressed(&keybindings.right_keys)
+            if self.keyboard.is_long_pressed(&keybindings.left_keys)
+                && !self.keyboard.is_long_pressed(&keybindings.right_keys)
             {
                 self.player_screen
                     .active_tetromino
                     .left(&self.player_screen.grid);
             }
-            if self.keyboard.is_any_delay_pressed(&keybindings.right_keys)
-                && !self.keyboard.is_any_delay_pressed(&keybindings.left_keys)
+            if self.keyboard.is_long_pressed(&keybindings.right_keys)
+                && !self.keyboard.is_long_pressed(&keybindings.left_keys)
             {
                 self.player_screen
                     .active_tetromino
