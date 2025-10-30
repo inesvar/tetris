@@ -56,7 +56,7 @@ impl LocalPlayer {
     }
 
     pub fn renew(&mut self, seed: u64) {
-        self.player_screen.grid.null();
+        self.player_screen.grid.reset();
         self.player_screen.score = 0;
         self.player_screen.saved_tetromino = None;
         self.player_screen.ghost_tetromino = None;
@@ -96,7 +96,7 @@ impl LocalPlayer {
     }
 
     pub fn start(&mut self) {
-        self.player_screen.grid.null();
+        self.player_screen.grid.reset();
         self.player_screen.game_over = false;
     }
 

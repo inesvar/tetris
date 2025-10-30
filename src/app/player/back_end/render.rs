@@ -32,7 +32,7 @@ impl TetrisGrid {
     }
 
     fn draw_on_empty_grid(&mut self, blocks: &[Position], tetris_color: TetrisColor) {
-        self.null();
+        self.reset();
 
         for block in blocks {
             self[block] = Some(tetris_color);

@@ -10,7 +10,7 @@ type GridLine = Vec<Option<TetrisColor>>;
 pub(in crate::app) struct TetrisGrid {
     // Number of columns. Can be cast to `usize` and `u32`.
     pub(super) nb_columns: i32,
-    // Number of rows (below the skyline). Can be cast to `usize` and `u32`.
+    // Total number of rows (including those above the skyline). Can be cast to `usize` and `u32`.
     pub(super) nb_rows: i32,
     // Number of hidden rows (above the skyline). Can be cast to `usize` and `u32`.
     pub(super) nb_hidden_rows: i32,
@@ -39,7 +39,7 @@ pub(in crate::app::player) trait UseTetrisGrid {
     fn add_garbage(&mut self, completed_lines: u64);
 
     /// Empty the grid.
-    fn null(&mut self);
+    fn reset(&mut self);
 }
 
 impl UseTetrisGrid for TetrisGrid {
@@ -76,7 +76,7 @@ impl UseTetrisGrid for TetrisGrid {
     }
 
     /// Empty the grid.
-    fn null(&mut self) {
+    fn reset(&mut self) {
         *self = Self::new(
             self.nb_columns as u32,
             self.nb_rows as u32,
@@ -143,10 +143,11 @@ impl IndexMut<&Position> for TetrisGrid {
 }
 
 impl TetrisGrid {
-    fn is_block_inside_grid(&self, block: &Position) -> Result<(), BackendError> {
+    /// Return whether `pos` is a valid block inside the tetris grid.
+    fn contains(&self, pos: &Position) -> Result<(), BackendError> {
         let is_block_inside_grid =
-            block.x >= 0 && block.y >= 0 && block.x < self.nb_columns && block.y < self.nb_rows;
-
+        pos.x >= 0 && pos.y >= 0 && pos.x < self.nb_columns && pos.y < self.nb_rows;
+        
         if is_block_inside_grid {
             Ok(())
         } else {
@@ -154,26 +155,24 @@ impl TetrisGrid {
         }
     }
 
-    pub(super) fn is_block_empty(&self, block: &Position) -> Result<(), BackendError> {
+    /// Return whether `block` is available in the tetris grid.
+    /// 
+    /// # Panics
+    /// 
+    /// If `block` is outside the tetris grid.
+    fn is_block_empty(&self, block: &Position) -> Result<(), BackendError> {
         if self[block].is_none() {
             Ok(())
         } else {
             Err(BackendError::UnavailableBlock)
         }
     }
-
-    /// Returns true if the `block` is inside the grid in an empty slot.
-    pub(super) fn is_block_available(&self, block: &Position) -> Result<(), BackendError> {
-        self.is_block_inside_grid(block)?;
-        self.is_block_empty(block)
-    }
-
-    /// Returns true if `blocks` can enter the grid.
-    pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<(), BackendError> {
-        let can_spawn = blocks.iter().try_for_each(|b| self.is_block_empty(b));
-        can_spawn.map_err(|_| BackendError::BlockOut)
-    }
-
+    
+    /// Remove `row` from the tetris grid.
+    /// 
+    /// # Panics
+    /// 
+    /// If `row` is greater or equal to `self.nb_rows`.
     fn pop_row(&mut self, row: usize) {
         self.matrix.remove(row);
         self.matrix.insert(0, vec![None; self.nb_columns as usize]);
@@ -181,7 +180,7 @@ impl TetrisGrid {
         self.line_sum.remove(row);
         self.line_sum.insert(0, 0);
     }
-
+    
     /// Clear lines, return number of cleared lines.
     fn clear_lines(&mut self) -> u64 {
         let mut score = 0;
@@ -194,12 +193,37 @@ impl TetrisGrid {
         score
     }
 
+    /// Add `block` to the tetris grid.
+    /// 
+    /// # Panics
+    /// 
+    /// If `block` is outside the tetris grid.
     fn add_block(&mut self, block: &Position, tetris_color: TetrisColor) {
         self[block] = Some(tetris_color);
         self.line_sum[block.y as usize] += 1;
     }
 
+    /// Return true if the `block` is inside the grid in an empty slot.
+    pub(super) fn is_block_available(&self, block: &Position) -> Result<(), BackendError> {
+        self.contains(block)?;
+        self.is_block_empty(block)
+    }
+
+    /// Return true if `blocks` can enter the grid.
+    /// 
+    /// # Panics
+    /// 
+    /// If any of the `blocks` is outside the tetris grid.
+    pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<(), BackendError> {
+        let can_spawn = blocks.iter().try_for_each(|b| self.is_block_empty(b));
+        can_spawn.map_err(|_| BackendError::BlockOut)
+    }
+
     /// Push the blocks into the grid and return the number of lines completed.
+    /// 
+    /// # Panics
+    /// 
+    /// If any of the `blocks` is outside the tetris grid.
     pub(super) fn add_blocks(
         &mut self,
         blocks: &[Position],
