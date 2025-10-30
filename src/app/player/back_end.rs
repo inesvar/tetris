@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 use simple_mermaid::mermaid;
 
 pub(in crate::app::player) use render::Render;
+pub(in crate::app::player) use tetris_grid::UseTetrisGrid;
 pub(in crate::app) use tetris_grid::{BackendError, TetrisGrid};
 pub(crate) use tetromino::Tetromino;
 pub(in crate::app::player) use tetromino_kind::TetrominoKind;

@@ -221,6 +221,7 @@ impl Tetromino {
 
 #[cfg(test)]
 mod tests {
+    use super::super::UseTetrisGrid;
     use super::*;
     use crate::settings::{NB_COLUMNS, NB_HIDDEN_ROWS, NB_ROWS};
 

@@ -1,5 +1,5 @@
 //! Define the [render()](PlayerScreen::render()) and [constructor](PlayerScreen::empty()) of [PlayerScreen].
-use super::back_end::{Render, TetrisGrid, Tetromino};
+use super::back_end::{Render, TetrisGrid, Tetromino, UseTetrisGrid};
 use super::{CircularBuffer, PlayerScreen};
 use crate::assets::Assets;
 use crate::settings::{
