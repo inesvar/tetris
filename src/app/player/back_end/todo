@@ -1,8 +1,18 @@
-- fix paths for Windows in assets.rs
-- press key s open settings
-- assets load bug when too low in filesystem
-- re-implement clipboard copy/paste button using arboard (https://crates.io/crates/arboard/3.4.1) 
+# problems
+- the row 0 of the tetris grid should be the one on the bottom...
+- serialize a PlayerScreen(PlayerScreen) instead of doing black magic
+- use tokio to outsource tcp comms
+- today key inputs are sent to the tetris game and mouse inputs to the app... something more flexible would be great
+- remove the `is_ghost` boolean
 
+# new features
+- fix paths for Windows in assets.rs
+- press key s open settings (requires some planning before, the code is messy)
+- output an error when playing remote doesn't work
+# other
+- correct srs using guidelines
+- read tetris guidelines to update code and vocabulary
+- assets load bug when too low in filesystem
 
 # not  the priority
 

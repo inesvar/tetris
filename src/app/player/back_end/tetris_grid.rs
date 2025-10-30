@@ -146,8 +146,8 @@ impl TetrisGrid {
     /// Return whether `pos` is a valid block inside the tetris grid.
     fn contains(&self, pos: &Position) -> Result<(), BackendError> {
         let is_block_inside_grid =
-        pos.x >= 0 && pos.y >= 0 && pos.x < self.nb_columns && pos.y < self.nb_rows;
-        
+            pos.x >= 0 && pos.y >= 0 && pos.x < self.nb_columns && pos.y < self.nb_rows;
+
         if is_block_inside_grid {
             Ok(())
         } else {
@@ -156,9 +156,9 @@ impl TetrisGrid {
     }
 
     /// Return whether `block` is available in the tetris grid.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// If `block` is outside the tetris grid.
     fn is_block_empty(&self, block: &Position) -> Result<(), BackendError> {
         if self[block].is_none() {
@@ -167,20 +167,20 @@ impl TetrisGrid {
             Err(BackendError::UnavailableBlock)
         }
     }
-    
+
     /// Remove `row` from the tetris grid.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// If `row` is greater or equal to `self.nb_rows`.
     fn pop_row(&mut self, row: usize) {
         self.matrix.remove(row);
-        self.matrix.insert(0, vec![None; self.nb_columns as usize]);
-
         self.line_sum.remove(row);
+
+        self.matrix.insert(0, vec![None; self.nb_columns as usize]);
         self.line_sum.insert(0, 0);
     }
-    
+
     /// Clear lines, return number of cleared lines.
     fn clear_lines(&mut self) -> u64 {
         let mut score = 0;
@@ -194,11 +194,17 @@ impl TetrisGrid {
     }
 
     /// Add `block` to the tetris grid.
-    /// 
+    ///
     /// # Panics
-    /// 
-    /// If `block` is outside the tetris grid.
+    ///
+    /// If `block` is outside the tetris grid or not empty.
     fn add_block(&mut self, block: &Position, tetris_color: TetrisColor) {
+        if self.is_block_empty(block).is_err() {
+            panic!(
+                "Trying to add a block to the grid but {:?} is not empty",
+                block
+            );
+        }
         self[block] = Some(tetris_color);
         self.line_sum[block.y as usize] += 1;
     }
@@ -210,9 +216,9 @@ impl TetrisGrid {
     }
 
     /// Return true if `blocks` can enter the grid.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// If any of the `blocks` is outside the tetris grid.
     pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<(), BackendError> {
         let can_spawn = blocks.iter().try_for_each(|b| self.is_block_empty(b));
@@ -220,9 +226,9 @@ impl TetrisGrid {
     }
 
     /// Push the blocks into the grid and return the number of lines completed.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// If any of the `blocks` is outside the tetris grid.
     pub(super) fn add_blocks(
         &mut self,
@@ -242,5 +248,97 @@ impl TetrisGrid {
         } else {
             Ok(self.clear_lines())
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn tetris_grid_from(str: &[&str]) -> TetrisGrid {
+        let nb_rows = str.len();
+        let nb_columns = str[0].len();
+        let mut tetris_grid = TetrisGrid::new(nb_columns as u32, nb_rows as u32, 0);
+
+        for row in 0..nb_rows {
+            for (column, char) in str[row].char_indices() {
+                let pos = Position::new(column as i32, row as i32);
+                let tetris_color = match char {
+                    ' ' => None,
+                    _ => Some(TetrisColor::Grey),
+                };
+                if let Some(tetris_color) = tetris_color {
+                    tetris_grid.add_block(&pos, tetris_color);
+                }
+            }
+        }
+
+        tetris_grid
+    }
+
+    fn tetris_grid_matches(tetris_grid: &TetrisGrid, str: &[&str]) -> bool {
+        let nb_rows = str.len();
+        let nb_columns = str[0].len();
+
+        if tetris_grid.nb_rows != nb_rows as i32 || tetris_grid.nb_columns != nb_columns as i32 {
+            return false;
+        }
+
+        for row in 0..nb_rows {
+            for (column, char) in str[row].char_indices() {
+                let pos = Position::new(column as i32, row as i32);
+                if (char == ' ') != tetris_grid.is_block_empty(&pos).is_ok() {
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
+
+    #[test]
+    fn is_block_empty_is_correct() {
+        let mut instance = TetrisGrid::new(5, 5, 0);
+        let pos = Position::new(0, 0);
+
+        assert!(instance.is_block_empty(&pos).is_ok());
+
+        instance.add_block(&pos, TetrisColor::Grey);
+
+        assert_eq!(
+            instance.is_block_empty(&pos),
+            Err(BackendError::UnavailableBlock)
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn is_block_empty_panics_outside_of_the_grid() {
+        let instance = TetrisGrid::new(5, 5, 0);
+        let pos = Position::new(5, 5);
+
+        let _ = instance.is_block_empty(&pos).is_ok();
+    }
+
+    #[test]
+    fn pop_row_is_correct() {
+        let mut tetris_grid = tetris_grid_from(&[
+            "XX XX X X X X",
+            " X X X XX XX ",
+            "X X XX XX X X",
+            "XXXXXXXXXXXXX",
+        ]);
+
+        tetris_grid.pop_row(3);
+
+        assert!(tetris_grid_matches(
+            &tetris_grid,
+            &[
+                "             ",
+                "XX XX X X X X",
+                " X X X XX XX ",
+                "X X XX XX X X",
+            ]
+        ));
     }
 }
