@@ -127,7 +127,7 @@ impl Render for TetrisGrid {
         } */
         for position in self.positions() {
             if let Some(tetris_color) = self[&position] {
-                tetris_color.render(position.x() as usize, position.y() as usize, grid_position, draw_state, gl, assets);
+                position.render(&tetris_color, grid_position, draw_state, gl, assets);
             }
         }
     }
@@ -143,9 +143,8 @@ impl Render for Tetromino {
         assets: &Assets,
     ) {
         for block in self.blocks() {
-            self.color.render(
-                block.x() as usize,
-                block.y() as usize,
+            block.render(
+                &self.color,
                 grid_position,
                 draw_state,
                 gl,
@@ -165,38 +164,28 @@ impl Tetromino {
         assets: &Assets,
     ) {
         let draw_state = draw_state.blend(Blend::Multiply);
-        for block in self.blocks() {
-            self.color.render(
-                block.x() as usize,
-                block.y() as usize,
-                grid_position,
-                &draw_state,
-                gl,
-                assets,
-            );
-        }
+        self.render(grid_position, &draw_state, gl, assets);
     }
 }
 
-impl TetrisColor {
-    /// Draw a [Block] using the specified [TetrisColor], `x` and `y` coordinates and `grid_position`.
+impl Position {
+    /// Draw a tetris block using the specified [TetrisColor] and `grid_position`.
     pub fn render(
         &self,
-        x: usize,
-        y: usize,
+        color: &TetrisColor,
         grid_position: Matrix2d,
         draw_state: &DrawState,
         gl: &mut GlGraphics,
         assets: &Assets,
     ) {
         let dims = rectangle::square(
-            x as Scalar * BLOCK_SIZE,
-            y as Scalar * BLOCK_SIZE,
+            self.x() as Scalar * BLOCK_SIZE,
+            self.y() as Scalar * BLOCK_SIZE,
             BLOCK_SIZE,
         );
 
         Image::new().rect(dims).draw(
-            assets.texture_from_tetris_color(self),
+            assets.texture_from_tetris_color(color),
             draw_state,
             grid_position,
             gl,
