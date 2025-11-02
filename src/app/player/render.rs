@@ -1,5 +1,5 @@
 //! Define `trait` [Render] for [Block], [Tetromino] and [TetrisGrid].
-use super::back_end::{Position, TetrisGrid, Tetromino, UseTetrisGrid};
+use super::core::{Position, TetrisGrid, Tetromino, UseTetrisGrid};
 use crate::assets::TetrisColor;
 use crate::assets::Assets;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};

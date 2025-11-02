@@ -1,5 +1,5 @@
 //! Define `trait` [UseTetromino], re-export `trait` [Render], `struct` [Tetromino], `struct` [TetrisGrid] and `enum` [TetrominoKind].
-#![doc = mermaid!("back_end/back_end_flowgraph.mmd")]
+#![doc = mermaid!("core/core_flowgraph.mmd")]
 mod moving_primitives;
 mod rotation_translation;
 mod spatial_primitives;

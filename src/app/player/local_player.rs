@@ -1,10 +1,10 @@
 //! Define the general implementation of [LocalPlayer].
-use super::back_end::{TetrisGrid, Tetromino, UseTetrisGrid};
+use super::core::{TetrisGrid, Tetromino, UseTetrisGrid};
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
     UseTetromino,
 };
-use crate::app::player::back_end::BackendError;
+use crate::app::player::core::BackendError;
 use crate::{app::Countdown, app::PlayerConfig, assets::Assets, once, settings::*};
 use graphics::types::Matrix2d;
 use opengl_graphics::GlGraphics;

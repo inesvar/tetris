@@ -1,8 +1,8 @@
 //! Define the mecanism of the game relative to one player.
 //!
-//! This module uses [back_end] to make the tetromino move according to the player's commands.
+//! This module uses [core] to make the tetromino move according to the player's commands.
 //! It also generates new tetromino pieces and handles the queue of next pieces.
-mod back_end;
+mod core;
 mod render;
 mod circular_buffer;
 mod handle_key_player;
@@ -11,9 +11,9 @@ mod player_screen;
 mod pressed_keys;
 mod update_player;
 
-pub(in crate::app::player) use self::back_end::{Tetromino, UseTetromino};
+pub(in crate::app::player) use self::core::{Tetromino, UseTetromino};
 use self::{
-    back_end::{TetrisGrid, TetrominoKind},
+    core::{TetrisGrid, TetrominoKind},
     circular_buffer::CircularBuffer,
     pressed_keys::PressedKeys,
 };
