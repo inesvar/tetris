@@ -135,7 +135,7 @@ impl Render for TetrisGrid {
 }
 
 impl Render for Tetromino {
-    /// Draw a [Tetromino] (eventually a ghost) at the given `tetromino_position`.
+    /// Draw a [Tetromino] (eventually a ghost).
     fn render(
         &self,
         grid_position: Matrix2d,
@@ -143,11 +143,29 @@ impl Render for Tetromino {
         gl: &mut GlGraphics,
         assets: &Assets,
     ) {
-        let draw_state = if self.is_ghost {
-            draw_state.blend(Blend::Multiply)
-        } else {
-            *draw_state
-        };
+        for block in self.blocks {
+            self.color.render(
+                block.x as usize,
+                block.y as usize,
+                grid_position,
+                draw_state,
+                gl,
+                assets,
+            );
+        }
+    }
+}
+
+impl Tetromino {
+    /// Draw a semi-transparent [Tetromino].
+    pub(in crate::app::player) fn render_ghost(
+        &self,
+        grid_position: Matrix2d,
+        draw_state: &DrawState,
+        gl: &mut GlGraphics,
+        assets: &Assets,
+    ) {
+        let draw_state = draw_state.blend(Blend::Multiply);
         for block in self.blocks {
             self.color.render(
                 block.x as usize,

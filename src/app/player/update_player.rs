@@ -119,7 +119,7 @@ impl LocalPlayer {
         self.keyboard.update();
 
         // Updates the ghost_tetromino
-        let mut ghost = self.player_screen.active_tetromino.make_ghost_copy();
+        let mut ghost = self.player_screen.active_tetromino;
         ghost.hard_drop(&self.player_screen.grid);
         self.player_screen.ghost_tetromino = Some(ghost);
 

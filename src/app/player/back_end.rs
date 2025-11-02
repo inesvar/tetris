@@ -55,10 +55,6 @@ pub(in crate::app::player) trait UseTetromino: Sized {
     /// Return error on LockOut and number of completed lines on success.
     fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, BackendError>;
 
-    // TODO so it's hard dropped separately? it could be hard droped here !
-    /// Return a ghost copy of the Tetromino.
-    fn make_ghost_copy(&mut self) -> Self;
-
     /// Return a random bag of [TetrominoKind] of the specified size using the given rng.
     fn new_tetromino_bag(size_of_bag: u32, rng: &mut Pcg32) -> Vec<TetrominoKind>;
 }

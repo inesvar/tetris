@@ -20,7 +20,6 @@ pub(crate) struct Tetromino {
     pub(super) blocks: [Position; 4],
     pub(in crate::app::player) color: TetrisColor,
     direction: Direction,
-    pub(super) is_ghost: bool,
 }
 
 impl UseTetromino for Tetromino {
@@ -97,7 +96,6 @@ impl UseTetromino for Tetromino {
             blocks: [positions[1], positions[2], positions[3], positions[4]],
             color: kind.into(),
             direction: Direction::default(),
-            is_ghost: false,
         }
     }
 
@@ -106,12 +104,6 @@ impl UseTetromino for Tetromino {
         self.center = positions[0];
         self.blocks = [positions[1], positions[2], positions[3], positions[4]];
         self.direction = Direction::Up;
-    }
-
-    fn make_ghost_copy(&mut self) -> Tetromino {
-        let mut ghost = *self;
-        ghost.is_ghost = true;
-        ghost
     }
 
     fn new_tetromino_bag(requested_size_of_bag: u32, rng: &mut Pcg32) -> Vec<TetrominoKind> {
@@ -190,7 +182,6 @@ impl Default for Tetromino {
             blocks: [Position::default(); 4],
             color: TetrisColor::Yellow,
             direction: Direction::default(),
-            is_ghost: false,
         }
     }
 }

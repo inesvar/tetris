@@ -54,7 +54,7 @@ impl PlayerScreen {
             .render(grid_transform, &ctx.draw_state, gl, assets);
 
         if let Some(ghost) = self.ghost_tetromino {
-            ghost.render(grid_transform, &ctx.draw_state, gl, assets);
+            ghost.render_ghost(grid_transform, &ctx.draw_state, gl, assets);
         }
 
         if display_active_tetromino {
