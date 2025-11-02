@@ -1,5 +1,6 @@
 //! Define `trait` [Render] for [Block], [Tetromino] and [TetrisGrid].
-use super::{spatial_primitives::Position, TetrisColor, TetrisGrid, Tetromino, UseTetrisGrid};
+use super::back_end::{Position, TetrisGrid, Tetromino, UseTetrisGrid};
+use crate::assets::TetrisColor;
 use crate::assets::Assets;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
 use graphics::draw_state::Blend;
@@ -20,15 +21,15 @@ pub(in crate::app::player) trait Render {
 
 impl TetrisGrid {
     pub(in crate::app::player) fn total_width(&self) -> f64 {
-        self.nb_columns as f64 * BLOCK_SIZE
+        self.nb_columns() as f64 * BLOCK_SIZE
     }
 
     pub(in crate::app::player) fn visible_height(&self) -> f64 {
-        (self.nb_rows - self.nb_hidden_rows) as f64 * BLOCK_SIZE
+        self.nb_visible_rows() as f64 * BLOCK_SIZE
     }
 
     pub(in crate::app::player) fn hidden_height(&self) -> f64 {
-        self.nb_hidden_rows as f64 * BLOCK_SIZE
+        self.nb_hidden_rows() as f64 * BLOCK_SIZE
     }
 
     fn draw_on_empty_grid(&mut self, blocks: &[Position], tetris_color: TetrisColor) {
@@ -124,11 +125,9 @@ impl Render for TetrisGrid {
                 }
             }
         } */
-        for (y, row) in self.matrix.iter().enumerate() {
-            for (x, cell) in row.iter().enumerate() {
-                if let Some(tetris_color) = cell {
-                    tetris_color.render(x, y, grid_position, draw_state, gl, assets);
-                }
+        for position in self.positions() {
+            if let Some(tetris_color) = self[&position] {
+                tetris_color.render(position.x() as usize, position.y() as usize, grid_position, draw_state, gl, assets);
             }
         }
     }
@@ -143,10 +142,10 @@ impl Render for Tetromino {
         gl: &mut GlGraphics,
         assets: &Assets,
     ) {
-        for block in self.blocks {
+        for block in self.blocks() {
             self.color.render(
-                block.x as usize,
-                block.y as usize,
+                block.x() as usize,
+                block.y() as usize,
                 grid_position,
                 draw_state,
                 gl,
@@ -166,10 +165,10 @@ impl Tetromino {
         assets: &Assets,
     ) {
         let draw_state = draw_state.blend(Blend::Multiply);
-        for block in self.blocks {
+        for block in self.blocks() {
             self.color.render(
-                block.x as usize,
-                block.y as usize,
+                block.x() as usize,
+                block.y() as usize,
                 grid_position,
                 &draw_state,
                 gl,

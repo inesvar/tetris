@@ -10,7 +10,7 @@ pub(super) const LEFT: Position = Position::new(-1, 0);
 
 /// Position on a discrete grid, serializable.
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
-pub(super) struct Position {
+pub(in crate::app::player) struct Position {
     /// Horizontal coordinate, from left to right.
     pub(super) x: i32,
     /// Vertical coordinate, *from top to bottom*.
@@ -29,7 +29,7 @@ pub(super) enum Direction {
 }
 
 impl Position {
-    pub(super) const fn new(x: i32, y: i32) -> Self {
+    pub(in crate::app::player) const fn new(x: i32, y: i32) -> Self {
         Position { x, y }
     }
 
@@ -53,6 +53,14 @@ impl Position {
 
     pub(super) const fn turned_counterclockwise(&self) -> Self {
         Position::new(self.y, -self.x)
+    }
+
+    pub(in crate::app::player) fn x(&self) -> i32 {
+        self.x
+    }
+
+    pub(in crate::app::player) fn y(&self) -> i32 {
+        self.y
     }
 }
 

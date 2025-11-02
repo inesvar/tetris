@@ -172,6 +172,10 @@ impl Tetromino {
         self.center.translate_by(movement);
         Ok(())
     }
+
+    pub(in crate::app::player) fn blocks(&self) -> &[Position] {
+        &self.blocks
+    }
 }
 
 impl Default for Tetromino {

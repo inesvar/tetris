@@ -3,6 +3,7 @@
 //! This module uses [back_end] to make the tetromino move according to the player's commands.
 //! It also generates new tetromino pieces and handles the queue of next pieces.
 mod back_end;
+mod render;
 mod circular_buffer;
 mod handle_key_player;
 mod local_player;

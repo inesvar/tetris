@@ -9,12 +9,12 @@ type GridLine = Vec<Option<TetrisColor>>;
 #[derive(Serialize, Deserialize)]
 pub(in crate::app) struct TetrisGrid {
     // Number of columns. Can be cast to `usize` and `u32`.
-    pub(super) nb_columns: i32,
+    nb_columns: i32,
     // Total number of rows (including those above the skyline). Can be cast to `usize` and `u32`.
-    pub(super) nb_rows: i32,
+    nb_rows: i32,
     // Number of hidden rows (above the skyline). Can be cast to `usize` and `u32`.
-    pub(super) nb_hidden_rows: i32,
-    pub(super) matrix: Vec<GridLine>,
+    nb_hidden_rows: i32,
+    matrix: Vec<GridLine>,
     line_sum: Vec<i32>,
 }
 
@@ -248,6 +248,26 @@ impl TetrisGrid {
         } else {
             Ok(self.clear_lines())
         }
+    }
+
+    pub(in crate::app::player) fn nb_visible_rows(&self) -> i32 {
+        self.nb_rows - self.nb_hidden_rows
+    }
+
+    pub(in crate::app::player) fn nb_hidden_rows(&self) -> i32 {
+        self.nb_hidden_rows
+    }
+
+    pub(in crate::app::player) fn nb_columns(&self) -> i32 {
+        self.nb_columns
+    }
+
+    pub(in crate::app::player) fn positions(&self) -> impl Iterator<Item = Position> {
+        let h = self.nb_rows;
+        let w = self.nb_columns;
+        (0..h).flat_map(move |y| {
+            (0..w).map(move |x| Position::new(x, y))
+        })
     }
 }
 

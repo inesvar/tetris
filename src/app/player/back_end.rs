@@ -1,7 +1,6 @@
 //! Define `trait` [UseTetromino], re-export `trait` [Render], `struct` [Tetromino], `struct` [TetrisGrid] and `enum` [TetrominoKind].
 #![doc = mermaid!("back_end/back_end_flowgraph.mmd")]
 mod moving_primitives;
-mod render;
 mod rotation_translation;
 mod spatial_primitives;
 mod tetris_grid;
@@ -13,7 +12,7 @@ use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
 use simple_mermaid::mermaid;
 
-pub(in crate::app::player) use render::Render;
+pub(in super) use spatial_primitives::Position;
 pub(in crate::app::player) use tetris_grid::UseTetrisGrid;
 pub(in crate::app) use tetris_grid::{BackendError, TetrisGrid};
 pub(crate) use tetromino::Tetromino;
