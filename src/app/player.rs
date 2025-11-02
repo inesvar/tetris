@@ -2,19 +2,19 @@
 //!
 //! This module uses [core] to make the tetromino move according to the player's commands.
 //! It also generates new tetromino pieces and handles the queue of next pieces.
-mod core;
-mod render;
 mod circular_buffer;
+mod core;
 mod handle_key_player;
 mod local_player;
 mod player_screen;
 mod pressed_keys;
+mod render;
 mod update_player;
 
 pub(in crate::app::player) use self::core::{Tetromino, UseTetromino};
 use self::{
-    core::{TetrisGrid, TetrominoKind},
     circular_buffer::CircularBuffer,
+    core::{TetrisGrid, TetrominoKind},
     pressed_keys::PressedKeys,
 };
 use crate::settings::NB_NEXT_TETROMINO;

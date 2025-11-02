@@ -2,7 +2,7 @@
 
 use std::{cell::RefCell, net::TcpStream};
 
-use crate::{app::PlayerConfig, once, ui::interactive_widget_manager::TetrisCommand};
+use crate::{app::PlayerConfig, app::TetrisCommand, once};
 use opengl_graphics::OpenGL;
 use piston::Key;
 use serde::Deserialize;

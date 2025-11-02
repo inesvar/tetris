@@ -1,7 +1,7 @@
 //! Define `trait` [Render] for [Block], [Tetromino] and [TetrisGrid].
 use super::core::{Position, TetrisGrid, Tetromino, UseTetrisGrid};
-use crate::assets::TetrisColor;
 use crate::assets::Assets;
+use crate::assets::TetrisColor;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
 use graphics::draw_state::Blend;
 use graphics::types::{Matrix2d, Rectangle, Scalar};
@@ -143,13 +143,7 @@ impl Render for Tetromino {
         assets: &Assets,
     ) {
         for block in self.blocks() {
-            block.render(
-                &self.color,
-                grid_position,
-                draw_state,
-                gl,
-                assets,
-            );
+            block.render(&self.color, grid_position, draw_state, gl, assets);
         }
     }
 }

@@ -25,7 +25,6 @@ use std::time::SystemTime;
 mod app;
 mod assets;
 mod settings;
-mod ui;
 mod utils;
 
 /// Creates the window and the application, runs the event loop.

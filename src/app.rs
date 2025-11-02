@@ -2,18 +2,19 @@
 mod player;
 mod remote;
 mod render_app;
+mod ui;
 mod update_app;
 
 use self::player::LocalPlayer;
 pub use self::player::PlayerScreen;
 use self::remote::RemotePlayer;
-use crate::app::remote::MessageType;
-use crate::assets::Assets;
-use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
-use crate::ui::{
+use self::ui::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
     text::Text,
 };
+use crate::app::remote::MessageType;
+use crate::assets::Assets;
+use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
 use include_assets::NamedArchive;
 use local_ip_address::local_ip;
@@ -23,6 +24,7 @@ use piston_window::Key;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::net::TcpStream;
+pub use ui::TetrisCommand;
 
 #[derive(PartialEq, Debug)]
 pub enum PlayerConfig {

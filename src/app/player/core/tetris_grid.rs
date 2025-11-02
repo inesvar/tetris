@@ -265,9 +265,7 @@ impl TetrisGrid {
     pub(in crate::app::player) fn positions(&self) -> impl Iterator<Item = Position> {
         let h = self.nb_rows;
         let w = self.nb_columns;
-        (0..h).flat_map(move |y| {
-            (0..w).map(move |x| Position::new(x, y))
-        })
+        (0..h).flat_map(move |y| (0..w).map(move |x| Position::new(x, y)))
     }
 }
 

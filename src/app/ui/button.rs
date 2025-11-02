@@ -1,4 +1,5 @@
-use crate::{settings::DEFAULT_FONT_SIZE, ui::text::Text};
+use super::text::Text;
+use crate::settings::DEFAULT_FONT_SIZE;
 use graphics::color;
 use piston::MouseButton;
 

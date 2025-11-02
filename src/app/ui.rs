@@ -6,3 +6,5 @@ pub mod render;
 pub mod text;
 pub mod text_input;
 pub mod ui_widget;
+
+pub use interactive_widget_manager::TetrisCommand;

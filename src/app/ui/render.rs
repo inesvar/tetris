@@ -1,10 +1,10 @@
+use super::button::Button;
+use super::interactive_widget_manager::InteractiveWidgetManager;
+use super::key_input::KeyInput;
+use super::text::Text;
+use super::text_input::TextInput;
 use crate::assets::Assets;
 use crate::settings::{DEFAULT_BUTTON_Y_SPACING, TEXT_COLOR};
-use crate::ui::button::Button;
-use crate::ui::interactive_widget_manager::InteractiveWidgetManager;
-use crate::ui::key_input::KeyInput;
-use crate::ui::text::Text;
-use crate::ui::text_input::TextInput;
 use graphics::types::Matrix2d;
 use graphics::{color, rectangle, Context, Transformed};
 use opengl_graphics::{GlGraphics, GlyphCache};
