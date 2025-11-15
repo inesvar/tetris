@@ -1,19 +1,18 @@
 //! Define the [render()](PlayerScreen::render()) and [constructor](PlayerScreen::empty()) of [PlayerScreen].
 use super::core::{TetrisGrid, Tetromino, UseTetrisGrid};
-use super::render::Render;
 use super::{CircularBuffer, PlayerScreen};
+use crate::app::render_app::Render;
 use crate::app::ui::text::Text;
-use crate::assets::Assets;
+use crate::app::Piston2dGraphicsArguments;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_FONT_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
     GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_COLUMNS, NB_HIDDEN_ROWS, NB_NEXT_TETROMINO,
     NB_ROWS, TETROMINO_MAX_HEIGHT, TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
 use graphics::{
-    types::{Matrix2d, Rectangle},
-    {rectangle, Context, Transformed},
+    types::Rectangle,
+    {rectangle, Transformed},
 };
-use opengl_graphics::GlGraphics;
 
 impl PlayerScreen {
     pub fn empty() -> Self {
@@ -31,12 +30,9 @@ impl PlayerScreen {
     }
 
     // TODO clean this
-    pub fn render(
+    pub(in crate::app) fn render(
         &mut self,
-        transform: Matrix2d,
-        ctx: &Context,
-        gl: &mut GlGraphics,
-        assets: &mut Assets,
+        gl_ctx: &mut Piston2dGraphicsArguments,
         display_active_tetromino: bool,
     ) {
         let score_text = Text::new(
@@ -47,64 +43,69 @@ impl PlayerScreen {
             DEFAULT_SCORE_TEXT_Y,
             TEXT_COLOR,
         );
-        score_text.render(transform, ctx, gl, &mut assets.main_font);
+        score_text.render(gl_ctx);
 
-        let grid_transform = transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
+        let old_transform = gl_ctx.transform;
+        let grid_transform = gl_ctx.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
+        gl_ctx.transform = grid_transform;
 
-        self.grid
-            .render(grid_transform, &ctx.draw_state, gl, assets);
+        self.grid.render(gl_ctx);
 
         if let Some(ghost) = self.ghost_tetromino {
-            ghost.render_ghost(grid_transform, &ctx.draw_state, gl, assets);
+            let old_draw_state = gl_ctx.draw_state;
+            gl_ctx.draw_state = gl_ctx.draw_state.blend(graphics::draw_state::Blend::Multiply);
+            ghost.render(gl_ctx);
+            gl_ctx.draw_state = old_draw_state;
         }
 
         if display_active_tetromino {
-            self.active_tetromino
-                .render(grid_transform, &ctx.draw_state, gl, assets);
+            self.active_tetromino.render(gl_ctx);
         }
 
         // drawing a border for the hold piece
-        let transform2 = grid_transform.trans(
+        gl_ctx.transform = grid_transform.trans(
             -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
             self.grid.hidden_height(),
         );
         let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
         let dims: Rectangle = [0.0, 0.0, rectangle_width, rectangle_height];
-        rectangle(GRID_BG_COLOR, dims, transform2, gl);
+        rectangle(GRID_BG_COLOR, dims, gl_ctx.transform, gl_ctx.gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
-        outline_rect.draw(dims, &ctx.draw_state, transform2, gl);
+        outline_rect.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, gl_ctx.gl);
 
         // drawing the hold piece
         if let Some(saved) = self.saved_tetromino {
-            let transform3 = grid_transform.trans(
+            gl_ctx.transform = grid_transform.trans(
                 -self.grid.total_width() * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
                 TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
             );
-            saved.render(transform3, &ctx.draw_state, gl, assets);
+            saved.render(gl_ctx);
         }
 
         // drawing a border for the fifo of next pieces
-        let transform4 = grid_transform.trans(
+        gl_ctx.transform = grid_transform.trans(
             self.grid.total_width() * (NB_COLUMNS + 1) as f64 / NB_COLUMNS as f64,
             self.grid.hidden_height(),
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;
         let dims: Rectangle = [0.0, 0.0, width, height];
-        rectangle(GRID_BG_COLOR, dims, transform4, gl);
+        rectangle(GRID_BG_COLOR, dims, gl_ctx.transform, gl_ctx.gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
-        outline_rect.draw(dims, &ctx.draw_state, transform4, gl);
+        outline_rect.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, gl_ctx.gl);
 
         // drawing the next pieces
         for i in 0..NB_NEXT_TETROMINO {
-            let transform5 = grid_transform.trans(
+            gl_ctx.transform = grid_transform.trans(
                 self.grid.total_width() * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
             if let Some(tetromino) = self.fifo_next_tetromino.get(i) {
-                tetromino.render(transform5, &ctx.draw_state, gl, assets);
+                tetromino.render(gl_ctx);
             }
         }
+
+        gl_ctx.transform = old_transform;
     }
 }

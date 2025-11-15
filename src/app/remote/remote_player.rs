@@ -1,11 +1,8 @@
 use super::MessageType;
 use crate::{
-    app::{GameFlowChange, PlayerScreen},
-    assets::Assets,
+    app::{GameFlowChange, Piston2dGraphicsArguments, PlayerScreen},
     once,
 };
-use graphics::{math::Matrix2d, Context};
-use opengl_graphics::GlGraphics;
 use std::{
     net::{TcpListener, TcpStream},
     sync::{Arc, Mutex},
@@ -78,20 +75,13 @@ impl RemotePlayer {
         });
     }
 
-    pub fn render(
-        &self,
-        transform: Matrix2d,
-        ctx: &Context,
-        gl: &mut GlGraphics,
-        assets: &mut Assets,
-        display_active_tetromino: bool,
-    ) {
+    pub fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments, display_active_tetromino: bool) {
         if !*self.first_screen_received.lock().unwrap() {
             return;
         }
         {
             let mut screen = self.screen.lock().unwrap();
-            screen.render(transform, ctx, gl, assets, display_active_tetromino);
+            screen.render(gl_ctx, display_active_tetromino);
         }
         once!("render was done");
     }

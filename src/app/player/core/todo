@@ -1,9 +1,10 @@
 # problems
+- TextInput and KeyInput shouldn't be changed insider their render function
+- whether to display the active tetromino shouldn't be a render input argument
 - the row 0 of the tetris grid should be the one on the bottom...
 - serialize a PlayerScreen(PlayerScreen) instead of doing black magic
 - use tokio to outsource tcp comms
 - today key inputs are sent to the tetris game and mouse inputs to the app... something more flexible would be great
-- remove the `is_ghost` boolean
 
 # new features
 - fix paths for Windows in assets.rs

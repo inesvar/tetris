@@ -1,9 +1,42 @@
 //! Define the render function of [App].
 use super::{App, RunningState, ViewState};
+use crate::assets::Assets;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
 use crate::utils::formattings::format_seconds;
+use graphics::types::Matrix2d;
+use graphics::DrawState;
 use graphics::Transformed;
+use opengl_graphics::GlGraphics;
 use piston::RenderArgs;
+
+pub(super) struct Piston2dGraphicsArguments<'short, 'long> {
+    pub(super) transform: Matrix2d,
+    pub(super) draw_state: DrawState,
+    pub(super) gl: &'short mut GlGraphics,
+    pub(super) assets: &'short mut Assets<'long>,
+}
+
+impl<'short, 'long> Piston2dGraphicsArguments<'short, 'long> {
+    pub(in crate::app) fn new(
+        transform: Matrix2d,
+        draw_state: DrawState,
+        gl: &'short mut GlGraphics,
+        assets: &'short mut Assets<'long>,
+    ) -> Self {
+        Self {
+            transform,
+            draw_state,
+            gl,
+            assets,
+        }
+    }
+}
+
+#[allow(dead_code)]
+/// Draw tetris objects.
+pub(super) trait Render<GlCtx> {
+    fn render(&self, graphics_args: &mut GlCtx);
+}
 
 impl App<'_> {
     pub fn render(&mut self, args: &RenderArgs) {
@@ -11,90 +44,68 @@ impl App<'_> {
             // Clear the screen.
             graphics::clear(BG_COLOR, gl);
 
+            let mut gl_ctx = Piston2dGraphicsArguments::new(
+                ctx.transform,
+                ctx.draw_state,
+                gl,
+                &mut self.assets,
+            );
+
             match &self.view_state {
                 ViewState::MainMenu => {
-                    self.title_text
-                        .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
+                    self.title_text.render(&mut gl_ctx);
+                    self.widget_manager[0].render(&mut gl_ctx)
                 }
                 ViewState::Settings => {
-                    self.title_text
-                        .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
+                    self.title_text.render(&mut gl_ctx);
                     for widget_manager in &mut self.widget_manager {
-                        widget_manager.render(ctx.transform, &ctx, gl, &mut self.assets);
+                        widget_manager.render(&mut gl_ctx);
                     }
                 }
                 ViewState::CreateRoom => {
-                    self.title_text
-                        .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
+                    self.title_text.render(&mut gl_ctx);
+                    self.widget_manager[0].render(&mut gl_ctx)
                 }
                 ViewState::JoinRoom => {
-                    self.title_text
-                        .render(ctx.transform, &ctx, gl, &mut self.assets.tetris_font);
-                    self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
+                    self.title_text.render(&mut gl_ctx);
+                    self.widget_manager[0].render(&mut gl_ctx)
                 }
                 a if a.is_game() => {
+
+                    self.widget_manager[0].render(&mut gl_ctx);
                     if self.running == RunningState::Running {
-                        self.title_text.render(
-                            ctx.transform,
-                            &ctx,
-                            gl,
-                            &mut self.assets.tetris_font,
-                        );
+                        self.title_text.render(&mut gl_ctx);
                         self.timer_text.set_text(format_seconds(self.clock));
                     } else if self.running == RunningState::NotRunning {
-                        self.restart_text.render(
-                            ctx.transform,
-                            &ctx,
-                            gl,
-                            &mut self.assets.main_font,
-                        );
+                        self.restart_text.render(&mut gl_ctx);
                         self.timer_text
                             .set_text(format!("Elapsed: {:.2}s", self.clock));
                     } else if self.running == RunningState::Paused {
-                        self.pause_text
-                            .render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
+                        self.pause_text.render(&mut gl_ctx);
                         self.timer_text
                             .set_text(format!("Elapsed: {:.2}s", self.clock));
                     } else if self.running == RunningState::Starting {
-                        self.title_text.render(
-                            ctx.transform,
-                            &ctx,
-                            gl,
-                            &mut self.assets.tetris_font,
-                        );
+                        self.title_text.render(&mut gl_ctx);
                         self.timer_text.set_text("Elapsed: 0.00s".to_string());
                     }
 
-                    self.timer_text
-                        .render(ctx.transform, &ctx, gl, &mut self.assets.main_font);
+                    self.timer_text.render(&mut gl_ctx);
 
                     let mut nb_players = 0;
                     for player in &mut self.local_players {
-                        player.render(
-                            ctx.transform
-                                .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0),
-                            &ctx,
-                            gl,
-                            &mut self.assets,
-                            self.running != RunningState::NotRunning,
-                        );
+                        gl_ctx.transform = gl_ctx
+                            .transform
+                            .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0);
+                        player.render(&mut gl_ctx, self.running != RunningState::NotRunning);
                         nb_players += 1;
                     }
                     for player in &mut self.remote_player {
-                        player.render(
-                            ctx.transform
-                                .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0),
-                            &ctx,
-                            gl,
-                            &mut self.assets,
-                            self.running != RunningState::NotRunning,
-                        );
+                        gl_ctx.transform = ctx
+                            .transform
+                            .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0);
+                        player.render(&mut gl_ctx, self.running != RunningState::NotRunning);
                         nb_players += 1;
                     }
-
-                    self.widget_manager[0].render(ctx.transform, &ctx, gl, &mut self.assets)
                 }
                 _ => unreachable!(),
             }

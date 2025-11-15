@@ -1,23 +1,10 @@
-//! Define `trait` [Render] for [Block], [Tetromino] and [TetrisGrid].
+//! Define `trait` [Render] for [Tetromino] and [TetrisGrid].
 use super::core::{Position, TetrisGrid, Tetromino, UseTetrisGrid};
-use crate::assets::Assets;
+use crate::app::render_app::{Piston2dGraphicsArguments, Render};
 use crate::assets::TetrisColor;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
-use graphics::draw_state::Blend;
-use graphics::types::{Matrix2d, Rectangle, Scalar};
-use graphics::{rectangle, DrawState, Image};
-use opengl_graphics::GlGraphics;
-
-/// Draw a tetris object at the given position.
-pub(in crate::app::player) trait Render {
-    fn render(
-        &self,
-        transform: Matrix2d,
-        draw_state: &DrawState,
-        gl: &mut GlGraphics,
-        assets: &Assets,
-    );
-}
+use graphics::types::{Rectangle, Scalar};
+use graphics::{rectangle, Image};
 
 impl TetrisGrid {
     pub(in crate::app::player) fn total_width(&self) -> f64 {
@@ -93,84 +80,39 @@ impl TetrisGrid {
     }
 }
 
-impl Render for TetrisGrid {
-    /// Draw a [TetrisGrid] and its contents at the given `grid_position`.
-    fn render(
-        &self,
-        grid_position: Matrix2d,
-        draw_state: &DrawState,
-        gl: &mut GlGraphics,
-        assets: &Assets,
-    ) {
+impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisGrid {
+    fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>) {
         let empty_dims: Rectangle = [
             0.0,
             self.hidden_height(),
             self.total_width(),
             self.visible_height(),
         ];
-        rectangle(GRID_BG_COLOR, empty_dims, grid_position, gl);
+        rectangle(GRID_BG_COLOR, empty_dims, gl_ctx.transform, gl_ctx.gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
-        outline_rect.draw(empty_dims, draw_state, grid_position, gl);
+        outline_rect.draw(empty_dims, &gl_ctx.draw_state, gl_ctx.transform, gl_ctx.gl);
 
-        /* for (y, row) in self.matrix.iter().enumerate() {
-            for (x, _cell) in row.iter().enumerate() {
-                if y > 1 {
-                    let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
-                    let outline_dims = rectangle::square(
-                        x as Scalar * BLOCK_SIZE, // + GRID_THICKNESS as Scalar / 20.0,
-                        y as Scalar * BLOCK_SIZE, // + GRID_THICKNESS as Scalar / 20.0,
-                        BLOCK_SIZE,
-                    );
-                    outline_rect.draw(outline_dims, draw_state, self.transform, gl);
-                }
-            }
-        } */
         for position in self.positions() {
             if let Some(tetris_color) = self[&position] {
-                position.render(&tetris_color, grid_position, draw_state, gl, assets);
+                position.render_tetris_block(&tetris_color, gl_ctx);
             }
         }
     }
 }
 
-impl Render for Tetromino {
-    /// Draw a [Tetromino] (eventually a ghost).
-    fn render(
-        &self,
-        grid_position: Matrix2d,
-        draw_state: &DrawState,
-        gl: &mut GlGraphics,
-        assets: &Assets,
-    ) {
+impl Render<Piston2dGraphicsArguments<'_, '_>> for Tetromino {
+    fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>) {
         for block in self.blocks() {
-            block.render(&self.color, grid_position, draw_state, gl, assets);
+            block.render_tetris_block(&self.color, gl_ctx);
         }
-    }
-}
-
-impl Tetromino {
-    /// Draw a semi-transparent [Tetromino].
-    pub(in crate::app::player) fn render_ghost(
-        &self,
-        grid_position: Matrix2d,
-        draw_state: &DrawState,
-        gl: &mut GlGraphics,
-        assets: &Assets,
-    ) {
-        let draw_state = draw_state.blend(Blend::Multiply);
-        self.render(grid_position, &draw_state, gl, assets);
     }
 }
 
 impl Position {
-    /// Draw a tetris block using the specified [TetrisColor] and `grid_position`.
-    pub fn render(
+    fn render_tetris_block(
         &self,
-        color: &TetrisColor,
-        grid_position: Matrix2d,
-        draw_state: &DrawState,
-        gl: &mut GlGraphics,
-        assets: &Assets,
+        tetris_color: &TetrisColor,
+        gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>,
     ) {
         let dims = rectangle::square(
             self.x() as Scalar * BLOCK_SIZE,
@@ -179,10 +121,10 @@ impl Position {
         );
 
         Image::new().rect(dims).draw(
-            assets.texture_from_tetris_color(color),
-            draw_state,
-            grid_position,
-            gl,
+            gl_ctx.assets.texture_from_tetris_color(tetris_color),
+            &gl_ctx.draw_state,
+            gl_ctx.transform,
+            gl_ctx.gl,
         );
     }
 }

@@ -5,10 +5,8 @@ use super::{
     UseTetromino,
 };
 use crate::app::player::core::BackendError;
-use crate::{app::Countdown, app::PlayerConfig, assets::Assets, once, settings::*};
-use graphics::types::Matrix2d;
-use opengl_graphics::GlGraphics;
-use piston_window::Context;
+use crate::app::Piston2dGraphicsArguments;
+use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
@@ -111,14 +109,10 @@ impl LocalPlayer {
 
     pub fn render(
         &mut self,
-        transform: Matrix2d,
-        ctx: &Context,
-        gl: &mut GlGraphics,
-        assets: &mut Assets,
+        gl_ctx: &mut Piston2dGraphicsArguments,
         display_active_tetromino: bool,
     ) {
-        self.player_screen
-            .render(transform, ctx, gl, assets, display_active_tetromino);
+        self.player_screen.render(gl_ctx, display_active_tetromino);
     }
 
     pub(in crate::app) fn countdown(&mut self, i: &Countdown) {

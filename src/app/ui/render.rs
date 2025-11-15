@@ -1,46 +1,41 @@
+use super::super::Piston2dGraphicsArguments;
 use super::button::Button;
 use super::interactive_widget_manager::InteractiveWidgetManager;
 use super::key_input::KeyInput;
 use super::text::Text;
 use super::text_input::TextInput;
-use crate::assets::Assets;
-use crate::settings::{DEFAULT_BUTTON_Y_SPACING, TEXT_COLOR};
-use graphics::types::Matrix2d;
-use graphics::{color, rectangle, Context, Transformed};
-use opengl_graphics::{GlGraphics, GlyphCache};
+use crate::{app::render_app::Render, settings::{DEFAULT_BUTTON_Y_SPACING, TEXT_COLOR}};
+use graphics::{color, rectangle, Transformed};
 
-impl Text {
-    pub fn render(
-        &self,
-        transform: Matrix2d,
-        ctx: &Context,
-        gl: &mut GlGraphics,
-        font: &mut GlyphCache,
-    ) {
-        let text_transform = transform.trans(
+impl Render<Piston2dGraphicsArguments<'_, '_>> for Text {
+    fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments) {
+        let old_transform = gl_ctx.transform;
+        gl_ctx.transform = gl_ctx.transform.trans(
             self.x - self.content.len() as f64 * self.font_size as f64 * 0.315,
             self.y + self.font_size as f64 * 0.41,
         );
+
+        let font = if self.use_tetris_font {
+            &mut gl_ctx.assets.tetris_font
+        } else {
+            &mut gl_ctx.assets.main_font
+        };
         self.view
             .draw(
                 self.content.as_str(),
                 font,
-                &ctx.draw_state,
-                text_transform,
-                gl,
+                &gl_ctx.draw_state,
+                gl_ctx.transform,
+                gl_ctx.gl,
             )
             .unwrap();
+
+        gl_ctx.transform = old_transform;
     }
 }
 
 impl TextInput {
-    pub fn render(
-        &mut self,
-        transform: Matrix2d,
-        ctx: &Context,
-        gl: &mut GlGraphics,
-        font: &mut GlyphCache,
-    ) {
+    fn render(&mut self, gl_ctx: &mut Piston2dGraphicsArguments) {
         self.animation_counter += 1;
 
         let dims = rectangle::rectangle_by_corners(
@@ -49,12 +44,13 @@ impl TextInput {
             self.width / 2.0,
             self.height / 2.0,
         );
-        let button_transform = transform.trans(self.x, self.y);
+        let old_transform = gl_ctx.transform;
+        let button_transform = gl_ctx.transform.trans(self.x, self.y);
 
         let color = if self.focused { color::RED } else { TEXT_COLOR };
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
-        outline_rect.draw(dims, &ctx.draw_state, button_transform, gl);
+        outline_rect.draw(dims, &gl_ctx.draw_state, button_transform, gl_ctx.gl);
 
         if self.focused {
             if self.animation_counter % 60 == 0 {
@@ -69,23 +65,19 @@ impl TextInput {
         }
 
         self.text.content.push_str(&self.cursor);
-        self.text.render(transform, ctx, gl, font);
+        self.text.render(gl_ctx);
         if !self.cursor.is_empty() {
             self.text.content.pop();
         }
-        let info_transform = transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
-        self.info_text.render(info_transform, ctx, gl, font);
+        gl_ctx.transform = gl_ctx.transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
+        self.info_text.render(gl_ctx);
+
+        gl_ctx.transform = old_transform;
     }
 }
 
 impl KeyInput {
-    pub fn render(
-        &mut self,
-        transform: Matrix2d,
-        ctx: &Context,
-        gl: &mut GlGraphics,
-        font: &mut GlyphCache,
-    ) {
+    pub fn render(&mut self, gl_ctx: &mut Piston2dGraphicsArguments) {
         self.animation_counter += 1;
 
         let dims = rectangle::rectangle_by_corners(
@@ -94,12 +86,12 @@ impl KeyInput {
             self.width / 2.0,
             self.height / 2.0,
         );
-        let button_transform = transform.trans(self.x, self.y);
+        let button_transform = gl_ctx.transform.trans(self.x, self.y);
 
         let color = if self.focused { color::RED } else { TEXT_COLOR };
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
-        outline_rect.draw(dims, &ctx.draw_state, button_transform, gl);
+        outline_rect.draw(dims, &gl_ctx.draw_state, button_transform, gl_ctx.gl);
 
         if self.focused {
             // update the cursor so it appears to be blinking
@@ -112,7 +104,7 @@ impl KeyInput {
             }
             // render the text temporarily with the cursor
             self.custom_text.content.push_str(&self.cursor);
-            self.custom_text.render(transform, ctx, gl, font);
+            self.custom_text.render(gl_ctx);
             if !self.cursor.is_empty() {
                 self.custom_text.content.pop();
             }
@@ -120,26 +112,23 @@ impl KeyInput {
             self.cursor.clear();
             // if it's not focused, render the placeholder or custom text
             if self.custom {
-                self.custom_text.render(transform, ctx, gl, font);
+                self.custom_text.render(gl_ctx);
             } else {
-                self.placeholder.render(transform, ctx, gl, font);
+                self.placeholder.render(gl_ctx);
             }
         }
 
         // render the info_text
-        let info_transform = transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
-        self.info_text.render(info_transform, ctx, gl, font);
+        let old_transform = gl_ctx.transform;
+        gl_ctx.transform = gl_ctx.transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
+        self.info_text.render(gl_ctx);
+
+        gl_ctx.transform = old_transform;
     }
 }
 
-impl Button {
-    pub fn render(
-        &mut self,
-        transform: Matrix2d,
-        ctx: &Context,
-        gl: &mut GlGraphics,
-        assets: &mut Assets,
-    ) {
+impl Render<Piston2dGraphicsArguments<'_, '_>> for Button {
+    fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments) {
         let dims = rectangle::rectangle_by_corners(
             -self.width / 2.0,
             -self.height / 2.0,
@@ -148,32 +137,28 @@ impl Button {
         );
         let button = graphics::Rectangle::new(self.background_color);
 
-        let button_transform = transform.trans(self.x, self.y);
+        let old_transform = gl_ctx.transform;
+        gl_ctx.transform = gl_ctx.transform.trans(self.x, self.y);
 
-        button.draw(dims, &ctx.draw_state, button_transform, gl);
+        button.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, gl_ctx.gl);
 
-        self.text
-            .render(button_transform, ctx, gl, &mut assets.main_font);
+        self.text.render(gl_ctx);
+
+        gl_ctx.transform = old_transform;
     }
 }
 
 impl InteractiveWidgetManager {
-    pub fn render(
-        &mut self,
-        transform: Matrix2d,
-        ctx: &Context,
-        gl: &mut GlGraphics,
-        assets: &mut Assets,
-    ) {
-        for button in self.buttons.values_mut() {
-            button.render(transform, ctx, gl, assets);
+    pub fn render(&mut self, gl_ctx: &mut Piston2dGraphicsArguments) {
+        for button in self.buttons.values() {
+            button.render(gl_ctx);
         }
 
         for text_input in self.text_inputs.values_mut() {
-            text_input.render(transform, ctx, gl, &mut assets.main_font);
+            text_input.render(gl_ctx);
         }
         for key_input in self.key_inputs.values_mut() {
-            key_input.render(transform, ctx, gl, &mut assets.main_font);
+            key_input.render(gl_ctx);
         }
     }
 }

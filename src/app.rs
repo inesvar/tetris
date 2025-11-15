@@ -22,6 +22,7 @@ use opengl_graphics::{GlGraphics, OpenGL};
 use piston::MouseButton;
 use piston_window::Key;
 use rand::Rng;
+use render_app::Piston2dGraphicsArguments;
 use serde::{Deserialize, Serialize};
 use std::net::TcpStream;
 pub use ui::TetrisCommand;
