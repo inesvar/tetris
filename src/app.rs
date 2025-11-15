@@ -141,7 +141,7 @@ impl<'a> App<'a> {
             player_config,
             view_state: ViewState::MainMenu,
             assets,
-            title_text: Text::new(
+            title_text: Text::new_with_tetris_font(
                 "T",
                 DEFAULT_FONT_SIZE,
                 DEFAULT_WINDOW_WIDTH as f64 * 27.0 / 65.0,
