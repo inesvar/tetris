@@ -6,6 +6,7 @@ use super::{
 };
 use crate::app::player::core::CoreError;
 use crate::app::Piston2dGraphicsArguments;
+use crate::app::render_app::Render;
 use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
@@ -107,14 +108,6 @@ impl LocalPlayer {
         self.player_screen.saved_tetromino = None;
     }
 
-    pub fn render(
-        &mut self,
-        gl_ctx: &mut Piston2dGraphicsArguments,
-        display_active_tetromino: bool,
-    ) {
-        self.player_screen.render(gl_ctx, display_active_tetromino);
-    }
-
     pub(in crate::app) fn countdown(&mut self, i: &Countdown) {
         match i {
             Countdown::One => self
@@ -130,6 +123,15 @@ impl LocalPlayer {
                 .grid
                 .three(self.player_screen.active_tetromino.color),
         }
+    }
+}
+
+impl Render<Piston2dGraphicsArguments<'_, '_>> for LocalPlayer {
+    fn render(
+        &self,
+        gl_ctx: &mut Piston2dGraphicsArguments,
+    ) {
+        self.player_screen.render(gl_ctx);
     }
 }
 

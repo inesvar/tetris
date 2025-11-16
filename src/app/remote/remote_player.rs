@@ -1,6 +1,6 @@
 use super::MessageType;
 use crate::{
-    app::{GameFlowChange, Piston2dGraphicsArguments, PlayerScreen},
+    app::{GameFlowChange, Piston2dGraphicsArguments, PlayerScreen, render_app::Render},
     once,
 };
 use std::{
@@ -75,17 +75,6 @@ impl RemotePlayer {
         });
     }
 
-    pub fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments, display_active_tetromino: bool) {
-        if !*self.first_screen_received.lock().unwrap() {
-            return;
-        }
-        {
-            let mut screen = self.screen.lock().unwrap();
-            screen.render(gl_ctx, display_active_tetromino);
-        }
-        once!("render was done");
-    }
-
     pub fn get_lines_completed(&mut self) -> u64 {
         {
             let mut screen = self.screen.lock().unwrap();
@@ -138,5 +127,18 @@ impl RemotePlayer {
             }
         }
         last_game_flow
+    }
+}
+
+impl Render<Piston2dGraphicsArguments<'_, '_>> for RemotePlayer {
+    fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments) {
+        if !*self.first_screen_received.lock().unwrap() {
+            return;
+        }
+        {
+            let screen = self.screen.lock().unwrap();
+            screen.render(gl_ctx);
+        }
+        once!("render was done");
     }
 }

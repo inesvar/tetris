@@ -178,12 +178,13 @@ impl Tetromino {
     }
 }
 
+/// `Tetromino::default` is far from the origin and is not renderer on the screen.
 impl Default for Tetromino {
     fn default() -> Self {
         Tetromino {
             kind: TetrominoKind::O,
             center: Position::default(),
-            blocks: [Position::default(); 4],
+            blocks: [Position::new(-50, -50); 4],
             color: TetrisColor::Yellow,
             direction: Direction::default(),
         }

@@ -28,12 +28,12 @@ impl PlayerScreen {
             serialize_as_msg: true.into(),
         }
     }
+}
 
-    // TODO clean this
-    pub(in crate::app) fn render(
-        &mut self,
+impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
+    fn render(
+        &self,
         gl_ctx: &mut Piston2dGraphicsArguments,
-        display_active_tetromino: bool,
     ) {
         let score_text = Text::new(
             format!("Score: {}", self.score).as_str(),
@@ -60,9 +60,7 @@ impl PlayerScreen {
             gl_ctx.draw_state = old_draw_state;
         }
 
-        if display_active_tetromino {
-            self.active_tetromino.render(gl_ctx);
-        }
+        self.active_tetromino.render(gl_ctx);
 
         // drawing a border for the hold piece
         gl_ctx.transform = grid_transform.trans(
