@@ -272,10 +272,10 @@ mod tests {
         let nb_columns = str[0].len();
         let mut tetris_grid = TetrisGrid::new(nb_columns as u32, nb_rows as u32, 0);
 
-        for row in 0..nb_rows {
-            for (column, char) in str[row].char_indices() {
+        for (row, line) in str.iter().enumerate() {
+            for (column, cell) in line.char_indices() {
                 let pos = Position::new(column as i32, row as i32);
-                let tetris_color = match char {
+                let tetris_color = match cell {
                     ' ' => None,
                     _ => Some(TetrisColor::Grey),
                 };
@@ -296,10 +296,10 @@ mod tests {
             return false;
         }
 
-        for row in 0..nb_rows {
-            for (column, char) in str[row].char_indices() {
+        for (row, line) in str.iter().enumerate() {
+            for (column, cell) in line.char_indices() {
                 let pos = Position::new(column as i32, row as i32);
-                if (char == ' ') != tetris_grid.is_block_empty(&pos).is_ok() {
+                if (cell == ' ') != tetris_grid.is_block_empty(&pos).is_ok() {
                     return false;
                 }
             }
