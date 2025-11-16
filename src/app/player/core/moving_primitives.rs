@@ -95,7 +95,7 @@ impl Position {
     fn get_block_center_coordinates(&self) -> Self {
         Self::new(2 * self.x, 2 * self.y)
     }
-    
+
     /// Convert block coordinates to 2x zoomed coordinates.
     /// In 2x zoomed coordinates, block centers lie at even coordinates while block corners lie at odd coordinates.
     fn get_block_bottom_right_coordinates(&self) -> Self {

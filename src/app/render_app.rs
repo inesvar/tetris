@@ -96,15 +96,11 @@ impl App<'_> {
 
                     for player in &mut self.local_players {
                         player.render(&mut gl_ctx, self.running != RunningState::NotRunning);
-                        gl_ctx.transform = gl_ctx
-                            .transform
-                            .trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
+                        gl_ctx.transform = gl_ctx.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                     }
                     for player in &mut self.remote_player {
                         player.render(&mut gl_ctx, self.running != RunningState::NotRunning);
-                        gl_ctx.transform = gl_ctx
-                            .transform
-                            .trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
+                        gl_ctx.transform = gl_ctx.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                     }
                 }
                 _ => unreachable!(),

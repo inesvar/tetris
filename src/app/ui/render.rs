@@ -47,7 +47,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TextInput {
             self.height / 2.0,
         );
         let button_transform = gl_ctx.transform.trans(self.x, self.y);
-        
+
         let color = if self.focused { color::RED } else { TEXT_COLOR };
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
@@ -60,7 +60,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TextInput {
         } else {
             self.text.render(gl_ctx);
         }
-        
+
         let old_transform = gl_ctx.transform;
         gl_ctx.transform = gl_ctx.transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
         self.info_text.render(gl_ctx);
