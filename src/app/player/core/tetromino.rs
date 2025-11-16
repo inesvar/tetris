@@ -168,7 +168,7 @@ impl Tetromino {
             grid.is_block_available(new_block)?;
         }
         self.blocks = new_blocks;
-        self.direction.turn_by(movement);
+        self.direction.turn_around_block_center(movement);
         self.center.translate_by(movement);
         Ok(())
     }
