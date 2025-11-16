@@ -5,7 +5,7 @@ use super::{
     moving_primitives::ApplyRotationTranslation,
     rotation_translation::{RotationTranslation, RotationType},
     spatial_primitives::{Direction, Position},
-    tetris_grid::BackendError,
+    tetris_grid::CoreError,
     Deserialize, Pcg32, Serialize, TetrisColor, TetrisGrid, TetrominoKind, UseTetromino,
 };
 use core::fmt::Display;
@@ -145,7 +145,7 @@ impl UseTetromino for Tetromino {
         grid.can_blocks_spawn_on(&self.blocks).is_ok()
     }
 
-    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, BackendError> {
+    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, CoreError> {
         grid.add_blocks(&self.blocks, self.color)
     }
 }
@@ -156,7 +156,7 @@ impl Tetromino {
         &mut self,
         grid: &TetrisGrid,
         movement: &RotationTranslation,
-    ) -> Result<(), BackendError> {
+    ) -> Result<(), CoreError> {
         let mut new_blocks = self.blocks;
         for new_block in new_blocks.iter_mut() {
             if self.kind.is_rotation_center_on_block_center() {

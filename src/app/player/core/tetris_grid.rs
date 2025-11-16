@@ -1,4 +1,4 @@
-//! Define `struct` [TetrisGrid].
+//! Define `struct` [TetrisGrid], `enum` [CoreError] and `trait` [UseTetrisGrid].
 use super::{spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
 use rand::Rng;
 use std::ops::{Index, IndexMut};
@@ -20,7 +20,7 @@ pub(in crate::app) struct TetrisGrid {
 
 // same visibility as TetrisColor
 #[derive(Debug, PartialEq)]
-pub(in crate::app) enum BackendError {
+pub(in crate::app) enum CoreError {
     /// Tried to move outside of the grid.
     OutsideOfGrid,
     /// Tried to move to unavailable block.
@@ -144,14 +144,14 @@ impl IndexMut<&Position> for TetrisGrid {
 
 impl TetrisGrid {
     /// Return whether `pos` is a valid block inside the tetris grid.
-    fn contains(&self, pos: &Position) -> Result<(), BackendError> {
+    fn contains(&self, pos: &Position) -> Result<(), CoreError> {
         let is_block_inside_grid =
             pos.x >= 0 && pos.y >= 0 && pos.x < self.nb_columns && pos.y < self.nb_rows;
 
         if is_block_inside_grid {
             Ok(())
         } else {
-            Err(BackendError::OutsideOfGrid)
+            Err(CoreError::OutsideOfGrid)
         }
     }
 
@@ -160,11 +160,11 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If `block` is outside the tetris grid.
-    fn is_block_empty(&self, block: &Position) -> Result<(), BackendError> {
+    fn is_block_empty(&self, block: &Position) -> Result<(), CoreError> {
         if self[block].is_none() {
             Ok(())
         } else {
-            Err(BackendError::UnavailableBlock)
+            Err(CoreError::UnavailableBlock)
         }
     }
 
@@ -210,7 +210,7 @@ impl TetrisGrid {
     }
 
     /// Return true if the `block` is inside the grid in an empty slot.
-    pub(super) fn is_block_available(&self, block: &Position) -> Result<(), BackendError> {
+    pub(super) fn is_block_available(&self, block: &Position) -> Result<(), CoreError> {
         self.contains(block)?;
         self.is_block_empty(block)
     }
@@ -220,9 +220,9 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If any of the `blocks` is outside the tetris grid.
-    pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<(), BackendError> {
+    pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<(), CoreError> {
         let can_spawn = blocks.iter().try_for_each(|b| self.is_block_empty(b));
-        can_spawn.map_err(|_| BackendError::BlockOut)
+        can_spawn.map_err(|_| CoreError::BlockOut)
     }
 
     /// Push the blocks into the grid and return the number of lines completed.
@@ -234,7 +234,7 @@ impl TetrisGrid {
         &mut self,
         blocks: &[Position],
         tetris_color: TetrisColor,
-    ) -> Result<u64, BackendError> {
+    ) -> Result<u64, CoreError> {
         let mut no_block_below_skyline = true;
         for block in blocks {
             self.add_block(block, tetris_color);
@@ -244,7 +244,7 @@ impl TetrisGrid {
         }
         // Only continue playing if there's a block below the skyline
         if no_block_below_skyline {
-            Err(BackendError::LockOut)
+            Err(CoreError::LockOut)
         } else {
             Ok(self.clear_lines())
         }
@@ -325,7 +325,7 @@ mod tests {
 
         assert_eq!(
             instance.is_block_empty(&pos),
-            Err(BackendError::UnavailableBlock)
+            Err(CoreError::UnavailableBlock)
         );
     }
 

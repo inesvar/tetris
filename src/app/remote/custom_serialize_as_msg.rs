@@ -1,7 +1,7 @@
 //! Define custom Serialize for [Settings] and [PlayerScreen].
 //!
-//! PlayerScreen can be serialized as [MessageType::PlayerScreenMsg](super::MessageType::PlayerScreenMsg).
-//! Settings can be serialized as [MessageType::SettingsMsg](super::MessageType::SettingsMsg).
+//! PlayerScreen can be serialized as [MessageType::PlayerScreen](super::MessageType::PlayerScreen).
+//! Settings can be serialized as [MessageType::Settings](super::MessageType::Settings).
 use crate::{app::PlayerScreen, settings::Settings};
 use serde::{ser::SerializeStruct, Serialize, Serializer};
 

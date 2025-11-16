@@ -4,7 +4,7 @@ use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
     UseTetromino,
 };
-use crate::app::player::core::BackendError;
+use crate::app::player::core::CoreError;
 use crate::app::Piston2dGraphicsArguments;
 use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
 use rand::SeedableRng;
@@ -196,7 +196,7 @@ impl LocalPlayer {
                 self.get_new_tetromino();
             }
             // if the tetromino froze above the visible grid, it's game over !
-            Err(BackendError::LockOut) => {
+            Err(CoreError::LockOut) => {
                 self.declare_game_over();
                 return Err(());
             }
