@@ -94,20 +94,17 @@ impl App<'_> {
 
                     self.timer_text.render(&mut gl_ctx);
 
-                    let mut nb_players = 0;
                     for player in &mut self.local_players {
+                        player.render(&mut gl_ctx, self.running != RunningState::NotRunning);
                         gl_ctx.transform = gl_ctx
                             .transform
-                            .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0);
-                        player.render(&mut gl_ctx, self.running != RunningState::NotRunning);
-                        nb_players += 1;
+                            .trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                     }
                     for player in &mut self.remote_player {
-                        gl_ctx.transform = ctx
-                            .transform
-                            .trans((DEFAULT_WINDOW_WIDTH * nb_players) as f64, 0.0);
                         player.render(&mut gl_ctx, self.running != RunningState::NotRunning);
-                        nb_players += 1;
+                        gl_ctx.transform = gl_ctx
+                            .transform
+                            .trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                     }
                 }
                 _ => unreachable!(),
