@@ -1,16 +1,17 @@
 //! Define `struct` [TetrisGrid] and `enum` [CoreError].
 use super::{mermaid, spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
+use crate::settings::MAX_SMALL_UNSIGNED;
 use rand::Rng;
 use std::ops::{Index, IndexMut};
 
 /// Tetris grid.
 #[derive(Serialize, Deserialize)]
 pub(in crate::app) struct TetrisGrid {
-    // Number of columns. Can be cast to `usize` and `u32`.
+    /// Number of columns, below [MAX_SMALL_UNSIGNED].
     nb_columns: i32,
-    // Total number of rows (including those above the skyline). Can be cast to `usize` and `u32`.
+    /// Total number of rows (including those above the skyline), below [MAX_SMALL_UNSIGNED].
     nb_rows: i32,
-    // Number of hidden rows (above the skyline). Can be cast to `usize` and `u32`.
+    /// Number of hidden rows (above the skyline), below [MAX_SMALL_UNSIGNED].
     nb_hidden_rows: i32,
     matrix: Vec<Vec<Option<TetrisColor>>>,
     line_sum: Vec<i32>,
@@ -27,40 +28,41 @@ pub(in crate::app) enum CoreError {
     BlockOut,
     /// Locked down fully above the skyline (cf Guidelines 10.6.).
     LockOut,
+    #[allow(unused)]
+    /// Opponent's garbage pushed the blocks outside of the buffer zone (highly unlikely, Guidelines 10.6.).
+    TopOut,
 }
 
 /// In [super::tetris_grid], methods used by [crate::app::player] to initialize the grid and send garbage.
 impl TetrisGrid {
     /// Create an empty grid.
+    ///
+    /// # Panics
+    ///
+    /// If `nb_columns` or `nb_rows` or `nb_hidden_rows` is greater or equal to [MAX_SMALL_UNSIGNED].
     pub(in crate::app::player) fn new(nb_columns: u32, nb_rows: u32, nb_hidden_rows: u32) -> Self {
-        let nb_rows_usize: usize = nb_rows
-            .try_into()
-            .expect("nb_rows should be representable as usize");
-        let nb_columns_usize: usize = nb_columns
-            .try_into()
-            .expect("nb_columns should be representable as usize");
-
-        let mut matrix = Vec::with_capacity(nb_rows_usize);
-        for _ in 0..nb_rows {
-            matrix.push(vec![None; nb_columns_usize]);
+        if nb_columns >= MAX_SMALL_UNSIGNED
+            || nb_rows >= MAX_SMALL_UNSIGNED
+            || nb_hidden_rows >= MAX_SMALL_UNSIGNED
+        {
+            panic!("`nb_columns`, `nb_rows` and `nb_hidden_rows` should be less than `MAX_SMALL_UNSIGNED`");
         }
 
-        let nb_columns: i32 = nb_columns
-            .try_into()
-            .expect("nb_columns should be representable as i32");
-        let nb_rows: i32 = nb_rows
-            .try_into()
-            .expect("nb_rows should be representable as i32");
-        let nb_hidden_rows: i32 = nb_hidden_rows
-            .try_into()
-            .expect("nb_hidden_rows should be representable as i32");
+        let mut matrix = Vec::with_capacity(nb_rows as usize);
+        for _ in 0..nb_rows {
+            matrix.push(vec![None; nb_columns as usize]);
+        }
+
+        let nb_columns: i32 = nb_columns as i32;
+        let nb_rows: i32 = nb_rows as i32;
+        let nb_hidden_rows: i32 = nb_hidden_rows as i32;
 
         Self {
             nb_columns,
             nb_rows,
             nb_hidden_rows,
             matrix,
-            line_sum: vec![0; nb_rows_usize],
+            line_sum: vec![0; nb_rows as usize],
         }
     }
 
@@ -266,6 +268,7 @@ impl IndexMut<&Position> for TetrisGrid {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::settings::{NB_COLUMNS, NB_HIDDEN_ROWS, NB_ROWS};
 
     fn tetris_grid_from(str: &[&str]) -> TetrisGrid {
         let nb_rows = str.len();
@@ -306,6 +309,39 @@ mod tests {
         }
 
         true
+    }
+
+    #[should_panic(
+        expected = "`nb_columns`, `nb_rows` and `nb_hidden_rows` should be less than `MAX_SMALL_UNSIGNED`"
+    )]
+    #[test]
+    fn new_fails_if_nb_columns_is_too_big() {
+        let _ = TetrisGrid::new(MAX_SMALL_UNSIGNED, 0, 0);
+    }
+
+    #[should_panic(
+        expected = "`nb_columns`, `nb_rows` and `nb_hidden_rows` should be less than `MAX_SMALL_UNSIGNED`"
+    )]
+    #[test]
+    fn new_fails_if_nb_rows_is_too_big() {
+        let _ = TetrisGrid::new(0, MAX_SMALL_UNSIGNED, 0);
+    }
+
+    #[should_panic(
+        expected = "`nb_columns`, `nb_rows` and `nb_hidden_rows` should be less than `MAX_SMALL_UNSIGNED`"
+    )]
+    #[test]
+    fn new_fails_if_nb_hidden_rows_is_too_big() {
+        let _ = TetrisGrid::new(0, 0, MAX_SMALL_UNSIGNED);
+    }
+
+    #[test]
+    fn new_succeeds() {
+        let grid = TetrisGrid::new(NB_COLUMNS, NB_ROWS, NB_HIDDEN_ROWS);
+
+        assert_eq!(grid.nb_columns, NB_COLUMNS as i32);
+        assert_eq!(grid.nb_rows, NB_ROWS as i32);
+        assert_eq!(grid.nb_hidden_rows, NB_HIDDEN_ROWS as i32);
     }
 
     #[test]
