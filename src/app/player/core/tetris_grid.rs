@@ -5,31 +5,58 @@ use rand::Rng;
 use std::ops::{Index, IndexMut};
 
 /// Tetris grid.
+/// 
+/// According to the Tetris Guideline, the grid has 2 components:
+/// - **Matrix**: "the rectangular arrangement of cells creating the active game area, usually 10 columns wide by 20 rows high.
+/// Tetriminos fall from the top-middle just above the Skyline (off-screen) to the bottom."
+/// - **Buffer Zone**: "a 10-cell wide x 20-cell high invisible area above the Matrix used to detect Lock
+/// Out, Block Out, and Top Out **Game Over Conditions**."
 #[derive(Serialize, Deserialize)]
 pub(in crate::app) struct TetrisGrid {
-    /// Number of columns, below [MAX_SMALL_UNSIGNED].
+    /// Number of columns in the **Matrix** and **Buffer Zone**, always below [MAX_SMALL_UNSIGNED].
+    /// 
+    /// Should be 10 according to the Tetris Guideline.
     nb_columns: i32,
-    /// Total number of rows (including those above the skyline), below [MAX_SMALL_UNSIGNED].
+    /// Total number of rows in the **Matrix** and **Buffer Zone**, always below [MAX_SMALL_UNSIGNED].
+    /// 
+    /// Should be 40 according to the Tetris Guideline.
     nb_rows: i32,
-    /// Number of hidden rows (above the skyline), below [MAX_SMALL_UNSIGNED].
+    /// Number of hidden rows (ie in the **Buffer Zone** above the Skyline), always below [MAX_SMALL_UNSIGNED].
+    /// 
+    /// Should be 20 according to the Tetris Guideline.
     nb_hidden_rows: i32,
+    /// **Matrix** and **Buffer Zone** cells, indexed *from top to bottom*. 
     matrix: Vec<Vec<Option<TetrisColor>>>,
+    /// Number of filled blocks in each line of the [TetrisGrid::matrix].
     line_sum: Vec<i32>,
 }
 
 // same visibility as TetrisColor
+/// Error cases arising when using the [TetrisGrid].
+/// 
+/// Includes Tetris Guideline **Game Over Conditions** as well as minor errors
+/// relative to impossible moves in the grid.
 #[derive(Debug, PartialEq)]
 pub(in crate::app) enum CoreError {
     /// Tried to move outside of the grid.
     OutsideOfGrid,
     /// Tried to move to unavailable block.
     UnavailableBlock,
-    /// Tried to spawn to unavailable block.
+    /// According to the Tetris Guideline :
+    /// 
+    /// "This **Game Over Condition** occurs when part of a newly-generated tetrimino is blocked due to
+    /// an existing Block in the Matrix."
     BlockOut,
-    /// Locked down fully above the skyline (cf Guidelines 10.6.).
+    /// According to the Tetris Guideline :
+    /// 
+    /// "This **Game Over Condition** occurs when a whole tetrimino locks down above the Skyline."
     LockOut,
     #[allow(unused)]
-    /// Opponent's garbage pushed the blocks outside of the buffer zone (highly unlikely, Guidelines 10.6.).
+    /// According to the Tetris Guideline :
+    /// 
+    /// "This **Game Over Condition** occurs when an opponent’s Line Attack forces your Blocks
+    /// past the top of the 20-line Buffer zone. It is highly unlikely that this will ever occur,
+    /// since Lock out [...] or Block out [...] will likely occur before a Block ever gets pushed out of the Buffer zone."
     TopOut,
 }
 

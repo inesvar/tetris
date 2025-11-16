@@ -1,4 +1,4 @@
-//! Define the [render()](PlayerScreen::render()) and [constructor](PlayerScreen::empty()) of [PlayerScreen].
+//! Define the [constructor](PlayerScreen::empty()) of [PlayerScreen].
 use super::core::{TetrisGrid, Tetromino};
 use super::{CircularBuffer, PlayerScreen};
 use crate::settings::{NB_COLUMNS, NB_HIDDEN_ROWS, NB_NEXT_TETROMINO, NB_ROWS};
