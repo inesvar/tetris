@@ -103,7 +103,7 @@ impl UseTetromino for Tetromino {
         let positions = self.kind.get_initial_position();
         self.center = positions[0];
         self.blocks = [positions[1], positions[2], positions[3], positions[4]];
-        self.direction = Direction::Up;
+        self.direction = Direction::default();
     }
 
     fn new_tetromino_bag(requested_size_of_bag: u32, rng: &mut Pcg32) -> Vec<TetrominoKind> {

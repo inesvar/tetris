@@ -17,7 +17,8 @@ pub(in crate::app) use tetris_grid::{CoreError, TetrisGrid};
 pub(crate) use tetromino::Tetromino;
 pub(in crate::app::player) use tetromino_kind::TetrominoKind;
 
-/// Move or create a [Tetromino] on a [TetrisGrid].
+/// Use a [Tetromino] on a [TetrisGrid].
+#[doc = mermaid!("core/use_tetromino_flowgraph.mmd")]
 pub(in crate::app::player) trait UseTetromino: Sized {
     /// Return whether the tetromino could be moved one cell down.
     fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()>;

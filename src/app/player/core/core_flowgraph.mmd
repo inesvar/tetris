@@ -8,17 +8,19 @@ graph LR
     TetrisGrid[[TetrisGrid]]
     Tetromino[[Tetromino]]
     UseTetromino([UseTetromino])
+    CoreError[CoreError]
+    TetrominoKind[TetrominoKind]
 
     %% modules
     spatial_primitives[spatial_primitives]
     rotation_translation[rotation_translation]
     moving_primitives[moving_primitives]
     tetromino[tetromino]
+    tetromino_kind[tetromino_kind]
 
     subgraph spatial_primitives
         Direction ~~~ Position
     end
-    
 
     subgraph rotation_translation
         RotationTranslation --o RotationType
@@ -33,13 +35,22 @@ graph LR
     ApplyRotationTranslation ==> Position & Direction
     ApplyRotationTranslation -.-> RotationTranslation
 
-    subgraph tetris_grid
-        TetrisGrid
-    end
-
     subgraph tetromino
         UseTetromino ==> Tetromino
     end
 
-    Tetromino --o spatial_primitives
-    Tetromino -.-> ApplyRotationTranslation & TetrisGrid
+    Tetromino -.-> ApplyRotationTranslation
+
+    subgraph tetromino_kind
+        TetrominoKind
+    end
+
+    subgraph tetris_grid
+        TetrisGrid
+        CoreError
+    end
+
+    Tetromino ~~~ tetris_grid
+
+    UseTetromino -.-> tetris_grid & TetrominoKind
+    Tetromino --o spatial_primitives & TetrominoKind

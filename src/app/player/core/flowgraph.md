@@ -1,4 +1,4 @@
-# Flowgraph
+# `core`
 
 ```mermaid
 graph LR
@@ -11,17 +11,19 @@ graph LR
     TetrisGrid[[TetrisGrid]]
     Tetromino[[Tetromino]]
     UseTetromino([UseTetromino])
+    CoreError[CoreError]
+    TetrominoKind[TetrominoKind]
 
     %% modules
     spatial_primitives[spatial_primitives]
     rotation_translation[rotation_translation]
     moving_primitives[moving_primitives]
     tetromino[tetromino]
+    tetromino_kind[tetromino_kind]
 
     subgraph spatial_primitives
         Direction ~~~ Position
     end
-    
 
     subgraph rotation_translation
         RotationTranslation --o RotationType
@@ -36,50 +38,70 @@ graph LR
     ApplyRotationTranslation ==> Position & Direction
     ApplyRotationTranslation -.-> RotationTranslation
 
-    subgraph tetris_grid
-        TetrisGrid
-    end
-
     subgraph tetromino
         UseTetromino ==> Tetromino
     end
 
-    Tetromino --o spatial_primitives
-    Tetromino -.-> ApplyRotationTranslation & TetrisGrid
+    Tetromino -.-> ApplyRotationTranslation
+
+    subgraph tetromino_kind
+        TetrominoKind
+    end
+
+    subgraph tetris_grid
+        TetrisGrid
+        CoreError
+    end
+
+    Tetromino ~~~ tetris_grid
+
+    UseTetromino -.-> tetris_grid & TetrominoKind
+    Tetromino --o spatial_primitives & TetrominoKind
 ```
+
+# `UseTetromino`
 
 ```mermaid
 graph LR
     %% objects
-    Position[[Position]]
-    Direction[Direction]
-    RotationTranslation[[RotationTranslation]]
-    ApplyRotationTranslation([ApplyRotationTranslation])
-    ZoomInAndOut([ZoomInAndOut])
+    is_block_empty(is_block_empty)
+    contains(contains)
+    add_block(add_block)
+    clear_lines(clear_lines)
+    is_block_available(is_block_available)
+    can_blocks_spawn_on(can_blocks_spawn_on)
+    add_blocks(add_blocks)
+    try_move(**try_move**
+        right, left, fall, hard_drop,
+        turn_clockwise, turn_counterclockwise,
+        turn_half_turn)
+    can_enter_grid(can_enter_grid)
+    lock_down(lock_down)
+    UseTetromino([UseTetromino])
+    new(new, reset)
+    get_initial_position(get_initial_position)
 
     %% modules
-    rotation_translation[rotation_translation]
-    spatial_primitives[spatial_primitives]
-    moving_primitives[moving_primitives]
+    tetris_grid[tetris_grid]
+    tetromino[tetromino]
+    tetromino_kind[tetromino_kind]
 
-    subgraph spatial_primitives
-        Direction
-        Position
+    subgraph tetris_grid
+        can_blocks_spawn_on -.-> is_block_empty
+        is_block_available -.-> contains & is_block_empty
+        add_blocks -.-> add_block & clear_lines
     end
 
-    subgraph rotation_translation
-        RotationTranslation
+    subgraph tetromino_kind
+        get_initial_position
     end
 
-    subgraph moving_primitives
-        ApplyRotationTranslation
-        ZoomInAndOut
+    subgraph tetromino
+        UseTetromino === new & can_enter_grid & try_move & lock_down
     end
 
-    ApplyRotationTranslation -.-> RotationTranslation
-    ApplyRotationTranslation ==> Direction
-    ApplyRotationTranslation === ZoomInAndOut
-    ZoomInAndOut ==> Position
-
-    ZoomInAndOut ~~~ Direction
+    new -.-> get_initial_position
+    can_enter_grid -.-> can_blocks_spawn_on
+    try_move -.-> is_block_available
+    lock_down -.-> add_blocks
 ```
