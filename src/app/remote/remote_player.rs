@@ -1,6 +1,6 @@
 use super::MessageType;
 use crate::{
-    app::{GameFlowChange, Piston2dGraphicsArguments, PlayerScreen, render_app::Render},
+    app::{render_app::Render, GameFlowChange, Piston2dGraphicsArguments, PlayerScreen},
     once,
 };
 use std::{
