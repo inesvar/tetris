@@ -53,7 +53,9 @@ impl PlayerScreen {
 
         if let Some(ghost) = self.ghost_tetromino {
             let old_draw_state = gl_ctx.draw_state;
-            gl_ctx.draw_state = gl_ctx.draw_state.blend(graphics::draw_state::Blend::Multiply);
+            gl_ctx.draw_state = gl_ctx
+                .draw_state
+                .blend(graphics::draw_state::Blend::Multiply);
             ghost.render(gl_ctx);
             gl_ctx.draw_state = old_draw_state;
         }

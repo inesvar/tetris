@@ -6,7 +6,7 @@ use graphics::types::Color;
 pub struct Text {
     pub x: f64,
     pub y: f64,
-    pub content: String,
+    pub(super) content: String,
     pub font_size: u32,
     pub use_tetris_font: bool,
     pub(crate) view: graphics::Text,

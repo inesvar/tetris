@@ -14,6 +14,7 @@ pub(super) struct Piston2dGraphicsArguments<'short, 'long> {
     pub(super) draw_state: DrawState,
     pub(super) gl: &'short mut GlGraphics,
     pub(super) assets: &'short mut Assets<'long>,
+    pub(super) elapsed_secs: f64,
 }
 
 impl<'short, 'long> Piston2dGraphicsArguments<'short, 'long> {
@@ -22,12 +23,14 @@ impl<'short, 'long> Piston2dGraphicsArguments<'short, 'long> {
         draw_state: DrawState,
         gl: &'short mut GlGraphics,
         assets: &'short mut Assets<'long>,
+        elapsed_secs: f64,
     ) -> Self {
         Self {
             transform,
             draw_state,
             gl,
             assets,
+            elapsed_secs,
         }
     }
 }
@@ -49,6 +52,7 @@ impl App<'_> {
                 ctx.draw_state,
                 gl,
                 &mut self.assets,
+                self.clock,
             );
 
             match &self.view_state {
@@ -71,7 +75,6 @@ impl App<'_> {
                     self.widget_manager[0].render(&mut gl_ctx)
                 }
                 a if a.is_game() => {
-
                     self.widget_manager[0].render(&mut gl_ctx);
                     if self.running == RunningState::Running {
                         self.title_text.render(&mut gl_ctx);

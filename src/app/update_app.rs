@@ -16,6 +16,7 @@ impl App<'_> {
     pub fn update(&mut self, args: &UpdateArgs) {
         // TODO: split in two functions
         // first apply the changes inside the views
+        self.clock += args.dt;
         if self.view_state == ViewState::Settings {
             for (id, widget_manager) in self.widget_manager.iter_mut().enumerate() {
                 widget_manager.update_settings(&mut self.keybindings_manager[id]);
@@ -26,7 +27,6 @@ impl App<'_> {
             self.widget_manager[0].update_clipboard();
             self.widget_manager[0].update_from_text();
         } else if self.view_state.is_game() && self.running == RunningState::Starting {
-            self.clock += args.dt;
             match self.clock {
                 i if i < 1.0 => self.countdown(&Countdown::Three),
                 i if i < 2.0 => self.countdown(&Countdown::Two),
@@ -37,7 +37,6 @@ impl App<'_> {
                 player.send_serialized();
             }
         } else if self.view_state.is_game() && self.running == RunningState::Running {
-            self.clock += args.dt;
             self.frame_counter = self.frame_counter.wrapping_add(1);
             if let PlayerConfig::TwoRemote {
                 local_ip: _,

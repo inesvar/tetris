@@ -63,10 +63,16 @@ pub const DEFAULT_KEY_INPUT_HEIGHT: f64 = 50.0 * SCALE_FACTOR;
 /*               COLORS                 */
 /****************************************/
 
-pub const BG_COLOR: graphics::types::Color = [0.0, 0.3, 0.1, 1.0];
+pub const BG_COLOR: graphics::types::Color = [0.1, 0.1, 0.1, 1.0];
 pub const GRID_BG_COLOR: graphics::types::Color = [0.3, 0.3, 0.3, 1.0];
 pub const GRID_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
 pub const TEXT_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
+
+/****************************************/
+/*             ANIMATIONS               */
+/****************************************/
+
+pub const CURSOR_BLINK_PERIOD: f64 = 1.0;
 
 /****************************************/
 /*          GAME KEYBINDINGS            */

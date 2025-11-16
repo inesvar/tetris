@@ -8,11 +8,9 @@ pub struct TextInput {
     pub(super) width: f64,
     pub(super) height: f64,
     pub(super) text: Text,
-    pub(super) cursor: String,
     pub(super) info_text: Text,
     placeholder: String,
     pub(super) focused: bool,
-    pub(super) animation_counter: u64,
 }
 
 impl TextInput {
@@ -23,11 +21,9 @@ impl TextInput {
             width,
             height,
             info_text: Text::new("", DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
-            cursor: String::from(""),
             text: Text::new(placeholder, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
             placeholder: String::from(placeholder),
             focused: false,
-            animation_counter: 0,
         }
     }
 
@@ -46,11 +42,9 @@ impl TextInput {
             width,
             height,
             info_text: Text::new(info_text, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
-            cursor: String::from(""),
             text: Text::new(placeholder, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
             placeholder: String::from(placeholder),
             focused: false,
-            animation_counter: 0,
         }
     }
 
