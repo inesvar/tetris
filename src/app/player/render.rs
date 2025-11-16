@@ -1,11 +1,12 @@
 //! Define `trait` [Render] for [Tetromino] and [TetrisGrid].
-use super::core::{Position, TetrisGrid, Tetromino, UseTetrisGrid};
+use super::core::{Position, TetrisGrid, Tetromino};
 use crate::app::render_app::{Piston2dGraphicsArguments, Render};
 use crate::assets::TetrisColor;
 use crate::settings::{BLOCK_SIZE, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS};
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image};
 
+/// In [crate::app::player::render], helpers used to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
     pub(in crate::app::player) fn total_width(&self) -> f64 {
         self.nb_columns() as f64 * BLOCK_SIZE

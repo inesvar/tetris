@@ -1,4 +1,4 @@
-//! Define `trait` [UseTetromino], re-export `struct`s [Tetromino], [TetrisGrid], [TetrominoKind] as well as `trait` [UseTetrisGrid] and `enum` [CoreError].
+//! Define `trait` [UseTetromino], re-export `struct`s [Tetromino], [TetrisGrid], [TetrominoKind] as well as `enum` [CoreError].
 #![doc = mermaid!("core/core_flowgraph.mmd")]
 mod moving_primitives;
 mod rotation_translation;
@@ -13,7 +13,6 @@ use serde::{Deserialize, Serialize};
 use simple_mermaid::mermaid;
 
 pub(super) use spatial_primitives::Position;
-pub(in crate::app::player) use tetris_grid::UseTetrisGrid;
 pub(in crate::app) use tetris_grid::{CoreError, TetrisGrid};
 pub(crate) use tetromino::Tetromino;
 pub(in crate::app::player) use tetromino_kind::TetrominoKind;

@@ -1,9 +1,7 @@
-//! Define `struct` [TetrisGrid], `enum` [CoreError] and `trait` [UseTetrisGrid].
+//! Define `struct` [TetrisGrid] and `enum` [CoreError].
 use super::{spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
 use rand::Rng;
 use std::ops::{Index, IndexMut};
-
-type GridLine = Vec<Option<TetrisColor>>;
 
 /// Tetris grid.
 #[derive(Serialize, Deserialize)]
@@ -14,7 +12,7 @@ pub(in crate::app) struct TetrisGrid {
     nb_rows: i32,
     // Number of hidden rows (above the skyline). Can be cast to `usize` and `u32`.
     nb_hidden_rows: i32,
-    matrix: Vec<GridLine>,
+    matrix: Vec<Vec<Option<TetrisColor>>>,
     line_sum: Vec<i32>,
 }
 
@@ -31,19 +29,10 @@ pub(in crate::app) enum CoreError {
     LockOut,
 }
 
-pub(in crate::app::player) trait UseTetrisGrid {
-    /// Create a new [TetrisGrid].
-    fn new(nb_columns: u32, nb_rows: u32, nb_hidden_rows: u32) -> Self;
-
-    /// Add the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
-    fn add_garbage(&mut self, completed_lines: u64);
-
-    /// Empty the grid.
-    fn reset(&mut self);
-}
-
-impl UseTetrisGrid for TetrisGrid {
-    fn new(nb_columns: u32, nb_rows: u32, nb_hidden_rows: u32) -> Self {
+/// In [crate::app::player::core::tetris_grid], methods used by [crate::app::player] to initialize the grid and send garbage.
+impl TetrisGrid {
+    /// Create an empty grid.
+    pub(in crate::app::player) fn new(nb_columns: u32, nb_rows: u32, nb_hidden_rows: u32) -> Self {
         let nb_rows_usize: usize = nb_rows
             .try_into()
             .expect("nb_rows should be representable as usize");
@@ -76,7 +65,7 @@ impl UseTetrisGrid for TetrisGrid {
     }
 
     /// Empty the grid.
-    fn reset(&mut self) {
+    pub(in crate::app::player) fn reset(&mut self) {
         *self = Self::new(
             self.nb_columns as u32,
             self.nb_rows as u32,
@@ -85,7 +74,7 @@ impl UseTetrisGrid for TetrisGrid {
     }
 
     /// Adds the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
-    fn add_garbage(&mut self, completed_lines: u64) {
+    pub(in crate::app::player) fn add_garbage(&mut self, completed_lines: u64) {
         if completed_lines < 2 {
             return;
         }
@@ -128,17 +117,68 @@ impl UseTetrisGrid for TetrisGrid {
     }
 }
 
-impl Index<&Position> for TetrisGrid {
-    type Output = Option<TetrisColor>;
+/// In [crate::app::player::core::tetris_grid], getters used by [crate::app::player::render] to implement [crate::app::render_app::Render] for [TetrisGrid].
+impl TetrisGrid {
+    pub(in crate::app::player) fn nb_visible_rows(&self) -> i32 {
+        self.nb_rows - self.nb_hidden_rows
+    }
 
-    fn index(&self, block: &Position) -> &<Self as Index<&Position>>::Output {
-        &self.matrix[block.y as usize][block.x as usize]
+    pub(in crate::app::player) fn nb_hidden_rows(&self) -> i32 {
+        self.nb_hidden_rows
+    }
+
+    pub(in crate::app::player) fn nb_columns(&self) -> i32 {
+        self.nb_columns
+    }
+
+    pub(in crate::app::player) fn positions(&self) -> impl Iterator<Item = Position> {
+        let h = self.nb_rows;
+        let w = self.nb_columns;
+        (0..h).flat_map(move |y| (0..w).map(move |x| Position::new(x, y)))
     }
 }
 
-impl IndexMut<&Position> for TetrisGrid {
-    fn index_mut(&mut self, block: &Position) -> &mut <Self as Index<&Position>>::Output {
-        &mut self.matrix[block.y as usize][block.x as usize]
+/// In [crate::app::player::core::tetris_grid], methods used by [super::Tetromino] to enter, move and then lock down in the grid.
+impl TetrisGrid {
+    /// Return true if the `block` is inside the grid in an empty slot.
+    pub(super) fn is_block_available(&self, block: &Position) -> Result<(), CoreError> {
+        self.contains(block)?;
+        self.is_block_empty(block)
+    }
+
+    /// Return true if `blocks` can enter the grid.
+    ///
+    /// # Panics
+    ///
+    /// If any of the `blocks` is outside the tetris grid.
+    pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<(), CoreError> {
+        let can_spawn = blocks.iter().try_for_each(|b| self.is_block_empty(b));
+        can_spawn.map_err(|_| CoreError::BlockOut)
+    }
+
+    /// Push the blocks into the grid and return the number of lines completed.
+    ///
+    /// # Panics
+    ///
+    /// If any of the `blocks` is outside the tetris grid.
+    pub(super) fn add_blocks(
+        &mut self,
+        blocks: &[Position],
+        tetris_color: TetrisColor,
+    ) -> Result<u64, CoreError> {
+        let mut no_block_below_skyline = true;
+        for block in blocks {
+            self.add_block(block, tetris_color);
+            if block.y >= self.nb_hidden_rows {
+                no_block_below_skyline = false;
+            }
+        }
+        // Only continue playing if there's a block below the skyline
+        if no_block_below_skyline {
+            Err(CoreError::LockOut)
+        } else {
+            Ok(self.clear_lines())
+        }
     }
 }
 
@@ -208,64 +248,19 @@ impl TetrisGrid {
         self[block] = Some(tetris_color);
         self.line_sum[block.y as usize] += 1;
     }
+}
 
-    /// Return true if the `block` is inside the grid in an empty slot.
-    pub(super) fn is_block_available(&self, block: &Position) -> Result<(), CoreError> {
-        self.contains(block)?;
-        self.is_block_empty(block)
+impl Index<&Position> for TetrisGrid {
+    type Output = Option<TetrisColor>;
+
+    fn index(&self, block: &Position) -> &<Self as Index<&Position>>::Output {
+        &self.matrix[block.y as usize][block.x as usize]
     }
+}
 
-    /// Return true if `blocks` can enter the grid.
-    ///
-    /// # Panics
-    ///
-    /// If any of the `blocks` is outside the tetris grid.
-    pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<(), CoreError> {
-        let can_spawn = blocks.iter().try_for_each(|b| self.is_block_empty(b));
-        can_spawn.map_err(|_| CoreError::BlockOut)
-    }
-
-    /// Push the blocks into the grid and return the number of lines completed.
-    ///
-    /// # Panics
-    ///
-    /// If any of the `blocks` is outside the tetris grid.
-    pub(super) fn add_blocks(
-        &mut self,
-        blocks: &[Position],
-        tetris_color: TetrisColor,
-    ) -> Result<u64, CoreError> {
-        let mut no_block_below_skyline = true;
-        for block in blocks {
-            self.add_block(block, tetris_color);
-            if block.y >= self.nb_hidden_rows {
-                no_block_below_skyline = false;
-            }
-        }
-        // Only continue playing if there's a block below the skyline
-        if no_block_below_skyline {
-            Err(CoreError::LockOut)
-        } else {
-            Ok(self.clear_lines())
-        }
-    }
-
-    pub(in crate::app::player) fn nb_visible_rows(&self) -> i32 {
-        self.nb_rows - self.nb_hidden_rows
-    }
-
-    pub(in crate::app::player) fn nb_hidden_rows(&self) -> i32 {
-        self.nb_hidden_rows
-    }
-
-    pub(in crate::app::player) fn nb_columns(&self) -> i32 {
-        self.nb_columns
-    }
-
-    pub(in crate::app::player) fn positions(&self) -> impl Iterator<Item = Position> {
-        let h = self.nb_rows;
-        let w = self.nb_columns;
-        (0..h).flat_map(move |y| (0..w).map(move |x| Position::new(x, y)))
+impl IndexMut<&Position> for TetrisGrid {
+    fn index_mut(&mut self, block: &Position) -> &mut <Self as Index<&Position>>::Output {
+        &mut self.matrix[block.y as usize][block.x as usize]
     }
 }
 

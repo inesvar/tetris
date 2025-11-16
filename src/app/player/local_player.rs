@@ -1,5 +1,5 @@
 //! Define the general implementation of [LocalPlayer].
-use super::core::{TetrisGrid, Tetromino, UseTetrisGrid};
+use super::core::{TetrisGrid, Tetromino};
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
     UseTetromino,
