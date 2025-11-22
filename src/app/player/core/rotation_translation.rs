@@ -1,7 +1,7 @@
 //! Define `struct` [RotationTranslation] and `enum` [RotationType].
 use super::spatial_primitives::{Position, FALL, LEFT, RIGHT};
 
-/// Movement (first a rotation, then a translation).
+/// Movement (a rotation followed by a translation).
 #[derive(Clone, Copy, Default)]
 pub(super) struct RotationTranslation {
     pub(super) rotation_type: RotationType,
@@ -13,12 +13,15 @@ pub(super) struct RotationTranslation {
 #[derive(Clone, Copy, Default)]
 pub(super) enum RotationType {
     #[default]
+    /// Default.
     None,
     Clockwise,
     HalfTurn,
     Counterclockwise,
 }
 
+/// In [rotation_translation](super::rotation_translation), constructors used by
+/// [UseTetromino](super::UseTetromino) to move the [Tetromino](super::Tetromino).
 impl RotationTranslation {
     pub(super) const fn new(
         translation: &Position,

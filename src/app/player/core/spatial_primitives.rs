@@ -8,7 +8,7 @@ pub(super) const RIGHT: Position = Position::new(1, 0);
 pub(super) const FALL: Position = Position::new(0, 1);
 pub(super) const LEFT: Position = Position::new(-1, 0);
 
-/// Position on a discrete grid, serializable.
+/// Position on a discrete grid.
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
 pub(in crate::app::player) struct Position {
     /// Horizontal coordinate, from left to right.
@@ -22,12 +22,16 @@ pub(in crate::app::player) struct Position {
 #[cfg_attr(test, derive(enum_iterator::Sequence))]
 pub(super) enum Direction {
     #[default]
+    /// Default.
     Up,
     Right,
     Down,
     Left,
 }
 
+/// In [spatial_primitives](super::spatial_primitives), helpers used by [moving_primitives](super::moving_primitives)
+/// to implement [ApplyRotationTranslation](super::moving_primitives::ApplyRotationTranslation) for [Position]
+/// (also used by [tetromino_kind](super::tetromino_kind)).
 impl Position {
     pub(in crate::app::player) const fn new(x: i32, y: i32) -> Self {
         Position { x, y }
@@ -54,7 +58,10 @@ impl Position {
     pub(super) const fn turned_counterclockwise(&self) -> Self {
         Position::new(self.y, -self.x)
     }
+}
 
+/// In [spatial_primitives](super::spatial_primitives), getters used by [player::render](crate::app::player::render).
+impl Position {
     pub(in crate::app::player) fn x(&self) -> i32 {
         self.x
     }
@@ -64,6 +71,9 @@ impl Position {
     }
 }
 
+/// In [spatial_primitives](super::spatial_primitives), helpers used by
+/// [moving_primitives](super::moving_primitives) to implement
+/// [ApplyRotationTranslation](super::moving_primitives::ApplyRotationTranslation) for [Direction].
 impl Direction {
     pub(super) fn turn_clockwise(&mut self) {
         match self {

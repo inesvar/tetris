@@ -110,7 +110,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisGrid {
 
         for position in self.positions() {
             if let Some(tetris_color) = self[&position] {
-                position.render_tetris_block(&tetris_color, gl_ctx);
+                render_tetris_block(&position, &tetris_color, gl_ctx);
             }
         }
     }
@@ -119,33 +119,32 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisGrid {
 impl Render<Piston2dGraphicsArguments<'_, '_>> for Tetromino {
     fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>) {
         for block in self.blocks() {
-            block.render_tetris_block(&self.color, gl_ctx);
+            render_tetris_block(block, &self.color, gl_ctx);
         }
     }
 }
 
-impl Position {
-    fn render_tetris_block(
-        &self,
-        tetris_color: &TetrisColor,
-        gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>,
-    ) {
-        let dims = rectangle::square(
-            self.x() as Scalar * BLOCK_SIZE,
-            self.y() as Scalar * BLOCK_SIZE,
-            BLOCK_SIZE,
-        );
+/// In [player::render](super::render), helper to render a tetris block at `position` with `tetris_color`.
+fn render_tetris_block(
+    position: &Position,
+    tetris_color: &TetrisColor,
+    gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>,
+) {
+    let dims = rectangle::square(
+        position.x() as Scalar * BLOCK_SIZE,
+        position.y() as Scalar * BLOCK_SIZE,
+        BLOCK_SIZE,
+    );
 
-        Image::new().rect(dims).draw(
-            gl_ctx.assets.texture_from_tetris_color(tetris_color),
-            &gl_ctx.draw_state,
-            gl_ctx.transform,
-            gl_ctx.gl,
-        );
-    }
+    Image::new().rect(dims).draw(
+        gl_ctx.assets.texture_from_tetris_color(tetris_color),
+        &gl_ctx.draw_state,
+        gl_ctx.transform,
+        gl_ctx.gl,
+    );
 }
 
-/// In [super::render], helpers used to implement [crate::app::render_app::Render] for [TetrisGrid].
+/// In [player::render](super::render), helpers used to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
     pub(in crate::app::player) fn total_width(&self) -> f64 {
         self.nb_columns() as f64 * BLOCK_SIZE

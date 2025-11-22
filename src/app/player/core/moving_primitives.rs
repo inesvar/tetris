@@ -6,27 +6,23 @@ use super::{
 
 /// Apply a [RotationTranslation] to a spatial primitive ([Position] or [Direction]).
 pub(super) trait ApplyRotationTranslation {
-    /// Turn then translate as described by `movement`.
-    /// `movement.rotation_center` is understood as a block center.
+    /// Turn then translate as described by `movement` (turning around the center of the `movement.rotation_center` block).
     fn move_by(&mut self, movement: &RotationTranslation) {
         self.turn_around_block_center(movement);
         self.translate_by(movement);
     }
-    /// Like [ApplyRotationTranslation::move_by()], turn then translate as described by `movement`.
-    /// `movement.rotation_center` is understood as the bottom right block corner, not the block center.
+    /// Turn then translate as described by `movement` (turning around the bottom right corner of the `movement.rotation_center` block).
     fn move_by_with_offset(&mut self, movement: &RotationTranslation) {
-        self.turn_around_block_bottom_right_corner(movement);
+        self.turn_around_block_corner(movement);
         self.translate_by(movement);
     }
 
     /// Translate by `movement.translation`.
     fn translate_by(&mut self, movement: &RotationTranslation);
-    /// Turn around `movement.rotation_center` by `movement.rotation_type`.
-    /// `movement.rotation_center` is understood as the block center.
+    /// Turn around the center of the `movement.rotation_center` block by `movement.rotation_type`.
     fn turn_around_block_center(&mut self, movement: &RotationTranslation);
-    /// Turn around `movement.rotation_center` by `movement.rotation_type`.
-    /// `movement.rotation_center` is understood as the bottom right block corner, not the block center.
-    fn turn_around_block_bottom_right_corner(&mut self, movement: &RotationTranslation);
+    /// Turn around the bottom right corner of the `movement.rotation_center` block by `movement.rotation_type`.
+    fn turn_around_block_corner(&mut self, movement: &RotationTranslation);
 }
 
 impl ApplyRotationTranslation for Position {
@@ -53,7 +49,7 @@ impl ApplyRotationTranslation for Position {
         }
     }
 
-    fn turn_around_block_bottom_right_corner(&mut self, movement: &RotationTranslation) {
+    fn turn_around_block_corner(&mut self, movement: &RotationTranslation) {
         let mut zoomed = self.get_block_center_coordinates();
         let mut zoomed_rotation = *movement;
         zoomed_rotation.rotation_center = zoomed_rotation
@@ -83,26 +79,27 @@ impl ApplyRotationTranslation for Direction {
         }
     }
 
-    fn turn_around_block_bottom_right_corner(&mut self, movement: &RotationTranslation) {
+    fn turn_around_block_corner(&mut self, movement: &RotationTranslation) {
         self.turn_around_block_center(movement);
     }
 }
 
-/// These functions are useful to rotate the I tetromino, which unlike the other tetrominos rotates around a block corner and not a block center.
+/// In [moving_primitives](super::moving_primitives), helpers to convert between regular coordinates (also refered to as "block coordinates") and 2x zoomed coordinates.
+/// In 2x zoomed coordinates, block centers lie at even coordinates and block corners lie at odd coordinates.
+///
+/// These functions are used by [ApplyRotationTranslation] to rotate the I tetromino, which unlike the other tetrominos rotates around a block corner and not a block center.
 impl Position {
-    /// Convert block coordinates to 2x zoomed coordinates.
-    /// In 2x zoomed coordinates, block centers lie at even coordinates while block corners lie at odd coordinates.
+    /// Get 2x zoomed coordinates for the block center.
     fn get_block_center_coordinates(&self) -> Self {
         Self::new(2 * self.x, 2 * self.y)
     }
 
-    /// Convert block coordinates to 2x zoomed coordinates.
-    /// In 2x zoomed coordinates, block centers lie at even coordinates while block corners lie at odd coordinates.
+    /// Get 2x zoomed coordinates for the block bottom right corner.
     fn get_block_bottom_right_coordinates(&self) -> Self {
         Self::new(2 * self.x + 1, 2 * self.y + 1)
     }
 
-    /// Convert 2x zoomed coordinates to block coordinates.
+    /// Get block coordinates from 2x zoomed coordinates.
     fn get_block_coordinates(&self) -> Self {
         Self::new(self.x.div_euclid(2), self.y.div_euclid(2))
     }
@@ -219,7 +216,7 @@ mod tests {
             let rotation = RotationTranslation::rotation(rotation_type, &Position::default());
 
             expected.turn_around_block_center(&rotation);
-            instance.turn_around_block_bottom_right_corner(&rotation);
+            instance.turn_around_block_corner(&rotation);
 
             assert_eq!(instance, expected);
         }
@@ -263,7 +260,7 @@ mod tests {
             let mut instance = RISE;
             let rotation = RotationTranslation::rotation(*rotation_type, &Position::default());
 
-            instance.turn_around_block_bottom_right_corner(&rotation);
+            instance.turn_around_block_corner(&rotation);
 
             assert_eq!(instance, expected);
         }

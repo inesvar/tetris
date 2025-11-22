@@ -5,7 +5,7 @@ use rand::Rng;
 use std::ops::{Index, IndexMut};
 
 /// Tetris grid.
-/// 
+///
 /// According to the Tetris Guideline, the grid has 2 components:
 /// - **Matrix**: "the rectangular arrangement of cells creating the active game area, usually 10 columns wide by 20 rows high.
 /// Tetriminos fall from the top-middle just above the Skyline (off-screen) to the bottom."
@@ -13,19 +13,16 @@ use std::ops::{Index, IndexMut};
 /// Out, Block Out, and Top Out **Game Over Conditions**."
 #[derive(Serialize, Deserialize)]
 pub(in crate::app) struct TetrisGrid {
-    /// Number of columns in the **Matrix** and **Buffer Zone**, always below [MAX_SMALL_UNSIGNED].
-    /// 
+    /// Number of columns in the **Matrix** and **Buffer Zone**, can't be greater than [MAX_SMALL_UNSIGNED].
     /// Should be 10 according to the Tetris Guideline.
     nb_columns: i32,
-    /// Total number of rows in the **Matrix** and **Buffer Zone**, always below [MAX_SMALL_UNSIGNED].
-    /// 
+    /// Total number of rows in the **Matrix** and **Buffer Zone**, can't be greater than [MAX_SMALL_UNSIGNED].
     /// Should be 40 according to the Tetris Guideline.
     nb_rows: i32,
-    /// Number of hidden rows (ie in the **Buffer Zone** above the Skyline), always below [MAX_SMALL_UNSIGNED].
-    /// 
+    /// Number of hidden rows (ie in the **Buffer Zone** above the Skyline), can't be greater than [MAX_SMALL_UNSIGNED].
     /// Should be 20 according to the Tetris Guideline.
     nb_hidden_rows: i32,
-    /// **Matrix** and **Buffer Zone** cells, indexed *from top to bottom*. 
+    /// **Matrix** and **Buffer Zone** cells, indexed *from top to bottom*.
     matrix: Vec<Vec<Option<TetrisColor>>>,
     /// Number of filled blocks in each line of the [TetrisGrid::matrix].
     line_sum: Vec<i32>,
@@ -33,7 +30,7 @@ pub(in crate::app) struct TetrisGrid {
 
 // same visibility as TetrisColor
 /// Error cases arising when using the [TetrisGrid].
-/// 
+///
 /// Includes Tetris Guideline **Game Over Conditions** as well as minor errors
 /// relative to impossible moves in the grid.
 #[derive(Debug, PartialEq)]
@@ -43,34 +40,35 @@ pub(in crate::app) enum CoreError {
     /// Tried to move to unavailable block.
     UnavailableBlock,
     /// According to the Tetris Guideline :
-    /// 
+    ///
     /// "This **Game Over Condition** occurs when part of a newly-generated tetrimino is blocked due to
     /// an existing Block in the Matrix."
     BlockOut,
     /// According to the Tetris Guideline :
-    /// 
+    ///
     /// "This **Game Over Condition** occurs when a whole tetrimino locks down above the Skyline."
     LockOut,
     #[allow(unused)]
     /// According to the Tetris Guideline :
-    /// 
+    ///
     /// "This **Game Over Condition** occurs when an opponent’s Line Attack forces your Blocks
     /// past the top of the 20-line Buffer zone. It is highly unlikely that this will ever occur,
     /// since Lock out [...] or Block out [...] will likely occur before a Block ever gets pushed out of the Buffer zone."
     TopOut,
 }
 
-/// In [super::tetris_grid], methods used by [crate::app::player] to initialize the grid and send garbage.
+/// In [tetris_grid](super::tetris_grid), methods used by [app::player](crate::app::player)
+/// to initialize the grid and send garbage.
 impl TetrisGrid {
     /// Create an empty grid.
     ///
     /// # Panics
     ///
-    /// If `nb_columns` or `nb_rows` or `nb_hidden_rows` is greater or equal to [MAX_SMALL_UNSIGNED].
+    /// If `nb_columns` or `nb_rows` or `nb_hidden_rows` is greater than [MAX_SMALL_UNSIGNED].
     pub(in crate::app::player) fn new(nb_columns: u32, nb_rows: u32, nb_hidden_rows: u32) -> Self {
-        if nb_columns >= MAX_SMALL_UNSIGNED
-            || nb_rows >= MAX_SMALL_UNSIGNED
-            || nb_hidden_rows >= MAX_SMALL_UNSIGNED
+        if nb_columns > MAX_SMALL_UNSIGNED
+            || nb_rows > MAX_SMALL_UNSIGNED
+            || nb_hidden_rows > MAX_SMALL_UNSIGNED
         {
             panic!("`nb_columns`, `nb_rows` and `nb_hidden_rows` should be less than `MAX_SMALL_UNSIGNED`");
         }
@@ -102,7 +100,7 @@ impl TetrisGrid {
         );
     }
 
-    /// Adds the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
+    /// Add the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
     pub(in crate::app::player) fn add_garbage(&mut self, completed_lines: u64) {
         if completed_lines < 2 {
             return;
@@ -146,7 +144,8 @@ impl TetrisGrid {
     }
 }
 
-/// In [super::tetris_grid], methods used by [super::UseTetromino] to enter, move and then lock down in the grid.
+/// In [tetris_grid](super::tetris_grid), methods used by [UseTetromino](super::UseTetromino)
+/// to enter, move and then lock down in the grid.
 #[doc = mermaid!("use_tetromino_flowgraph.mmd")]
 impl TetrisGrid {
     /// Return true if `blocks` can enter the grid.
@@ -257,7 +256,8 @@ impl TetrisGrid {
     }
 }
 
-/// In [super::tetris_grid], getters used by [crate::app::player::render] to implement [crate::app::render_app::Render] for [TetrisGrid].
+/// In [tetris_grid](super::tetris_grid), getters used by [player::render](crate::app::player::render)
+/// to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
     pub(in crate::app::player) fn nb_visible_rows(&self) -> i32 {
         self.nb_rows - self.nb_hidden_rows
