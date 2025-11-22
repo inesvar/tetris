@@ -175,7 +175,7 @@ mod tests {
 
     #[test]
     fn translate_by_for_direction_does_nothing() {
-        let expected = Direction::Up;
+        let expected = Direction::North;
         let mut direction = expected;
 
         direction.translate_by(&CLOCKWISE_TURN);
@@ -190,10 +190,10 @@ mod tests {
         RotationType::Counterclockwise,
     ];
     const DIRECTIONS: [Direction; 4] = [
-        Direction::Up,
-        Direction::Right,
-        Direction::Down,
-        Direction::Left,
+        Direction::North,
+        Direction::East,
+        Direction::South,
+        Direction::West,
     ];
 
     #[test]

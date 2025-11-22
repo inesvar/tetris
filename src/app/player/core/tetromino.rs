@@ -200,14 +200,14 @@ impl Display for Tetromino {
 impl Tetromino {
     fn i_tetromino_rotation_correction(&mut self, movement: &RotationTranslation) -> Position {
         match (self.direction, movement.rotation_type) {
-            (Direction::Up, RotationType::Clockwise) => RIGHT,
-            (Direction::Right, RotationType::Counterclockwise) => LEFT,
-            (Direction::Right, RotationType::Clockwise) => FALL,
-            (Direction::Down, RotationType::Counterclockwise) => RISE,
-            (Direction::Down, RotationType::Clockwise) => LEFT,
-            (Direction::Left, RotationType::Counterclockwise) => RIGHT,
-            (Direction::Left, RotationType::Clockwise) => RISE,
-            (Direction::Up, RotationType::Counterclockwise) => FALL,
+            (Direction::North, RotationType::Clockwise) => RIGHT,
+            (Direction::East, RotationType::Counterclockwise) => LEFT,
+            (Direction::East, RotationType::Clockwise) => FALL,
+            (Direction::South, RotationType::Counterclockwise) => RISE,
+            (Direction::South, RotationType::Clockwise) => LEFT,
+            (Direction::West, RotationType::Counterclockwise) => RIGHT,
+            (Direction::West, RotationType::Clockwise) => RISE,
+            (Direction::North, RotationType::Counterclockwise) => FALL,
             (_, _) => todo!(),
         }
     }

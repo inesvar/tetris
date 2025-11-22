@@ -23,10 +23,10 @@ pub(in crate::app::player) struct Position {
 pub(super) enum Direction {
     #[default]
     /// Default.
-    Up,
-    Right,
-    Down,
-    Left,
+    North,
+    East,
+    South,
+    West,
 }
 
 /// In [spatial_primitives](super::spatial_primitives), helpers used by [moving_primitives](super::moving_primitives)
@@ -77,19 +77,19 @@ impl Position {
 impl Direction {
     pub(super) fn turn_clockwise(&mut self) {
         match self {
-            Direction::Up => *self = Direction::Right,
-            Direction::Right => *self = Direction::Down,
-            Direction::Down => *self = Direction::Left,
-            Direction::Left => *self = Direction::Up,
+            Direction::North => *self = Direction::East,
+            Direction::East => *self = Direction::South,
+            Direction::South => *self = Direction::West,
+            Direction::West => *self = Direction::North,
         }
     }
 
     pub(super) fn turn_counterclockwise(&mut self) {
         match self {
-            Direction::Up => *self = Direction::Left,
-            Direction::Left => *self = Direction::Down,
-            Direction::Down => *self = Direction::Right,
-            Direction::Right => *self = Direction::Up,
+            Direction::North => *self = Direction::West,
+            Direction::West => *self = Direction::South,
+            Direction::South => *self = Direction::East,
+            Direction::East => *self = Direction::North,
         }
     }
 }
@@ -160,30 +160,30 @@ mod tests {
 
     #[test]
     fn direction_turn_clockwise_is_correct() {
-        let mut clock = Direction::Up;
+        let mut clock = Direction::North;
 
         clock.turn_clockwise();
-        assert_eq!(clock, Direction::Right);
+        assert_eq!(clock, Direction::East);
 
         clock.turn_clockwise();
-        assert_eq!(clock, Direction::Down);
+        assert_eq!(clock, Direction::South);
 
         clock.turn_clockwise();
-        assert_eq!(clock, Direction::Left);
+        assert_eq!(clock, Direction::West);
     }
 
     #[test]
     fn direction_turn_counterclockwise_is_correct() {
-        let mut clock = Direction::Up;
+        let mut clock = Direction::North;
 
         clock.turn_counterclockwise();
-        assert_eq!(clock, Direction::Left);
+        assert_eq!(clock, Direction::West);
 
         clock.turn_counterclockwise();
-        assert_eq!(clock, Direction::Down);
+        assert_eq!(clock, Direction::South);
 
         clock.turn_counterclockwise();
-        assert_eq!(clock, Direction::Right);
+        assert_eq!(clock, Direction::East);
     }
 
     #[test]
