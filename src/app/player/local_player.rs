@@ -4,7 +4,7 @@ use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
     UseTetromino,
 };
-use crate::app::player::core::CoreError;
+use crate::app::player::core::GameOverError;
 use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
@@ -135,8 +135,7 @@ impl LocalPlayer {
         // TODO this should be done using the grid method and probably all other calls
         // using null()...
         let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
-        if !possible_active.can_enter_grid(&self.player_screen.grid) {
-            // This is a block out situation.
+        if possible_active.can_enter_grid(&self.player_screen.grid) == Err(GameOverError::BlockOut) {
             // Set the game_over flag and return the tetromino to the bag.
             self.declare_game_over();
             self.player_screen
@@ -187,7 +186,7 @@ impl LocalPlayer {
                 self.get_new_tetromino();
             }
             // if the tetromino froze above the visible grid, it's game over !
-            Err(CoreError::LockOut) => {
+            Err(GameOverError::LockOut) => {
                 self.declare_game_over();
                 return Err(());
             }

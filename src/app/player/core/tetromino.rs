@@ -5,7 +5,7 @@ use super::{
     moving_primitives::ApplyRotationTranslation,
     rotation_translation::{RotationTranslation, RotationType},
     spatial_primitives::{Direction, Position},
-    tetris_grid::CoreError,
+    tetris_grid::GameOverError,
     Deserialize, Pcg32, Serialize, TetrisColor, TetrisGrid, TetrominoKind, UseTetromino,
 };
 use core::fmt::Display;
@@ -23,13 +23,13 @@ pub(crate) struct Tetromino {
 }
 
 impl UseTetromino for Tetromino {
-    fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()> {
+    fn try_fall(&mut self, grid: &TetrisGrid) -> bool {
         let movement = RotationTranslation::fall();
-        self.try_move(grid, &movement).map_err(|_err| ())
+        self.try_move(grid, &movement)
     }
 
     fn hard_drop(&mut self, grid: &TetrisGrid) {
-        if self.fall(grid).is_ok() {
+        if self.try_fall(grid) {
             self.hard_drop(grid);
         }
     }
@@ -49,7 +49,7 @@ impl UseTetromino for Tetromino {
             return;
         };
         let movement = RotationTranslation::rotation(RotationType::HalfTurn, &self.center);
-        let _ = self.try_move(grid, &movement).is_ok();
+        let _ = self.try_move(grid, &movement);
     }
 
     fn turn_clockwise(&mut self, grid: &TetrisGrid) {
@@ -64,7 +64,7 @@ impl UseTetromino for Tetromino {
         for wall_kick in wall_kicks_translations {
             let movement =
                 RotationTranslation::new(wall_kick, RotationType::Clockwise, &self.center);
-            if self.try_move(grid, &movement).is_ok() {
+            if self.try_move(grid, &movement) {
                 return;
             }
         }
@@ -82,7 +82,7 @@ impl UseTetromino for Tetromino {
         for wall_kick in wall_kicks_translations {
             let movement =
                 RotationTranslation::new(wall_kick, RotationType::Counterclockwise, &self.center);
-            if self.try_move(grid, &movement).is_ok() {
+            if self.try_move(grid, &movement) {
                 return;
             }
         }
@@ -141,22 +141,18 @@ impl UseTetromino for Tetromino {
         tetromino_bag
     }
 
-    fn can_enter_grid(&self, grid: &TetrisGrid) -> bool {
-        grid.can_blocks_spawn_on(&self.blocks).is_ok()
+    fn can_enter_grid(&self, grid: &TetrisGrid) -> Result<(), GameOverError> {
+        grid.can_blocks_spawn_on(&self.blocks)
     }
 
-    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, CoreError> {
+    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
         grid.add_blocks(&self.blocks, self.color)
     }
 }
 
 impl Tetromino {
     /// Return whether the tetromino could be moved.
-    fn try_move(
-        &mut self,
-        grid: &TetrisGrid,
-        movement: &RotationTranslation,
-    ) -> Result<(), CoreError> {
+    fn try_move(&mut self, grid: &TetrisGrid, movement: &RotationTranslation) -> bool {
         let mut new_blocks = self.blocks;
         for new_block in new_blocks.iter_mut() {
             if self.kind.is_rotation_center_on_block_center() {
@@ -165,12 +161,14 @@ impl Tetromino {
                 new_block.move_by_with_offset(movement);
             }
             // Check if `copy` is inside `grid` and on an empty slot.
-            grid.is_block_available(new_block)?;
+            if !grid.is_block_available(new_block) {
+                return false;
+            }
         }
         self.blocks = new_blocks;
         self.direction.turn_around_block_center(movement);
         self.center.translate_by(movement);
-        Ok(())
+        true
     }
 
     pub(in crate::app::player) fn blocks(&self) -> &[Position] {

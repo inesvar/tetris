@@ -11,7 +11,7 @@ graph LR
     TetrisGrid[[TetrisGrid]]
     Tetromino[[Tetromino]]
     UseTetromino([UseTetromino])
-    CoreError[CoreError]
+    GameOverError[GameOverError]
     TetrominoKind[TetrominoKind]
 
     %% modules
@@ -50,7 +50,7 @@ graph LR
 
     subgraph tetris_grid
         TetrisGrid
-        CoreError
+        GameOverError
     end
 
     Tetromino ~~~ tetris_grid

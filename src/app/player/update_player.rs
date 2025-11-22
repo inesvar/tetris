@@ -45,11 +45,10 @@ impl LocalPlayer {
         // Translate the tetromino down on a key press
         if frame_counter % 5 == 0 {
             if self.keyboard.is_long_pressed(&keybindings.fall_keys)
-                && self
+                && !self
                     .player_screen
                     .active_tetromino
-                    .fall(&self.player_screen.grid)
-                    .is_err()
+                    .try_fall(&self.player_screen.grid)
                 && self.freeze_frame < frame_counter
             {
                 // if the tetromino reaches the bottom, set the freeze_frame
@@ -81,11 +80,10 @@ impl LocalPlayer {
 
         // move the tetromino down to emulate its fall
         if frame_counter % fall_speed_divide == 0
-            && self
+            && !self
                 .player_screen
                 .active_tetromino
-                .fall(&self.player_screen.grid)
-                .is_err()
+                .try_fall(&self.player_screen.grid)
             && self.freeze_frame < frame_counter
         {
             // if the tetromino reaches the bottom, set the freeze_frame
@@ -100,11 +98,10 @@ impl LocalPlayer {
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame
-            && self
+            && !self
                 .player_screen
                 .active_tetromino
-                .fall(&self.player_screen.grid)
-                .is_err()
+                .try_fall(&self.player_screen.grid)
         {
             let _ = self.lock_down_tetromino();
         }

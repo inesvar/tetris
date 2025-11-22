@@ -1,4 +1,4 @@
-//! Define `trait` [UseTetromino], re-export `struct`s [Tetromino], [TetrisGrid], [TetrominoKind] as well as `enum` [CoreError].
+//! Define `trait` [UseTetromino], re-export `struct`s [Tetromino], [TetrisGrid], [TetrominoKind] as well as `enum` [GameOverError].
 #![doc = mermaid!("core/core_flowgraph.mmd")]
 mod moving_primitives;
 mod rotation_translation;
@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use simple_mermaid::mermaid;
 
 pub(super) use spatial_primitives::Position;
-pub(in crate::app) use tetris_grid::{CoreError, TetrisGrid};
+pub(in crate::app) use tetris_grid::{GameOverError, TetrisGrid};
 pub(crate) use tetromino::Tetromino;
 pub(in crate::app::player) use tetromino_kind::TetrominoKind;
 
@@ -21,7 +21,7 @@ pub(in crate::app::player) use tetromino_kind::TetrominoKind;
 #[doc = mermaid!("core/use_tetromino_flowgraph.mmd")]
 pub(in crate::app::player) trait UseTetromino: Sized {
     /// Return whether the tetromino could be moved one cell down.
-    fn fall(&mut self, grid: &TetrisGrid) -> Result<(), ()>;
+    fn try_fall(&mut self, grid: &TetrisGrid) -> bool;
 
     /// Move the tetromino down until it's not possible anymore.
     fn hard_drop(&mut self, grid: &TetrisGrid);
@@ -48,11 +48,11 @@ pub(in crate::app::player) trait UseTetromino: Sized {
     fn reset(&mut self);
 
     /// Check whether the Tetromino can enter the grid.
-    fn can_enter_grid(&self, grid: &TetrisGrid) -> bool;
+    fn can_enter_grid(&self, grid: &TetrisGrid) -> Result<(), GameOverError>;
 
     /// Lock down in the grid.
-    /// Return error on LockOut and number of completed lines on success.
-    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, CoreError>;
+    /// Return number of completed lines on success.
+    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError>;
 
     /// Return a random bag of [TetrominoKind] of the specified size using the given rng.
     fn new_tetromino_bag(size_of_bag: u32, rng: &mut Pcg32) -> Vec<TetrominoKind>;

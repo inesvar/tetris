@@ -1,4 +1,4 @@
-//! Define `struct` [TetrisGrid] and `enum` [CoreError].
+//! Define `struct` [TetrisGrid] and `enum` [GameOverError].
 use super::{mermaid, spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
 use crate::settings::MAX_SMALL_UNSIGNED;
 use rand::Rng;
@@ -8,9 +8,9 @@ use std::ops::{Index, IndexMut};
 ///
 /// According to the Tetris Guideline, the grid has 2 components:
 /// - **Matrix**: "the rectangular arrangement of cells creating the active game area, usually 10 columns wide by 20 rows high.
-/// Tetriminos fall from the top-middle just above the Skyline (off-screen) to the bottom."
+///   Tetriminos fall from the top-middle just above the Skyline (off-screen) to the bottom."
 /// - **Buffer Zone**: "a 10-cell wide x 20-cell high invisible area above the Matrix used to detect Lock
-/// Out, Block Out, and Top Out **Game Over Conditions**."
+///   Out, Block Out, and Top Out **Game Over Conditions**."
 #[derive(Serialize, Deserialize)]
 pub(in crate::app) struct TetrisGrid {
     /// Number of columns in the **Matrix** and **Buffer Zone**, can't be greater than [MAX_SMALL_UNSIGNED].
@@ -29,31 +29,26 @@ pub(in crate::app) struct TetrisGrid {
 }
 
 // same visibility as TetrisColor
-/// Error cases arising when using the [TetrisGrid].
-///
-/// Includes Tetris Guideline **Game Over Conditions** as well as minor errors
-/// relative to impossible moves in the grid.
+/// Tetris Guideline **Game Over Conditions**.
 #[derive(Debug, PartialEq)]
-pub(in crate::app) enum CoreError {
-    /// Tried to move outside of the grid.
-    OutsideOfGrid,
-    /// Tried to move to unavailable block.
-    UnavailableBlock,
+#[allow(clippy::enum_variant_names)]
+pub(in crate::app) enum GameOverError {
     /// According to the Tetris Guideline :
     ///
-    /// "This **Game Over Condition** occurs when part of a newly-generated tetrimino is blocked due to
+    /// "[...] occurs when part of a newly-generated tetrimino is blocked due to
     /// an existing Block in the Matrix."
     BlockOut,
     /// According to the Tetris Guideline :
     ///
-    /// "This **Game Over Condition** occurs when a whole tetrimino locks down above the Skyline."
+    /// "[...] occurs when a whole tetrimino locks down above the Skyline."
     LockOut,
     #[allow(unused)]
     /// According to the Tetris Guideline :
     ///
-    /// "This **Game Over Condition** occurs when an opponent’s Line Attack forces your Blocks
-    /// past the top of the 20-line Buffer zone. It is highly unlikely that this will ever occur,
-    /// since Lock out [...] or Block out [...] will likely occur before a Block ever gets pushed out of the Buffer zone."
+    /// "[...] occurs when an opponent’s Line Attack forces your Blocks past the top
+    /// of the 20-line Buffer zone. It is highly unlikely that this will ever occur,
+    /// since Lock out [...] or Block out [...] will likely occur before a Block ever
+    /// gets pushed out of the Buffer zone."
     TopOut,
 }
 
@@ -153,15 +148,18 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If any of the `blocks` is outside the tetris grid.
-    pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<(), CoreError> {
-        let can_spawn = blocks.iter().try_for_each(|b| self.is_block_empty(b));
-        can_spawn.map_err(|_| CoreError::BlockOut)
+    pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<(), GameOverError> {
+        let can_spawn_on = blocks.iter().all(|block| self.is_block_empty(block));
+        if can_spawn_on {
+            Ok(())
+        } else {
+            Err(GameOverError::BlockOut)
+        }
     }
 
     /// Return true if the `block` is inside the grid in an empty slot.
-    pub(super) fn is_block_available(&self, block: &Position) -> Result<(), CoreError> {
-        self.contains(block)?;
-        self.is_block_empty(block)
+    pub(super) fn is_block_available(&self, block: &Position) -> bool {
+        self.contains(block) && self.is_block_empty(block)
     }
 
     /// Push the blocks into the grid and return the number of lines completed.
@@ -173,7 +171,7 @@ impl TetrisGrid {
         &mut self,
         blocks: &[Position],
         tetris_color: TetrisColor,
-    ) -> Result<u64, CoreError> {
+    ) -> Result<u64, GameOverError> {
         let mut no_block_below_skyline = true;
         for block in blocks {
             self.add_block(block, tetris_color);
@@ -183,7 +181,7 @@ impl TetrisGrid {
         }
         // Only continue playing if there's a block below the skyline
         if no_block_below_skyline {
-            Err(CoreError::LockOut)
+            Err(GameOverError::LockOut)
         } else {
             Ok(self.clear_lines())
         }
@@ -194,24 +192,13 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If `block` is outside the tetris grid.
-    fn is_block_empty(&self, block: &Position) -> Result<(), CoreError> {
-        if self[block].is_none() {
-            Ok(())
-        } else {
-            Err(CoreError::UnavailableBlock)
-        }
+    fn is_block_empty(&self, block: &Position) -> bool {
+        self[block].is_none()
     }
 
     /// Return whether `pos` is a valid block inside the tetris grid.
-    fn contains(&self, pos: &Position) -> Result<(), CoreError> {
-        let is_block_inside_grid =
-            pos.x >= 0 && pos.y >= 0 && pos.x < self.nb_columns && pos.y < self.nb_rows;
-
-        if is_block_inside_grid {
-            Ok(())
-        } else {
-            Err(CoreError::OutsideOfGrid)
-        }
+    fn contains(&self, pos: &Position) -> bool {
+        pos.x >= 0 && pos.y >= 0 && pos.x < self.nb_columns && pos.y < self.nb_rows
     }
 
     /// Remove complete lines, return number of cleared lines.
@@ -245,7 +232,7 @@ impl TetrisGrid {
     ///
     /// If `block` is outside the tetris grid or not empty.
     fn add_block(&mut self, block: &Position, tetris_color: TetrisColor) {
-        if self.is_block_empty(block).is_err() {
+        if !self.is_block_empty(block) {
             panic!(
                 "Trying to add a block to the grid but {:?} is not empty",
                 block
@@ -329,7 +316,7 @@ mod tests {
         for (row, line) in str.iter().enumerate() {
             for (column, cell) in line.char_indices() {
                 let pos = Position::new(column as i32, row as i32);
-                if (cell == ' ') != tetris_grid.is_block_empty(&pos).is_ok() {
+                if (cell == ' ') != tetris_grid.is_block_empty(&pos) {
                     return false;
                 }
             }
@@ -376,13 +363,12 @@ mod tests {
         let mut instance = TetrisGrid::new(5, 5, 0);
         let pos = Position::new(0, 0);
 
-        assert!(instance.is_block_empty(&pos).is_ok());
+        assert!(instance.is_block_empty(&pos));
 
         instance.add_block(&pos, TetrisColor::Grey);
 
-        assert_eq!(
-            instance.is_block_empty(&pos),
-            Err(CoreError::UnavailableBlock)
+        assert!(
+            !instance.is_block_empty(&pos)
         );
     }
 
@@ -392,7 +378,7 @@ mod tests {
         let instance = TetrisGrid::new(5, 5, 0);
         let pos = Position::new(5, 5);
 
-        let _ = instance.is_block_empty(&pos).is_ok();
+        let _ = instance.is_block_empty(&pos);
     }
 
     #[test]
