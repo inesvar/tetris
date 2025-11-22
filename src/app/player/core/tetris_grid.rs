@@ -330,7 +330,7 @@ mod tests {
     )]
     #[test]
     fn new_fails_if_nb_columns_is_too_big() {
-        let _ = TetrisGrid::new(MAX_SMALL_UNSIGNED, 0, 0);
+        let _ = TetrisGrid::new(MAX_SMALL_UNSIGNED + 1, 0, 0);
     }
 
     #[should_panic(
@@ -338,7 +338,7 @@ mod tests {
     )]
     #[test]
     fn new_fails_if_nb_rows_is_too_big() {
-        let _ = TetrisGrid::new(0, MAX_SMALL_UNSIGNED, 0);
+        let _ = TetrisGrid::new(0, MAX_SMALL_UNSIGNED + 1, 0);
     }
 
     #[should_panic(
@@ -346,7 +346,7 @@ mod tests {
     )]
     #[test]
     fn new_fails_if_nb_hidden_rows_is_too_big() {
-        let _ = TetrisGrid::new(0, 0, MAX_SMALL_UNSIGNED);
+        let _ = TetrisGrid::new(0, 0, MAX_SMALL_UNSIGNED + 1);
     }
 
     #[test]
