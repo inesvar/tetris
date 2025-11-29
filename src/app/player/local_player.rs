@@ -135,7 +135,8 @@ impl LocalPlayer {
         // TODO this should be done using the grid method and probably all other calls
         // using null()...
         let possible_active = self.player_screen.fifo_next_tetromino.pop().unwrap();
-        if possible_active.can_enter_grid(&self.player_screen.grid) == Err(GameOverError::BlockOut) {
+        if possible_active.can_enter_grid(&self.player_screen.grid) == Err(GameOverError::BlockOut)
+        {
             // Set the game_over flag and return the tetromino to the bag.
             self.declare_game_over();
             self.player_screen

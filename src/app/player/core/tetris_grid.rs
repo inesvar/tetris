@@ -367,9 +367,7 @@ mod tests {
 
         instance.add_block(&pos, TetrisColor::Grey);
 
-        assert!(
-            !instance.is_block_empty(&pos)
-        );
+        assert!(!instance.is_block_empty(&pos));
     }
 
     #[test]

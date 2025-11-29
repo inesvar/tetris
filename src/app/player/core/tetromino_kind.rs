@@ -201,7 +201,10 @@ mod tests {
     #[test]
     fn generic_wall_kicks_are_correct() {
         assert_eq!(
-            TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::North),
+            TetrominoKind::generic_wall_kick_translations(
+                RotationType::Clockwise,
+                Direction::North
+            ),
             positions!((0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2))
         );
 
@@ -214,10 +217,7 @@ mod tests {
         );
 
         assert_eq!(
-            TetrominoKind::generic_wall_kick_translations(
-                RotationType::Clockwise,
-                Direction::East
-            ),
+            TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::East),
             positions!((0, 0), (1, 0), (1, -1), (0, 2), (1, 2))
         );
 
@@ -230,7 +230,10 @@ mod tests {
         );
 
         assert_eq!(
-            TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::South),
+            TetrominoKind::generic_wall_kick_translations(
+                RotationType::Clockwise,
+                Direction::South
+            ),
             positions!((0, 0), (1, 0), (1, 1), (0, -2), (1, -2))
         );
 
@@ -303,7 +306,10 @@ mod tests {
         );
 
         assert_eq!(
-            TetrominoKind::i_wall_kick_translations(RotationType::Counterclockwise, Direction::North),
+            TetrominoKind::i_wall_kick_translations(
+                RotationType::Counterclockwise,
+                Direction::North
+            ),
             positions!((0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1))
         );
     }
