@@ -19,13 +19,23 @@ pub(in crate::app) struct TetrisGrid {
     /// Total number of rows in the **Matrix** and **Buffer Zone**, can't be greater than [MAX_SMALL_UNSIGNED].
     /// Should be 40 according to the Tetris Guideline.
     nb_rows: i32,
-    /// Number of hidden rows (ie in the **Buffer Zone** above the Skyline), can't be greater than [MAX_SMALL_UNSIGNED].
+    /// Number of hidden rows (ie in the **Buffer Zone** above the **Skyline**), can't be greater than [MAX_SMALL_UNSIGNED].
     /// Should be 20 according to the Tetris Guideline.
     nb_hidden_rows: i32,
     /// **Matrix** and **Buffer Zone** cells, indexed *from top to bottom*.
     matrix: Vec<Vec<Option<TetrisColor>>>,
     /// Number of filled blocks in each line of the [TetrisGrid::matrix].
     line_sum: Vec<i32>,
+}
+
+impl TetrisGrid {
+    pub fn from_position_y_to_grid_y(y: i32) -> i32 {
+        y
+    }
+
+    pub fn from_grid_y_to_position_y(y: i32) -> i32 {
+        y
+    }
 }
 
 // same visibility as TetrisColor
@@ -166,25 +176,24 @@ impl TetrisGrid {
     ///
     /// # Panics
     ///
-    /// If any of the `blocks` is outside the tetris grid.
+    /// If any of the `blocks` is outside the tetris grid or not empty.
     pub(super) fn add_blocks(
         &mut self,
         blocks: &[Position],
         tetris_color: TetrisColor,
     ) -> Result<u64, GameOverError> {
-        let mut no_block_below_skyline = true;
+        let all_above_skyline = blocks.iter().all(|block| self.is_above_skyline(block));
+
+        // Only continue playing if there's a block below the skyline
+        if all_above_skyline {
+            return Err(GameOverError::LockOut);
+        }
+
         for block in blocks {
             self.add_block(block, tetris_color);
-            if block.y >= self.nb_hidden_rows {
-                no_block_below_skyline = false;
-            }
         }
-        // Only continue playing if there's a block below the skyline
-        if no_block_below_skyline {
-            Err(GameOverError::LockOut)
-        } else {
-            Ok(self.clear_lines())
-        }
+
+        Ok(self.clear_lines())
     }
 
     /// Return whether `block` is available in the tetris grid.
@@ -196,9 +205,10 @@ impl TetrisGrid {
         self[block].is_none()
     }
 
-    /// Return whether `pos` is a valid block inside the tetris grid.
-    fn contains(&self, pos: &Position) -> bool {
-        pos.x >= 0 && pos.y >= 0 && pos.x < self.nb_columns && pos.y < self.nb_rows
+    /// Return `true` is `block` is in the **Matrix** or the **Buffer Zone**.
+    fn contains(&self, block: &Position) -> bool {
+        let line = TetrisGrid::from_position_y_to_grid_y(block.y);
+        block.x >= 0 && line >= 0 && block.x < self.nb_columns && line < self.nb_rows
     }
 
     /// Remove complete lines, return number of cleared lines.
@@ -213,7 +223,7 @@ impl TetrisGrid {
         score
     }
 
-    /// Remove `row` from the tetris grid.
+    /// Remove `row` from the tetris grid (and add a new empty row at the top).
     ///
     /// # Panics
     ///
@@ -233,13 +243,15 @@ impl TetrisGrid {
     /// If `block` is outside the tetris grid or not empty.
     fn add_block(&mut self, block: &Position, tetris_color: TetrisColor) {
         if !self.is_block_empty(block) {
-            panic!(
-                "Trying to add a block to the grid but {:?} is not empty",
-                block
-            );
+            panic!()
         }
-        self[block] = Some(tetris_color);
-        self.line_sum[block.y as usize] += 1;
+        let line = TetrisGrid::from_position_y_to_grid_y(block.y) as usize;
+        self.matrix[line][block.x as usize] = Some(tetris_color);
+        self.line_sum[line] += 1;
+    }
+
+    fn is_above_skyline(&self, block: &Position) -> bool {
+        TetrisGrid::from_position_y_to_grid_y(block.y) < self.nb_hidden_rows
     }
 }
 
@@ -261,7 +273,7 @@ impl TetrisGrid {
     pub(in crate::app::player) fn positions(&self) -> impl Iterator<Item = Position> {
         let h = self.nb_rows;
         let w = self.nb_columns;
-        (0..h).flat_map(move |y| (0..w).map(move |x| Position::new(x, y)))
+        (0..h).flat_map(move |y| (0..w).map(move |x| Position::new(x, TetrisGrid::from_grid_y_to_position_y(y))))
     }
 }
 
@@ -269,13 +281,15 @@ impl Index<&Position> for TetrisGrid {
     type Output = Option<TetrisColor>;
 
     fn index(&self, block: &Position) -> &<Self as Index<&Position>>::Output {
-        &self.matrix[block.y as usize][block.x as usize]
+        let line = TetrisGrid::from_position_y_to_grid_y(block.y) as usize;
+        &self.matrix[line][block.x as usize]
     }
 }
 
 impl IndexMut<&Position> for TetrisGrid {
     fn index_mut(&mut self, block: &Position) -> &mut <Self as Index<&Position>>::Output {
-        &mut self.matrix[block.y as usize][block.x as usize]
+        let line = TetrisGrid::from_position_y_to_grid_y(block.y) as usize;
+        &mut self.matrix[line][block.x as usize]
     }
 }
 
