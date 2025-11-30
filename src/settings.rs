@@ -15,8 +15,8 @@ pub const GUEST_PORT: &str = ":26005";
 pub const OPENGL_VERSION: OpenGL = OpenGL::V4_5;
 
 pub const NB_COLUMNS: u32 = 10;
-pub const NB_ROWS: u32 = 22;
-pub const NB_HIDDEN_ROWS: u32 = 2;
+pub const NB_ROWS: u32 = 30;
+pub const NB_HIDDEN_ROWS: u32 = 10;
 /// A reasonable maximum for "small unsigned numbers".
 /// Any [u32] less than or equal to [MAX_SMALL_UNSIGNED] is safe to cast to [i32] and [usize].
 pub const MAX_SMALL_UNSIGNED: u32 = 100;

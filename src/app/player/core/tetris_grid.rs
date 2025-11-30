@@ -30,11 +30,11 @@ pub(in crate::app) struct TetrisGrid {
 
 impl TetrisGrid {
     pub fn from_position_y_to_grid_y(y: i32) -> i32 {
-        y
+        y + 8
     }
 
     pub fn from_grid_y_to_position_y(y: i32) -> i32 {
-        y
+        y - 8
     }
 }
 
@@ -273,7 +273,9 @@ impl TetrisGrid {
     pub(in crate::app::player) fn positions(&self) -> impl Iterator<Item = Position> {
         let h = self.nb_rows;
         let w = self.nb_columns;
-        (0..h).flat_map(move |y| (0..w).map(move |x| Position::new(x, TetrisGrid::from_grid_y_to_position_y(y))))
+        (0..h).flat_map(move |y| {
+            (0..w).map(move |x| Position::new(x, TetrisGrid::from_grid_y_to_position_y(y)))
+        })
     }
 }
 
