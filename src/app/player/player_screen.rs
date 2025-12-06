@@ -1,12 +1,12 @@
 //! Define the [constructor](PlayerScreen::empty()) of [PlayerScreen].
 use super::core::{TetrisGrid, Tetromino};
 use super::{CircularBuffer, PlayerScreen};
-use crate::settings::{NB_BUFFER_ROWS, NB_COLUMNS, NB_NEXT_TETROMINO, NB_ROWS};
+use crate::settings::{NB_BUFFER_ROWS, NB_COLUMNS, NB_MATRIX_ROWS, NB_NEXT_TETROMINO};
 
 impl PlayerScreen {
     pub fn empty() -> Self {
         PlayerScreen {
-            grid: TetrisGrid::new(NB_COLUMNS, NB_ROWS, NB_BUFFER_ROWS), //FIXME: this will not always be the case
+            grid: TetrisGrid::new(NB_COLUMNS, NB_MATRIX_ROWS, NB_BUFFER_ROWS), //FIXME: this will not always be the case
             score: 0,
             game_over: false,
             new_completed_lines: 0,

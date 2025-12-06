@@ -151,7 +151,7 @@ impl TetrisGrid {
     }
 
     fn visible_height(&self) -> f64 {
-        self.nb_visible_rows() as f64 * BLOCK_SIZE
+        self.nb_matrix_rows() as f64 * BLOCK_SIZE
     }
 
     fn hidden_height(&self) -> f64 {
