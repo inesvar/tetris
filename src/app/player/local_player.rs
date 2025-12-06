@@ -83,7 +83,7 @@ impl LocalPlayer {
     }
 
     pub fn add_garbage(&mut self, completed_lines: u64) {
-        self.garbage_to_be_added = completed_lines;
+        self.garbage_to_be_added += completed_lines;
     }
 
     pub fn get_lines_completed(&mut self) -> u64 {
