@@ -24,7 +24,7 @@ pub(in crate::app) struct TetrisGrid {
     nb_buffer_rows: i32,
     /// **Matrix** and **Buffer Zone** cells, indexed *from bottom to top*.
     cells: Vec<Vec<Option<TetrisColor>>>,
-    /// Number of filled blocks in each line of the [TetrisGrid::matrix].
+    /// Number of filled blocks in each line of the [TetrisGrid::cells].
     line_sum: Vec<i32>,
 }
 
