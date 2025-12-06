@@ -146,75 +146,15 @@ fn render_tetris_block(
 
 /// In [player::render](super::render), helpers used to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
-    pub(in crate::app::player) fn total_width(&self) -> f64 {
+    fn total_width(&self) -> f64 {
         self.nb_columns() as f64 * BLOCK_SIZE
     }
 
-    pub(in crate::app::player) fn visible_height(&self) -> f64 {
+    fn visible_height(&self) -> f64 {
         self.nb_visible_rows() as f64 * BLOCK_SIZE
     }
 
-    pub(in crate::app::player) fn hidden_height(&self) -> f64 {
+    fn hidden_height(&self) -> f64 {
         NB_VISIBLE_BUFFER_ROWS as f64 * BLOCK_SIZE
-    }
-
-    fn draw_on_empty_grid(&mut self, blocks: &[Position], tetris_color: TetrisColor) {
-        self.reset();
-
-        for block in blocks {
-            self[block] = Some(tetris_color);
-        }
-    }
-
-    const ONE: [Position; 9] = [
-        Position::new(5, 9),
-        Position::new(4, 10),
-        Position::new(5, 10),
-        Position::new(5, 11),
-        Position::new(5, 12),
-        Position::new(3, 13),
-        Position::new(4, 13),
-        Position::new(5, 13),
-        Position::new(6, 13),
-    ];
-
-    const TWO: [Position; 10] = [
-        Position::new(4, 9),
-        Position::new(5, 9),
-        Position::new(3, 10),
-        Position::new(6, 10),
-        Position::new(5, 11),
-        Position::new(4, 12),
-        Position::new(3, 13),
-        Position::new(4, 13),
-        Position::new(5, 13),
-        Position::new(6, 13),
-    ];
-
-    const THREE: [Position; 9] = [
-        Position::new(4, 9),
-        Position::new(5, 9),
-        Position::new(3, 10),
-        Position::new(6, 10),
-        Position::new(5, 11),
-        Position::new(3, 12),
-        Position::new(6, 12),
-        Position::new(4, 13),
-        Position::new(5, 13),
-    ];
-
-    /// Draw a 1 with blocks of the same color as tetromino.
-    pub(in crate::app::player) fn one(&mut self, tetris_color: TetrisColor) {
-        self.draw_on_empty_grid(&Self::ONE, tetris_color);
-    }
-
-    /// Draw a 2 with blocks of the same color as tetromino.
-    pub(in crate::app::player) fn two(&mut self, tetris_color: TetrisColor) {
-        self.draw_on_empty_grid(&Self::TWO, tetris_color);
-    }
-
-    /// Draw a 3 with blocks of the same color as tetromino.
-    pub(in crate::app::player) fn three(&mut self, tetris_color: TetrisColor) {
-        self.draw_on_empty_grid(&Self::THREE, tetris_color);
     }
 }

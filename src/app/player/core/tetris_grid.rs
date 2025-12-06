@@ -2,7 +2,7 @@
 use super::{mermaid, spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
 use crate::settings::{MAX_SMALL_UNSIGNED, NB_BUFFER_ROWS, NB_VISIBLE_BUFFER_ROWS};
 use rand::Rng;
-use std::ops::{Index, IndexMut};
+use std::ops::Index;
 
 /// Tetris grid.
 ///
@@ -261,7 +261,7 @@ impl TetrisGrid {
     }
 }
 
-/// In [tetris_grid](super::tetris_grid), getters used by [player::render](crate::app::player::render)
+/// In [tetris_grid](super::tetris_grid), helpers used by [player::render](crate::app::player::render)
 /// to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
     pub(in crate::app::player) fn nb_visible_rows(&self) -> i32 {
@@ -279,6 +279,64 @@ impl TetrisGrid {
             (0..w).map(move |x| Position::new(x, TetrisGrid::from_grid_y_to_position_y(y)))
         })
     }
+
+    fn draw_on_empty_grid(&mut self, blocks: &[Position], tetris_color: TetrisColor) {
+        self.reset();
+
+        let _ = self.add_blocks(blocks, tetris_color);
+    }
+
+    const ONE: [Position; 9] = [
+        Position::new(5, 9),
+        Position::new(4, 10),
+        Position::new(5, 10),
+        Position::new(5, 11),
+        Position::new(5, 12),
+        Position::new(3, 13),
+        Position::new(4, 13),
+        Position::new(5, 13),
+        Position::new(6, 13),
+    ];
+
+    const TWO: [Position; 10] = [
+        Position::new(4, 9),
+        Position::new(5, 9),
+        Position::new(3, 10),
+        Position::new(6, 10),
+        Position::new(5, 11),
+        Position::new(4, 12),
+        Position::new(3, 13),
+        Position::new(4, 13),
+        Position::new(5, 13),
+        Position::new(6, 13),
+    ];
+
+    const THREE: [Position; 9] = [
+        Position::new(4, 9),
+        Position::new(5, 9),
+        Position::new(3, 10),
+        Position::new(6, 10),
+        Position::new(5, 11),
+        Position::new(3, 12),
+        Position::new(6, 12),
+        Position::new(4, 13),
+        Position::new(5, 13),
+    ];
+
+    /// Draw a 1 with blocks of the same color as tetromino.
+    pub(in crate::app::player) fn one(&mut self, tetris_color: TetrisColor) {
+        self.draw_on_empty_grid(&Self::ONE, tetris_color);
+    }
+
+    /// Draw a 2 with blocks of the same color as tetromino.
+    pub(in crate::app::player) fn two(&mut self, tetris_color: TetrisColor) {
+        self.draw_on_empty_grid(&Self::TWO, tetris_color);
+    }
+
+    /// Draw a 3 with blocks of the same color as tetromino.
+    pub(in crate::app::player) fn three(&mut self, tetris_color: TetrisColor) {
+        self.draw_on_empty_grid(&Self::THREE, tetris_color);
+    }
 }
 
 impl Index<&Position> for TetrisGrid {
@@ -287,13 +345,6 @@ impl Index<&Position> for TetrisGrid {
     fn index(&self, block: &Position) -> &<Self as Index<&Position>>::Output {
         let line = TetrisGrid::from_position_y_to_grid_y(block.y) as usize;
         &self.matrix[line][block.x as usize]
-    }
-}
-
-impl IndexMut<&Position> for TetrisGrid {
-    fn index_mut(&mut self, block: &Position) -> &mut <Self as Index<&Position>>::Output {
-        let line = TetrisGrid::from_position_y_to_grid_y(block.y) as usize;
-        &mut self.matrix[line][block.x as usize]
     }
 }
 
