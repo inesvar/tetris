@@ -135,7 +135,7 @@ impl TetrisGrid {
 
             self.matrix
                 .insert(0, vec![Some(TetrisColor::Grey); self.nb_columns as usize]);
-            self.matrix[self.nb_rows as usize][empty as usize] = None;
+            self.matrix[0][empty as usize] = None;
 
             self.matrix.remove(self.nb_rows as usize);
         }
@@ -213,7 +213,7 @@ impl TetrisGrid {
     /// Remove complete lines, return number of cleared lines.
     fn clear_lines(&mut self) -> u64 {
         let mut score = 0;
-        for y in 0..self.nb_rows as usize {
+        for y in (0..self.nb_rows as usize).rev() {
             if self.line_sum[y] == self.nb_columns {
                 self.pop_row(y);
                 score += 1;
