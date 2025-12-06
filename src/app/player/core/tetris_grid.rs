@@ -13,7 +13,7 @@ use std::ops::Index;
 ///   Out, Block Out, and Top Out **Game Over Conditions**."
 #[derive(Serialize, Deserialize)]
 pub(in crate::app) struct TetrisGrid {
-    /// Number of columns in the **Matrix** and **Buffer Zone**, can't be greater than [MAX_SMALL_UNSIGNED].
+    /// Number of columns in the **Matrix** and **Buffer Zone**, has to be between 4 and [MAX_SMALL_UNSIGNED].
     /// Should be 10 according to the Tetris Guideline.
     nb_columns: i32,
     /// Total number of rows in the **Matrix** and **Buffer Zone**, can't be greater than [MAX_SMALL_UNSIGNED].
@@ -29,11 +29,11 @@ pub(in crate::app) struct TetrisGrid {
 }
 
 impl TetrisGrid {
-    fn from_position_y_to_grid_y(&self, y: i32) -> i32 {
+    fn convert_position_y_to_grid_y(&self, y: i32) -> i32 {
         -y + self.nb_rows + NB_VISIBLE_BUFFER_ROWS as i32 - self.nb_buffer_rows - 1
     }
 
-    fn from_grid_y_to_position_y(&self, y: i32) -> i32 {
+    fn convert_grid_y_to_position_y(&self, y: i32) -> i32 {
         -y + self.nb_rows + NB_VISIBLE_BUFFER_ROWS as i32 - self.nb_buffer_rows - 1
     }
 }
@@ -76,6 +76,9 @@ impl TetrisGrid {
             || nb_hidden_rows > MAX_SMALL_UNSIGNED
         {
             panic!("`nb_columns`, `nb_rows` and `nb_hidden_rows` should be less than `MAX_SMALL_UNSIGNED`");
+        }
+        if nb_columns < 4 {
+            panic!("`nb_columns` should be greater than or equal to 4");
         }
 
         let mut matrix = Vec::with_capacity(nb_rows as usize);
@@ -206,7 +209,7 @@ impl TetrisGrid {
 
     /// Return `true` is `block` is in the **Matrix** or the **Buffer Zone**.
     fn contains(&self, block: &Position) -> bool {
-        let line = self.from_position_y_to_grid_y(block.y);
+        let line = self.convert_position_y_to_grid_y(block.y);
         block.x >= 0 && line >= 0 && block.x < self.nb_columns && line < self.nb_rows
     }
 
@@ -247,24 +250,24 @@ impl TetrisGrid {
         if !self.is_block_empty(block) {
             panic!()
         }
-        let line = self.from_position_y_to_grid_y(block.y) as usize;
+        let line = self.convert_position_y_to_grid_y(block.y) as usize;
         self.matrix[line][block.x as usize] = Some(tetris_color);
         self.line_sum[line] += 1;
     }
 
     fn is_above_skyline(&self, block: &Position) -> bool {
-        self.from_position_y_to_grid_y(block.y) >= self.nb_rows - self.nb_buffer_rows
+        self.convert_position_y_to_grid_y(block.y) >= self.nb_rows - self.nb_buffer_rows
     }
 }
 
 /// In [tetris_grid](super::tetris_grid), helpers used by [player::render](crate::app::player::render)
 /// to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
-    pub(in crate::app::player) fn nb_visible_rows(&self) -> i32 {
+    pub(in crate::app::player) const fn nb_visible_rows(&self) -> i32 {
         self.nb_rows - self.nb_buffer_rows
     }
 
-    pub(in crate::app::player) fn nb_columns(&self) -> i32 {
+    pub(in crate::app::player) const fn nb_columns(&self) -> i32 {
         self.nb_columns
     }
 
@@ -272,66 +275,80 @@ impl TetrisGrid {
         let h = self.nb_rows;
         let w = self.nb_columns;
         (0..h).flat_map(move |y| {
-            (0..w).map(move |x| Position::new(x, self.from_grid_y_to_position_y(y)))
+            (0..w).map(move |x| Position::new(x, self.convert_grid_y_to_position_y(y)))
         })
     }
 
     fn draw_on_empty_grid(&mut self, blocks: &[Position], tetris_color: TetrisColor) {
         self.reset();
 
-        let _ = self.add_blocks(blocks, tetris_color);
+        for block in blocks {
+            self.add_block(block, tetris_color);
+        }
     }
 
-    const ONE: [Position; 9] = [
-        Position::new(5, 9),
-        Position::new(4, 10),
-        Position::new(5, 10),
-        Position::new(5, 11),
-        Position::new(5, 12),
-        Position::new(3, 13),
-        Position::new(4, 13),
-        Position::new(5, 13),
-        Position::new(6, 13),
-    ];
-
-    const TWO: [Position; 10] = [
-        Position::new(4, 9),
-        Position::new(5, 9),
-        Position::new(3, 10),
-        Position::new(6, 10),
-        Position::new(5, 11),
-        Position::new(4, 12),
-        Position::new(3, 13),
-        Position::new(4, 13),
-        Position::new(5, 13),
-        Position::new(6, 13),
-    ];
-
-    const THREE: [Position; 9] = [
-        Position::new(4, 9),
-        Position::new(5, 9),
-        Position::new(3, 10),
-        Position::new(6, 10),
-        Position::new(5, 11),
-        Position::new(3, 12),
-        Position::new(6, 12),
-        Position::new(4, 13),
-        Position::new(5, 13),
-    ];
+    const fn init(&self, x: i32, y: i32) -> Position {
+        match (x, y) {
+            (x @ -2..2, y @ -2..3) => Position::new(
+                self.nb_columns / 2 + x,
+                self.nb_visible_rows() / 2 + y + NB_VISIBLE_BUFFER_ROWS as i32,
+            ),
+            _ => {
+                panic!("x (resp. y) should be between -2 and 2 excluded (resp. -2 and 3 excluded)")
+            }
+        }
+    }
 
     /// Draw a 1 with blocks of the same color as tetromino.
     pub(in crate::app::player) fn one(&mut self, tetris_color: TetrisColor) {
-        self.draw_on_empty_grid(&Self::ONE, tetris_color);
+        let one = [
+            self.init(0, -2),
+            self.init(-1, -1),
+            self.init(0, -1),
+            self.init(0, 0),
+            self.init(0, 1),
+            self.init(-2, 2),
+            self.init(-1, 2),
+            self.init(0, 2),
+            self.init(1, 2),
+        ];
+
+        self.draw_on_empty_grid(&one, tetris_color);
     }
 
     /// Draw a 2 with blocks of the same color as tetromino.
     pub(in crate::app::player) fn two(&mut self, tetris_color: TetrisColor) {
-        self.draw_on_empty_grid(&Self::TWO, tetris_color);
+        let two = [
+            self.init(-1, -2),
+            self.init(0, -2),
+            self.init(-2, -1),
+            self.init(1, -1),
+            self.init(0, 0),
+            self.init(-1, 1),
+            self.init(-2, 2),
+            self.init(-1, 2),
+            self.init(0, 2),
+            self.init(1, 2),
+        ];
+
+        self.draw_on_empty_grid(&two, tetris_color);
     }
 
     /// Draw a 3 with blocks of the same color as tetromino.
     pub(in crate::app::player) fn three(&mut self, tetris_color: TetrisColor) {
-        self.draw_on_empty_grid(&Self::THREE, tetris_color);
+        let three = [
+            self.init(-1, -2),
+            self.init(0, -2),
+            self.init(-2, -1),
+            self.init(1, -1),
+            self.init(0, 0),
+            self.init(-2, 1),
+            self.init(1, 1),
+            self.init(-1, 2),
+            self.init(0, 2),
+        ];
+
+        self.draw_on_empty_grid(&three, tetris_color);
     }
 }
 
@@ -339,7 +356,7 @@ impl Index<&Position> for TetrisGrid {
     type Output = Option<TetrisColor>;
 
     fn index(&self, block: &Position) -> &<Self as Index<&Position>>::Output {
-        let line = self.from_position_y_to_grid_y(block.y) as usize;
+        let line = self.convert_position_y_to_grid_y(block.y) as usize;
         &self.matrix[line][block.x as usize]
     }
 }

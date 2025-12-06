@@ -111,7 +111,7 @@ graph LR
     add_block(add_block)
 
     is_block_empty(is_block_empty)
-    from_position_y_to_grid_y(from_position_y_to_grid_y)
+    convert_position_y_to_grid_y(convert_position_y_to_grid_y)
 
     contains(contains)
 
@@ -129,14 +129,14 @@ graph LR
         add_blocks -.-> clear_lines
         add_blocks -.-> add_block
     
-        is_above_skyline -.-> from_position_y_to_grid_y
+        is_above_skyline -.-> convert_position_y_to_grid_y
         clear_lines -.-> pop_row
         add_block -.-> is_block_empty
-        add_block -.-> from_position_y_to_grid_y
+        add_block -.-> convert_position_y_to_grid_y
     
-        is_block_empty -.-> from_position_y_to_grid_y
+        is_block_empty -.-> convert_position_y_to_grid_y
 
-        contains -.-> from_position_y_to_grid_y
+        contains -.-> convert_position_y_to_grid_y
 
         can_blocks_spawn_on -.-> is_block_empty
         is_block_available -.-> contains
