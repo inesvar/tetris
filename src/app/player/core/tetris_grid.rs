@@ -1,6 +1,6 @@
 //! Define `struct` [TetrisGrid] and `enum` [GameOverError].
 use super::{mermaid, spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
-use crate::settings::{MAX_SMALL_UNSIGNED, NB_BUFFER_ROWS, NB_ROWS, NB_VISIBLE_BUFFER_ROWS};
+use crate::settings::{MAX_SMALL_UNSIGNED, NB_VISIBLE_BUFFER_ROWS};
 use rand::Rng;
 use std::ops::Index;
 
@@ -19,9 +19,9 @@ pub(in crate::app) struct TetrisGrid {
     /// Total number of rows in the **Matrix** and **Buffer Zone**, can't be greater than [MAX_SMALL_UNSIGNED].
     /// Should be 40 according to the Tetris Guideline.
     nb_rows: i32,
-    /// Number of hidden rows (ie in the **Buffer Zone** above the **Skyline**), can't be greater than [MAX_SMALL_UNSIGNED].
+    /// Number of buffer rows (ie in the **Buffer Zone** above the **Skyline**), can't be greater than [MAX_SMALL_UNSIGNED].
     /// Should be 20 according to the Tetris Guideline.
-    nb_hidden_rows: i32,
+    nb_buffer_rows: i32,
     /// **Matrix** and **Buffer Zone** cells, indexed *from bottom to top*.
     matrix: Vec<Vec<Option<TetrisColor>>>,
     /// Number of filled blocks in each line of the [TetrisGrid::matrix].
@@ -29,12 +29,12 @@ pub(in crate::app) struct TetrisGrid {
 }
 
 impl TetrisGrid {
-    pub fn from_position_y_to_grid_y(y: i32) -> i32 {
-        -y + (NB_ROWS + NB_VISIBLE_BUFFER_ROWS - NB_BUFFER_ROWS - 1) as i32
+    fn from_position_y_to_grid_y(&self, y: i32) -> i32 {
+        -y + self.nb_rows + NB_VISIBLE_BUFFER_ROWS as i32 - self.nb_buffer_rows - 1
     }
 
-    pub fn from_grid_y_to_position_y(y: i32) -> i32 {
-        -y + (NB_ROWS + NB_VISIBLE_BUFFER_ROWS - NB_BUFFER_ROWS - 1) as i32
+    fn from_grid_y_to_position_y(&self, y: i32) -> i32 {
+        -y + self.nb_rows + NB_VISIBLE_BUFFER_ROWS as i32 - self.nb_buffer_rows - 1
     }
 }
 
@@ -85,12 +85,12 @@ impl TetrisGrid {
 
         let nb_columns: i32 = nb_columns as i32;
         let nb_rows: i32 = nb_rows as i32;
-        let nb_hidden_rows: i32 = nb_hidden_rows as i32;
+        let nb_buffer_rows: i32 = nb_hidden_rows as i32;
 
         Self {
             nb_columns,
             nb_rows,
-            nb_hidden_rows,
+            nb_buffer_rows,
             matrix,
             line_sum: vec![0; nb_rows as usize],
         }
@@ -101,7 +101,7 @@ impl TetrisGrid {
         *self = Self::new(
             self.nb_columns as u32,
             self.nb_rows as u32,
-            self.nb_hidden_rows as u32,
+            self.nb_buffer_rows as u32,
         );
     }
 
@@ -206,7 +206,7 @@ impl TetrisGrid {
 
     /// Return `true` is `block` is in the **Matrix** or the **Buffer Zone**.
     fn contains(&self, block: &Position) -> bool {
-        let line = TetrisGrid::from_position_y_to_grid_y(block.y);
+        let line = self.from_position_y_to_grid_y(block.y);
         block.x >= 0 && line >= 0 && block.x < self.nb_columns && line < self.nb_rows
     }
 
@@ -247,13 +247,13 @@ impl TetrisGrid {
         if !self.is_block_empty(block) {
             panic!()
         }
-        let line = TetrisGrid::from_position_y_to_grid_y(block.y) as usize;
+        let line = self.from_position_y_to_grid_y(block.y) as usize;
         self.matrix[line][block.x as usize] = Some(tetris_color);
         self.line_sum[line] += 1;
     }
 
     fn is_above_skyline(&self, block: &Position) -> bool {
-        TetrisGrid::from_position_y_to_grid_y(block.y) >= self.nb_rows - self.nb_hidden_rows
+        self.from_position_y_to_grid_y(block.y) >= self.nb_rows - self.nb_buffer_rows
     }
 }
 
@@ -261,18 +261,18 @@ impl TetrisGrid {
 /// to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
     pub(in crate::app::player) fn nb_visible_rows(&self) -> i32 {
-        self.nb_rows - self.nb_hidden_rows
+        self.nb_rows - self.nb_buffer_rows
     }
 
     pub(in crate::app::player) fn nb_columns(&self) -> i32 {
         self.nb_columns
     }
 
-    pub(in crate::app::player) fn positions(&self) -> impl Iterator<Item = Position> {
+    pub(in crate::app::player) fn positions(&self) -> impl Iterator<Item = Position> + use<'_> {
         let h = self.nb_rows;
         let w = self.nb_columns;
         (0..h).flat_map(move |y| {
-            (0..w).map(move |x| Position::new(x, TetrisGrid::from_grid_y_to_position_y(y)))
+            (0..w).map(move |x| Position::new(x, self.from_grid_y_to_position_y(y)))
         })
     }
 
@@ -339,7 +339,7 @@ impl Index<&Position> for TetrisGrid {
     type Output = Option<TetrisColor>;
 
     fn index(&self, block: &Position) -> &<Self as Index<&Position>>::Output {
-        let line = TetrisGrid::from_position_y_to_grid_y(block.y) as usize;
+        let line = self.from_position_y_to_grid_y(block.y) as usize;
         &self.matrix[line][block.x as usize]
     }
 }
@@ -420,7 +420,7 @@ mod tests {
 
         assert_eq!(grid.nb_columns, NB_COLUMNS as i32);
         assert_eq!(grid.nb_rows, NB_ROWS as i32);
-        assert_eq!(grid.nb_hidden_rows, NB_BUFFER_ROWS as i32);
+        assert_eq!(grid.nb_buffer_rows, NB_BUFFER_ROWS as i32);
     }
 
     #[test]
