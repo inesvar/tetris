@@ -1,0 +1,39 @@
+graph LR
+    %% tetris grid
+    clear_lines(clear_lines)
+    pop_row(pop_row)
+    is_above_skyline(is_above_skyline)
+    add_block(add_block)
+
+    is_block_empty(is_block_empty)
+    convert_position_y_to_grid_y(convert_position_y_to_grid_y)
+
+    contains(contains)
+
+    add_blocks(add_blocks)
+    can_blocks_spawn_on(can_blocks_spawn_on)
+    is_block_available(is_block_available)
+
+    subgraph tetris_grid
+        subgraph "pub(super)"
+            add_blocks
+            can_blocks_spawn_on
+            is_block_available
+        end
+        add_blocks -.-> is_above_skyline
+        add_blocks -.-> clear_lines
+        add_blocks -.-> add_block
+    
+        is_above_skyline -.-> convert_position_y_to_grid_y
+        clear_lines -.-> pop_row
+        add_block -.-> is_block_empty
+        add_block -.-> convert_position_y_to_grid_y
+    
+        is_block_empty -.-> convert_position_y_to_grid_y
+
+        contains -.-> convert_position_y_to_grid_y
+
+        can_blocks_spawn_on -.-> is_block_empty
+        is_block_available -.-> contains
+        is_block_available -.-> is_block_empty
+    end

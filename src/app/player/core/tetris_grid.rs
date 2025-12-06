@@ -155,7 +155,7 @@ impl TetrisGrid {
 
 /// In [tetris_grid](super::tetris_grid), methods used by [UseTetromino](super::UseTetromino)
 /// to enter, move and then lock down in the grid.
-#[doc = mermaid!("use_tetromino_flowgraph.mmd")]
+#[doc = mermaid!("tetris_grid_internals_flowgraph.mmd")]
 impl TetrisGrid {
     /// Return true if `blocks` can enter the grid.
     ///

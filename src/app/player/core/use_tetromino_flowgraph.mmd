@@ -2,6 +2,7 @@ graph LR
     %% objects
     is_block_empty(is_block_empty)
     contains(contains)
+    is_above_skyline(is_above_skyline)
     add_block(add_block)
     clear_lines(clear_lines)
     is_block_available(is_block_available)
@@ -25,7 +26,7 @@ graph LR
     subgraph tetris_grid
         can_blocks_spawn_on -.-> is_block_empty
         is_block_available -.-> contains & is_block_empty
-        add_blocks -.-> add_block & clear_lines
+        add_blocks -.-> add_block & clear_lines & is_above_skyline
     end
 
     subgraph tetromino_kind
