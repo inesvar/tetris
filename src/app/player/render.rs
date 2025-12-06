@@ -8,7 +8,7 @@ use crate::assets::TetrisColor;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_FONT_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
     GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO, TETROMINO_MAX_HEIGHT,
-    TETROMINO_MAX_WIDTH, TEXT_COLOR,
+    TETROMINO_MAX_WIDTH, TEXT_COLOR, NB_VISIBLE_BUFFER_ROWS
 };
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
@@ -155,7 +155,7 @@ impl TetrisGrid {
     }
 
     pub(in crate::app::player) fn hidden_height(&self) -> f64 {
-        2.0 * BLOCK_SIZE
+        NB_VISIBLE_BUFFER_ROWS as f64 * BLOCK_SIZE
     }
 
     fn draw_on_empty_grid(&mut self, blocks: &[Position], tetris_color: TetrisColor) {

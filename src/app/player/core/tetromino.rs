@@ -216,11 +216,11 @@ impl Tetromino {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::settings::{NB_COLUMNS, NB_HIDDEN_ROWS, NB_ROWS};
+    use crate::settings::{NB_COLUMNS, NB_BUFFER_ROWS, NB_ROWS};
 
     #[test]
     fn i_tetromino_rotation_is_correct() {
-        let empty_grid = TetrisGrid::new(NB_COLUMNS, NB_ROWS, NB_HIDDEN_ROWS);
+        let empty_grid = TetrisGrid::new(NB_COLUMNS, NB_ROWS, NB_BUFFER_ROWS);
         let mut i_tetromino = Tetromino::new(TetrominoKind::I);
         let mut naive_i_tetromino = Tetromino::new(TetrominoKind::I);
         naive_i_tetromino.kind = TetrominoKind::T;

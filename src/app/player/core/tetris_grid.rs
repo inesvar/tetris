@@ -1,6 +1,6 @@
 //! Define `struct` [TetrisGrid] and `enum` [GameOverError].
 use super::{mermaid, spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
-use crate::settings::MAX_SMALL_UNSIGNED;
+use crate::settings::{MAX_SMALL_UNSIGNED, NB_BUFFER_ROWS, NB_VISIBLE_BUFFER_ROWS};
 use rand::Rng;
 use std::ops::{Index, IndexMut};
 
@@ -30,11 +30,11 @@ pub(in crate::app) struct TetrisGrid {
 
 impl TetrisGrid {
     pub fn from_position_y_to_grid_y(y: i32) -> i32 {
-        y + 18
+        y + (NB_BUFFER_ROWS - NB_VISIBLE_BUFFER_ROWS) as i32
     }
 
     pub fn from_grid_y_to_position_y(y: i32) -> i32 {
-        y - 18
+        y - (NB_BUFFER_ROWS - NB_VISIBLE_BUFFER_ROWS) as i32
     }
 }
 
@@ -294,7 +294,7 @@ impl IndexMut<&Position> for TetrisGrid {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::settings::{NB_COLUMNS, NB_HIDDEN_ROWS, NB_ROWS};
+    use crate::settings::{NB_COLUMNS, NB_BUFFER_ROWS, NB_ROWS};
 
     fn tetris_grid_from(str: &[&str]) -> TetrisGrid {
         let nb_rows = str.len();
@@ -363,11 +363,11 @@ mod tests {
 
     #[test]
     fn new_succeeds() {
-        let grid = TetrisGrid::new(NB_COLUMNS, NB_ROWS, NB_HIDDEN_ROWS);
+        let grid = TetrisGrid::new(NB_COLUMNS, NB_ROWS, NB_BUFFER_ROWS);
 
         assert_eq!(grid.nb_columns, NB_COLUMNS as i32);
         assert_eq!(grid.nb_rows, NB_ROWS as i32);
-        assert_eq!(grid.nb_hidden_rows, NB_HIDDEN_ROWS as i32);
+        assert_eq!(grid.nb_hidden_rows, NB_BUFFER_ROWS as i32);
     }
 
     #[test]
