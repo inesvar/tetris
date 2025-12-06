@@ -30,11 +30,11 @@ pub(in crate::app) struct TetrisGrid {
 
 impl TetrisGrid {
     pub fn from_position_y_to_grid_y(y: i32) -> i32 {
-        y + 8
+        y + 18
     }
 
     pub fn from_grid_y_to_position_y(y: i32) -> i32 {
-        y - 8
+        y - 18
     }
 }
 
@@ -260,10 +260,6 @@ impl TetrisGrid {
 impl TetrisGrid {
     pub(in crate::app::player) fn nb_visible_rows(&self) -> i32 {
         self.nb_rows - self.nb_hidden_rows
-    }
-
-    pub(in crate::app::player) fn nb_hidden_rows(&self) -> i32 {
-        self.nb_hidden_rows
     }
 
     pub(in crate::app::player) fn nb_columns(&self) -> i32 {

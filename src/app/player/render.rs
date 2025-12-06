@@ -132,7 +132,7 @@ fn render_tetris_block(
 ) {
     let dims = rectangle::square(
         position.x() as Scalar * BLOCK_SIZE,
-        TetrisGrid::from_position_y_to_grid_y(position.y()) as Scalar * BLOCK_SIZE,
+        position.y() as Scalar * BLOCK_SIZE,
         BLOCK_SIZE,
     );
 
@@ -155,7 +155,7 @@ impl TetrisGrid {
     }
 
     pub(in crate::app::player) fn hidden_height(&self) -> f64 {
-        self.nb_hidden_rows() as f64 * BLOCK_SIZE
+        2.0 * BLOCK_SIZE
     }
 
     fn draw_on_empty_grid(&mut self, blocks: &[Position], tetris_color: TetrisColor) {
