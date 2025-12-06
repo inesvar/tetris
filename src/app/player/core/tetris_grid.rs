@@ -158,9 +158,14 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If any of the `blocks` is outside the tetris grid.
-    pub(super) fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<Position, GameOverError> {
+    pub(super) fn can_blocks_spawn_on(
+        &self,
+        blocks: &[Position],
+    ) -> Result<Position, GameOverError> {
         let offset = Position::new(self.nb_columns / 2 - 2, 0);
-        let can_spawn_on = blocks.iter().all(|block| self.is_block_empty(&(*block + offset)));
+        let can_spawn_on = blocks
+            .iter()
+            .all(|block| self.is_block_empty(&(*block + offset)));
         if can_spawn_on {
             Ok(offset)
         } else {
@@ -295,7 +300,7 @@ impl IndexMut<&Position> for TetrisGrid {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::settings::{NB_COLUMNS, NB_BUFFER_ROWS, NB_ROWS};
+    use crate::settings::{NB_BUFFER_ROWS, NB_COLUMNS, NB_ROWS};
 
     fn tetris_grid_from(str: &[&str]) -> TetrisGrid {
         let nb_rows = str.len();

@@ -228,7 +228,7 @@ impl Tetromino {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::settings::{NB_COLUMNS, NB_BUFFER_ROWS, NB_ROWS};
+    use crate::settings::{NB_BUFFER_ROWS, NB_COLUMNS, NB_ROWS};
 
     #[test]
     fn i_tetromino_rotation_is_correct() {
