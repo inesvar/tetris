@@ -1,6 +1,6 @@
 //! Define `struct` [TetrisGrid] and `enum` [GameOverError].
 use super::{mermaid, spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
-use crate::settings::{MAX_SMALL_UNSIGNED, NB_BUFFER_ROWS, NB_VISIBLE_BUFFER_ROWS};
+use crate::settings::{MAX_SMALL_UNSIGNED, NB_BUFFER_ROWS, NB_ROWS, NB_VISIBLE_BUFFER_ROWS};
 use rand::Rng;
 use std::ops::Index;
 
@@ -22,7 +22,7 @@ pub(in crate::app) struct TetrisGrid {
     /// Number of hidden rows (ie in the **Buffer Zone** above the **Skyline**), can't be greater than [MAX_SMALL_UNSIGNED].
     /// Should be 20 according to the Tetris Guideline.
     nb_hidden_rows: i32,
-    /// **Matrix** and **Buffer Zone** cells, indexed *from top to bottom*.
+    /// **Matrix** and **Buffer Zone** cells, indexed *from bottom to top*.
     matrix: Vec<Vec<Option<TetrisColor>>>,
     /// Number of filled blocks in each line of the [TetrisGrid::matrix].
     line_sum: Vec<i32>,
@@ -30,11 +30,11 @@ pub(in crate::app) struct TetrisGrid {
 
 impl TetrisGrid {
     pub fn from_position_y_to_grid_y(y: i32) -> i32 {
-        y + (NB_BUFFER_ROWS - NB_VISIBLE_BUFFER_ROWS) as i32
+        -y + (NB_ROWS + NB_VISIBLE_BUFFER_ROWS - NB_BUFFER_ROWS - 1) as i32
     }
 
     pub fn from_grid_y_to_position_y(y: i32) -> i32 {
-        y - (NB_BUFFER_ROWS - NB_VISIBLE_BUFFER_ROWS) as i32
+        -y + (NB_ROWS + NB_VISIBLE_BUFFER_ROWS - NB_BUFFER_ROWS - 1) as i32
     }
 }
 
@@ -130,21 +130,14 @@ impl TetrisGrid {
 
         for _ in 0..lines_to_add {
             // move the matrix and line_sum one line up
-            self.line_sum
-                .insert(self.nb_rows as usize, self.nb_columns - 1);
-            self.line_sum.remove(0);
+            self.line_sum.insert(0, self.nb_columns - 1);
+            self.line_sum.remove(self.nb_rows as usize);
 
             self.matrix
-                .insert(self.nb_rows as usize, vec![None; self.nb_columns as usize]);
-            for x in 0..self.nb_columns {
-                // add blocks in the entire line except in one column
-                if x != empty {
-                    self.matrix[self.nb_rows as usize][x as usize] = Some(TetrisColor::Grey);
-                } else {
-                    self.matrix[self.nb_rows as usize][x as usize] = None;
-                }
-            }
-            self.matrix.remove(0);
+                .insert(0, vec![Some(TetrisColor::Grey); self.nb_columns as usize]);
+            self.matrix[self.nb_rows as usize][empty as usize] = None;
+
+            self.matrix.remove(self.nb_rows as usize);
         }
     }
 }
@@ -238,8 +231,11 @@ impl TetrisGrid {
         self.matrix.remove(row);
         self.line_sum.remove(row);
 
-        self.matrix.insert(0, vec![None; self.nb_columns as usize]);
-        self.line_sum.insert(0, 0);
+        self.matrix.insert(
+            (self.nb_rows - 1) as usize,
+            vec![None; self.nb_columns as usize],
+        );
+        self.line_sum.insert((self.nb_rows - 1) as usize, 0);
     }
 
     /// Add `block` to the tetris grid.
@@ -257,7 +253,7 @@ impl TetrisGrid {
     }
 
     fn is_above_skyline(&self, block: &Position) -> bool {
-        TetrisGrid::from_position_y_to_grid_y(block.y) < self.nb_hidden_rows
+        TetrisGrid::from_position_y_to_grid_y(block.y) >= self.nb_rows - self.nb_hidden_rows
     }
 }
 
