@@ -1,7 +1,6 @@
 # problems
 - tetris_grid : rename `contains`
 - the clock should pause during a game pause (partially revert blinking changes)
-- the row 0 of the tetris grid should be the one on the bottom...
 - serialize a PlayerScreen(PlayerScreen) instead of doing black magic
 - use tokio to outsource tcp comms
 - today key inputs are sent to the tetris game and mouse inputs to the app... something more flexible would be great
