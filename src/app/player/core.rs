@@ -47,8 +47,8 @@ pub(in crate::app::player) trait UseTetromino: Sized {
     /// Reset the Tetromino at its starting position.
     fn reset(&mut self);
 
-    /// Check whether the Tetromino can enter the grid.
-    fn can_enter_grid(&self, grid: &TetrisGrid) -> Result<(), GameOverError>;
+    /// If possible, move the Tetromino to its starting position in the grid.
+    fn can_enter_grid(&mut self, grid: &TetrisGrid) -> Result<(), GameOverError>;
 
     /// Lock down in the grid.
     /// Return number of completed lines on success.

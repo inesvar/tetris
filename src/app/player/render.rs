@@ -63,7 +63,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
         // drawing the hold piece
         if let Some(saved) = self.saved_tetromino {
             gl_ctx.transform = grid_transform.trans(
-                -self.grid.total_width() * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
+                -TETROMINO_MAX_WIDTH - 2.0 * BLOCK_SIZE,
                 TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
             );
             saved.render(gl_ctx);
@@ -84,7 +84,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
         // drawing the next pieces
         for i in 0..NB_NEXT_TETROMINO {
             gl_ctx.transform = grid_transform.trans(
-                self.grid.total_width() * (NB_COLUMNS - 1) as f64 / NB_COLUMNS as f64,
+                self.grid.total_width() + 2.0 * BLOCK_SIZE,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
             if let Some(tetromino) = self.fifo_next_tetromino.get(i) {

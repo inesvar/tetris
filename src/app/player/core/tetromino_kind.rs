@@ -64,7 +64,7 @@ const NO_WALL_KICKS: [Position; 1] = [Position::new(0, 0)];
 
 const fn init(x: i32, y: i32) -> Position {
     match (x, y) {
-        (x @ 0..4, y @ 0..4) => Position::new(3 + x, y),
+        (x @ 0..4, y @ 0..4) => Position::new(x, y),
         _ => panic!("x and y should be between 0 and 4 excluded"),
     }
 }

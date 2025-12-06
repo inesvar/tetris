@@ -141,8 +141,12 @@ impl UseTetromino for Tetromino {
         tetromino_bag
     }
 
-    fn can_enter_grid(&self, grid: &TetrisGrid) -> Result<(), GameOverError> {
-        grid.can_blocks_spawn_on(&self.blocks)
+    fn can_enter_grid(&mut self, grid: &TetrisGrid) -> Result<(), GameOverError> {
+        let offset = grid.can_blocks_spawn_on(&self.blocks)?;
+        let translation = RotationTranslation::translation(offset);
+
+        self.translate(&translation);
+        Ok(())
     }
 
     fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
@@ -169,6 +173,14 @@ impl Tetromino {
         self.direction.turn_around_block_center(movement);
         self.center.translate_by(movement);
         true
+    }
+
+    /// Translate the tetromino.
+    fn translate(&mut self, movement: &RotationTranslation) {
+        for block in self.blocks.iter_mut() {
+            block.translate_by(movement);
+        }
+        self.center.translate_by(movement);
     }
 
     pub(in crate::app::player) fn blocks(&self) -> &[Position] {

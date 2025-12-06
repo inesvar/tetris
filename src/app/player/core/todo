@@ -1,5 +1,4 @@
 # problems
-- tetris_grid : decorrelate Position and grid indexing
 - tetris_grid : rename `contains`
 - tetris_grid : remove Index and IndexMut trait impl because it hurts encapsulation
 - tetris_grid : go through from_position_y_to_grid_y for everything
