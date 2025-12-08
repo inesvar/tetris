@@ -8,23 +8,23 @@ use std::ops::Index;
 ///
 /// According to the **TetrisGuideline**, the grid has 2 components:
 /// - **Matrix**: "the rectangular arrangement of cells creating the active game area, usually 10 columns wide by 20 rows high.
-///   Tetriminos fall from the top-middle just above the Skyline (off-screen) to the bottom."
+///   Tetriminos fall from the top-middle just above the **Skyline** (off-screen) to the bottom."
 /// - **Buffer Zone**: "a 10-cell wide x 20-cell high invisible area above the Matrix used to detect Lock
 ///   Out, Block Out, and Top Out **Game Over Conditions**."
-#[derive(Serialize, Deserialize)]
+#[derive(PartialEq, Serialize, Deserialize)]
 pub(in crate::app) struct TetrisGrid {
     /// Number of columns in the **Matrix** and **Buffer Zone**.
-    /// 
+    ///
     /// Has to be between 4 and [MAX_SMALL_UNSIGNED].
     /// Should be 10 according to the **TetrisGuideline**.
     nb_columns: i32,
     /// Number of rows in the **Matrix**.
-    /// 
+    ///
     /// Has to be between 6 and [MAX_SMALL_UNSIGNED].
     /// Should be 20 according to the **TetrisGuideline**.
     nb_matrix_rows: i32,
     /// Number of buffer rows (ie in the **Buffer Zone** above the **Skyline**).
-    /// 
+    ///
     /// Has to be between 2 and [MAX_SMALL_UNSIGNED].
     /// Should be 20 according to the **TetrisGuideline**.
     nb_buffer_rows: i32,
@@ -52,19 +52,19 @@ pub(in crate::app) enum GameOverError {
     /// According to the **TetrisGuideline** :
     ///
     /// "[...] occurs when part of a newly-generated tetrimino is blocked due to
-    /// an existing Block in the Matrix."
+    /// an existing Block in the **Matrix**."
     BlockOut,
     /// According to the **TetrisGuideline** :
     ///
-    /// "[...] occurs when a whole tetrimino locks down above the Skyline."
+    /// "[...] occurs when a whole tetrimino locks down above the **Skyline**."
     LockOut,
     #[allow(unused)]
     /// According to the **TetrisGuideline** :
     ///
     /// "[...] occurs when an opponent’s Line Attack forces your Blocks past the top
-    /// of the 20-line Buffer zone. It is highly unlikely that this will ever occur,
+    /// of the 20-line **Buffer zone**. It is highly unlikely that this will ever occur,
     /// since Lock out [...] or Block out [...] will likely occur before a Block ever
-    /// gets pushed out of the Buffer zone."
+    /// gets pushed out of the **Buffer zone**."
     TopOut,
 }
 
@@ -125,40 +125,28 @@ impl TetrisGrid {
         );
     }
 
-    /// Add the specified number of lines at the bottom of the grid. The lines will be filled with blocks except for one column.
-    pub(in crate::app::player) fn add_garbage(&mut self, completed_lines: u64) {
-        if completed_lines < 2 {
-            return;
-        }
-        println!(
-            "the garbage creating function was called for {} lines",
-            completed_lines
-        );
-        let lines_to_add = if completed_lines == 4 {
-            4
-        } else {
-            completed_lines - 1
+    /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
+    pub(in crate::app::player) fn add_garbage(
+        &mut self,
+        completed_lines: u64,
+    ) -> Result<(), GameOverError> {
+        let lines_to_add = match completed_lines {
+            x if x < 2 => return Ok(()),
+            x if x < 4 => x - 1,
+            _ => completed_lines,
         };
+        println!(
+            "the garbage creating function was called for {} lines, will add {}",
+            completed_lines, lines_to_add
+        );
 
-        /*****************************
-         *     CHANGING THE GRID     *
-         *****************************/
-
-        // store the column index that will be empty
         let mut rng = rand::thread_rng();
         let empty = rng.gen_range(0..self.nb_columns);
 
         for _ in 0..lines_to_add {
-            // move the matrix and line_sum one line up
-            self.line_sum.insert(0, self.nb_columns - 1);
-            self.line_sum.remove(self.nb_rows_usize());
-
-            self.cells
-                .insert(0, vec![Some(TetrisColor::Grey); self.nb_columns as usize]);
-            self.cells[0][empty as usize] = None;
-
-            self.cells.remove(self.nb_rows_usize());
+            self.add_garbage_row(empty as usize)?;
         }
+        Ok(())
     }
 }
 
@@ -166,7 +154,7 @@ impl TetrisGrid {
 /// to enter, move and then lock down in the grid.
 #[doc = mermaid!("tetris_grid_internals_flowgraph.mmd")]
 impl TetrisGrid {
-    /// Return true if `blocks` can enter the grid.
+    /// Return the translation needed for `blocks` to enter the grid.
     ///
     /// # Panics
     ///
@@ -196,7 +184,7 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If any of the `blocks` is outside the tetris grid or not empty.
-    pub(super) fn add_blocks(
+    pub(super) fn add_blocks_and_clear_lines(
         &mut self,
         blocks: &[Position],
         tetris_color: TetrisColor,
@@ -249,14 +237,35 @@ impl TetrisGrid {
     ///
     /// # Panics
     ///
-    /// If `row` is greater or equal to `self.nb_rows`.
+    /// If `row` is greater or equal to `self.cells.len()`.
     fn pop_row(&mut self, row: usize) {
         self.cells.remove(row);
         self.line_sum.remove(row);
 
-        self.cells
-            .insert(self.nb_rows_usize() - 1, vec![None; self.nb_columns as usize]);
+        self.cells.insert(
+            self.nb_rows_usize() - 1,
+            vec![None; self.nb_columns as usize],
+        );
         self.line_sum.insert(self.nb_rows_usize() - 1, 0);
+    }
+
+    /// Add garbage row to the tetris grid (only if the top row is empty).
+    ///
+    /// # Panics
+    ///
+    /// If `empty` is greater or equal to `self.nb_columns`, or `self.line_sum` is empty.
+    fn add_garbage_row(&mut self, empty: usize) -> Result<(), GameOverError> {
+        if *self.line_sum.last().unwrap() > 0 {
+            return Err(GameOverError::TopOut);
+        }
+        self.line_sum.insert(0, self.nb_columns - 1);
+        self.cells
+            .insert(0, vec![Some(TetrisColor::Grey); self.nb_columns as usize]);
+        self.cells[0][empty as usize] = None;
+
+        self.line_sum.remove(self.nb_rows_usize());
+        self.cells.remove(self.nb_rows_usize());
+        Ok(())
     }
 
     /// Add `block` to the tetris grid.
@@ -391,13 +400,20 @@ mod tests {
     fn tetris_grid_from(str: &[&str]) -> TetrisGrid {
         let nb_rows = str.len();
         let nb_columns = str[0].len();
-        let mut tetris_grid = TetrisGrid::new(nb_columns as u32, nb_rows as u32, 0);
+        let mut tetris_grid = TetrisGrid::new(nb_columns as u32, nb_rows as u32, NB_VISIBLE_BUFFER_ROWS);
 
-        for (row, line) in str.iter().enumerate() {
+        for (row, line) in str.iter().rev().enumerate() {
             for (column, cell) in line.char_indices() {
-                let pos = Position::new(column as i32, row as i32);
+                let pos = Position::new(column as i32, tetris_grid.convert_grid_y_to_position_y(row as i32));
                 let tetris_color = match cell {
                     ' ' => None,
+                    'C' => Some(TetrisColor::Cyan),
+                    'Y' => Some(TetrisColor::Yellow),
+                    'P' => Some(TetrisColor::Purple),
+                    'B' => Some(TetrisColor::Blue),
+                    'O' => Some(TetrisColor::Orange),
+                    'G' => Some(TetrisColor::Green),
+                    'R' => Some(TetrisColor::Red),
                     _ => Some(TetrisColor::Grey),
                 };
                 if let Some(tetris_color) = tetris_color {
@@ -409,24 +425,31 @@ mod tests {
         tetris_grid
     }
 
-    fn tetris_grid_matches(tetris_grid: &TetrisGrid, str: &[&str]) -> bool {
-        let nb_rows = str.len();
-        let nb_columns = str[0].len();
-
-        if tetris_grid.nb_rows_usize() != nb_rows || tetris_grid.nb_columns != nb_columns as i32 {
-            return false;
-        }
-
-        for (row, line) in str.iter().enumerate() {
-            for (column, cell) in line.char_indices() {
-                let pos = Position::new(column as i32, row as i32);
-                if (cell == ' ') != tetris_grid.is_block_empty(&pos) {
-                    return false;
+    fn print_tetris_grid(tetris_grid: &TetrisGrid) -> String {
+        let mut str = String::from("");
+        for line in tetris_grid.cells.iter().rev() {
+            for cell in line {
+                match cell {
+                    None => str.push_str(" "),
+                    Some(TetrisColor::Cyan) => str.push_str("C"),
+                    Some(TetrisColor::Yellow) => str.push_str("Y"),
+                    Some(TetrisColor::Purple) => str.push_str("P"),
+                    Some(TetrisColor::Blue) => str.push_str("B"),
+                    Some(TetrisColor::Orange) => str.push_str("O"),
+                    Some(TetrisColor::Green) => str.push_str("G"),
+                    Some(TetrisColor::Red) => str.push_str("R"),
+                    Some(TetrisColor::Grey) => str.push_str("X"),
                 }
             }
+            str.push_str("\n");
         }
 
-        true
+        str
+    }
+
+    fn tetris_grid_matches(tetris_grid: &TetrisGrid, str: &[&str]) -> bool {
+        let other_grid = tetris_grid_from(str);
+        *tetris_grid == other_grid
     }
 
     #[should_panic(
@@ -453,25 +476,19 @@ mod tests {
         let _ = TetrisGrid::new(NB_COLUMNS, NB_MATRIX_ROWS, MAX_SMALL_UNSIGNED + 1);
     }
 
-    #[should_panic(
-        expected = "`nb_columns` should be greater than or equal to 4"
-    )]
+    #[should_panic(expected = "`nb_columns` should be greater than or equal to 4")]
     #[test]
     fn new_fails_if_nb_columns_is_too_small() {
         let _ = TetrisGrid::new(3, NB_MATRIX_ROWS, NB_BUFFER_ROWS);
     }
 
-    #[should_panic(
-        expected = "`nb_matrix_rows` should be greater than or equal to 6"
-    )]
+    #[should_panic(expected = "`nb_matrix_rows` should be greater than or equal to 6")]
     #[test]
     fn new_fails_if_nb_matrix_rows_is_too_small() {
         let _ = TetrisGrid::new(NB_COLUMNS, 5, NB_BUFFER_ROWS);
     }
 
-    #[should_panic(
-        expected = "`nb_buffer_rows` should be greater than or equal to 2"
-    )]
+    #[should_panic(expected = "`nb_buffer_rows` should be greater than or equal to 2")]
     #[test]
     fn new_fails_if_nb_buffer_rows_is_too_small() {
         let _ = TetrisGrid::new(NB_COLUMNS, NB_MATRIX_ROWS, 1);
@@ -487,8 +504,77 @@ mod tests {
     }
 
     #[test]
+    fn reset_is_correct() {
+        let mut grid = tetris_grid_from(&[
+            "      X X",
+            "      XXX",
+            "     XX X",
+            "    X XXX",
+            "      XXX",
+            "    XXXXX",
+        ]);
+
+        grid.reset();
+
+        assert!(tetris_grid_matches(
+            &grid,
+            &[
+                "         ",
+                "         ",
+                "         ",
+                "         ",
+                "         ",
+                "         ",
+            ]
+        ));
+    }
+
+    #[test]
+    fn add_garbage_is_correct() {
+        let mut grid = tetris_grid_from(&[
+            "         ",
+            "         ",
+            "        X",
+            "X        ",
+            "XX       ",
+            "XXX      ",
+        ]);
+
+        assert!(grid.add_garbage_row(0).is_ok());
+        assert!(grid.add_garbage_row(1).is_ok());
+
+        assert!(tetris_grid_matches(
+            &grid,
+            &[
+                "        X",
+                "X        ",
+                "XX       ",
+                "XXX      ",
+                " XXXXXXXX",
+                "X XXXXXXX",
+            ]
+        ), "{}", print_tetris_grid(&grid));
+    }
+
+    #[test]
+    fn add_garbage_returns_error_on_top_out() {
+        let mut grid = tetris_grid_from(&[
+            "        X",
+            "        X",
+            "        X",
+            "        X",
+            "        X",
+            "        X",
+        ]);
+
+        assert!(grid.add_garbage_row(0).is_ok());
+        assert!(grid.add_garbage_row(0).is_ok());
+        assert!(grid.add_garbage_row(0).is_err(), "{}", print_tetris_grid(&grid));
+    }
+
+    #[test]
     fn is_block_empty_is_correct() {
-        let mut instance = TetrisGrid::new(5, 5, 0);
+        let mut instance = TetrisGrid::new(4, 6, NB_VISIBLE_BUFFER_ROWS);
         let pos = Position::new(0, 0);
 
         assert!(instance.is_block_empty(&pos));
@@ -501,7 +587,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn is_block_empty_panics_outside_of_the_grid() {
-        let instance = TetrisGrid::new(5, 5, 0);
+        let instance = TetrisGrid::new(4, 6, NB_VISIBLE_BUFFER_ROWS);
         let pos = Position::new(5, 5);
 
         let _ = instance.is_block_empty(&pos);
@@ -510,6 +596,8 @@ mod tests {
     #[test]
     fn pop_row_is_correct() {
         let mut tetris_grid = tetris_grid_from(&[
+            "             ",
+            "             ",
             "XX XX X X X X",
             " X X X XX XX ",
             "X X XX XX X X",
@@ -522,9 +610,11 @@ mod tests {
             &tetris_grid,
             &[
                 "             ",
-                "XX XX X X X X",
+                "             ",
+                "             ",
                 " X X X XX XX ",
                 "X X XX XX X X",
+                "XXXXXXXXXXXXX",
             ]
         ));
     }

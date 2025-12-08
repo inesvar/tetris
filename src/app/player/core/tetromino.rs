@@ -150,7 +150,7 @@ impl UseTetromino for Tetromino {
     }
 
     fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
-        grid.add_blocks(&self.blocks, self.color)
+        grid.add_blocks_and_clear_lines(&self.blocks, self.color)
     }
 }
 

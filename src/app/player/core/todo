@@ -1,3 +1,7 @@
+- make more tetris_grid unit tests
+- fix broken unit tests
+- rework tetromino_kind
+
 # problems
 - tetris_grid : rename `contains`
 - the clock should pause during a game pause (partially revert blinking changes)

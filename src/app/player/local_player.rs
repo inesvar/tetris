@@ -195,10 +195,18 @@ impl LocalPlayer {
         }
 
         // Adds garbage to the grid
-        self.player_screen
+        match self
+            .player_screen
             .grid
-            .add_garbage(self.garbage_to_be_added);
-        self.garbage_to_be_added = 0;
+            .add_garbage(self.garbage_to_be_added)
+        {
+            Ok(()) => self.garbage_to_be_added = 0,
+            Err(GameOverError::TopOut) => {
+                self.declare_game_over();
+                return Err(());
+            }
+            _ => unreachable!(),
+        }
 
         Ok(())
     }
