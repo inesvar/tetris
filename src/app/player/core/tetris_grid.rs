@@ -6,21 +6,27 @@ use std::ops::Index;
 
 /// Tetris grid.
 ///
-/// According to the Tetris Guideline, the grid has 2 components:
+/// According to the **TetrisGuideline**, the grid has 2 components:
 /// - **Matrix**: "the rectangular arrangement of cells creating the active game area, usually 10 columns wide by 20 rows high.
 ///   Tetriminos fall from the top-middle just above the Skyline (off-screen) to the bottom."
 /// - **Buffer Zone**: "a 10-cell wide x 20-cell high invisible area above the Matrix used to detect Lock
 ///   Out, Block Out, and Top Out **Game Over Conditions**."
 #[derive(Serialize, Deserialize)]
 pub(in crate::app) struct TetrisGrid {
-    /// Number of columns in the **Matrix** and **Buffer Zone**, has to be between 4 and [MAX_SMALL_UNSIGNED].
-    /// Should be 10 according to the Tetris Guideline.
+    /// Number of columns in the **Matrix** and **Buffer Zone**.
+    /// 
+    /// Has to be between 4 and [MAX_SMALL_UNSIGNED].
+    /// Should be 10 according to the **TetrisGuideline**.
     nb_columns: i32,
-    /// Number of rows in the **Matrix**, has to be between 6 and [MAX_SMALL_UNSIGNED].
-    /// Should be 20 according to the Tetris Guideline.
+    /// Number of rows in the **Matrix**.
+    /// 
+    /// Has to be between 6 and [MAX_SMALL_UNSIGNED].
+    /// Should be 20 according to the **TetrisGuideline**.
     nb_matrix_rows: i32,
-    /// Number of buffer rows (ie in the **Buffer Zone** above the **Skyline**), can't be greater than [MAX_SMALL_UNSIGNED].
-    /// Should be 20 according to the Tetris Guideline.
+    /// Number of buffer rows (ie in the **Buffer Zone** above the **Skyline**).
+    /// 
+    /// Has to be between 2 and [MAX_SMALL_UNSIGNED].
+    /// Should be 20 according to the **TetrisGuideline**.
     nb_buffer_rows: i32,
     /// **Matrix** and **Buffer Zone** cells, indexed *from bottom to top*.
     cells: Vec<Vec<Option<TetrisColor>>>,
@@ -39,21 +45,21 @@ impl TetrisGrid {
 }
 
 // same visibility as TetrisColor
-/// Tetris Guideline **Game Over Conditions**.
+/// **TetrisGuideline** **Game Over Conditions**.
 #[derive(Debug, PartialEq)]
 #[allow(clippy::enum_variant_names)]
 pub(in crate::app) enum GameOverError {
-    /// According to the Tetris Guideline :
+    /// According to the **TetrisGuideline** :
     ///
     /// "[...] occurs when part of a newly-generated tetrimino is blocked due to
     /// an existing Block in the Matrix."
     BlockOut,
-    /// According to the Tetris Guideline :
+    /// According to the **TetrisGuideline** :
     ///
     /// "[...] occurs when a whole tetrimino locks down above the Skyline."
     LockOut,
     #[allow(unused)]
-    /// According to the Tetris Guideline :
+    /// According to the **TetrisGuideline** :
     ///
     /// "[...] occurs when an opponent’s Line Attack forces your Blocks past the top
     /// of the 20-line Buffer zone. It is highly unlikely that this will ever occur,
@@ -69,7 +75,7 @@ impl TetrisGrid {
     ///
     /// # Panics
     ///
-    /// If `nb_columns` or `nb_rows` or `nb_hidden_rows` is greater than [MAX_SMALL_UNSIGNED].
+    /// If [TetrisGrid::nb_columns] or [TetrisGrid::nb_matrix_rows] or [TetrisGrid::nb_buffer_rows] aren't in the expected range.
     pub(in crate::app::player) fn new(
         nb_columns: u32,
         nb_matrix_rows: u32,
@@ -87,10 +93,13 @@ impl TetrisGrid {
         if nb_matrix_rows < 6 {
             panic!("`nb_matrix_rows` should be greater than or equal to 6");
         }
+        if nb_buffer_rows < 2 {
+            panic!("`nb_buffer_rows` should be greater than or equal to 2");
+        }
 
-        let nb_rows = (nb_matrix_rows + nb_buffer_rows) as usize;
-        let mut matrix = Vec::with_capacity(nb_rows);
-        for _ in 0..nb_rows {
+        let nb_rows_usize = (nb_matrix_rows + nb_buffer_rows) as usize;
+        let mut matrix = Vec::with_capacity(nb_rows_usize);
+        for _ in 0..nb_rows_usize {
             matrix.push(vec![None; nb_columns as usize]);
         }
 
@@ -103,7 +112,7 @@ impl TetrisGrid {
             nb_matrix_rows,
             nb_buffer_rows,
             cells: matrix,
-            line_sum: vec![0; nb_rows],
+            line_sum: vec![0; nb_rows_usize],
         }
     }
 
@@ -142,13 +151,13 @@ impl TetrisGrid {
         for _ in 0..lines_to_add {
             // move the matrix and line_sum one line up
             self.line_sum.insert(0, self.nb_columns - 1);
-            self.line_sum.remove(self.nb_rows());
+            self.line_sum.remove(self.nb_rows_usize());
 
             self.cells
                 .insert(0, vec![Some(TetrisColor::Grey); self.nb_columns as usize]);
             self.cells[0][empty as usize] = None;
 
-            self.cells.remove(self.nb_rows());
+            self.cells.remove(self.nb_rows_usize());
         }
     }
 }
@@ -227,7 +236,7 @@ impl TetrisGrid {
     /// Remove complete lines, return number of cleared lines.
     fn clear_lines(&mut self) -> u64 {
         let mut score = 0;
-        for y in (0..self.nb_rows()).rev() {
+        for y in (0..self.nb_rows_usize()).rev() {
             if self.line_sum[y] == self.nb_columns {
                 self.pop_row(y);
                 score += 1;
@@ -246,8 +255,8 @@ impl TetrisGrid {
         self.line_sum.remove(row);
 
         self.cells
-            .insert(self.nb_rows() - 1, vec![None; self.nb_columns as usize]);
-        self.line_sum.insert(self.nb_rows() - 1, 0);
+            .insert(self.nb_rows_usize() - 1, vec![None; self.nb_columns as usize]);
+        self.line_sum.insert(self.nb_rows_usize() - 1, 0);
     }
 
     /// Add `block` to the tetris grid.
@@ -268,7 +277,7 @@ impl TetrisGrid {
         self.convert_position_y_to_grid_y(block.y) >= self.nb_matrix_rows
     }
 
-    const fn nb_rows(&self) -> usize {
+    const fn nb_rows_usize(&self) -> usize {
         (self.nb_matrix_rows + self.nb_buffer_rows) as usize
     }
 }
@@ -276,11 +285,11 @@ impl TetrisGrid {
 /// In [tetris_grid](super::tetris_grid), helpers used by [player::render](crate::app::player::render)
 /// to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
-    pub(in crate::app::player) const fn nb_matrix_rows(&self) -> i32 {
+    pub(in crate::app::player) const fn nb_matrix_rows_i32(&self) -> i32 {
         self.nb_matrix_rows
     }
 
-    pub(in crate::app::player) const fn nb_columns(&self) -> i32 {
+    pub(in crate::app::player) const fn nb_columns_i32(&self) -> i32 {
         self.nb_columns
     }
 
@@ -404,7 +413,7 @@ mod tests {
         let nb_rows = str.len();
         let nb_columns = str[0].len();
 
-        if tetris_grid.nb_rows() != nb_rows || tetris_grid.nb_columns != nb_columns as i32 {
+        if tetris_grid.nb_rows_usize() != nb_rows || tetris_grid.nb_columns != nb_columns as i32 {
             return false;
         }
 
@@ -421,27 +430,51 @@ mod tests {
     }
 
     #[should_panic(
-        expected = "`nb_columns`, `nb_rows` and `nb_hidden_rows` should be less than `MAX_SMALL_UNSIGNED`"
+        expected = "`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `MAX_SMALL_UNSIGNED`"
     )]
     #[test]
     fn new_fails_if_nb_columns_is_too_big() {
-        let _ = TetrisGrid::new(MAX_SMALL_UNSIGNED + 1, 0, 0);
+        let _ = TetrisGrid::new(MAX_SMALL_UNSIGNED + 1, NB_MATRIX_ROWS, NB_BUFFER_ROWS);
     }
 
     #[should_panic(
-        expected = "`nb_columns`, `nb_rows` and `nb_hidden_rows` should be less than `MAX_SMALL_UNSIGNED`"
+        expected = "`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `MAX_SMALL_UNSIGNED`"
     )]
     #[test]
-    fn new_fails_if_nb_rows_is_too_big() {
-        let _ = TetrisGrid::new(0, MAX_SMALL_UNSIGNED + 1, 0);
+    fn new_fails_if_nb_matrix_rows_is_too_big() {
+        let _ = TetrisGrid::new(NB_COLUMNS, MAX_SMALL_UNSIGNED + 1, NB_BUFFER_ROWS);
     }
 
     #[should_panic(
-        expected = "`nb_columns`, `nb_rows` and `nb_hidden_rows` should be less than `MAX_SMALL_UNSIGNED`"
+        expected = "`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `MAX_SMALL_UNSIGNED`"
     )]
     #[test]
-    fn new_fails_if_nb_hidden_rows_is_too_big() {
-        let _ = TetrisGrid::new(0, 0, MAX_SMALL_UNSIGNED + 1);
+    fn new_fails_if_nb_buffer_rows_is_too_big() {
+        let _ = TetrisGrid::new(NB_COLUMNS, NB_MATRIX_ROWS, MAX_SMALL_UNSIGNED + 1);
+    }
+
+    #[should_panic(
+        expected = "`nb_columns` should be greater than or equal to 4"
+    )]
+    #[test]
+    fn new_fails_if_nb_columns_is_too_small() {
+        let _ = TetrisGrid::new(3, NB_MATRIX_ROWS, NB_BUFFER_ROWS);
+    }
+
+    #[should_panic(
+        expected = "`nb_matrix_rows` should be greater than or equal to 6"
+    )]
+    #[test]
+    fn new_fails_if_nb_matrix_rows_is_too_small() {
+        let _ = TetrisGrid::new(NB_COLUMNS, 5, NB_BUFFER_ROWS);
+    }
+
+    #[should_panic(
+        expected = "`nb_buffer_rows` should be greater than or equal to 2"
+    )]
+    #[test]
+    fn new_fails_if_nb_buffer_rows_is_too_small() {
+        let _ = TetrisGrid::new(NB_COLUMNS, NB_MATRIX_ROWS, 1);
     }
 
     #[test]

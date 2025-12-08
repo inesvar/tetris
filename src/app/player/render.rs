@@ -147,11 +147,11 @@ fn render_tetris_block(
 /// In [player::render](super::render), helpers used to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
     fn total_width(&self) -> f64 {
-        self.nb_columns() as f64 * BLOCK_SIZE
+        self.nb_columns_i32() as f64 * BLOCK_SIZE
     }
 
     fn visible_height(&self) -> f64 {
-        self.nb_matrix_rows() as f64 * BLOCK_SIZE
+        self.nb_matrix_rows_i32() as f64 * BLOCK_SIZE
     }
 
     fn hidden_height(&self) -> f64 {
