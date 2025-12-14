@@ -2,6 +2,7 @@
 use include_assets::NamedArchive;
 use opengl_graphics::*;
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum TetrisColor {
@@ -13,6 +14,22 @@ pub enum TetrisColor {
     Green,
     Red,
     Grey,
+}
+
+impl Display for TetrisColor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match self {
+            TetrisColor::Cyan => "C",
+            TetrisColor::Yellow => "Y",
+            TetrisColor::Purple => "P",
+            TetrisColor::Blue => "B",
+            TetrisColor::Orange => "O",
+            TetrisColor::Green => "G",
+            TetrisColor::Red => "R",
+            TetrisColor::Grey => "X",
+        };
+        write!(f, "{str}")
+    }
 }
 
 pub struct Assets<'a> {

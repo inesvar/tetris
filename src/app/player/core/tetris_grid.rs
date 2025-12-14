@@ -2,6 +2,7 @@
 use super::{mermaid, spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
 use crate::settings::{MAX_SMALL_UNSIGNED, NB_VISIBLE_BUFFER_ROWS};
 use rand::Rng;
+use std::fmt::Display;
 use std::ops::Index;
 
 /// Tetris grid.
@@ -45,7 +46,7 @@ impl TetrisGrid {
 }
 
 // same visibility as TetrisColor
-/// **TetrisGuideline** **Game Over Conditions**.
+/// **TetrisGuideline** Game Over Conditions.
 #[derive(Debug, PartialEq)]
 #[allow(clippy::enum_variant_names)]
 pub(in crate::app) enum GameOverError {
@@ -261,7 +262,7 @@ impl TetrisGrid {
         self.line_sum.insert(0, self.nb_columns - 1);
         self.cells
             .insert(0, vec![Some(TetrisColor::Grey); self.nb_columns as usize]);
-        self.cells[0][empty as usize] = None;
+        self.cells[0][empty] = None;
 
         self.line_sum.remove(self.nb_rows_usize());
         self.cells.remove(self.nb_rows_usize());
@@ -275,7 +276,7 @@ impl TetrisGrid {
     /// If `block` is outside the tetris grid or not empty.
     fn add_block(&mut self, block: &Position, tetris_color: TetrisColor) {
         if !self.is_block_empty(block) {
-            panic!()
+            panic!("Tried adding a block to a non-empty cell")
         }
         let line = self.convert_position_y_to_grid_y(block.y) as usize;
         self.cells[line][block.x as usize] = Some(tetris_color);
@@ -392,19 +393,85 @@ impl Index<&Position> for TetrisGrid {
     }
 }
 
+macro_rules! concatln {
+    ( $( $line:expr ),* $(,)? ) => {
+        concat!( $( $line, "\n", )*)
+    };
+}
+
+impl Display for TetrisGrid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let separator = "-".repeat(self.nb_columns as usize);
+        writeln!(f, "{separator}")?;
+        for (index, line) in self.cells.iter().enumerate().rev() {
+            for cell in line {
+                if let Some(tetris_color) = cell {
+                    write!(f, "{tetris_color}")?;
+                } else {
+                    write!(f, " ")?;
+                }
+            }
+            writeln!(f)?;
+
+            if self.nb_matrix_rows == index as i32 {
+                writeln!(f, "{separator}")?;
+            }
+        }
+        writeln!(f, "{separator}")?;
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::settings::{NB_BUFFER_ROWS, NB_COLUMNS, NB_MATRIX_ROWS};
 
-    fn tetris_grid_from(str: &[&str]) -> TetrisGrid {
-        let nb_rows = str.len();
-        let nb_columns = str[0].len();
-        let mut tetris_grid = TetrisGrid::new(nb_columns as u32, nb_rows as u32, NB_VISIBLE_BUFFER_ROWS);
+    fn tetris_grid_from_str(string: &str) -> TetrisGrid {
+        let lines: Vec<&str> = string.split('\n').collect();
+        let mut iter = lines.split(|line| line.contains("-"));
+        
+        let buffer = iter.nth(1).unwrap();
+        let matrix = iter.next().unwrap();
 
-        for (row, line) in str.iter().rev().enumerate() {
+        let nb_matrix_rows = matrix.len();
+        let nb_buffer_rows = buffer.len();
+        let nb_columns = matrix[0].len();
+        let mut tetris_grid = TetrisGrid::new(
+            nb_columns as u32,
+            nb_matrix_rows as u32,
+            nb_buffer_rows as u32,
+        );
+
+        for (row, line) in matrix.iter().rev().enumerate() {
             for (column, cell) in line.char_indices() {
-                let pos = Position::new(column as i32, tetris_grid.convert_grid_y_to_position_y(row as i32));
+                let pos = Position::new(
+                    column as i32,
+                    tetris_grid.convert_grid_y_to_position_y(row as i32),
+                );
+                let tetris_color = match cell {
+                    ' ' => None,
+                    'C' => Some(TetrisColor::Cyan),
+                    'Y' => Some(TetrisColor::Yellow),
+                    'P' => Some(TetrisColor::Purple),
+                    'B' => Some(TetrisColor::Blue),
+                    'O' => Some(TetrisColor::Orange),
+                    'G' => Some(TetrisColor::Green),
+                    'R' => Some(TetrisColor::Red),
+                    _ => Some(TetrisColor::Grey),
+                };
+                if let Some(tetris_color) = tetris_color {
+                    tetris_grid.add_block(&pos, tetris_color);
+                }
+            }
+        }
+
+        for (row, line) in buffer.iter().rev().enumerate() {
+            for (column, cell) in line.char_indices() {
+                let pos = Position::new(
+                    column as i32,
+                    tetris_grid.convert_grid_y_to_position_y((nb_matrix_rows + row) as i32),
+                );
                 let tetris_color = match cell {
                     ' ' => None,
                     'C' => Some(TetrisColor::Cyan),
@@ -425,31 +492,8 @@ mod tests {
         tetris_grid
     }
 
-    fn print_tetris_grid(tetris_grid: &TetrisGrid) -> String {
-        let mut str = String::from("");
-        for line in tetris_grid.cells.iter().rev() {
-            for cell in line {
-                match cell {
-                    None => str.push_str(" "),
-                    Some(TetrisColor::Cyan) => str.push_str("C"),
-                    Some(TetrisColor::Yellow) => str.push_str("Y"),
-                    Some(TetrisColor::Purple) => str.push_str("P"),
-                    Some(TetrisColor::Blue) => str.push_str("B"),
-                    Some(TetrisColor::Orange) => str.push_str("O"),
-                    Some(TetrisColor::Green) => str.push_str("G"),
-                    Some(TetrisColor::Red) => str.push_str("R"),
-                    Some(TetrisColor::Grey) => str.push_str("X"),
-                }
-            }
-            str.push_str("\n");
-        }
-
-        str
-    }
-
-    fn tetris_grid_matches(tetris_grid: &TetrisGrid, str: &[&str]) -> bool {
-        let other_grid = tetris_grid_from(str);
-        *tetris_grid == other_grid
+    fn tetris_grid_matches_str(tetris_grid: &TetrisGrid, string: &str) -> bool {
+        tetris_grid.to_string() == string
     }
 
     #[should_panic(
@@ -505,71 +549,105 @@ mod tests {
 
     #[test]
     fn reset_is_correct() {
-        let mut grid = tetris_grid_from(&[
+        let mut grid = tetris_grid_from_str(concatln!(
+            "---------",
+            "         ",
+            "       XX",
+            "---------",
             "      X X",
             "      XXX",
             "     XX X",
             "    X XXX",
             "      XXX",
             "    XXXXX",
-        ]);
+            "---------",
+        ));
 
         grid.reset();
 
-        assert!(tetris_grid_matches(
-            &grid,
-            &[
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-            ]
-        ));
+        assert!(
+            tetris_grid_matches_str(
+                &grid,
+                concatln!(
+                    "---------",
+                    "         ",
+                    "         ",
+                    "---------",
+                    "         ",
+                    "         ",
+                    "         ",
+                    "         ",
+                    "         ",
+                    "         ",
+                    "---------",
+                )
+            ),
+            "Actual grid:\n{}",
+            grid
+        );
     }
 
     #[test]
     fn add_garbage_is_correct() {
-        let mut grid = tetris_grid_from(&[
+        let mut grid = tetris_grid_from_str(concatln!(
+            "---------",
+            "         ",
+            "         ",
+            "---------",
             "         ",
             "         ",
             "        X",
             "X        ",
             "XX       ",
             "XXX      ",
-        ]);
+            "---------",
+        ));
 
         assert!(grid.add_garbage_row(0).is_ok());
         assert!(grid.add_garbage_row(1).is_ok());
+        assert!(grid.add_garbage_row(1).is_ok());
 
-        assert!(tetris_grid_matches(
-            &grid,
-            &[
-                "        X",
-                "X        ",
-                "XX       ",
-                "XXX      ",
-                " XXXXXXXX",
-                "X XXXXXXX",
-            ]
-        ), "{}", print_tetris_grid(&grid));
+        assert!(
+            tetris_grid_matches_str(
+                &grid,
+                concatln!(
+                    "---------",
+                    "         ",
+                    "        X",
+                    "---------",
+                    "X        ",
+                    "XX       ",
+                    "XXX      ",
+                    " XXXXXXXX",
+                    "X XXXXXXX",
+                    "X XXXXXXX",
+                    "---------",
+                )
+            ),
+            "Actual grid:\n{}",
+            grid
+        );
     }
 
     #[test]
     fn add_garbage_returns_error_on_top_out() {
-        let mut grid = tetris_grid_from(&[
+        let mut grid = tetris_grid_from_str(concatln!(
+            "---------",
+            "         ",
+            "         ",
+            "---------",
             "        X",
             "        X",
             "        X",
             "        X",
             "        X",
             "        X",
-        ]);
+            "---------",
+        ));
 
         assert!(grid.add_garbage_row(0).is_ok());
         assert!(grid.add_garbage_row(0).is_ok());
-        assert!(grid.add_garbage_row(0).is_err(), "{}", print_tetris_grid(&grid));
+        assert!(grid.add_garbage_row(0).is_err(), "Actual grid:\n{}", grid);
     }
 
     #[test]
@@ -595,27 +673,41 @@ mod tests {
 
     #[test]
     fn pop_row_is_correct() {
-        let mut tetris_grid = tetris_grid_from(&[
+        let mut tetris_grid = tetris_grid_from_str(concatln!(
+            "-------------",
+            "             ",
+            "             ",
+            "-------------",
             "             ",
             "             ",
             "XX XX X X X X",
             " X X X XX XX ",
             "X X XX XX X X",
             "XXXXXXXXXXXXX",
-        ]);
+            "-------------",
+        ));
 
         tetris_grid.pop_row(3);
 
-        assert!(tetris_grid_matches(
-            &tetris_grid,
-            &[
-                "             ",
-                "             ",
-                "             ",
-                " X X X XX XX ",
-                "X X XX XX X X",
-                "XXXXXXXXXXXXX",
-            ]
-        ));
+        assert!(
+            tetris_grid_matches_str(
+                &tetris_grid,
+                concatln!(
+                    "-------------",
+                    "             ",
+                    "             ",
+                    "-------------",
+                    "             ",
+                    "             ",
+                    "             ",
+                    " X X X XX XX ",
+                    "X X XX XX X X",
+                    "XXXXXXXXXXXXX",
+                    "-------------",
+                )
+            ),
+            "Actual grid:\n{}",
+            tetris_grid
+        );
     }
 }
