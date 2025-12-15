@@ -4,7 +4,7 @@ use opengl_graphics::*;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub enum TetrisColor {
     Cyan,
     Yellow,
@@ -13,22 +13,41 @@ pub enum TetrisColor {
     Orange,
     Green,
     Red,
+    #[default]
     Grey,
 }
 
 impl Display for TetrisColor {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let str = match self {
-            TetrisColor::Cyan => "C",
-            TetrisColor::Yellow => "Y",
-            TetrisColor::Purple => "P",
-            TetrisColor::Blue => "B",
-            TetrisColor::Orange => "O",
-            TetrisColor::Green => "G",
-            TetrisColor::Red => "R",
-            TetrisColor::Grey => "X",
+            Self::Cyan => "C",
+            Self::Yellow => "Y",
+            Self::Purple => "P",
+            Self::Blue => "B",
+            Self::Orange => "O",
+            Self::Green => "G",
+            Self::Red => "R",
+            Self::Grey => "X",
         };
         write!(f, "{str}")
+    }
+}
+
+impl TryFrom<char> for TetrisColor {
+    type Error = ();
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            'C' => Ok(Self::Cyan),
+            'Y' => Ok(Self::Yellow),
+            'P' => Ok(Self::Purple),
+            'B' => Ok(Self::Blue),
+            'O' => Ok(Self::Orange),
+            'G' => Ok(Self::Green),
+            'R' => Ok(Self::Red),
+            'X' => Ok(Self::Grey),
+            _ => Err(()),
+        }
     }
 }
 
