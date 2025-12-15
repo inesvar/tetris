@@ -7,8 +7,8 @@ use crate::app::PlayerScreen;
 use crate::assets::TetrisColor;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_FONT_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
-    GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_COLUMNS, NB_NEXT_TETROMINO,
-    NB_VISIBLE_BUFFER_ROWS, TETROMINO_MAX_HEIGHT, TETROMINO_MAX_WIDTH, TEXT_COLOR,
+    GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO, NB_VISIBLE_BUFFER_ROWS,
+    TETROMINO_MAX_HEIGHT, TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
@@ -71,7 +71,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
 
         // drawing a border for the fifo of next pieces
         gl_ctx.transform = grid_transform.trans(
-            self.grid.total_width() * (NB_COLUMNS + 1) as f64 / NB_COLUMNS as f64,
+            self.grid.total_width() + BLOCK_SIZE,
             self.grid.hidden_height(),
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
