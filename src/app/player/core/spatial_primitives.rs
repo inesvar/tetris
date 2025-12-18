@@ -117,101 +117,128 @@ impl std::ops::AddAssign for Position {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rstest::rstest;
 
-    #[test]
-    fn position_arithmetic_neg_is_correct() {
-        assert_eq!(RIGHT.neg(), LEFT);
-        assert_eq!(FALL.neg(), RISE);
-        assert_eq!(LEFT.neg(), RIGHT);
-        assert_eq!(RISE.neg(), FALL);
+    #[rstest]
+    #[case(RISE, FALL)]
+    #[case(RIGHT, LEFT)]
+    #[case(FALL, RISE)]
+    #[case(LEFT, RIGHT)]
+    fn position_neg_is_correct(#[case] input: Position, #[case] expected: Position) {
+        assert_eq!(input.neg(), expected);
     }
 
-    #[test]
-    fn position_arithmetic_mirror_x_is_correct() {
-        assert_eq!(RIGHT.mirror_x(), LEFT);
-        assert_eq!(FALL.mirror_x(), FALL);
-        assert_eq!(LEFT.mirror_x(), RIGHT);
-        assert_eq!(RISE.mirror_x(), RISE);
+    #[rstest]
+    #[case(RISE, RISE)]
+    #[case(RIGHT, LEFT)]
+    #[case(FALL, FALL)]
+    #[case(LEFT, RIGHT)]
+    fn position_mirror_x_is_correct(#[case] input: Position, #[case] expected: Position) {
+        assert_eq!(input.mirror_x(), expected);
     }
 
-    #[test]
-    fn position_arithmetic_mirror_y_is_correct() {
-        assert_eq!(RIGHT.mirror_y(), RIGHT);
-        assert_eq!(FALL.mirror_y(), RISE);
-        assert_eq!(LEFT.mirror_y(), LEFT);
-        assert_eq!(RISE.mirror_y(), FALL);
+    #[rstest]
+    #[case(RISE, FALL)]
+    #[case(RIGHT, RIGHT)]
+    #[case(FALL, RISE)]
+    #[case(LEFT, LEFT)]
+    fn position_mirror_y_is_correct(#[case] input: Position, #[case] expected: Position) {
+        assert_eq!(input.mirror_y(), expected);
     }
 
-    #[test]
-    fn position_arithmetic_turned_clockwise_is_correct() {
-        assert_eq!(RIGHT.turned_clockwise(), FALL);
-        assert_eq!(FALL.turned_clockwise(), LEFT);
-        assert_eq!(LEFT.turned_clockwise(), RISE);
-        assert_eq!(RISE.turned_clockwise(), RIGHT);
+    #[rstest]
+    #[case(RISE, RIGHT)]
+    #[case(RIGHT, FALL)]
+    #[case(FALL, LEFT)]
+    #[case(LEFT, RISE)]
+    fn position_turned_clockwise_is_correct(#[case] input: Position, #[case] expected: Position) {
+        assert_eq!(input.turned_clockwise(), expected);
     }
 
-    #[test]
-    fn position_arithmetic_turned_counterclockwise_is_correct() {
-        assert_eq!(RIGHT.turned_counterclockwise(), RISE);
-        assert_eq!(FALL.turned_counterclockwise(), RIGHT);
-        assert_eq!(LEFT.turned_counterclockwise(), FALL);
-        assert_eq!(RISE.turned_counterclockwise(), LEFT);
+    #[rstest]
+    #[case(RISE, LEFT)]
+    #[case(RIGHT, RISE)]
+    #[case(FALL, RIGHT)]
+    #[case(LEFT, FALL)]
+    fn position_turned_counterclockwise_is_correct(
+        #[case] input: Position,
+        #[case] expected: Position,
+    ) {
+        assert_eq!(input.turned_counterclockwise(), expected);
     }
 
-    #[test]
-    fn direction_turn_clockwise_is_correct() {
-        let mut clock = Direction::North;
+    #[rstest]
+    #[case(Direction::North, Direction::East)]
+    #[case(Direction::East, Direction::South)]
+    #[case(Direction::South, Direction::West)]
+    #[case(Direction::West, Direction::North)]
+    fn direction_turn_clockwise_is_correct(#[case] input: Direction, #[case] expected: Direction) {
+        let mut actual = input;
 
-        clock.turn_clockwise();
-        assert_eq!(clock, Direction::East);
+        actual.turn_clockwise();
 
-        clock.turn_clockwise();
-        assert_eq!(clock, Direction::South);
-
-        clock.turn_clockwise();
-        assert_eq!(clock, Direction::West);
+        assert_eq!(actual, expected);
     }
 
-    #[test]
-    fn direction_turn_counterclockwise_is_correct() {
-        let mut clock = Direction::North;
+    #[rstest]
+    #[case(Direction::North, Direction::West)]
+    #[case(Direction::East, Direction::North)]
+    #[case(Direction::South, Direction::East)]
+    #[case(Direction::West, Direction::South)]
+    fn direction_turn_counterclockwise_is_correct(
+        #[case] input: Direction,
+        #[case] expected: Direction,
+    ) {
+        let mut actual = input;
 
-        clock.turn_counterclockwise();
-        assert_eq!(clock, Direction::West);
+        actual.turn_counterclockwise();
 
-        clock.turn_counterclockwise();
-        assert_eq!(clock, Direction::South);
-
-        clock.turn_counterclockwise();
-        assert_eq!(clock, Direction::East);
+        assert_eq!(actual, expected);
     }
 
-    #[test]
-    fn position_add_is_correct() {
-        let a = Position::new(7, -5);
-        let b = Position::new(2, -4);
-        let expected = Position::new(9, -9);
-
-        assert_eq!(a + b, expected);
+    #[rstest]
+    #[case(Position::new(0, 0), Position::new(0, 0), Position::new(0, 0))]
+    #[case(Position::new(1, 0), Position::new(0, 0), Position::new(1, 0))]
+    #[case(Position::new(0, 1), Position::new(0, 0), Position::new(0, 1))]
+    #[case(Position::new(0, 0), Position::new(1, 0), Position::new(1, 0))]
+    #[case(Position::new(0, 0), Position::new(0, 1), Position::new(0, 1))]
+    fn position_add_is_correct(
+        #[case] op1: Position,
+        #[case] op2: Position,
+        #[case] expected: Position,
+    ) {
+        assert_eq!(op1 + op2, expected);
     }
 
-    #[test]
-    fn position_sub_is_correct() {
-        let a = Position::new(4, -3);
-        let b = Position::new(-7, -4);
-        let expected = Position::new(11, 1);
-
-        assert_eq!(a - b, expected);
+    #[rstest]
+    #[case(Position::new(0, 0), Position::new(0, 0), Position::new(0, 0))]
+    #[case(Position::new(1, 0), Position::new(0, 0), Position::new(1, 0))]
+    #[case(Position::new(0, 1), Position::new(0, 0), Position::new(0, 1))]
+    #[case(Position::new(0, 0), Position::new(1, 0), Position::new(-1, 0))]
+    #[case(Position::new(0, 0), Position::new(0, 1), Position::new(0, -1))]
+    fn position_sub_is_correct(
+        #[case] op1: Position,
+        #[case] op2: Position,
+        #[case] expected: Position,
+    ) {
+        assert_eq!(op1 - op2, expected);
     }
 
-    #[test]
-    fn position_add_assign_is_correct() {
-        let mut a = Position::new(3, -1);
-        let b = Position::new(-2, 6);
-        let expected = Position::new(1, 5);
+    #[rstest]
+    #[case(Position::new(0, 0), Position::new(0, 0), Position::new(0, 0))]
+    #[case(Position::new(1, 0), Position::new(0, 0), Position::new(1, 0))]
+    #[case(Position::new(0, 1), Position::new(0, 0), Position::new(0, 1))]
+    #[case(Position::new(0, 0), Position::new(1, 0), Position::new(1, 0))]
+    #[case(Position::new(0, 0), Position::new(0, 1), Position::new(0, 1))]
+    fn position_add_assign_is_correct(
+        #[case] op1: Position,
+        #[case] op2: Position,
+        #[case] expected: Position,
+    ) {
+        let mut actual = op1;
 
-        a += b;
+        actual += op2;
 
-        assert_eq!(a, expected);
+        assert_eq!(actual, expected);
     }
 }
