@@ -797,7 +797,40 @@ mod tests {
     fn is_block_empty_panics_outside_of_the_grid() {
         let grid = TetrisGrid::compact_new();
 
-        grid.is_block_empty(&Position::new(0, grid.nb_buffer_rows + grid.nb_matrix_rows));
+        grid.is_block_empty(&Position::new(0, 8));
+    }
+
+    fn grid_has_topleft_and_bottomright_corners(grid: &TetrisGrid, topleft: &Position, bottomright: &Position) {
+        assert!(grid.contains(topleft));
+        assert!(grid.contains(bottomright));
+
+        // neighbors of the grid corners that are outside of the grid
+        // horizontal offset :
+        assert!(!grid.contains(&(*topleft + Position::new(-1, 0))));
+        assert!(!grid.contains(&(*bottomright + Position::new(1, 0))));
+        // vertical offset :
+        assert!(!grid.contains(&(*topleft + Position::new(0, -1))));
+        assert!(!grid.contains(&(*bottomright + Position::new(0, 1))));   
+    }
+
+    #[test]
+    fn contains_is_correct() {
+        let grid = TetrisGrid::minimal_new();
+        grid_has_topleft_and_bottomright_corners(&grid, &Position::new(0, 0), &Position::new(3, 7));
+
+
+        let grid = TetrisGrid::default();
+        grid_has_topleft_and_bottomright_corners(&grid, &Position::new(0, -18), &Position::new(9, 21));
+    }
+
+    #[test]
+    fn is_block_available_returns_false_outside_of_the_grid() {
+        let grid = TetrisGrid::compact_new();
+
+        assert!(!grid.is_block_available(&Position::new(0, -1)));
+        assert!(!grid.is_block_available(&Position::new(-1, 0)));
+        assert!(!grid.is_block_available(&Position::new(3, 8)));
+        assert!(!grid.is_block_available(&Position::new(4, 7)));
     }
 
     #[test]
