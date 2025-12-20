@@ -50,13 +50,12 @@ impl ApplyRotationTranslation for Position {
     }
 
     fn turn_around_block_corner(&mut self, movement: &RotationTranslation) {
-        let mut zoomed = self.get_block_center_coordinates();
-        let mut zoomed_rotation = *movement;
-        zoomed_rotation.rotation_center = zoomed_rotation
-            .rotation_center
-            .get_block_bottom_right_coordinates();
+        let zoomed_rotation = movement.with_corner_rotation_center();
+        let mut zoomed = self.to_zoomed_2x();
+
         zoomed.turn_around_block_center(&zoomed_rotation);
-        *self = zoomed.get_block_coordinates();
+
+        *self = zoomed.from_zoomed_2x();
     }
 }
 
@@ -87,21 +86,37 @@ impl ApplyRotationTranslation for Direction {
 /// In [moving_primitives](super::moving_primitives), helpers to convert between regular coordinates (also refered to as "block coordinates") and 2x zoomed coordinates.
 /// In 2x zoomed coordinates, block centers lie at even coordinates and block corners lie at odd coordinates.
 ///
-/// These functions are used by [ApplyRotationTranslation] to rotate the I tetromino, which unlike the other tetrominos rotates around a block corner and not a block center.
+/// These functions are used by [ApplyRotationTranslation] to rotate the I tetromino, which rotates around a block corner.
+/// Most tetrominos rotate around a block center.
 impl Position {
     /// Get 2x zoomed coordinates for the block center.
-    fn get_block_center_coordinates(&self) -> Self {
+    fn to_zoomed_2x(self) -> Self {
         Self::new(2 * self.x, 2 * self.y)
     }
 
     /// Get 2x zoomed coordinates for the block bottom right corner.
-    fn get_block_bottom_right_coordinates(&self) -> Self {
+    fn to_zoomed_2x_corner(self) -> Self {
         Self::new(2 * self.x + 1, 2 * self.y + 1)
     }
 
     /// Get block coordinates from 2x zoomed coordinates.
-    fn get_block_coordinates(&self) -> Self {
+    #[allow(clippy::wrong_self_convention)]
+    fn from_zoomed_2x(self) -> Self {
         Self::new(self.x.div_euclid(2), self.y.div_euclid(2))
+    }
+}
+
+/// In [moving_primitives](super::moving_primitives), helper to convert between regular coordinates (also refered to as "block coordinates") and 2x zoomed coordinates.
+/// In 2x zoomed coordinates, block centers lie at even coordinates and block corners lie at odd coordinates.
+///
+/// These functions are used by [ApplyRotationTranslation] to rotate the I tetromino, which rotates around a block corner.
+/// Most tetrominos rotate around a block center.
+impl RotationTranslation {
+    fn with_corner_rotation_center(&self) -> Self {
+        let mut copy = *self;
+        copy.rotation_center = copy.rotation_center.to_zoomed_2x_corner();
+
+        copy
     }
 }
 
@@ -109,186 +124,189 @@ impl Position {
 mod tests {
     use super::super::spatial_primitives::{FALL, LEFT, RIGHT, RISE};
     use super::*;
+    use rstest::rstest;
 
-    #[test]
-    fn zoom_in_from_center_is_correct() {
-        let pos = Position::new(5, -2);
-        let expected = Position::new(10, -4);
-
-        let actual = pos.get_block_center_coordinates();
-
-        assert_eq!(actual, expected);
+    #[rstest]
+    #[case(Position::new(0, 0), Position::new(0, 0))]
+    #[case(Position::new(1, 0), Position::new(2, 0))]
+    #[case(Position::new(0, 1), Position::new(0, 2))]
+    #[case(Position::new(-1, 0), Position::new(-2, 0))]
+    #[case(Position::new(0, -1), Position::new(0, -2))]
+    fn to_zoomed_2x_is_correct(#[case] input: Position, #[case] expected: Position) {
+        assert_eq!(input.to_zoomed_2x(), expected);
     }
 
-    #[test]
-    fn zoom_in_from_intersection_is_correct() {
-        let pos = Position::new(-4, 3);
-        let expected = Position::new(-7, 7);
-
-        let actual = pos.get_block_bottom_right_coordinates();
-
-        assert_eq!(actual, expected);
+    #[rstest]
+    #[case(Position::new(0, 0), Position::new(1, 1))]
+    #[case(Position::new(1, 0), Position::new(3, 1))]
+    #[case(Position::new(0, 1), Position::new(1, 3))]
+    #[case(Position::new(-1, 0), Position::new(-1, 1))]
+    #[case(Position::new(0, -1), Position::new(1, -1))]
+    fn to_zoomed_2x_corner_is_correct(#[case] input: Position, #[case] expected: Position) {
+        assert_eq!(input.to_zoomed_2x_corner(), expected);
     }
 
-    #[test]
-    fn zoom_out_is_correct() {
-        let pos = Position::new(-5, 5);
-        let expected = Position::new(-3, 2);
-
-        let actual = pos.get_block_coordinates();
-
-        assert_eq!(actual, expected);
+    #[rstest]
+    #[case(Position::new(0, 0), Position::new(0, 0))]
+    #[case(Position::new(1, 1), Position::new(0, 0))]
+    #[case(Position::new(2, 0), Position::new(1, 0))]
+    #[case(Position::new(0, 2), Position::new(0, 1))]
+    #[case(Position::new(3, 1), Position::new(1, 0))]
+    #[case(Position::new(1, 3), Position::new(0, 1))]
+    #[case(Position::new(-1, 1), Position::new(-1, 0))]
+    #[case(Position::new(1, -1), Position::new(0, -1))]
+    #[case(Position::new(-2, 0), Position::new(-1, 0))]
+    #[case(Position::new(0, -2), Position::new(0, -1))]
+    fn from_zoomed_2x_is_correct(#[case] input: Position, #[case] expected: Position) {
+        assert_eq!(input.from_zoomed_2x(), expected);
     }
 
-    #[test]
-    fn zoom_in_from_center_then_zoom_out_does_nothing() {
-        for expected in [
-            Position::new(0, 0),
-            Position::new(-5, 2),
-            Position::new(-4, 3),
-        ] {
-            let actual = expected
-                .get_block_center_coordinates()
-                .get_block_coordinates();
-
-            assert_eq!(actual, expected);
-        }
-    }
-
-    #[test]
-    fn zoom_in_from_intersection_then_zoom_out_does_nothing() {
-        for expected in [
-            Position::new(0, 0),
-            Position::new(-5, 2),
-            Position::new(-4, 3),
-        ] {
-            let actual = expected
-                .get_block_bottom_right_coordinates()
-                .get_block_coordinates();
-
-            assert_eq!(actual, expected);
-        }
-    }
-
+    const RIGHT_TRANSLATION: RotationTranslation = RotationTranslation::right();
     const CLOCKWISE_TURN: RotationTranslation =
-        RotationTranslation::rotation(RotationType::Clockwise, &Position::new(0, 0));
+        RotationTranslation::centered_rotation(RotationType::Clockwise);
 
-    #[test]
-    fn translate_by_for_direction_does_nothing() {
-        let expected = Direction::North;
-        let mut direction = expected;
+    #[rstest]
+    fn direction_translate_by_does_nothing(
+        #[values(Direction::North)] expected: Direction,
+        #[values(RIGHT_TRANSLATION, CLOCKWISE_TURN)] movement: RotationTranslation,
+    ) {
+        let mut input = expected;
 
-        direction.translate_by(&CLOCKWISE_TURN);
+        input.translate_by(&movement);
 
-        assert_eq!(direction, expected);
+        assert_eq!(input, expected);
     }
 
-    const ROTATION_TYPES: [RotationType; 4] = [
-        RotationType::None,
-        RotationType::Clockwise,
-        RotationType::HalfTurn,
-        RotationType::Counterclockwise,
-    ];
-    const DIRECTIONS: [Direction; 4] = [
-        Direction::North,
-        Direction::East,
-        Direction::South,
-        Direction::West,
-    ];
+    #[rstest]
+    #[case(Direction::North, RotationType::None, Direction::North)]
+    #[case(Direction::North, RotationType::Clockwise, Direction::East)]
+    #[case(Direction::North, RotationType::HalfTurn, Direction::South)]
+    #[case(Direction::North, RotationType::Counterclockwise, Direction::West)]
+    #[case(Direction::East, RotationType::None, Direction::East)]
+    #[case(Direction::East, RotationType::Clockwise, Direction::South)]
+    #[case(Direction::East, RotationType::HalfTurn, Direction::West)]
+    #[case(Direction::East, RotationType::Counterclockwise, Direction::North)]
+    fn direction_turn_around_functions_are_correct(
+        #[case] input: Direction,
+        #[case] rotation_type: RotationType,
+        #[case] expected: Direction,
+    ) {
+        let mut actual1 = input;
+        let mut actual2 = input;
+        let rotation = RotationTranslation::centered_rotation(rotation_type);
 
-    #[test]
-    fn turn_by_for_direction_is_correct() {
-        for (rotation_type, expected) in ROTATION_TYPES.iter().zip(DIRECTIONS) {
-            let mut instance = Direction::default();
-            let rotation = RotationTranslation::rotation(*rotation_type, &Position::default());
+        actual1.turn_around_block_center(&rotation);
+        actual2.turn_around_block_corner(&rotation);
 
-            instance.turn_around_block_center(&rotation);
-
-            assert_eq!(instance, expected);
-        }
+        assert_eq!(actual1, expected);
+        assert_eq!(actual2, expected);
     }
 
-    #[test]
-    fn turn_by_with_offset_for_direction_is_identical_to_turn_by() {
-        for rotation_type in ROTATION_TYPES {
-            let mut instance = Direction::default();
-            let mut expected = instance;
-            let rotation = RotationTranslation::rotation(rotation_type, &Position::default());
+    #[rstest]
+    #[case(Position::new(0, 0), Position::new(0, 0), Position::new(0, 0))]
+    #[case(Position::new(1, 0), Position::new(0, 0), Position::new(1, 0))]
+    #[case(Position::new(0, 1), Position::new(0, 0), Position::new(0, 1))]
+    #[case(Position::new(0, 0), Position::new(1, 0), Position::new(1, 0))]
+    #[case(Position::new(0, 0), Position::new(0, 1), Position::new(0, 1))]
+    fn position_translate_by_is_correct(
+        #[case] input: Position,
+        #[case] translation: Position,
+        #[case] expected: Position,
+    ) {
+        let mut actual = input;
+        let translation = RotationTranslation::translation(translation);
 
-            expected.turn_around_block_center(&rotation);
-            instance.turn_around_block_corner(&rotation);
+        actual.translate_by(&translation);
 
-            assert_eq!(instance, expected);
-        }
+        assert_eq!(actual, expected);
     }
 
-    #[test]
-    fn translate_by_for_position_is_correct() {
-        let mut instance = Position::new(5, -2);
-        let expected = Position::new(2, 2);
-        let translation = Position::new(-3, 4);
+    #[rstest]
+    #[case(RISE, RotationType::None, RISE)]
+    #[case(RISE, RotationType::Clockwise, RIGHT)]
+    #[case(RISE, RotationType::HalfTurn, FALL)]
+    #[case(RISE, RotationType::Counterclockwise, LEFT)]
+    #[case(RIGHT, RotationType::None, RIGHT)]
+    #[case(RIGHT, RotationType::Clockwise, FALL)]
+    #[case(RIGHT, RotationType::HalfTurn, LEFT)]
+    #[case(RIGHT, RotationType::Counterclockwise, RISE)]
+    fn position_turn_around_is_correct(
+        #[values(Position::new(0, 0), LEFT)] rotation_center: Position,
+        #[case] input: Position,
+        #[case] rotation_type: RotationType,
+        #[case] expected: Position,
+    ) {
+        // Translate `input` before turning around `rotation_center`.
+        let mut actual = rotation_center + input;
+        let rotation = RotationTranslation::rotation(rotation_type, &rotation_center);
 
-        instance.translate_by(&RotationTranslation::translation(translation));
+        actual.turn_around_block_center(&rotation);
 
-        assert_eq!(instance, expected);
+        assert_eq!(actual, rotation_center + expected);
     }
 
-    const UNIT_POSITIONS: [Position; 4] = [RISE, RIGHT, FALL, LEFT];
+    #[rstest]
+    #[case(RISE, RotationType::None, RISE)]
+    #[case(RISE, RotationType::Clockwise, Position::new(2, 0))]
+    #[case(RISE, RotationType::HalfTurn, Position::new(1, 2))]
+    #[case(RISE, RotationType::Counterclockwise, Position::new(-1, 1))]
+    #[case(RIGHT, RotationType::None, RIGHT)]
+    #[case(RIGHT, RotationType::Clockwise, Position::new(1, 1))]
+    #[case(RIGHT, RotationType::HalfTurn, Position::new(0, 1))]
+    #[case(RIGHT, RotationType::Counterclockwise, Position::new(0, 0))]
+    fn position_turn_around_with_offset_is_correct(
+        #[values(Position::new(0, 0), LEFT)] rotation_center: Position,
+        #[case] input: Position,
+        #[case] rotation_type: RotationType,
+        #[case] expected: Position,
+    ) {
+        let mut actual = rotation_center + input;
+        let rotation = RotationTranslation::rotation(rotation_type, &rotation_center);
 
-    #[test]
-    fn turn_by_for_position_is_correct() {
-        for (rotation_type, expected) in ROTATION_TYPES.iter().zip(UNIT_POSITIONS) {
-            let mut instance = UNIT_POSITIONS[0];
-            let rotation = RotationTranslation::rotation(*rotation_type, &Position::default());
+        actual.turn_around_block_corner(&rotation);
 
-            instance.turn_around_block_center(&rotation);
-
-            assert_eq!(instance, expected);
-        }
+        assert_eq!(actual, rotation_center + expected);
     }
 
-    const RISE_TURNED_WITH_OFFSET: [Position; 4] = [
-        RISE,
-        Position::new(2, 0),
-        Position::new(1, 2),
-        Position::new(-1, 1),
-    ];
+    #[rstest]
+    #[case(
+        Position::new(0, 0),
+        RotationTranslation::identity(),
+        Position::new(0, 0)
+    )]
+    #[case(Position::new(0, 0), RotationTranslation::right(), RIGHT)]
+    #[case(Position::new(0, 0), RotationTranslation::new(&Position::new(-3, 4), RotationType::Clockwise, &Position::new(-1, 0)), Position::new(-4, 5))]
+    #[case(Position::new(-2, 1), RotationTranslation::new(&Position::new(-3, 4), RotationType::Clockwise, &Position::new(4, 3)), Position::new(3, 1))]
+    fn move_by_for_position_is_correct(
+        #[case] input: Position,
+        #[case] movement: RotationTranslation,
+        #[case] expected: Position,
+    ) {
+        let mut actual = input;
 
-    #[test]
-    fn turn_by_with_offset_for_position_is_correct() {
-        for (rotation_type, expected) in ROTATION_TYPES.iter().zip(RISE_TURNED_WITH_OFFSET) {
-            let mut instance = RISE;
-            let rotation = RotationTranslation::rotation(*rotation_type, &Position::default());
+        actual.move_by(&movement);
 
-            instance.turn_around_block_corner(&rotation);
-
-            assert_eq!(instance, expected);
-        }
+        assert_eq!(actual, expected);
     }
 
-    #[test]
-    fn move_by_for_position_is_correct() {
-        let mut instance = Position::new(-2, 1);
-        let center = Position::new(4, 3);
-        let translation = Position::new(-3, 4);
-        let rotation_translation =
-            RotationTranslation::new(&translation, RotationType::Clockwise, &center);
+    #[rstest]
+    #[case(
+        Position::new(0, 0),
+        RotationTranslation::identity(),
+        Position::new(0, 0)
+    )]
+    #[case(Position::new(0, 0), RotationTranslation::right(), RIGHT)]
+    #[case(Position::new(0, 0), RotationTranslation::new(&Position::new(-3, 4), RotationType::Clockwise, &Position::new(-1, 0)), Position::new(-3, 5))]
+    #[case(Position::new(-2, 1), RotationTranslation::new(&Position::new(-3, 4), RotationType::Clockwise, &Position::new(4, 3)), Position::new(4, 1))]
+    fn move_by_with_offset_for_position_is_correct(
+        #[case] input: Position,
+        #[case] movement: RotationTranslation,
+        #[case] expected: Position,
+    ) {
+        let mut actual = input;
 
-        instance.move_by(&rotation_translation);
+        actual.move_by_with_offset(&movement);
 
-        assert_eq!(instance, Position::new(3, 1));
-    }
-
-    #[test]
-    fn move_by_with_offset_for_position_is_correct() {
-        let mut instance = Position::new(-2, 1);
-        let center = Position::new(4, 3);
-        let translation = Position::new(-3, 4);
-        let rotation_translation =
-            RotationTranslation::new(&translation, RotationType::Clockwise, &center);
-
-        instance.move_by_with_offset(&rotation_translation);
-
-        assert_eq!(instance, Position::new(4, 1));
+        assert_eq!(actual, expected);
     }
 }

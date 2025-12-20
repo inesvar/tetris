@@ -36,7 +36,7 @@ impl RotationTranslation {
     }
 
     // TODO: remove when const traits are allowed
-    const fn const_default() -> Self {
+    pub(super) const fn identity() -> Self {
         Self::new(
             &Position::new(0, 0),
             RotationType::None,
@@ -48,7 +48,7 @@ impl RotationTranslation {
     pub(super) const fn translation(translation: Position) -> Self {
         Self {
             translation,
-            ..Self::const_default()
+            ..Self::identity()
         }
     }
 
@@ -68,7 +68,15 @@ impl RotationTranslation {
         Self {
             rotation_type,
             rotation_center: *rotation_center,
-            ..Self::const_default()
+            ..Self::identity()
+        }
+    }
+
+    #[cfg(test)]
+    pub(super) const fn centered_rotation(rotation_type: RotationType) -> Self {
+        Self {
+            rotation_type,
+            ..Self::identity()
         }
     }
 }
