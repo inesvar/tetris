@@ -40,7 +40,7 @@ impl From<TetrominoMove> for RotationType {
             TetrominoMove::Clockwise => Self::Clockwise,
             TetrominoMove::Counterclockwise => Self::Counterclockwise,
             TetrominoMove::HalfTurn => Self::HalfTurn,
-            _ => Self::None,
+            _ => Self::Identity,
         }
     }
 }

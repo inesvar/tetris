@@ -104,7 +104,7 @@ impl Tetromino {
         tetromino_move: TetrominoMove,
         grid: &TetrisGrid,
     ) -> bool {
-        if RotationType::from(tetromino_move) == RotationType::None {
+        if RotationType::from(tetromino_move) == RotationType::Identity {
             self.apply_translation(tetromino_move, grid)
         } else if self.kind != TetrominoKind::O {
             self.apply_rotation(tetromino_move, grid)

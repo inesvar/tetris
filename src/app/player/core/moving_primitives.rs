@@ -45,7 +45,7 @@ impl ApplyRotationTranslation for Position {
                 let vector = *self - center;
                 *self = center + vector.neg();
             }
-            RotationType::None => {}
+            RotationType::Identity => {}
         }
     }
 
@@ -74,7 +74,7 @@ impl ApplyRotationTranslation for Direction {
                 self.turn_clockwise();
                 self.turn_clockwise();
             }
-            RotationType::None => {}
+            RotationType::Identity => {}
         }
     }
 
@@ -177,11 +177,11 @@ mod tests {
     }
 
     #[rstest]
-    #[case(Direction::North, RotationType::None, Direction::North)]
+    #[case(Direction::North, RotationType::Identity, Direction::North)]
     #[case(Direction::North, RotationType::Clockwise, Direction::East)]
     #[case(Direction::North, RotationType::HalfTurn, Direction::South)]
     #[case(Direction::North, RotationType::Counterclockwise, Direction::West)]
-    #[case(Direction::East, RotationType::None, Direction::East)]
+    #[case(Direction::East, RotationType::Identity, Direction::East)]
     #[case(Direction::East, RotationType::Clockwise, Direction::South)]
     #[case(Direction::East, RotationType::HalfTurn, Direction::West)]
     #[case(Direction::East, RotationType::Counterclockwise, Direction::North)]
@@ -221,11 +221,11 @@ mod tests {
     }
 
     #[rstest]
-    #[case(Position::RISE, RotationType::None, Position::RISE)]
+    #[case(Position::RISE, RotationType::Identity, Position::RISE)]
     #[case(Position::RISE, RotationType::Clockwise, Position::RIGHT)]
     #[case(Position::RISE, RotationType::HalfTurn, Position::FALL)]
     #[case(Position::RISE, RotationType::Counterclockwise, Position::LEFT)]
-    #[case(Position::RIGHT, RotationType::None, Position::RIGHT)]
+    #[case(Position::RIGHT, RotationType::Identity, Position::RIGHT)]
     #[case(Position::RIGHT, RotationType::Clockwise, Position::FALL)]
     #[case(Position::RIGHT, RotationType::HalfTurn, Position::LEFT)]
     #[case(Position::RIGHT, RotationType::Counterclockwise, Position::RISE)]
@@ -245,11 +245,11 @@ mod tests {
     }
 
     #[rstest]
-    #[case(Position::RISE, RotationType::None, Position::RISE)]
+    #[case(Position::RISE, RotationType::Identity, Position::RISE)]
     #[case(Position::RISE, RotationType::Clockwise, Position::new(2, 0))]
     #[case(Position::RISE, RotationType::HalfTurn, Position::new(1, 2))]
     #[case(Position::RISE, RotationType::Counterclockwise, Position::new(-1, 1))]
-    #[case(Position::RIGHT, RotationType::None, Position::RIGHT)]
+    #[case(Position::RIGHT, RotationType::Identity, Position::RIGHT)]
     #[case(Position::RIGHT, RotationType::Clockwise, Position::new(1, 1))]
     #[case(Position::RIGHT, RotationType::HalfTurn, Position::new(0, 1))]
     #[case(Position::RIGHT, RotationType::Counterclockwise, Position::new(0, 0))]

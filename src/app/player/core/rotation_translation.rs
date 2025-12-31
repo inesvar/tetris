@@ -14,7 +14,7 @@ pub(super) struct RotationTranslation {
 pub(super) enum RotationType {
     #[default]
     /// Default.
-    None,
+    Identity,
     Clockwise,
     HalfTurn,
     Counterclockwise,
@@ -38,7 +38,7 @@ impl RotationTranslation {
     pub(super) const fn identity() -> Self {
         Self::new(
             &Position::new(0, 0),
-            RotationType::None,
+            RotationType::Identity,
             &Position::new(0, 0),
         )
     }
