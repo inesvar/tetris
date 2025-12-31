@@ -1,5 +1,5 @@
 //! Define `struct` [RotationTranslation] and `enum` [RotationType].
-use super::spatial_primitives::{Position, FALL, LEFT, RIGHT};
+use super::spatial_primitives::Position;
 
 /// Movement (a rotation followed by a translation).
 #[derive(Clone, Copy, Default)]
@@ -52,15 +52,15 @@ impl RotationTranslation {
     }
 
     pub(super) const fn fall() -> Self {
-        RotationTranslation::translation(FALL)
+        RotationTranslation::translation(Position::FALL)
     }
 
     pub(super) const fn right() -> Self {
-        RotationTranslation::translation(RIGHT)
+        RotationTranslation::translation(Position::RIGHT)
     }
 
     pub(super) const fn left() -> Self {
-        RotationTranslation::translation(LEFT)
+        RotationTranslation::translation(Position::LEFT)
     }
 
     pub(super) const fn rotation(rotation_type: RotationType, rotation_center: &Position) -> Self {

@@ -122,7 +122,6 @@ impl RotationTranslation {
 
 #[cfg(test)]
 mod tests {
-    use super::super::spatial_primitives::{FALL, LEFT, RIGHT, RISE};
     use super::*;
     use rstest::rstest;
 
@@ -222,16 +221,16 @@ mod tests {
     }
 
     #[rstest]
-    #[case(RISE, RotationType::None, RISE)]
-    #[case(RISE, RotationType::Clockwise, RIGHT)]
-    #[case(RISE, RotationType::HalfTurn, FALL)]
-    #[case(RISE, RotationType::Counterclockwise, LEFT)]
-    #[case(RIGHT, RotationType::None, RIGHT)]
-    #[case(RIGHT, RotationType::Clockwise, FALL)]
-    #[case(RIGHT, RotationType::HalfTurn, LEFT)]
-    #[case(RIGHT, RotationType::Counterclockwise, RISE)]
+    #[case(Position::RISE, RotationType::None, Position::RISE)]
+    #[case(Position::RISE, RotationType::Clockwise, Position::RIGHT)]
+    #[case(Position::RISE, RotationType::HalfTurn, Position::FALL)]
+    #[case(Position::RISE, RotationType::Counterclockwise, Position::LEFT)]
+    #[case(Position::RIGHT, RotationType::None, Position::RIGHT)]
+    #[case(Position::RIGHT, RotationType::Clockwise, Position::FALL)]
+    #[case(Position::RIGHT, RotationType::HalfTurn, Position::LEFT)]
+    #[case(Position::RIGHT, RotationType::Counterclockwise, Position::RISE)]
     fn position_turn_around_is_correct(
-        #[values(Position::new(0, 0), LEFT)] rotation_center: Position,
+        #[values(Position::new(0, 0), Position::LEFT)] rotation_center: Position,
         #[case] input: Position,
         #[case] rotation_type: RotationType,
         #[case] expected: Position,
@@ -246,16 +245,16 @@ mod tests {
     }
 
     #[rstest]
-    #[case(RISE, RotationType::None, RISE)]
-    #[case(RISE, RotationType::Clockwise, Position::new(2, 0))]
-    #[case(RISE, RotationType::HalfTurn, Position::new(1, 2))]
-    #[case(RISE, RotationType::Counterclockwise, Position::new(-1, 1))]
-    #[case(RIGHT, RotationType::None, RIGHT)]
-    #[case(RIGHT, RotationType::Clockwise, Position::new(1, 1))]
-    #[case(RIGHT, RotationType::HalfTurn, Position::new(0, 1))]
-    #[case(RIGHT, RotationType::Counterclockwise, Position::new(0, 0))]
+    #[case(Position::RISE, RotationType::None, Position::RISE)]
+    #[case(Position::RISE, RotationType::Clockwise, Position::new(2, 0))]
+    #[case(Position::RISE, RotationType::HalfTurn, Position::new(1, 2))]
+    #[case(Position::RISE, RotationType::Counterclockwise, Position::new(-1, 1))]
+    #[case(Position::RIGHT, RotationType::None, Position::RIGHT)]
+    #[case(Position::RIGHT, RotationType::Clockwise, Position::new(1, 1))]
+    #[case(Position::RIGHT, RotationType::HalfTurn, Position::new(0, 1))]
+    #[case(Position::RIGHT, RotationType::Counterclockwise, Position::new(0, 0))]
     fn position_turn_around_with_offset_is_correct(
-        #[values(Position::new(0, 0), LEFT)] rotation_center: Position,
+        #[values(Position::new(0, 0), Position::LEFT)] rotation_center: Position,
         #[case] input: Position,
         #[case] rotation_type: RotationType,
         #[case] expected: Position,
@@ -274,7 +273,7 @@ mod tests {
         RotationTranslation::identity(),
         Position::new(0, 0)
     )]
-    #[case(Position::new(0, 0), RotationTranslation::right(), RIGHT)]
+    #[case(Position::new(0, 0), RotationTranslation::right(), Position::RIGHT)]
     #[case(Position::new(0, 0), RotationTranslation::new(&Position::new(-3, 4), RotationType::Clockwise, &Position::new(-1, 0)), Position::new(-4, 5))]
     #[case(Position::new(-2, 1), RotationTranslation::new(&Position::new(-3, 4), RotationType::Clockwise, &Position::new(4, 3)), Position::new(3, 1))]
     fn move_by_for_position_is_correct(
@@ -295,7 +294,7 @@ mod tests {
         RotationTranslation::identity(),
         Position::new(0, 0)
     )]
-    #[case(Position::new(0, 0), RotationTranslation::right(), RIGHT)]
+    #[case(Position::new(0, 0), RotationTranslation::right(), Position::RIGHT)]
     #[case(Position::new(0, 0), RotationTranslation::new(&Position::new(-3, 4), RotationType::Clockwise, &Position::new(-1, 0)), Position::new(-3, 5))]
     #[case(Position::new(-2, 1), RotationTranslation::new(&Position::new(-3, 4), RotationType::Clockwise, &Position::new(4, 3)), Position::new(4, 1))]
     fn move_by_with_offset_for_position_is_correct(

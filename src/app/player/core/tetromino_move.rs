@@ -1,6 +1,6 @@
 #![allow(unused)]
 use super::rotation_translation::RotationType;
-use super::spatial_primitives::{Position, FALL, LEFT, RIGHT};
+use super::spatial_primitives::Position;
 
 #[derive(PartialEq)]
 pub(in crate::app::player) enum TetrominoMove {
@@ -26,9 +26,9 @@ impl TetrominoMove {
 impl From<&TetrominoMove> for Position {
     fn from(value: &TetrominoMove) -> Self {
         match value {
-            TetrominoMove::Fall | TetrominoMove::HardDrop => FALL,
-            TetrominoMove::Right => RIGHT,
-            TetrominoMove::Left => LEFT,
+            TetrominoMove::Fall | TetrominoMove::HardDrop => Position::FALL,
+            TetrominoMove::Right => Position::RIGHT,
+            TetrominoMove::Left => Position::LEFT,
             _ => Self::default(),
         }
     }

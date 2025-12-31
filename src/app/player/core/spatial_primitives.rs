@@ -1,13 +1,6 @@
 //! Define `struct` [Position] and `enum` [Direction].
 use super::{Deserialize, Serialize};
 
-// y increases from top to bottom
-#[cfg(test)]
-pub(super) const RISE: Position = Position::new(0, -1);
-pub(super) const RIGHT: Position = Position::new(1, 0);
-pub(super) const FALL: Position = Position::new(0, 1);
-pub(super) const LEFT: Position = Position::new(-1, 0);
-
 /// Position on a discrete grid.
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
 pub(in crate::app::player) struct Position {
@@ -15,6 +8,15 @@ pub(in crate::app::player) struct Position {
     pub(super) x: i32,
     /// Vertical coordinate, *from top to bottom*.
     pub(super) y: i32,
+}
+
+impl Position {
+    // y increases from top to bottom
+    #[cfg(test)]
+    pub(super) const RISE: Position = Position::new(0, -1);
+    pub(super) const RIGHT: Position = Position::new(1, 0);
+    pub(super) const FALL: Position = Position::new(0, 1);
+    pub(super) const LEFT: Position = Position::new(-1, 0);
 }
 
 /// Four cardinal directions.
@@ -120,46 +122,46 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case(RISE, FALL)]
-    #[case(RIGHT, LEFT)]
-    #[case(FALL, RISE)]
-    #[case(LEFT, RIGHT)]
+    #[case(Position::RISE, Position::FALL)]
+    #[case(Position::RIGHT, Position::LEFT)]
+    #[case(Position::FALL, Position::RISE)]
+    #[case(Position::LEFT, Position::RIGHT)]
     fn position_neg_is_correct(#[case] input: Position, #[case] expected: Position) {
         assert_eq!(input.neg(), expected);
     }
 
     #[rstest]
-    #[case(RISE, RISE)]
-    #[case(RIGHT, LEFT)]
-    #[case(FALL, FALL)]
-    #[case(LEFT, RIGHT)]
+    #[case(Position::RISE, Position::RISE)]
+    #[case(Position::RIGHT, Position::LEFT)]
+    #[case(Position::FALL, Position::FALL)]
+    #[case(Position::LEFT, Position::RIGHT)]
     fn position_mirror_x_is_correct(#[case] input: Position, #[case] expected: Position) {
         assert_eq!(input.mirror_x(), expected);
     }
 
     #[rstest]
-    #[case(RISE, FALL)]
-    #[case(RIGHT, RIGHT)]
-    #[case(FALL, RISE)]
-    #[case(LEFT, LEFT)]
+    #[case(Position::RISE, Position::FALL)]
+    #[case(Position::RIGHT, Position::RIGHT)]
+    #[case(Position::FALL, Position::RISE)]
+    #[case(Position::LEFT, Position::LEFT)]
     fn position_mirror_y_is_correct(#[case] input: Position, #[case] expected: Position) {
         assert_eq!(input.mirror_y(), expected);
     }
 
     #[rstest]
-    #[case(RISE, RIGHT)]
-    #[case(RIGHT, FALL)]
-    #[case(FALL, LEFT)]
-    #[case(LEFT, RISE)]
+    #[case(Position::RISE, Position::RIGHT)]
+    #[case(Position::RIGHT, Position::FALL)]
+    #[case(Position::FALL, Position::LEFT)]
+    #[case(Position::LEFT, Position::RISE)]
     fn position_turned_clockwise_is_correct(#[case] input: Position, #[case] expected: Position) {
         assert_eq!(input.turned_clockwise(), expected);
     }
 
     #[rstest]
-    #[case(RISE, LEFT)]
-    #[case(RIGHT, RISE)]
-    #[case(FALL, RIGHT)]
-    #[case(LEFT, FALL)]
+    #[case(Position::RISE, Position::LEFT)]
+    #[case(Position::RIGHT, Position::RISE)]
+    #[case(Position::FALL, Position::RIGHT)]
+    #[case(Position::LEFT, Position::FALL)]
     fn position_turned_counterclockwise_is_correct(
         #[case] input: Position,
         #[case] expected: Position,

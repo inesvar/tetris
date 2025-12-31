@@ -1,6 +1,4 @@
 //! Define [Tetromino].
-#[cfg(test)]
-use super::spatial_primitives::{FALL, LEFT, RIGHT, RISE};
 use super::{
     moving_primitives::ApplyRotationTranslation,
     rotation_translation::{RotationTranslation, RotationType},
@@ -265,14 +263,14 @@ impl Display for Tetromino {
 impl Tetromino {
     fn i_tetromino_rotation_correction(&mut self, movement: &RotationTranslation) -> Position {
         match (self.direction, movement.rotation_type) {
-            (Direction::North, RotationType::Clockwise) => RIGHT,
-            (Direction::East, RotationType::Counterclockwise) => LEFT,
-            (Direction::East, RotationType::Clockwise) => FALL,
-            (Direction::South, RotationType::Counterclockwise) => RISE,
-            (Direction::South, RotationType::Clockwise) => LEFT,
-            (Direction::West, RotationType::Counterclockwise) => RIGHT,
-            (Direction::West, RotationType::Clockwise) => RISE,
-            (Direction::North, RotationType::Counterclockwise) => FALL,
+            (Direction::North, RotationType::Clockwise) => Position::RIGHT,
+            (Direction::East, RotationType::Counterclockwise) => Position::LEFT,
+            (Direction::East, RotationType::Clockwise) => Position::FALL,
+            (Direction::South, RotationType::Counterclockwise) => Position::RISE,
+            (Direction::South, RotationType::Clockwise) => Position::LEFT,
+            (Direction::West, RotationType::Counterclockwise) => Position::RIGHT,
+            (Direction::West, RotationType::Clockwise) => Position::RISE,
+            (Direction::North, RotationType::Counterclockwise) => Position::FALL,
             (_, _) => todo!(),
         }
     }
