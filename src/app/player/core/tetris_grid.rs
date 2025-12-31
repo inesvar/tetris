@@ -167,7 +167,7 @@ impl TetrisGrid {
 
     /// Return true if the `block` is inside the grid in an empty slot.
     pub(super) fn is_block_available(&self, block: &Position) -> bool {
-        self.contains(block) && self.is_block_empty(block)
+        self.is_in_grid(block) && self.is_block_empty(block)
     }
 
     /// Push the blocks into the grid and return the number of lines completed.
@@ -204,7 +204,7 @@ impl TetrisGrid {
     }
 
     /// Return `true` is `block` is in the **Matrix** or the **Buffer Zone**.
-    fn contains(&self, block: &Position) -> bool {
+    fn is_in_grid(&self, block: &Position) -> bool {
         let line = self.convert_position_y_to_grid_y(block.y);
         block.x >= 0
             && line >= 0
@@ -710,21 +710,21 @@ mod tests {
     #[rstest]
     #[case(TetrisGrid::default(), Position::new(0, -18), Position::new(9, 21))]
     #[case(TetrisGrid::new(4, 6, 2), Position::new(0, 0), Position::new(3, 7))]
-    fn contains_is_correct(
+    fn is_in_grid_is_correct(
         #[case] grid: TetrisGrid,
         #[case] top_left: Position,
         #[case] bottom_right: Position,
     ) {
-        assert!(grid.contains(&top_left));
-        assert!(grid.contains(&bottom_right));
+        assert!(grid.is_in_grid(&top_left));
+        assert!(grid.is_in_grid(&bottom_right));
 
         // neighbors of the grid corners that are outside of the grid
         // horizontal offset :
-        assert!(!grid.contains(&(top_left + Position::new(-1, 0))));
-        assert!(!grid.contains(&(bottom_right + Position::new(1, 0))));
+        assert!(!grid.is_in_grid(&(top_left + Position::new(-1, 0))));
+        assert!(!grid.is_in_grid(&(bottom_right + Position::new(1, 0))));
         // vertical offset :
-        assert!(!grid.contains(&(top_left + Position::new(0, -1))));
-        assert!(!grid.contains(&(bottom_right + Position::new(0, 1))));
+        assert!(!grid.is_in_grid(&(top_left + Position::new(0, -1))));
+        assert!(!grid.is_in_grid(&(bottom_right + Position::new(0, 1))));
     }
 
     #[rstest]

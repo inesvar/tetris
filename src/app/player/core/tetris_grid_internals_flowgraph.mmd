@@ -8,7 +8,7 @@ graph LR
     is_block_empty(is_block_empty)
     convert_position_y_to_grid_y(convert_position_y_to_grid_y)
 
-    contains(contains)
+    is_in_grid(is_in_grid)
 
     add_blocks(add_blocks)
     can_blocks_spawn_on(can_blocks_spawn_on)
@@ -31,9 +31,9 @@ graph LR
     
         is_block_empty -.-> convert_position_y_to_grid_y
 
-        contains -.-> convert_position_y_to_grid_y
+        is_in_grid -.-> convert_position_y_to_grid_y
 
         can_blocks_spawn_on -.-> is_block_empty
-        is_block_available -.-> contains
+        is_block_available -.-> is_in_grid
         is_block_available -.-> is_block_empty
     end

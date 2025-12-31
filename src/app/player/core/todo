@@ -3,7 +3,6 @@
 - rework tetromino_kind
 
 # problems
-- tetris_grid : rename `contains`
 - the clock should pause during a game pause (partially revert blinking changes)
 - serialize a PlayerScreen(PlayerScreen) instead of doing black magic
 - use tokio to outsource tcp comms
