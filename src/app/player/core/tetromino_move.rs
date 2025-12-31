@@ -1,4 +1,3 @@
-#![allow(unused)]
 use super::rotation_translation::RotationType;
 use super::spatial_primitives::Position;
 
@@ -16,10 +15,6 @@ pub(in crate::app::player) enum TetrominoMove {
 impl TetrominoMove {
     pub(super) fn is_repeated(&self) -> bool {
         *self == Self::HardDrop
-    }
-
-    pub(super) fn has_wall_kicks(&self) -> bool {
-        *self == Self::Clockwise || *self == Self::Counterclockwise
     }
 }
 

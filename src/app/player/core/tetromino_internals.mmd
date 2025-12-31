@@ -1,0 +1,70 @@
+graph LR
+    %% objects
+    is_in_grid(is_in_grid)
+    is_block_empty(is_block_empty)
+    is_above_skyline(is_above_skyline)
+    add_block(add_block)
+    clear_lines(clear_lines)
+    is_block_available(is_block_available)
+    can_blocks_spawn_on(can_blocks_spawn_on)
+    add_blocks(add_blocks_and_clear_lines)
+    apply(apply)
+    apply_rotation(apply_rotation)
+    apply_translation(apply_translation)
+    try_move(try_move)
+    can_enter_grid(can_enter_grid)
+    lock_down(lock_down)
+    new(new, reset)
+    get_initial_position(get_initial_position)
+    is_rotation_center_on_block_center(is_rotation_center_on_block_center)
+    wall_kick_translations(wall_kick_translations)
+    ApplyRotationTranslation([ApplyRotationTranslation])
+    translate(translate)
+
+    %% modules
+    tetris_grid[tetris_grid]
+    tetromino[tetromino]
+    tetromino_kind[tetromino_kind]
+
+    subgraph tetris_grid
+        is_block_available -.-> is_in_grid
+        is_block_available -.-> is_block_empty
+        can_blocks_spawn_on -.-> is_block_empty
+        add_blocks -.-> add_block
+        add_blocks -.-> clear_lines
+        add_blocks -.-> is_above_skyline
+    end
+
+    subgraph tetromino
+        new
+        subgraph can_enter_grid_group[ ]
+            direction LR
+            can_enter_grid -.-> translate
+        end
+        lock_down
+        subgraph apply_group[ ]
+            direction LR
+            apply -.-> apply_translation
+            apply -.-> apply_rotation
+            apply_translation -.-> try_move
+            apply_rotation -.-> try_move
+        end
+    end
+
+    subgraph moving_primitives
+        ApplyRotationTranslation
+    end
+
+    subgraph tetromino_kind
+        get_initial_position
+        wall_kick_translations
+        is_rotation_center_on_block_center
+    end
+
+    new -.-> get_initial_position
+    apply_group -.-> is_block_available
+    apply_group -.-> is_rotation_center_on_block_center
+    apply_group -.-> wall_kick_translations
+    apply_group -.-> ApplyRotationTranslation
+    can_enter_grid_group -.-> can_blocks_spawn_on
+    lock_down -.-> add_blocks

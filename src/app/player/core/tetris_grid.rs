@@ -49,7 +49,6 @@ pub(in crate::app) enum GameOverError {
     ///
     /// "[...] occurs when a whole tetrimino locks down above the **Skyline**."
     LockOut,
-    #[allow(unused)]
     /// According to the **Tetris Guideline** :
     ///
     /// "[...] occurs when an opponent’s Line Attack forces your Blocks past the top
@@ -143,7 +142,7 @@ impl TetrisGrid {
 
 /// In [tetris_grid](super::tetris_grid), methods used  by
 /// [Tetromino](super::tetromino::Tetromino) to enter, move and then lock down in the grid.
-#[doc = mermaid!("tetris_grid_internals_flowgraph.mmd")]
+#[doc = mermaid!("tetris_grid_internals.mmd")]
 impl TetrisGrid {
     /// Return the translation needed for `blocks` to enter the grid.
     ///

@@ -13,8 +13,7 @@ use simple_mermaid::mermaid;
 use std::fmt::Formatter;
 
 /// Tetromino.
-///
-#[doc = mermaid!("use_tetromino_flowgraph.mmd")]
+#[doc = mermaid!("tetromino.mmd")]
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub(crate) struct Tetromino {
     kind: TetrominoKind,
@@ -23,6 +22,7 @@ pub(crate) struct Tetromino {
     direction: Direction,
 }
 
+#[doc = mermaid!("tetromino_internals.mmd")]
 impl Tetromino {
     pub(in crate::app::player) fn new(kind: TetrominoKind) -> Tetromino {
         let positions = kind.get_initial_position();
@@ -35,10 +35,7 @@ impl Tetromino {
     }
 
     pub(in crate::app::player) fn reset(&mut self) {
-        let positions = self.kind.get_initial_position();
-        self.center = positions[0];
-        self.blocks = [positions[1], positions[2], positions[3], positions[4]];
-        self.direction = Direction::default();
+        *self = Self::new(self.kind)
     }
 
     pub(in crate::app::player) fn new_tetromino_bag(
@@ -96,9 +93,7 @@ impl Tetromino {
     ) -> Result<u64, GameOverError> {
         grid.add_blocks_and_clear_lines(&self.blocks, self.color())
     }
-}
 
-impl Tetromino {
     pub(in crate::app::player) fn apply(
         &mut self,
         tetromino_move: TetrominoMove,
@@ -154,7 +149,7 @@ impl Tetromino {
             }
         }
         self.blocks = new_blocks;
-        self.direction.turn_around_block_center(movement);
+        self.direction.move_by(movement);
         self.center.translate_by(movement);
         true
     }
@@ -176,6 +171,7 @@ impl Tetromino {
     }
 }
 
+// TODO remove this...
 /// `Tetromino::default` is far from the origin and is not renderer on the screen.
 impl Default for Tetromino {
     fn default() -> Self {

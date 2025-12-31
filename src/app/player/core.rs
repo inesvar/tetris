@@ -1,5 +1,5 @@
 //! Re-export `struct`s [Tetromino], [TetrisGrid], [TetrominoKind] as well as `enum` [GameOverError].
-#![doc = mermaid!("core/core_flowgraph.mmd")]
+#![doc = mermaid!("core/tetromino.mmd")]
 mod moving_primitives;
 mod rotation_translation;
 mod spatial_primitives;
