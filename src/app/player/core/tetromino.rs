@@ -6,6 +6,7 @@ use super::{
     rotation_translation::{RotationTranslation, RotationType},
     spatial_primitives::{Direction, Position},
     tetris_grid::GameOverError,
+    tetromino_move::TetrominoMove,
     Deserialize, Pcg32, Serialize, TetrisColor, TetrisGrid, TetrominoKind, UseTetromino,
 };
 use core::fmt::Display;
@@ -153,6 +154,47 @@ impl UseTetromino for Tetromino {
 }
 
 impl Tetromino {
+    #[allow(unused)]
+    fn apply(&mut self, tetromino_move: &TetrominoMove, grid: &TetrisGrid) -> bool {
+        if RotationType::from(tetromino_move) == RotationType::None {
+            self.apply_translation(tetromino_move, grid)
+        } else {
+            self.apply_rotation(tetromino_move, grid)
+        }
+    }
+
+    #[allow(unused)]
+    fn apply_translation(&mut self, tetromino_move: &TetrominoMove, grid: &TetrisGrid) -> bool {
+        let translation = RotationTranslation::translation(tetromino_move.into());
+        let moved = self.try_move(grid, &translation);
+
+        if tetromino_move.is_repeated() {
+            while self.try_move(grid, &translation) {}
+        }
+
+        moved
+    }
+
+    #[allow(unused)]
+    fn apply_rotation(&mut self, tetromino_move: &TetrominoMove, grid: &TetrisGrid) -> bool {
+        let rotation_type = RotationType::from(tetromino_move);
+
+        let wall_kicks_translations = TetrominoKind::wall_kick_translations(
+            &self.kind,
+            rotation_type,
+            self.direction,
+        );
+        for wall_kick in wall_kicks_translations {
+            let movement =
+                RotationTranslation::new(wall_kick, rotation_type, &self.center);
+            if self.try_move(grid, &movement) {
+                return true;
+            }
+        }
+
+        false
+    }
+
     /// Return whether the tetromino could be moved.
     fn try_move(&mut self, grid: &TetrisGrid, movement: &RotationTranslation) -> bool {
         let mut new_blocks = self.blocks;

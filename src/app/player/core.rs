@@ -6,6 +6,7 @@ mod spatial_primitives;
 mod tetris_grid;
 mod tetromino;
 mod tetromino_kind;
+mod tetromino_move;
 
 use crate::assets::TetrisColor;
 use rand_pcg::Pcg32;

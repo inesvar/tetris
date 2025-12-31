@@ -10,7 +10,7 @@ pub(super) struct RotationTranslation {
 }
 
 /// Four 90° rotation types.
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, PartialEq)]
 pub(super) enum RotationType {
     #[default]
     /// Default.
