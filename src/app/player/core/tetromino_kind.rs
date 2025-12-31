@@ -76,7 +76,7 @@ impl TetrominoKind {
         match self {
             // in order : center_x, center_y, first_block_x, first_block_y, second_block_x, second_block_y...
             TetrominoKind::I => [init(1, 1), init(0, 1), init(1, 1), init(2, 1), init(3, 1)],
-            TetrominoKind::O => [init(2, 1), init(1, 0), init(2, 0), init(1, 1), init(2, 1)],
+            TetrominoKind::O => [init(1, 0), init(1, 0), init(2, 0), init(1, 1), init(2, 1)],
             TetrominoKind::T => [init(1, 1), init(1, 0), init(0, 1), init(1, 1), init(2, 1)],
             TetrominoKind::J => [init(1, 1), init(0, 0), init(0, 1), init(1, 1), init(2, 1)],
             TetrominoKind::L => [init(1, 1), init(2, 0), init(0, 1), init(1, 1), init(2, 1)],
@@ -87,7 +87,7 @@ impl TetrominoKind {
 
     /// Return if the rotation center is on a block center.
     pub(super) fn is_rotation_center_on_block_center(&self) -> bool {
-        *self != TetrominoKind::I
+        *self != TetrominoKind::I && *self != TetrominoKind::O
     }
 
     /// Return an array of the 5 SRS wall-kick translations.
@@ -98,7 +98,8 @@ impl TetrominoKind {
     ) -> &'static [Position] {
         // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
         match self {
-            TetrominoKind::O => unreachable!(), // the O piece doesn't even rotate
+            // it's useless calling this function for the O tetromino, since it doesn't move when turned
+            TetrominoKind::O => &NO_WALL_KICKS,
             TetrominoKind::I => Self::i_wall_kick_translations(rtype, rotation_status),
             _ => Self::generic_wall_kick_translations(rtype, rotation_status),
         }

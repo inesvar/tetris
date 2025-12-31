@@ -158,8 +158,10 @@ impl Tetromino {
     fn apply(&mut self, tetromino_move: &TetrominoMove, grid: &TetrisGrid) -> bool {
         if RotationType::from(tetromino_move) == RotationType::None {
             self.apply_translation(tetromino_move, grid)
-        } else {
+        } else if self.kind != TetrominoKind::O {
             self.apply_rotation(tetromino_move, grid)
+        } else {
+            false // the O tetromino doesn't move when turned
         }
     }
 
