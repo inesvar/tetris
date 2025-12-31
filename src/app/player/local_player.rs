@@ -2,7 +2,6 @@
 use super::core::{TetrisGrid, Tetromino};
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
-    UseTetromino,
 };
 use crate::app::player::core::GameOverError;
 use crate::{app::Countdown, app::PlayerConfig, once, settings::*};

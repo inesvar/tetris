@@ -14,7 +14,6 @@ graph LR
         turn_half_turn)
     can_enter_grid(can_enter_grid)
     lock_down(lock_down)
-    UseTetromino([UseTetromino])
     new(new, reset)
     get_initial_position(get_initial_position)
 
@@ -34,7 +33,7 @@ graph LR
     end
 
     subgraph tetromino
-        UseTetromino === new & can_enter_grid & try_move & lock_down
+        new & can_enter_grid & try_move & lock_down
     end
 
     new -.-> get_initial_position

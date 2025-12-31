@@ -11,7 +11,7 @@ mod pressed_keys;
 mod render;
 mod update_player;
 
-pub(in crate::app::player) use self::core::{Tetromino, UseTetromino};
+pub(in crate::app::player) use self::core::Tetromino;
 use self::{
     circular_buffer::CircularBuffer,
     core::{TetrisGrid, TetrominoKind},

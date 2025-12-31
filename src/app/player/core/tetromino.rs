@@ -1,4 +1,4 @@
-//! Define `trait` [UseTetromino] for [Tetromino].
+//! Define [Tetromino].
 #[cfg(test)]
 use super::spatial_primitives::{FALL, LEFT, RIGHT, RISE};
 use super::{
@@ -7,13 +7,16 @@ use super::{
     spatial_primitives::{Direction, Position},
     tetris_grid::GameOverError,
     tetromino_move::TetrominoMove,
-    Deserialize, Pcg32, Serialize, TetrisColor, TetrisGrid, TetrominoKind, UseTetromino,
+    Deserialize, Pcg32, Serialize, TetrisColor, TetrisGrid, TetrominoKind,
 };
 use core::fmt::Display;
 use rand::seq::SliceRandom;
+use simple_mermaid::mermaid;
 use std::fmt::Formatter;
 
 /// Tetromino.
+///
+#[doc = mermaid!("use_tetromino_flowgraph.mmd")]
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub(crate) struct Tetromino {
     kind: TetrominoKind,
@@ -22,29 +25,29 @@ pub(crate) struct Tetromino {
     direction: Direction,
 }
 
-impl UseTetromino for Tetromino {
-    fn try_fall(&mut self, grid: &TetrisGrid) -> bool {
+impl Tetromino {
+    pub(in crate::app::player) fn try_fall(&mut self, grid: &TetrisGrid) -> bool {
         let movement = RotationTranslation::fall();
         self.try_move(grid, &movement)
     }
 
-    fn hard_drop(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn hard_drop(&mut self, grid: &TetrisGrid) {
         if self.try_fall(grid) {
             self.hard_drop(grid);
         }
     }
 
-    fn left(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn left(&mut self, grid: &TetrisGrid) {
         let movement = RotationTranslation::left();
         let _ = self.try_move(grid, &movement);
     }
 
-    fn right(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn right(&mut self, grid: &TetrisGrid) {
         let movement = RotationTranslation::right();
         let _ = self.try_move(grid, &movement);
     }
 
-    fn turn_half_turn(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn turn_half_turn(&mut self, grid: &TetrisGrid) {
         if self.kind == TetrominoKind::O {
             return;
         };
@@ -52,7 +55,7 @@ impl UseTetromino for Tetromino {
         let _ = self.try_move(grid, &movement);
     }
 
-    fn turn_clockwise(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn turn_clockwise(&mut self, grid: &TetrisGrid) {
         if self.kind == TetrominoKind::O {
             return;
         };
@@ -70,7 +73,7 @@ impl UseTetromino for Tetromino {
         }
     }
 
-    fn turn_counterclockwise(&mut self, grid: &TetrisGrid) {
+    pub(in crate::app::player) fn turn_counterclockwise(&mut self, grid: &TetrisGrid) {
         if self.kind == TetrominoKind::O {
             return;
         };
@@ -88,7 +91,7 @@ impl UseTetromino for Tetromino {
         }
     }
 
-    fn new(kind: TetrominoKind) -> Tetromino {
+    pub(in crate::app::player) fn new(kind: TetrominoKind) -> Tetromino {
         let positions = kind.get_initial_position();
         Tetromino {
             kind,
@@ -98,14 +101,17 @@ impl UseTetromino for Tetromino {
         }
     }
 
-    fn reset(&mut self) {
+    pub(in crate::app::player) fn reset(&mut self) {
         let positions = self.kind.get_initial_position();
         self.center = positions[0];
         self.blocks = [positions[1], positions[2], positions[3], positions[4]];
         self.direction = Direction::default();
     }
 
-    fn new_tetromino_bag(requested_size_of_bag: u32, rng: &mut Pcg32) -> Vec<TetrominoKind> {
+    pub(in crate::app::player) fn new_tetromino_bag(
+        requested_size_of_bag: u32,
+        rng: &mut Pcg32,
+    ) -> Vec<TetrominoKind> {
         let mut size_of_bag = requested_size_of_bag;
         if size_of_bag == 0 {
             size_of_bag = 1;
@@ -140,7 +146,10 @@ impl UseTetromino for Tetromino {
         tetromino_bag
     }
 
-    fn can_enter_grid(&mut self, grid: &TetrisGrid) -> Result<(), GameOverError> {
+    pub(in crate::app::player) fn can_enter_grid(
+        &mut self,
+        grid: &TetrisGrid,
+    ) -> Result<(), GameOverError> {
         let offset = grid.can_blocks_spawn_on(&self.blocks)?;
         let translation = RotationTranslation::translation(offset);
 
@@ -148,7 +157,10 @@ impl UseTetromino for Tetromino {
         Ok(())
     }
 
-    fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
+    pub(in crate::app::player) fn lock_down(
+        self,
+        grid: &mut TetrisGrid,
+    ) -> Result<u64, GameOverError> {
         grid.add_blocks_and_clear_lines(&self.blocks, self.color())
     }
 }
@@ -181,14 +193,10 @@ impl Tetromino {
     fn apply_rotation(&mut self, tetromino_move: &TetrominoMove, grid: &TetrisGrid) -> bool {
         let rotation_type = RotationType::from(tetromino_move);
 
-        let wall_kicks_translations = TetrominoKind::wall_kick_translations(
-            &self.kind,
-            rotation_type,
-            self.direction,
-        );
+        let wall_kicks_translations =
+            TetrominoKind::wall_kick_translations(&self.kind, rotation_type, self.direction);
         for wall_kick in wall_kicks_translations {
-            let movement =
-                RotationTranslation::new(wall_kick, rotation_type, &self.center);
+            let movement = RotationTranslation::new(wall_kick, rotation_type, &self.center);
             if self.try_move(grid, &movement) {
                 return true;
             }

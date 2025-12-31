@@ -1,7 +1,7 @@
 //! Define the update function of [LocalPlayer].
 //!
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
-use super::{LocalPlayer, UseTetromino};
+use super::LocalPlayer;
 use crate::settings::Keybindings;
 
 impl LocalPlayer {

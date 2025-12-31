@@ -5,10 +5,9 @@ graph LR
     RotationTranslation[[RotationTranslation]]
     RotationType[RotationType]
     ApplyRotationTranslation([ApplyRotationTranslation])
-    TetrisGrid[[TetrisGrid]]
+    %% TetrisGrid[[TetrisGrid]]
     Tetromino[[Tetromino]]
-    UseTetromino([UseTetromino])
-    GameOverError[GameOverError]
+    %% GameOverError[GameOverError]
     TetrominoKind[TetrominoKind]
 
     subgraph spatial_primitives
@@ -29,7 +28,7 @@ graph LR
     ApplyRotationTranslation -.-> RotationTranslation
 
     subgraph tetromino
-        UseTetromino ==> Tetromino
+        Tetromino
     end
 
     Tetromino -.-> ApplyRotationTranslation
@@ -38,12 +37,10 @@ graph LR
         TetrominoKind
     end
 
-    subgraph tetris_grid
-        TetrisGrid
-        GameOverError
-    end
+    %% subgraph tetris_grid
+    %%     TetrisGrid
+    %%     GameOverError
+    %% end
 
-    Tetromino ~~~ tetris_grid
-
-    UseTetromino -.-> tetris_grid & TetrominoKind
+    %% Tetromino ~~~ tetris_grid
     Tetromino --o spatial_primitives & TetrominoKind

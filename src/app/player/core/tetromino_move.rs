@@ -1,6 +1,6 @@
 #![allow(unused)]
 use super::rotation_translation::RotationType;
-use super::spatial_primitives::{Position, FALL, RIGHT, LEFT};
+use super::spatial_primitives::{Position, FALL, LEFT, RIGHT};
 
 #[derive(PartialEq)]
 pub(in crate::app::player) enum TetrominoMove {

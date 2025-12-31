@@ -20,8 +20,7 @@ pub(super) enum RotationType {
     Counterclockwise,
 }
 
-/// In [rotation_translation](super::rotation_translation), constructors used by
-/// [UseTetromino](super::UseTetromino) to move the [Tetromino](super::Tetromino).
+/// In [rotation_translation](super::rotation_translation), constructors used to move the [Tetromino](super::Tetromino).
 impl RotationTranslation {
     pub(super) const fn new(
         translation: &Position,

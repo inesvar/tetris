@@ -8,10 +8,9 @@ graph LR
     RotationTranslation[[RotationTranslation]]
     RotationType[RotationType]
     ApplyRotationTranslation([ApplyRotationTranslation])
-    TetrisGrid[[TetrisGrid]]
+    %% TetrisGrid[[TetrisGrid]]
     Tetromino[[Tetromino]]
-    UseTetromino([UseTetromino])
-    GameOverError[GameOverError]
+    %% GameOverError[GameOverError]
     TetrominoKind[TetrominoKind]
 
     subgraph spatial_primitives
@@ -32,7 +31,7 @@ graph LR
     ApplyRotationTranslation -.-> RotationTranslation
 
     subgraph tetromino
-        UseTetromino ==> Tetromino
+        Tetromino
     end
 
     Tetromino -.-> ApplyRotationTranslation
@@ -41,18 +40,16 @@ graph LR
         TetrominoKind
     end
 
-    subgraph tetris_grid
-        TetrisGrid
-        GameOverError
-    end
+    %% subgraph tetris_grid
+    %%     TetrisGrid
+    %%     GameOverError
+    %% end
 
-    Tetromino ~~~ tetris_grid
-
-    UseTetromino -.-> tetris_grid & TetrominoKind
+    %% Tetromino ~~~ tetris_grid
     Tetromino --o spatial_primitives & TetrominoKind
 ```
 
-# `UseTetromino`
+# Using `Tetromino`
 
 ```mermaid
 graph LR
@@ -71,7 +68,6 @@ graph LR
         turn_half_turn)
     can_enter_grid(can_enter_grid)
     lock_down(lock_down)
-    UseTetromino([UseTetromino])
     new(new, reset)
     get_initial_position(get_initial_position)
 
@@ -91,7 +87,7 @@ graph LR
     end
 
     subgraph tetromino
-        UseTetromino === new & can_enter_grid & try_move & lock_down
+        new & can_enter_grid & try_move & lock_down
     end
 
     new -.-> get_initial_position
