@@ -14,6 +14,7 @@ pub enum TetrisColor {
     Green,
     Red,
     #[default]
+    /// Default.
     Grey,
 }
 
