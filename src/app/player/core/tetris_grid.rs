@@ -436,6 +436,7 @@ impl Default for TetrisGrid {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rstest::{fixture, rstest};
 
     macro_rules! concatln {
         ( $( $line:expr ),* $(,)? ) => {
@@ -444,19 +445,17 @@ mod tests {
     }
 
     impl TetrisGrid {
-        /// ```
-        /// Self::new(4, 6, 2)
-        /// ```
-        fn minimal_new() -> Self {
-            Self::new(4, 6, 2)
-        }
+        const COMPACT_NB_COLUMNS: u32 = 9;
+        const COMPACT_NB_MATRIX_ROWS: u32 = 6;
+        const COMPACT_NB_BUFFER_ROWS: u32 = 2;
 
-        /// ```
-        /// Self::new(9, 6, 2)
-        /// ```
         fn compact_new() -> Self {
             // smallest possible with the formatter playing nice
-            Self::new(9, 6, 2)
+            Self::new(
+                TetrisGrid::COMPACT_NB_COLUMNS,
+                TetrisGrid::COMPACT_NB_MATRIX_ROWS,
+                TetrisGrid::COMPACT_NB_BUFFER_ROWS,
+            )
         }
 
         fn from_str(string: &str) -> Self {
@@ -493,120 +492,77 @@ mod tests {
         }
     }
 
+    #[rstest]
+    #[case(MAX_SMALL_UNSIGNED + 1, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, TetrisGrid::DEFAULT_NB_BUFFER_ROWS)]
+    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, MAX_SMALL_UNSIGNED + 1, TetrisGrid::DEFAULT_NB_BUFFER_ROWS)]
+    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, MAX_SMALL_UNSIGNED + 1)]
     #[should_panic(
         expected = "`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `MAX_SMALL_UNSIGNED`"
     )]
-    #[test]
-    fn new_fails_if_nb_columns_is_too_big() {
-        let _ = TetrisGrid::new(
-            MAX_SMALL_UNSIGNED + 1,
-            TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
-            TetrisGrid::DEFAULT_NB_BUFFER_ROWS,
-        );
+    fn new_panics_if_any_arg_is_too_big(
+        #[case] nb_columns: u32,
+        #[case] nb_matrix_rows: u32,
+        #[case] nb_buffer_rows: u32,
+    ) {
+        TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows);
     }
 
-    #[should_panic(
-        expected = "`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `MAX_SMALL_UNSIGNED`"
-    )]
-    #[test]
-    fn new_fails_if_nb_matrix_rows_is_too_big() {
-        let _ = TetrisGrid::new(
-            TetrisGrid::DEFAULT_NB_COLUMNS,
-            MAX_SMALL_UNSIGNED + 1,
-            TetrisGrid::DEFAULT_NB_BUFFER_ROWS,
-        );
-    }
-
-    #[should_panic(
-        expected = "`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `MAX_SMALL_UNSIGNED`"
-    )]
-    #[test]
-    fn new_fails_if_nb_buffer_rows_is_too_big() {
-        let _ = TetrisGrid::new(
-            TetrisGrid::DEFAULT_NB_COLUMNS,
-            TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
-            MAX_SMALL_UNSIGNED + 1,
-        );
-    }
-
+    #[rstest]
     #[should_panic(expected = "`nb_columns` should be greater than or equal to 4")]
-    #[test]
-    fn new_fails_if_nb_columns_is_too_small() {
-        let _ = TetrisGrid::new(
-            3,
-            TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
-            TetrisGrid::DEFAULT_NB_BUFFER_ROWS,
-        );
-    }
-
+    #[case(
+        3,
+        TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
+        TetrisGrid::DEFAULT_NB_BUFFER_ROWS
+    )]
     #[should_panic(expected = "`nb_matrix_rows` should be greater than or equal to 6")]
-    #[test]
-    fn new_fails_if_nb_matrix_rows_is_too_small() {
-        let _ = TetrisGrid::new(
-            TetrisGrid::DEFAULT_NB_COLUMNS,
-            5,
-            TetrisGrid::DEFAULT_NB_BUFFER_ROWS,
-        );
-    }
-
+    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, 5, TetrisGrid::DEFAULT_NB_BUFFER_ROWS)]
     #[should_panic(expected = "`nb_buffer_rows` should be greater than or equal to 2")]
-    #[test]
-    fn new_fails_if_nb_buffer_rows_is_too_small() {
-        let _ = TetrisGrid::new(
-            TetrisGrid::DEFAULT_NB_COLUMNS,
-            TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
-            1,
-        );
+    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, 1)]
+    fn new_panics_if_any_arg_is_too_small(
+        #[case] nb_columns: u32,
+        #[case] nb_matrix_rows: u32,
+        #[case] nb_buffer_rows: u32,
+    ) {
+        TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows);
     }
 
-    #[test]
-    fn minimal_new_succeeds() {
-        let grid = TetrisGrid::minimal_new();
+    #[rstest]
+    #[case::default(TetrisGrid::default())]
+    #[case::compact(TetrisGrid::compact_new())]
+    #[case::smallest_possible_grid(TetrisGrid::new(4, 6, 2))]
+    #[case::biggest_possible_grid(TetrisGrid::new(
+        MAX_SMALL_UNSIGNED,
+        MAX_SMALL_UNSIGNED,
+        MAX_SMALL_UNSIGNED
+    ))]
+    fn new_doesnt_panic_if_all_args_are_correct(#[case] _grid: TetrisGrid) {}
 
-        assert_eq!(grid.nb_columns, 4);
-        assert_eq!(grid.nb_matrix_rows, 6);
-        assert_eq!(grid.nb_buffer_rows, 2);
+    #[rstest]
+    #[case::default(
+        TetrisGrid::DEFAULT_NB_COLUMNS,
+        TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
+        TetrisGrid::DEFAULT_NB_BUFFER_ROWS
+    )]
+    #[case::biggest_possible(MAX_SMALL_UNSIGNED, MAX_SMALL_UNSIGNED, MAX_SMALL_UNSIGNED)]
+    fn new_is_correct(
+        #[case] nb_columns: u32,
+        #[case] nb_matrix_rows: u32,
+        #[case] nb_buffer_rows: u32,
+    ) {
+        let grid = TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows);
+
+        assert_eq!(grid.nb_columns, nb_columns as i32);
+        assert_eq!(grid.nb_matrix_rows, nb_matrix_rows as i32);
+        assert_eq!(grid.nb_buffer_rows, nb_buffer_rows as i32);
     }
 
-    #[test]
-    fn default_is_correct() {
-        let grid = TetrisGrid::default();
-
-        assert_eq!(grid.nb_columns, TetrisGrid::DEFAULT_NB_COLUMNS as i32);
-        assert_eq!(
-            grid.nb_matrix_rows,
-            TetrisGrid::DEFAULT_NB_MATRIX_ROWS as i32
-        );
-        assert_eq!(
-            grid.nb_buffer_rows,
-            TetrisGrid::DEFAULT_NB_BUFFER_ROWS as i32
-        );
+    #[fixture]
+    fn empty_compact_grid() -> String {
+        TetrisGrid::compact_new().to_string()
     }
 
-    #[test]
-    fn new_is_empty() {
-        let grid = TetrisGrid::compact_new();
-
-        assert_eq!(
-            grid.to_string(),
-            concatln!(
-                "---------",
-                "         ",
-                "         ",
-                "---------",
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-                "---------"
-            )
-        );
-    }
-
-    #[test]
-    fn reset_is_correct() {
+    #[rstest]
+    fn reset_is_empty(#[from(empty_compact_grid)] expected: String) {
         let mut grid = TetrisGrid::from_str(concatln!(
             "---------",
             "         ",
@@ -623,24 +579,7 @@ mod tests {
 
         grid.reset();
 
-        assert_eq!(
-            grid.to_string(),
-            concatln!(
-                "---------",
-                "         ",
-                "         ",
-                "---------",
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-                "---------",
-            ),
-            "Actual grid:\n{}",
-            grid
-        );
+        assert_eq!(grid.to_string(), expected, "Actual grid:\n{}", grid);
     }
 
     #[test]
@@ -709,60 +648,26 @@ mod tests {
         );
     }
 
-    #[test]
-    fn convert_position_y_to_grid_y_is_correct() {
-        let grid = TetrisGrid::minimal_new();
-
-        assert_eq!(
-            grid.convert_position_y_to_grid_y(0),
-            grid.nb_matrix_rows + NB_VISIBLE_BUFFER_ROWS as i32 - 1
-        );
-        assert_eq!(
-            grid.convert_position_y_to_grid_y(1),
-            grid.nb_matrix_rows + NB_VISIBLE_BUFFER_ROWS as i32 - 2
-        );
+    #[rstest]
+    #[case(TetrisGrid::default(), 0, 20 + NB_VISIBLE_BUFFER_ROWS as i32 - 1)]
+    #[case(TetrisGrid::default(), NB_VISIBLE_BUFFER_ROWS as i32, 20 - 1)]
+    fn convert_position_y_to_grid_y_is_correct(
+        #[case] grid: TetrisGrid,
+        #[case] input: i32,
+        #[case] expected: i32,
+    ) {
+        assert_eq!(grid.convert_position_y_to_grid_y(input), expected);
     }
 
-    #[test]
-    fn convert_grid_y_to_position_y_is_correct() {
-        let grid = TetrisGrid::minimal_new();
-
-        assert_eq!(
-            grid.convert_grid_y_to_position_y(grid.nb_matrix_rows - 1),
-            NB_VISIBLE_BUFFER_ROWS as i32
-        );
-        assert_eq!(
-            grid.convert_grid_y_to_position_y(
-                grid.nb_matrix_rows + NB_VISIBLE_BUFFER_ROWS as i32 - 1
-            ),
-            0
-        );
-    }
-
-    #[test]
-    fn convert_position_y_to_grid_y_and_convert_grid_y_to_position_y_are_reciprocal() {
-        let grid = TetrisGrid::minimal_new();
-
-        assert_eq!(
-            grid.convert_position_y_to_grid_y(
-                grid.convert_grid_y_to_position_y(grid.nb_matrix_rows)
-            ),
-            grid.nb_matrix_rows
-        );
-        assert_eq!(
-            grid.convert_grid_y_to_position_y(
-                grid.convert_position_y_to_grid_y(grid.nb_matrix_rows)
-            ),
-            grid.nb_matrix_rows
-        );
-        assert_eq!(
-            grid.convert_position_y_to_grid_y(grid.convert_grid_y_to_position_y(0)),
-            0
-        );
-        assert_eq!(
-            grid.convert_grid_y_to_position_y(grid.convert_position_y_to_grid_y(0)),
-            0
-        );
+    #[rstest]
+    #[case(TetrisGrid::default(), 20 - 1, NB_VISIBLE_BUFFER_ROWS as i32)]
+    #[case(TetrisGrid::default(), 20 + NB_VISIBLE_BUFFER_ROWS as i32 - 1, 0)]
+    fn convert_grid_y_to_position_y_is_correct(
+        #[case] grid: TetrisGrid,
+        #[case] input: i32,
+        #[case] expected: i32,
+    ) {
+        assert_eq!(grid.convert_grid_y_to_position_y(input), expected);
     }
 
     #[test]
@@ -788,49 +693,50 @@ mod tests {
 
         assert!(!grid.is_block_empty(&Position::new(0, 2)));
         assert!(grid.is_block_empty(&Position::new(8, 2)));
-        assert!(!grid.is_block_empty(&Position::new(8, 7)));
+        assert!(!grid.is_block_empty(&Position::new(0, 7)));
         assert!(!grid.is_block_empty(&Position::new(8, 7)));
     }
 
-    #[test]
+    #[rstest]
+    #[case(TetrisGrid::default(), Position::new(-1, -18))]
+    #[case(TetrisGrid::default(), Position::new(0, -19))]
+    #[case(TetrisGrid::default(), Position::new(10, 21))]
+    #[case(TetrisGrid::default(), Position::new(9, 22))]
     #[should_panic]
-    fn is_block_empty_panics_outside_of_the_grid() {
-        let grid = TetrisGrid::compact_new();
-
-        grid.is_block_empty(&Position::new(0, 8));
+    fn is_block_empty_panics_outside_of_the_grid(#[case] grid: TetrisGrid, #[case] pos: Position) {
+        grid.is_block_empty(&pos);
     }
 
-    fn grid_has_topleft_and_bottomright_corners(grid: &TetrisGrid, topleft: &Position, bottomright: &Position) {
-        assert!(grid.contains(topleft));
-        assert!(grid.contains(bottomright));
+    #[rstest]
+    #[case(TetrisGrid::default(), Position::new(0, -18), Position::new(9, 21))]
+    #[case(TetrisGrid::new(4, 6, 2), Position::new(0, 0), Position::new(3, 7))]
+    fn contains_is_correct(
+        #[case] grid: TetrisGrid,
+        #[case] top_left: Position,
+        #[case] bottom_right: Position,
+    ) {
+        assert!(grid.contains(&top_left));
+        assert!(grid.contains(&bottom_right));
 
         // neighbors of the grid corners that are outside of the grid
         // horizontal offset :
-        assert!(!grid.contains(&(*topleft + Position::new(-1, 0))));
-        assert!(!grid.contains(&(*bottomright + Position::new(1, 0))));
+        assert!(!grid.contains(&(top_left + Position::new(-1, 0))));
+        assert!(!grid.contains(&(bottom_right + Position::new(1, 0))));
         // vertical offset :
-        assert!(!grid.contains(&(*topleft + Position::new(0, -1))));
-        assert!(!grid.contains(&(*bottomright + Position::new(0, 1))));   
+        assert!(!grid.contains(&(top_left + Position::new(0, -1))));
+        assert!(!grid.contains(&(bottom_right + Position::new(0, 1))));
     }
 
-    #[test]
-    fn contains_is_correct() {
-        let grid = TetrisGrid::minimal_new();
-        grid_has_topleft_and_bottomright_corners(&grid, &Position::new(0, 0), &Position::new(3, 7));
-
-
-        let grid = TetrisGrid::default();
-        grid_has_topleft_and_bottomright_corners(&grid, &Position::new(0, -18), &Position::new(9, 21));
-    }
-
-    #[test]
-    fn is_block_available_returns_false_outside_of_the_grid() {
-        let grid = TetrisGrid::compact_new();
-
-        assert!(!grid.is_block_available(&Position::new(0, -1)));
-        assert!(!grid.is_block_available(&Position::new(-1, 0)));
-        assert!(!grid.is_block_available(&Position::new(3, 8)));
-        assert!(!grid.is_block_available(&Position::new(4, 7)));
+    #[rstest]
+    #[case(TetrisGrid::default(), Position::new(-1, -18))]
+    #[case(TetrisGrid::default(), Position::new(0, -19))]
+    #[case(TetrisGrid::default(), Position::new(10, 21))]
+    #[case(TetrisGrid::default(), Position::new(9, 22))]
+    fn is_block_available_returns_false_outside_of_the_grid(
+        #[case] grid: TetrisGrid,
+        #[case] outside_pos: Position,
+    ) {
+        assert!(!grid.is_block_available(&outside_pos));
     }
 
     #[test]
