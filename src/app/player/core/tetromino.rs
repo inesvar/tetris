@@ -24,71 +24,6 @@ pub(crate) struct Tetromino {
 }
 
 impl Tetromino {
-    pub(in crate::app::player) fn try_fall(&mut self, grid: &TetrisGrid) -> bool {
-        let movement = RotationTranslation::fall();
-        self.try_move(grid, &movement)
-    }
-
-    pub(in crate::app::player) fn hard_drop(&mut self, grid: &TetrisGrid) {
-        if self.try_fall(grid) {
-            self.hard_drop(grid);
-        }
-    }
-
-    pub(in crate::app::player) fn left(&mut self, grid: &TetrisGrid) {
-        let movement = RotationTranslation::left();
-        let _ = self.try_move(grid, &movement);
-    }
-
-    pub(in crate::app::player) fn right(&mut self, grid: &TetrisGrid) {
-        let movement = RotationTranslation::right();
-        let _ = self.try_move(grid, &movement);
-    }
-
-    pub(in crate::app::player) fn turn_half_turn(&mut self, grid: &TetrisGrid) {
-        if self.kind == TetrominoKind::O {
-            return;
-        };
-        let movement = RotationTranslation::rotation(RotationType::HalfTurn, &self.center);
-        let _ = self.try_move(grid, &movement);
-    }
-
-    pub(in crate::app::player) fn turn_clockwise(&mut self, grid: &TetrisGrid) {
-        if self.kind == TetrominoKind::O {
-            return;
-        };
-        let wall_kicks_translations = TetrominoKind::wall_kick_translations(
-            &self.kind,
-            RotationType::Clockwise,
-            self.direction,
-        );
-        for wall_kick in wall_kicks_translations {
-            let movement =
-                RotationTranslation::new(wall_kick, RotationType::Clockwise, &self.center);
-            if self.try_move(grid, &movement) {
-                return;
-            }
-        }
-    }
-
-    pub(in crate::app::player) fn turn_counterclockwise(&mut self, grid: &TetrisGrid) {
-        if self.kind == TetrominoKind::O {
-            return;
-        };
-        let wall_kicks_translations = TetrominoKind::wall_kick_translations(
-            &self.kind,
-            RotationType::Counterclockwise,
-            self.direction,
-        );
-        for wall_kick in wall_kicks_translations {
-            let movement =
-                RotationTranslation::new(wall_kick, RotationType::Counterclockwise, &self.center);
-            if self.try_move(grid, &movement) {
-                return;
-            }
-        }
-    }
-
     pub(in crate::app::player) fn new(kind: TetrominoKind) -> Tetromino {
         let positions = kind.get_initial_position();
         Tetromino {
@@ -164,8 +99,11 @@ impl Tetromino {
 }
 
 impl Tetromino {
-    #[allow(unused)]
-    fn apply(&mut self, tetromino_move: &TetrominoMove, grid: &TetrisGrid) -> bool {
+    pub(in crate::app::player) fn apply(
+        &mut self,
+        tetromino_move: TetrominoMove,
+        grid: &TetrisGrid,
+    ) -> bool {
         if RotationType::from(tetromino_move) == RotationType::None {
             self.apply_translation(tetromino_move, grid)
         } else if self.kind != TetrominoKind::O {
@@ -175,8 +113,7 @@ impl Tetromino {
         }
     }
 
-    #[allow(unused)]
-    fn apply_translation(&mut self, tetromino_move: &TetrominoMove, grid: &TetrisGrid) -> bool {
+    fn apply_translation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
         let translation = RotationTranslation::translation(tetromino_move.into());
         let moved = self.try_move(grid, &translation);
 
@@ -187,8 +124,7 @@ impl Tetromino {
         moved
     }
 
-    #[allow(unused)]
-    fn apply_rotation(&mut self, tetromino_move: &TetrominoMove, grid: &TetrisGrid) -> bool {
+    fn apply_rotation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
         let rotation_type = RotationType::from(tetromino_move);
 
         let wall_kicks_translations =
@@ -308,7 +244,7 @@ mod tests {
             corrected_rotation.translation = translation;
             let _ = naive_i_tetromino.try_move(&empty_grid, &corrected_rotation);
 
-            i_tetromino.turn_clockwise(&empty_grid);
+            i_tetromino.apply(TetrominoMove::Clockwise, &empty_grid);
 
             println!(
                 "{:?}\n{:?}\n{:?}\n{:?}",
@@ -332,7 +268,7 @@ mod tests {
             corrected_rotation.translation = translation;
             let _ = naive_i_tetromino.try_move(&empty_grid, &corrected_rotation);
 
-            i_tetromino.turn_counterclockwise(&empty_grid);
+            i_tetromino.apply(TetrominoMove::Counterclockwise, &empty_grid);
 
             println!(
                 "{:?}\n{:?}\n{:?}\n{:?}",

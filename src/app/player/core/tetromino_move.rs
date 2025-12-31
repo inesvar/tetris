@@ -2,7 +2,7 @@
 use super::rotation_translation::RotationType;
 use super::spatial_primitives::Position;
 
-#[derive(PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub(in crate::app::player) enum TetrominoMove {
     Right,
     Left,
@@ -23,8 +23,8 @@ impl TetrominoMove {
     }
 }
 
-impl From<&TetrominoMove> for Position {
-    fn from(value: &TetrominoMove) -> Self {
+impl From<TetrominoMove> for Position {
+    fn from(value: TetrominoMove) -> Self {
         match value {
             TetrominoMove::Fall | TetrominoMove::HardDrop => Position::FALL,
             TetrominoMove::Right => Position::RIGHT,
@@ -34,8 +34,8 @@ impl From<&TetrominoMove> for Position {
     }
 }
 
-impl From<&TetrominoMove> for RotationType {
-    fn from(value: &TetrominoMove) -> Self {
+impl From<TetrominoMove> for RotationType {
+    fn from(value: TetrominoMove) -> Self {
         match value {
             TetrominoMove::Clockwise => Self::Clockwise,
             TetrominoMove::Counterclockwise => Self::Counterclockwise,

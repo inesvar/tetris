@@ -1,6 +1,7 @@
 //! Define the update function of [LocalPlayer].
 //!
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
+use super::core::TetrominoMove;
 use super::LocalPlayer;
 use crate::settings::Keybindings;
 
@@ -48,7 +49,7 @@ impl LocalPlayer {
                 && !self
                     .player_screen
                     .active_tetromino
-                    .try_fall(&self.player_screen.grid)
+                    .apply(TetrominoMove::Fall, &self.player_screen.grid)
                 && self.freeze_frame < frame_counter
             {
                 // if the tetromino reaches the bottom, set the freeze_frame
@@ -60,14 +61,14 @@ impl LocalPlayer {
             {
                 self.player_screen
                     .active_tetromino
-                    .left(&self.player_screen.grid);
+                    .apply(TetrominoMove::Left, &self.player_screen.grid);
             }
             if self.keyboard.is_long_pressed(&keybindings.right_keys)
                 && !self.keyboard.is_long_pressed(&keybindings.left_keys)
             {
                 self.player_screen
                     .active_tetromino
-                    .right(&self.player_screen.grid);
+                    .apply(TetrominoMove::Right, &self.player_screen.grid);
             }
         }
 
@@ -83,7 +84,7 @@ impl LocalPlayer {
             && !self
                 .player_screen
                 .active_tetromino
-                .try_fall(&self.player_screen.grid)
+                .apply(TetrominoMove::Fall, &self.player_screen.grid)
             && self.freeze_frame < frame_counter
         {
             // if the tetromino reaches the bottom, set the freeze_frame
@@ -101,7 +102,7 @@ impl LocalPlayer {
             && !self
                 .player_screen
                 .active_tetromino
-                .try_fall(&self.player_screen.grid)
+                .apply(TetrominoMove::Fall, &self.player_screen.grid)
         {
             let _ = self.lock_down_tetromino();
         }
@@ -117,7 +118,7 @@ impl LocalPlayer {
 
         // Updates the ghost_tetromino
         let mut ghost = self.player_screen.active_tetromino;
-        ghost.hard_drop(&self.player_screen.grid);
+        ghost.apply(TetrominoMove::HardDrop, &self.player_screen.grid);
         self.player_screen.ghost_tetromino = Some(ghost);
 
         // Send the player_screen data if necessary

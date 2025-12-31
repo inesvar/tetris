@@ -51,26 +51,6 @@ impl RotationTranslation {
         }
     }
 
-    pub(super) const fn fall() -> Self {
-        RotationTranslation::translation(Position::FALL)
-    }
-
-    pub(super) const fn right() -> Self {
-        RotationTranslation::translation(Position::RIGHT)
-    }
-
-    pub(super) const fn left() -> Self {
-        RotationTranslation::translation(Position::LEFT)
-    }
-
-    pub(super) const fn rotation(rotation_type: RotationType, rotation_center: &Position) -> Self {
-        Self {
-            rotation_type,
-            rotation_center: *rotation_center,
-            ..Self::identity()
-        }
-    }
-
     #[cfg(test)]
     pub(super) const fn centered_rotation(rotation_type: RotationType) -> Self {
         Self {
