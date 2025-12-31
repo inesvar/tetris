@@ -18,7 +18,6 @@ pub(crate) struct Tetromino {
     kind: TetrominoKind,
     center: Position,
     pub(super) blocks: [Position; 4],
-    pub(in crate::app::player) color: TetrisColor,
     direction: Direction,
 }
 
@@ -94,7 +93,6 @@ impl UseTetromino for Tetromino {
             kind,
             center: positions[0],
             blocks: [positions[1], positions[2], positions[3], positions[4]],
-            color: kind.into(),
             direction: Direction::default(),
         }
     }
@@ -150,7 +148,7 @@ impl UseTetromino for Tetromino {
     }
 
     fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
-        grid.add_blocks_and_clear_lines(&self.blocks, self.color)
+        grid.add_blocks_and_clear_lines(&self.blocks, self.color())
     }
 }
 
@@ -186,6 +184,10 @@ impl Tetromino {
     pub(in crate::app::player) fn blocks(&self) -> &[Position] {
         &self.blocks
     }
+
+    pub(in crate::app::player) fn color(&self) -> TetrisColor {
+        self.kind.into()
+    }
 }
 
 /// `Tetromino::default` is far from the origin and is not renderer on the screen.
@@ -195,7 +197,6 @@ impl Default for Tetromino {
             kind: TetrominoKind::O,
             center: Position::default(),
             blocks: [Position::new(-50, -50); 4],
-            color: TetrisColor::Yellow,
             direction: Direction::default(),
         }
     }

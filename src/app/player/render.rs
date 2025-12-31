@@ -119,7 +119,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisGrid {
 impl Render<Piston2dGraphicsArguments<'_, '_>> for Tetromino {
     fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>) {
         for block in self.blocks() {
-            render_tetris_block(block, &self.color, gl_ctx);
+            render_tetris_block(block, &self.color(), gl_ctx);
         }
     }
 }
