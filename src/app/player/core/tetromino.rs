@@ -101,7 +101,7 @@ impl Tetromino {
         tetromino_move: TetrominoMove,
         grid: &TetrisGrid,
     ) -> bool {
-        if RotationType::from(tetromino_move) == RotationType::Identity {
+        if tetromino_move.get_rotation_type() == RotationType::Identity {
             self.apply_translation(tetromino_move, grid)
         } else if self.kind != TetrominoKind::O {
             self.apply_rotation(tetromino_move, grid)
@@ -111,7 +111,7 @@ impl Tetromino {
     }
 
     fn apply_translation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
-        let translation = RotationTranslation::translation(tetromino_move.into());
+        let translation = RotationTranslation::translation(tetromino_move.get_translation());
         let moved = self.try_move(grid, &translation);
 
         if tetromino_move.is_repeated() {
@@ -122,7 +122,7 @@ impl Tetromino {
     }
 
     fn apply_rotation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
-        let rotation_type = RotationType::from(tetromino_move);
+        let rotation_type = tetromino_move.get_rotation_type();
 
         let wall_kicks_translations =
             TetrominoKind::wall_kick_translations(&self.kind, rotation_type, self.direction);
