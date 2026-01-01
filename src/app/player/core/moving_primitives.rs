@@ -62,7 +62,6 @@ impl ApplyRotationTranslation for Position {
 impl ApplyRotationTranslation for Direction {
     fn translate_by(&mut self, _movement: &RotationTranslation) {}
 
-    // TODO: move this to rotation_translation so there's something to test there
     fn turn_around_block_center(&mut self, movement: &RotationTranslation) {
         match movement.rotation_type {
             RotationType::Clockwise => {

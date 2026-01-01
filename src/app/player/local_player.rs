@@ -1,5 +1,5 @@
 //! Define the general implementation of [LocalPlayer].
-use super::core::{TetrisGrid, Tetromino};
+use super::core::{new_tetromino_bag, TetrisGrid, Tetromino};
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
 };
@@ -57,7 +57,7 @@ impl LocalPlayer {
         self.player_screen.saved_tetromino = None;
         self.player_screen.ghost_tetromino = None;
         self.rng = Pcg32::seed_from_u64(seed);
-        self.bag_of_tetromino = Tetromino::new_tetromino_bag(BAG_SIZE, &mut self.rng);
+        self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
         self.player_screen.active_tetromino = Tetromino::from(self.bag_of_tetromino.pop().unwrap());
         self.player_screen.fifo_next_tetromino =
             CircularBuffer::new([Tetromino::default(); NB_NEXT_TETROMINO]);
@@ -67,7 +67,7 @@ impl LocalPlayer {
                     .fifo_next_tetromino
                     .push(Tetromino::from(kind));
             } else {
-                self.bag_of_tetromino = Tetromino::new_tetromino_bag(BAG_SIZE, &mut self.rng);
+                self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
                 if let Some(kind) = self.bag_of_tetromino.pop() {
                     self.player_screen
                         .fifo_next_tetromino
@@ -134,7 +134,7 @@ impl LocalPlayer {
     pub(super) fn get_new_tetromino(&mut self) {
         // Refill the bag if necessary
         if self.bag_of_tetromino.is_empty() {
-            self.bag_of_tetromino = Tetromino::new_tetromino_bag(BAG_SIZE, &mut self.rng);
+            self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
         }
         // Check if there's enough place on the grid for a new tetromino
         // TODO this should be done using the grid method and probably all other calls
