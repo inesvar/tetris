@@ -70,6 +70,16 @@ const fn init(x: i32, y: i32) -> Position {
 }
 
 impl TetrominoKind {
+    pub(super) const ALL: [Self; 7] = [
+        Self::I,
+        Self::J,
+        Self::L,
+        Self::O,
+        Self::S,
+        Self::T,
+        Self::Z,
+    ];
+
     /// Return the initial position of the center and the blocks.
     pub(super) fn get_initial_position(&self) -> [Position; 5] {
         // cf https://tetris.fandom.com/wiki/SRS#Spawn_Orientation_and_Location

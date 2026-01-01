@@ -5,6 +5,7 @@ mod rotation_translation;
 mod spatial_primitives;
 mod tetris_grid;
 mod tetromino;
+mod tetromino_bag;
 mod tetromino_kind;
 mod tetromino_move;
 
