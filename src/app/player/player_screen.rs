@@ -12,7 +12,7 @@ impl PlayerScreen {
             new_completed_lines: 0,
             active_tetromino: Tetromino::default(),
             saved_tetromino: None,
-            fifo_next_tetromino: CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new(),
+            fifo_next_tetromino: CircularBuffer::new([Tetromino::default(); NB_NEXT_TETROMINO]),
             ghost_tetromino: None,
             serialize_as_msg: true.into(),
         }

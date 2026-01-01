@@ -15,7 +15,7 @@ impl LocalPlayer {
         let rng = Pcg32::seed_from_u64(0);
         let bag_of_tetromino = Vec::new();
         let first_tetromino = Tetromino::default();
-        let fifo_next_tetromino = CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
+        let fifo_next_tetromino = CircularBuffer::new([Tetromino::default(); NB_NEXT_TETROMINO]);
         let mut remote_ip = String::from("");
         let mut sender = false;
         if let PlayerConfig::TwoRemote {
@@ -60,7 +60,7 @@ impl LocalPlayer {
         self.bag_of_tetromino = Tetromino::new_tetromino_bag(BAG_SIZE, &mut self.rng);
         self.player_screen.active_tetromino = Tetromino::from(self.bag_of_tetromino.pop().unwrap());
         self.player_screen.fifo_next_tetromino =
-            CircularBuffer::<NB_NEXT_TETROMINO, Tetromino>::new();
+            CircularBuffer::new([Tetromino::default(); NB_NEXT_TETROMINO]);
         for _ in 0..NB_NEXT_TETROMINO {
             if let Some(kind) = self.bag_of_tetromino.pop() {
                 self.player_screen

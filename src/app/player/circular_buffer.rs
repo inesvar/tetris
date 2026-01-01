@@ -40,9 +40,9 @@ where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
     /// Construct a new circular buffer of size K for type T.
-    pub(super) fn new() -> Self {
+    pub(super) fn new(array: [T; K]) -> Self {
         CircularBuffer::<K, T> {
-            array: [T::default(); K],
+            array,
             begin: 0,
             size: 0,
         }
