@@ -50,12 +50,4 @@ impl RotationTranslation {
             ..Self::identity()
         }
     }
-
-    #[cfg(test)]
-    pub(super) const fn centered_rotation(rotation_type: RotationType) -> Self {
-        Self {
-            rotation_type,
-            ..Self::identity()
-        }
-    }
 }

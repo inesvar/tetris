@@ -125,6 +125,30 @@ mod tests {
     use super::*;
     use rstest::rstest;
 
+    impl RotationTranslation {
+        const fn centered_rotation(rotation_type: RotationType) -> Self {
+            Self {
+                rotation_type,
+                ..Self::identity()
+            }
+        }
+
+        const fn rotation(rotation_type: RotationType, rotation_center: &Position) -> Self {
+            Self {
+                rotation_type,
+                rotation_center: *rotation_center,
+                ..Self::identity()
+            }
+        }
+
+        const fn right() -> Self {
+            Self {
+                translation: Position::RIGHT,
+                ..Self::identity()
+            }
+        }
+    }
+
     #[rstest]
     #[case(Position::new(0, 0), Position::new(0, 0))]
     #[case(Position::new(1, 0), Position::new(2, 0))]
