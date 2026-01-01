@@ -11,7 +11,6 @@ where
 {
     array: [T; K],
     begin: usize,
-    size: usize,
 }
 
 impl<const K: usize, T: Default + Copy + Serialize + Debug> Display for CircularBuffer<K, T>
@@ -19,7 +18,7 @@ where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "begin {}, size {}, content", self.begin, self.size)?;
+        write!(f, "begin {}, content", self.begin)?;
         for i in 0..K {
             write!(f, " {:?}", self.array[i])?;
         }
@@ -36,7 +35,6 @@ where
         CircularBuffer::<K, T> {
             array,
             begin: 0,
-            size: K,
         }
     }
 
@@ -55,7 +53,7 @@ where
     /// Get the i-th element in the buffer.
     pub(super) fn get(&self, i: usize) -> Option<T> {
         //println!("getting {i} from {}", self);
-        if i < self.size {
+        if i < K {
             Some(self.array[(self.begin + i) % K])
         } else {
             None
@@ -75,7 +73,6 @@ mod tests {
     where
         [usize; K]: Serialize + for<'a> Deserialize<'a>,
     {
-        assert_eq!(buffer.size, K);
         assert_eq!(buffer.begin, 0);
     }
 
@@ -86,10 +83,10 @@ mod tests {
     where
         [usize; K]: Serialize + for<'a> Deserialize<'a>,
     {
-        for i in 0..buffer.size {
+        for i in 0..K {
             assert_eq!(buffer.get(i), Some(i));
         }
-        assert_eq!(buffer.get(buffer.size), None);
+        assert_eq!(buffer.get(K), None);
     }
 
     #[rstest]
@@ -102,16 +99,14 @@ mod tests {
         let mut replacement;
         for i in 0..K {
             replacement = i;
-            assert_eq!(buffer.size, K, "{}", buffer);
             assert_eq!(buffer.begin, i, "{}", buffer);
             buffer.get_front_push_back(&mut replacement);
-            assert_eq!(buffer.get(buffer.size - 1), Some(i), "{}", buffer);
+            assert_eq!(buffer.get(K - 1), Some(i), "{}", buffer);
         }
         replacement = K;
-        assert_eq!(buffer.size, K, "{}", buffer);
         assert_eq!(buffer.begin, 0, "{}", buffer);
         buffer.get_front_push_back(&mut replacement);
-        assert_eq!(buffer.get(buffer.size - 1), Some(K), "{}", buffer);
+        assert_eq!(buffer.get(K - 1), Some(K), "{}", buffer);
     }
 
     #[rstest]
@@ -124,13 +119,11 @@ mod tests {
         let mut replacement;
         for i in 0..K {
             replacement = i;
-            assert_eq!(buffer.size, K, "{}", buffer);
             assert_eq!(buffer.begin, (K - i) % K, "{}", buffer);
             buffer.get_back_push_front(&mut replacement);
             assert_eq!(buffer.get(0), Some(i), "{}", buffer);
         }
         replacement = K;
-        assert_eq!(buffer.size, K, "{}", buffer);
         assert_eq!(buffer.begin, 0, "{}", buffer);
         buffer.get_back_push_front(&mut replacement);
         assert_eq!(buffer.get(0), Some(K), "{}", buffer);
