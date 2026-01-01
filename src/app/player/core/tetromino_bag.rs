@@ -1,6 +1,5 @@
-#![allow(unused)]
 use super::{Deserialize, Serialize, TetrominoKind};
-use rand::{seq::SliceRandom, SeedableRng};
+use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
 use std::array;
 
@@ -72,6 +71,7 @@ impl BagType {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::SeedableRng;
     use rstest::rstest;
 
     #[rstest]
