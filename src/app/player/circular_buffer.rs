@@ -44,7 +44,7 @@ where
         CircularBuffer::<K, T> {
             array,
             begin: 0,
-            size: 0,
+            size: K,
         }
     }
 
@@ -94,5 +94,26 @@ where
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const FIVE: usize = 5;
+    const SIX: usize = 6;
+
+    #[test]
+    fn new_has_maximum_length() {
+        assert_eq!(CircularBuffer::new([0; FIVE]).size, FIVE);
+        assert_eq!(CircularBuffer::new([0; SIX]).size, SIX);
+    }
+
+
+    #[test]
+    fn new_has_begin_zero() {
+        assert_eq!(CircularBuffer::new([0; FIVE]).begin, 0);
+        assert_eq!(CircularBuffer::new([0; SIX]).begin, 0);
     }
 }
