@@ -2,7 +2,7 @@
 //!
 //! This module uses [core] to make the tetromino move according to the player's commands.
 //! It also generates new tetromino pieces and handles the queue of next pieces.
-mod circular_buffer;
+mod circular_array;
 mod core;
 mod handle_key_player;
 mod local_player;
@@ -13,7 +13,7 @@ mod update_player;
 
 pub(in crate::app::player) use self::core::Tetromino;
 use self::{
-    circular_buffer::CircularBuffer,
+    circular_array::CircularArray,
     core::{TetrisGrid, TetrominoBag},
     pressed_keys::PressedKeys,
 };
@@ -69,7 +69,7 @@ pub struct PlayerScreen {
     /// The held tetromino piece rendered in the corner.
     pub saved_tetromino: Option<Tetromino>,
     /// Next tetromino pieces rendered on the side.
-    pub fifo_next_tetromino: CircularBuffer<NB_NEXT_TETROMINO, Tetromino>,
+    pub fifo_next_tetromino: CircularArray<NB_NEXT_TETROMINO, Tetromino>,
     /// The shade of the active tetromino after hard drop.
     pub ghost_tetromino: Option<Tetromino>,
     /// Flag not to be modified except in Serialize. Set to true.

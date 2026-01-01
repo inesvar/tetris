@@ -7,9 +7,7 @@ use super::{
     tetromino_move::TetrominoMove,
     Deserialize, Serialize, TetrisColor, TetrisGrid, TetrominoKind,
 };
-use core::fmt::Display;
 use simple_mermaid::mermaid;
-use std::fmt::Formatter;
 
 /// Tetromino.
 #[doc = mermaid!("tetromino.mmd")]
@@ -144,13 +142,6 @@ impl Default for Tetromino {
             blocks: [Position::new(-50, -50); 4],
             direction: Direction::default(),
         }
-    }
-}
-
-// Required by `CircularBuffer`.
-impl Display for Tetromino {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "{:?}", self.kind)
     }
 }
 

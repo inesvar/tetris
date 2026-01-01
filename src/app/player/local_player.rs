@@ -1,8 +1,6 @@
 //! Define the general implementation of [LocalPlayer].
 use super::core::{GameOverError, TetrisGrid, Tetromino, TetrominoBag};
-use super::{
-    circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
-};
+use super::{circular_array::CircularArray, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen};
 use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
@@ -14,7 +12,7 @@ impl LocalPlayer {
         let rng = Pcg32::seed_from_u64(0);
         let bag_of_tetromino = TetrominoBag::default();
         let first_tetromino = Tetromino::default();
-        let fifo_next_tetromino = CircularBuffer::new([Tetromino::default(); NB_NEXT_TETROMINO]);
+        let fifo_next_tetromino = CircularArray::new([Tetromino::default(); NB_NEXT_TETROMINO]);
         let mut remote_ip = String::from("");
         let mut sender = false;
         if let PlayerConfig::TwoRemote {
@@ -58,7 +56,7 @@ impl LocalPlayer {
         self.rng = Pcg32::seed_from_u64(seed);
         self.bag_of_tetromino = TetrominoBag::default();
         self.player_screen.active_tetromino = self.bag_of_tetromino.get(&mut self.rng).into();
-        self.player_screen.fifo_next_tetromino = CircularBuffer::new(
+        self.player_screen.fifo_next_tetromino = CircularArray::new(
             self.bag_of_tetromino
                 .get_chunk::<NB_NEXT_TETROMINO>(&mut self.rng)
                 .map(|kind| kind.into()),
@@ -125,8 +123,7 @@ impl LocalPlayer {
         self.player_screen
             .fifo_next_tetromino
             .get_front_push_back(&mut swap);
-        if swap.can_enter_grid(&self.player_screen.grid) == Err(GameOverError::BlockOut)
-        {
+        if swap.can_enter_grid(&self.player_screen.grid) == Err(GameOverError::BlockOut) {
             // Set the game_over flag and return the tetromino to the bag.
             self.declare_game_over();
             self.player_screen

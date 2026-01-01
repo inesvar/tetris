@@ -1,11 +1,11 @@
-//! Define [CircularBuffer] and methods to use it.
+//! Define [CircularArray] and methods to use it.
 use core::fmt::{Debug, Display};
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 
 /// Push back pop front circular buffer.
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CircularBuffer<const K: usize, T: Default + Copy + Serialize + Debug>
+pub struct CircularArray<const K: usize, T: Default + Copy + Serialize + Debug>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
@@ -13,7 +13,7 @@ where
     begin: usize,
 }
 
-impl<const K: usize, T: Default + Copy + Serialize + Debug> Display for CircularBuffer<K, T>
+impl<const K: usize, T: Default + Copy + Serialize + Debug> Display for CircularArray<K, T>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
@@ -26,16 +26,13 @@ where
     }
 }
 
-impl<const K: usize, T: Default + Copy + Serialize + Debug> CircularBuffer<K, T>
+impl<const K: usize, T: Default + Copy + Serialize + Debug> CircularArray<K, T>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
     /// Construct a new circular buffer of size K for type T.
     pub(super) fn new(array: [T; K]) -> Self {
-        CircularBuffer::<K, T> {
-            array,
-            begin: 0,
-        }
+        CircularArray::<K, T> { array, begin: 0 }
     }
 
     pub(super) fn get_front_push_back(&mut self, replacement: &mut T) {
@@ -67,9 +64,9 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case(CircularBuffer::new([0; 5]))]
-    #[case(CircularBuffer::new([10; 4]))]
-    fn new_is_correct<const K: usize>(#[case] buffer: CircularBuffer<K, usize>)
+    #[case(CircularArray::new([0; 5]))]
+    #[case(CircularArray::new([10; 4]))]
+    fn new_is_correct<const K: usize>(#[case] buffer: CircularArray<K, usize>)
     where
         [usize; K]: Serialize + for<'a> Deserialize<'a>,
     {
@@ -77,9 +74,9 @@ mod tests {
     }
 
     #[rstest]
-    #[case(CircularBuffer::new([0, 1, 2, 3, 4]))]
-    #[case(CircularBuffer::new([0, 1, 2, 3]))]
-    fn get_is_correct<const K: usize>(#[case] buffer: CircularBuffer<K, usize>)
+    #[case(CircularArray::new([0, 1, 2, 3, 4]))]
+    #[case(CircularArray::new([0, 1, 2, 3]))]
+    fn get_is_correct<const K: usize>(#[case] buffer: CircularArray<K, usize>)
     where
         [usize; K]: Serialize + for<'a> Deserialize<'a>,
     {
@@ -90,9 +87,9 @@ mod tests {
     }
 
     #[rstest]
-    #[case(CircularBuffer::new([55, 22, 33]))]
-    #[case(CircularBuffer::new([44, 66, 0, 88]))]
-    fn get_front_push_back_is_correct<const K: usize>(#[case] mut buffer: CircularBuffer<K, usize>)
+    #[case(CircularArray::new([55, 22, 33]))]
+    #[case(CircularArray::new([44, 66, 0, 88]))]
+    fn get_front_push_back_is_correct<const K: usize>(#[case] mut buffer: CircularArray<K, usize>)
     where
         [usize; K]: Serialize + for<'a> Deserialize<'a>,
     {
@@ -110,9 +107,9 @@ mod tests {
     }
 
     #[rstest]
-    #[case(CircularBuffer::new([55, 22, 33]))]
-    #[case(CircularBuffer::new([44, 66, 0, 88]))]
-    fn get_back_push_front_is_correct<const K: usize>(#[case] mut buffer: CircularBuffer<K, usize>)
+    #[case(CircularArray::new([55, 22, 33]))]
+    #[case(CircularArray::new([44, 66, 0, 88]))]
+    fn get_back_push_front_is_correct<const K: usize>(#[case] mut buffer: CircularArray<K, usize>)
     where
         [usize; K]: Serialize + for<'a> Deserialize<'a>,
     {
