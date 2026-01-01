@@ -22,9 +22,8 @@ pub(crate) struct Tetromino {
     direction: Direction,
 }
 
-#[doc = mermaid!("tetromino_internals.mmd")]
-impl Tetromino {
-    pub(in crate::app::player) fn new(kind: TetrominoKind) -> Tetromino {
+impl From<TetrominoKind> for Tetromino {
+    fn from(kind: TetrominoKind) -> Tetromino {
         let positions = kind.get_initial_position();
         Tetromino {
             kind,
@@ -33,9 +32,12 @@ impl Tetromino {
             direction: Direction::default(),
         }
     }
+}
 
+#[doc = mermaid!("tetromino_internals.mmd")]
+impl Tetromino {
     pub(in crate::app::player) fn reset(&mut self) {
-        *self = Self::new(self.kind)
+        *self = Self::from(self.kind)
     }
 
     pub(in crate::app::player) fn new_tetromino_bag(
@@ -215,8 +217,8 @@ mod tests {
     #[test]
     fn i_tetromino_rotation_is_correct() {
         let empty_grid = TetrisGrid::default();
-        let mut i_tetromino = Tetromino::new(TetrominoKind::I);
-        let mut naive_i_tetromino = Tetromino::new(TetrominoKind::I);
+        let mut i_tetromino = Tetromino::from(TetrominoKind::I);
+        let mut naive_i_tetromino = Tetromino::from(TetrominoKind::I);
         naive_i_tetromino.kind = TetrominoKind::T;
 
         println!(
