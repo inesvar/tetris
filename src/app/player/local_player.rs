@@ -121,21 +121,20 @@ impl LocalPlayer {
         // Check if there's enough place on the grid for a new tetromino
         // TODO this should be done using the grid method and probably all other calls
         // using null()...
-        let mut possible_active = self.player_screen.fifo_next_tetromino.pop_front().unwrap();
-        if possible_active.can_enter_grid(&self.player_screen.grid) == Err(GameOverError::BlockOut)
+        let mut swap = self.bag_of_tetromino.get(&mut self.rng).into();
+        self.player_screen
+            .fifo_next_tetromino
+            .get_front_push_back(&mut swap);
+        if swap.can_enter_grid(&self.player_screen.grid) == Err(GameOverError::BlockOut)
         {
             // Set the game_over flag and return the tetromino to the bag.
             self.declare_game_over();
             self.player_screen
                 .fifo_next_tetromino
-                .push_front(possible_active);
+                .get_back_push_front(&mut swap);
             return;
         }
-        // Add a new tetromino to the file to replace the one that was taken
-        self.player_screen
-            .fifo_next_tetromino
-            .push(self.bag_of_tetromino.get(&mut self.rng).into());
-        self.player_screen.active_tetromino = possible_active;
+        self.player_screen.active_tetromino = swap;
     }
 
     /// Sends the player screen to the remote player and resets the new_completed_lines attribute.

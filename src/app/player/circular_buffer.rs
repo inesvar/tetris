@@ -40,10 +40,16 @@ where
         }
     }
 
-    pub(super) fn swap_front(&mut self, replacement: &mut T) {
+    pub(super) fn get_front_push_back(&mut self, replacement: &mut T) {
         std::mem::swap(replacement, &mut self.array[self.begin]);
         self.begin += 1;
         self.begin %= K;
+    }
+
+    pub(super) fn get_back_push_front(&mut self, replacement: &mut T) {
+        self.begin += K - 1;
+        self.begin %= K;
+        std::mem::swap(replacement, &mut self.array[self.begin]);
     }
 
     /// Get the i-th element in the buffer.
@@ -51,44 +57,6 @@ where
         //println!("getting {i} from {}", self);
         if i < self.size {
             Some(self.array[(self.begin + i) % K])
-        } else {
-            None
-        }
-    }
-
-    /// Push an element to the back of the buffer.
-    pub(super) fn push(&mut self, t: T) {
-        if self.size != K {
-            self.array[(self.begin + self.size) % K] = t;
-            self.size += 1;
-        }
-        //println!("pushed {t}, now {}", self);
-    }
-
-    /// Push an element to the front of the buffer.
-    pub(super) fn push_front(&mut self, t: T) {
-        if self.size != K {
-            let begin: usize = if self.begin > 0 {
-                self.begin - 1
-            } else {
-                K - 1
-            };
-            self.array[begin] = t;
-            self.begin = begin;
-            self.size += 1;
-        }
-        //println!("pushed {t}, now {}", self);
-    }
-
-    /// Pop an element from the front of the buffer.
-    pub(super) fn pop_front(&mut self) -> Option<T> {
-        //println!("popping from {}", self);
-        if self.size != 0 {
-            let pop = self.array[self.begin];
-            self.begin += 1;
-            self.begin %= K;
-            self.size -= 1;
-            Some(pop)
         } else {
             None
         }
@@ -125,45 +93,9 @@ mod tests {
     }
 
     #[rstest]
-    #[case(CircularBuffer::new([55, 22, 33]), 55)]
-    #[case(CircularBuffer::new([44, 66, 0, 88]), 44)]
-    fn pop_front_after_new_is_correct<const K: usize>(
-        #[case] mut buffer: CircularBuffer<K, usize>,
-        #[case] first: usize,
-    ) where
-        [usize; K]: Serialize + for<'a> Deserialize<'a>,
-    {
-        assert_eq!(buffer.pop_front(), Some(first));
-        assert_eq!(buffer.size, K - 1);
-        assert_eq!(buffer.begin, 1);
-    }
-
-    #[rstest]
     #[case(CircularBuffer::new([55, 22, 33]))]
     #[case(CircularBuffer::new([44, 66, 0, 88]))]
-    fn pop_front_returns_some_when_not_empty<const K: usize>(
-        #[case] mut buffer: CircularBuffer<K, usize>,
-    ) where
-        [usize; K]: Serialize + for<'a> Deserialize<'a>,
-    {
-        for i in 0..K {
-            let expected = buffer.get(0);
-            assert!(expected.is_some(), "{}", buffer);
-            assert_eq!(buffer.size, K - i, "{}", buffer);
-            assert_eq!(buffer.begin, i, "{}", buffer);
-            assert_eq!(buffer.pop_front(), expected, "{}", buffer);
-        }
-        let expected = buffer.get(0);
-        assert!(expected.is_none(), "{}", buffer);
-        assert_eq!(buffer.size, 0, "{}", buffer);
-        assert_eq!(buffer.begin, 0, "{}", buffer);
-        assert_eq!(buffer.pop_front(), expected, "{}", buffer);
-    }
-
-    #[rstest]
-    #[case(CircularBuffer::new([55, 22, 33]))]
-    #[case(CircularBuffer::new([44, 66, 0, 88]))]
-    fn swap_front_is_correct<const K: usize>(#[case] mut buffer: CircularBuffer<K, usize>)
+    fn get_front_push_back_is_correct<const K: usize>(#[case] mut buffer: CircularBuffer<K, usize>)
     where
         [usize; K]: Serialize + for<'a> Deserialize<'a>,
     {
@@ -172,13 +104,35 @@ mod tests {
             replacement = i;
             assert_eq!(buffer.size, K, "{}", buffer);
             assert_eq!(buffer.begin, i, "{}", buffer);
-            buffer.swap_front(&mut replacement);
+            buffer.get_front_push_back(&mut replacement);
             assert_eq!(buffer.get(buffer.size - 1), Some(i), "{}", buffer);
         }
         replacement = K;
         assert_eq!(buffer.size, K, "{}", buffer);
         assert_eq!(buffer.begin, 0, "{}", buffer);
-        buffer.swap_front(&mut replacement);
+        buffer.get_front_push_back(&mut replacement);
         assert_eq!(buffer.get(buffer.size - 1), Some(K), "{}", buffer);
+    }
+
+    #[rstest]
+    #[case(CircularBuffer::new([55, 22, 33]))]
+    #[case(CircularBuffer::new([44, 66, 0, 88]))]
+    fn get_back_push_front_is_correct<const K: usize>(#[case] mut buffer: CircularBuffer<K, usize>)
+    where
+        [usize; K]: Serialize + for<'a> Deserialize<'a>,
+    {
+        let mut replacement;
+        for i in 0..K {
+            replacement = i;
+            assert_eq!(buffer.size, K, "{}", buffer);
+            assert_eq!(buffer.begin, (K - i) % K, "{}", buffer);
+            buffer.get_back_push_front(&mut replacement);
+            assert_eq!(buffer.get(0), Some(i), "{}", buffer);
+        }
+        replacement = K;
+        assert_eq!(buffer.size, K, "{}", buffer);
+        assert_eq!(buffer.begin, 0, "{}", buffer);
+        buffer.get_back_push_front(&mut replacement);
+        assert_eq!(buffer.get(0), Some(K), "{}", buffer);
     }
 }
