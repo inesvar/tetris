@@ -13,7 +13,7 @@ use std::fmt::Formatter;
 
 /// Tetromino.
 #[doc = mermaid!("tetromino.mmd")]
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
 pub(crate) struct Tetromino {
     kind: TetrominoKind,
     center: Position,
