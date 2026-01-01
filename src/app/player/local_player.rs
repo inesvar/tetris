@@ -1,9 +1,8 @@
 //! Define the general implementation of [LocalPlayer].
-use super::core::{new_tetromino_bag, TetrisGrid, Tetromino};
+use super::core::{GameOverError, TetrisGrid, Tetromino, TetrominoBag};
 use super::{
     circular_buffer::CircularBuffer, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen,
 };
-use crate::app::player::core::GameOverError;
 use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
@@ -13,7 +12,7 @@ impl LocalPlayer {
     pub fn new(player_config: &PlayerConfig) -> Self {
         let grid = TetrisGrid::default();
         let rng = Pcg32::seed_from_u64(0);
-        let bag_of_tetromino = Vec::new();
+        let bag_of_tetromino = TetrominoBag::default();
         let first_tetromino = Tetromino::default();
         let fifo_next_tetromino = CircularBuffer::new([Tetromino::default(); NB_NEXT_TETROMINO]);
         let mut remote_ip = String::from("");
@@ -57,26 +56,13 @@ impl LocalPlayer {
         self.player_screen.saved_tetromino = None;
         self.player_screen.ghost_tetromino = None;
         self.rng = Pcg32::seed_from_u64(seed);
-        self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
-        self.player_screen.active_tetromino = Tetromino::from(self.bag_of_tetromino.pop().unwrap());
-        self.player_screen.fifo_next_tetromino =
-            CircularBuffer::new([Tetromino::default(); NB_NEXT_TETROMINO]);
-        for _ in 0..NB_NEXT_TETROMINO {
-            if let Some(kind) = self.bag_of_tetromino.pop() {
-                self.player_screen
-                    .fifo_next_tetromino
-                    .push(Tetromino::from(kind));
-            } else {
-                self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
-                if let Some(kind) = self.bag_of_tetromino.pop() {
-                    self.player_screen
-                        .fifo_next_tetromino
-                        .push(Tetromino::from(kind));
-                } else {
-                    unreachable!();
-                }
-            }
-        }
+        self.bag_of_tetromino = TetrominoBag::default();
+        self.player_screen.active_tetromino = self.bag_of_tetromino.get(&mut self.rng).into();
+        self.player_screen.fifo_next_tetromino = CircularBuffer::new(
+            self.bag_of_tetromino
+                .get_chunk::<NB_NEXT_TETROMINO>(&mut self.rng)
+                .map(|kind| kind.into()),
+        );
         self.freeze_frame = 0;
         self.player_screen.game_over = false;
     }
@@ -132,10 +118,6 @@ impl LocalPlayer {
 impl LocalPlayer {
     /// Sets a new active_tetromino when the precedent one is frozen.
     pub(super) fn get_new_tetromino(&mut self) {
-        // Refill the bag if necessary
-        if self.bag_of_tetromino.is_empty() {
-            self.bag_of_tetromino = new_tetromino_bag(BAG_SIZE, &mut self.rng);
-        }
         // Check if there's enough place on the grid for a new tetromino
         // TODO this should be done using the grid method and probably all other calls
         // using null()...
@@ -152,7 +134,7 @@ impl LocalPlayer {
         // Add a new tetromino to the file to replace the one that was taken
         self.player_screen
             .fifo_next_tetromino
-            .push(Tetromino::from(self.bag_of_tetromino.pop().unwrap()));
+            .push(self.bag_of_tetromino.get(&mut self.rng).into());
         self.player_screen.active_tetromino = possible_active;
     }
 

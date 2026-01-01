@@ -16,6 +16,6 @@ use simple_mermaid::mermaid;
 pub(super) use spatial_primitives::Position;
 pub(in crate::app) use tetris_grid::{GameOverError, TetrisGrid};
 pub(crate) use tetromino::Tetromino;
-pub(in crate::app::player) use tetromino_bag::new_tetromino_bag;
+pub(in crate::app::player) use tetromino_bag::TetrominoBag;
 pub(in crate::app::player) use tetromino_kind::TetrominoKind;
 pub(in crate::app::player) use tetromino_move::TetrominoMove;
