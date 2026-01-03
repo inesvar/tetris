@@ -1,5 +1,5 @@
 //! Define `struct` [TetrisGrid] and `enum` [GameOverError].
-use super::{mermaid, spatial_primitives::Position, Deserialize, Serialize, TetrisColor};
+use super::{mermaid, Deserialize, Position, Serialize, TetrisColor};
 use crate::settings::{MAX_SMALL_UNSIGNED, NB_VISIBLE_BUFFER_ROWS};
 use rand::Rng;
 use std::fmt::Display;
@@ -204,10 +204,10 @@ impl TetrisGrid {
 
     /// Return `true` is `block` is in the **Matrix** or the **Buffer Zone**.
     fn is_in_grid(&self, block: &Position) -> bool {
-        let line = self.convert_position_y_to_grid_y(block.y);
-        block.x >= 0
+        let line = self.convert_position_y_to_grid_y(block.y());
+        block.x() >= 0
             && line >= 0
-            && block.x < self.nb_columns
+            && block.x() < self.nb_columns
             && line < self.nb_matrix_rows + self.nb_buffer_rows
     }
 
@@ -267,13 +267,13 @@ impl TetrisGrid {
         if !self.is_block_empty(block) {
             panic!("Tried adding a block to a non-empty cell")
         }
-        let line = self.convert_position_y_to_grid_y(block.y) as usize;
-        self.cells[line][block.x as usize] = Some(tetris_color);
+        let line = self.convert_position_y_to_grid_y(block.y()) as usize;
+        self.cells[line][block.x() as usize] = Some(tetris_color);
         self.line_sum[line] += 1;
     }
 
     fn is_above_skyline(&self, block: &Position) -> bool {
-        self.convert_position_y_to_grid_y(block.y) >= self.nb_matrix_rows
+        self.convert_position_y_to_grid_y(block.y()) >= self.nb_matrix_rows
     }
 
     const fn nb_rows_usize(&self) -> usize {
@@ -387,8 +387,8 @@ impl Index<&Position> for TetrisGrid {
     type Output = Option<TetrisColor>;
 
     fn index(&self, block: &Position) -> &<Self as Index<&Position>>::Output {
-        let line = self.convert_position_y_to_grid_y(block.y) as usize;
-        &self.cells[line][block.x as usize]
+        let line = self.convert_position_y_to_grid_y(block.y()) as usize;
+        &self.cells[line][block.x() as usize]
     }
 }
 

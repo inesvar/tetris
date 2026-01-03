@@ -1,5 +1,5 @@
 //! Define `struct` [RotationTranslation] and `enum` [RotationType].
-use super::spatial_primitives::Position;
+use super::Position;
 
 /// Movement (a rotation followed by a translation).
 #[derive(Clone, Copy, Default)]
@@ -11,7 +11,7 @@ pub(super) struct RotationTranslation {
 
 /// Four 90° rotation types.
 #[derive(Clone, Copy, Default, PartialEq, Debug)]
-pub(super) enum RotationType {
+pub(in crate::app::player::core) enum RotationType {
     #[default]
     /// Default.
     Identity,

@@ -1,5 +1,5 @@
-use super::rotation_translation::RotationType;
-use super::spatial_primitives::Position;
+use super::tetromino::RotationType;
+use super::Position;
 
 #[derive(Clone, Copy, PartialEq)]
 pub(in crate::app::player) enum TetrominoMove {

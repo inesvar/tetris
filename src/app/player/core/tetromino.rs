@@ -1,16 +1,25 @@
 //! Define [Tetromino].
+#[doc = mermaid!("tetromino.mmd")]
+use self::{
+    moving_primitives::ApplyRotationTranslation, rotation_translation::RotationTranslation,
+    spatial_primitives::Direction,
+};
 use super::{
-    moving_primitives::ApplyRotationTranslation,
-    rotation_translation::{RotationTranslation, RotationType},
-    spatial_primitives::{Direction, Position},
-    tetris_grid::GameOverError,
-    tetromino_move::TetrominoMove,
-    Deserialize, Serialize, TetrisColor, TetrisGrid, TetrominoKind,
+    tetris_grid::GameOverError, tetromino_move::TetrominoMove, Deserialize, Serialize, TetrisColor,
+    TetrisGrid,
 };
 use simple_mermaid::mermaid;
 
+mod moving_primitives;
+mod rotation_translation;
+mod spatial_primitives;
+mod tetromino_kind;
+
+pub(super) use rotation_translation::RotationType;
+pub(in crate::app::player) use spatial_primitives::Position;
+pub(in crate::app::player) use tetromino_kind::TetrominoKind;
+
 /// Tetromino.
-#[doc = mermaid!("tetromino.mmd")]
 #[derive(Clone, Copy, Serialize, Deserialize, Debug)]
 pub(crate) struct Tetromino {
     kind: TetrominoKind,

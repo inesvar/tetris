@@ -5,7 +5,7 @@ use super::{Deserialize, Serialize};
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
 pub(in crate::app::player) struct Position {
     /// Horizontal coordinate, from left to right.
-    pub(super) x: i32,
+    pub(super) x: i32, // TODO: make private
     /// Vertical coordinate, *from top to bottom*.
     pub(super) y: i32,
 }
@@ -13,10 +13,10 @@ pub(in crate::app::player) struct Position {
 impl Position {
     // y increases from top to bottom
     #[cfg(test)]
-    pub(super) const RISE: Position = Position::new(0, -1);
-    pub(super) const RIGHT: Position = Position::new(1, 0);
-    pub(super) const FALL: Position = Position::new(0, 1);
-    pub(super) const LEFT: Position = Position::new(-1, 0);
+    pub(in crate::app::player::core) const RISE: Position = Position::new(0, -1);
+    pub(in crate::app::player::core) const RIGHT: Position = Position::new(1, 0);
+    pub(in crate::app::player::core) const FALL: Position = Position::new(0, 1);
+    pub(in crate::app::player::core) const LEFT: Position = Position::new(-1, 0);
 }
 
 /// Four cardinal directions.

@@ -1,9 +1,5 @@
 //! Define `enum` [TetrominoKind].
-use super::{
-    rotation_translation::RotationType,
-    spatial_primitives::{Direction, Position},
-    Deserialize, Serialize, TetrisColor,
-};
+use super::{Deserialize, Direction, Position, RotationType, Serialize, TetrisColor};
 
 /// Seven types of Tetromino.
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
@@ -70,7 +66,7 @@ const fn init(x: i32, y: i32) -> Position {
 }
 
 impl TetrominoKind {
-    pub(super) const ALL: [Self; 7] = [
+    pub(in crate::app::player::core) const ALL: [Self; 7] = [
         Self::I,
         Self::J,
         Self::L,
