@@ -59,21 +59,21 @@ pub struct PlayerScreen {
     /// Tetris grid.
     pub(in crate::app) grid: TetrisGrid,
     /// Number of lines cleared.
-    pub score: u64,
+    pub(in crate::app) score: u64,
     /// Indicates if the game is lost by the current player.
-    pub game_over: bool,
+    pub(in crate::app) game_over: bool,
     /// Is set and reset during the update resp. when lines are cleared and when data is sent to the remote players
-    pub new_completed_lines: u64,
+    pub(in crate::app) new_completed_lines: u64,
     /// The falling tetromino.
-    pub active_tetromino: Tetromino,
+    pub(in crate::app) active_tetromino: Tetromino,
     /// The held tetromino piece rendered in the corner.
-    pub saved_tetromino: Option<Tetromino>,
+    pub(in crate::app) saved_tetromino: Option<Tetromino>,
     /// Next tetromino pieces rendered on the side.
-    pub fifo_next_tetromino: CircularArray<NB_NEXT_TETROMINO, Tetromino>,
+    pub(in crate::app) fifo_next_tetromino: CircularArray<NB_NEXT_TETROMINO, Tetromino>,
     /// The shade of the active tetromino after hard drop.
-    pub ghost_tetromino: Option<Tetromino>,
+    pub(in crate::app) ghost_tetromino: Option<Tetromino>,
     /// Flag not to be modified except in Serialize. Set to true.
-    pub serialize_as_msg: RefCell<bool>,
+    pub(in crate::app) serialize_as_msg: RefCell<bool>,
 }
 
 /// Constructor for the random generator.

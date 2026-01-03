@@ -1,6 +1,7 @@
-use super::{Deserialize, Serialize, TetrominoKind};
+use super::TetrominoKind;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
+use serde::{Deserialize, Serialize};
 use std::array;
 
 #[derive(Serialize, Deserialize, Default)]

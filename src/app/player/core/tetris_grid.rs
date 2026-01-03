@@ -1,7 +1,9 @@
 //! Define `struct` [TetrisGrid] and `enum` [GameOverError].
-use super::{mermaid, Deserialize, Position, Serialize, TetrisColor};
+use super::{Position, TetrisColor};
 use crate::settings::{MAX_SMALL_UNSIGNED, NB_VISIBLE_BUFFER_ROWS};
 use rand::Rng;
+use serde::{Deserialize, Serialize};
+use simple_mermaid::mermaid;
 use std::fmt::Display;
 use std::ops::Index;
 

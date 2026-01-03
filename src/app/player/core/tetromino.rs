@@ -1,19 +1,19 @@
 //! Define [Tetromino].
-#[doc = mermaid!("tetromino.mmd")]
-use self::{
-    moving_primitives::ApplyRotationTranslation, rotation_translation::RotationTranslation,
-    spatial_primitives::Direction,
-};
-use super::{
-    tetris_grid::GameOverError, tetromino_move::TetrominoMove, Deserialize, Serialize, TetrisColor,
-    TetrisGrid,
-};
-use simple_mermaid::mermaid;
+#![doc = mermaid!("tetromino/tetromino.mmd")]
+
 
 mod moving_primitives;
 mod rotation_translation;
 mod spatial_primitives;
 mod tetromino_kind;
+
+use self::{
+    moving_primitives::ApplyRotationTranslation, rotation_translation::RotationTranslation,
+    spatial_primitives::Direction,
+};
+use super::{GameOverError, TetrisColor, TetrisGrid, TetrominoMove};
+use serde::{Deserialize, Serialize};
+use simple_mermaid::mermaid;
 
 pub(super) use rotation_translation::RotationType;
 pub(in crate::app::player) use spatial_primitives::Position;
@@ -21,7 +21,7 @@ pub(in crate::app::player) use tetromino_kind::TetrominoKind;
 
 /// Tetromino.
 #[derive(Clone, Copy, Serialize, Deserialize, Debug)]
-pub(crate) struct Tetromino {
+pub(in crate::app) struct Tetromino {
     kind: TetrominoKind,
     center: Position,
     pub(super) blocks: [Position; 4],
@@ -40,7 +40,7 @@ impl From<TetrominoKind> for Tetromino {
     }
 }
 
-#[doc = mermaid!("tetromino_internals.mmd")]
+#[doc = mermaid!("tetromino/tetromino_internals.mmd")]
 impl Tetromino {
     pub(in crate::app::player) fn reset(&mut self) {
         *self = Self::from(self.kind)

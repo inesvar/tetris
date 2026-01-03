@@ -1,5 +1,5 @@
 //! Define `struct` [Position] and `enum` [Direction].
-use super::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 /// Position on a discrete grid.
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]

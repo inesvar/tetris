@@ -1,5 +1,6 @@
 //! Define `enum` [TetrominoKind].
-use super::{Deserialize, Direction, Position, RotationType, Serialize, TetrisColor};
+use super::{Direction, Position, RotationType, TetrisColor};
+use serde::{Deserialize, Serialize};
 
 /// Seven types of Tetromino.
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
