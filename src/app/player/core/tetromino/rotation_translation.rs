@@ -1,5 +1,8 @@
 //! Define `struct` [RotationTranslation] and `enum` [RotationType].
+#![doc = mermaid!("rotation_translation.mmd")] 
+
 use super::Position;
+use simple_mermaid::mermaid;
 
 /// Movement (a rotation followed by a translation).
 #[derive(Clone, Copy, Default)]

@@ -1,15 +1,21 @@
+//! Define `struct` [TetrominoBag] and `enum` [BagType].
+#![doc = mermaid!("tetromino_bag.mmd")]
+
 use super::TetrominoKind;
+use simple_mermaid::mermaid;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
 use std::array;
 
+/// Tetromino bag.
 #[derive(Serialize, Deserialize, Default)]
 pub(in crate::app::player) struct TetrominoBag {
     tetrominos: Vec<TetrominoKind>,
     bag_type: BagType,
 }
 
+/// Type of tetromino bag.
 #[derive(Copy, Clone, Default, Serialize, Deserialize)]
 pub(in crate::app::player) enum BagType {
     CompletelyRandom,

@@ -1,6 +1,5 @@
-//! Define [Tetromino].
+//! Define `struct` [Tetromino], re-export `struct` [Position] and `enum`s [TetrominoKind] and [RotationType].
 #![doc = mermaid!("tetromino/tetromino.mmd")]
-
 
 mod moving_primitives;
 mod rotation_translation;
@@ -42,6 +41,10 @@ impl From<TetrominoKind> for Tetromino {
 
 #[doc = mermaid!("tetromino/tetromino_internals.mmd")]
 impl Tetromino {
+    pub(in crate::app::player) fn new(kind: TetrominoKind) -> Self {
+        Self::from(kind)
+    }
+
     pub(in crate::app::player) fn reset(&mut self) {
         *self = Self::from(self.kind)
     }
@@ -178,8 +181,8 @@ mod tests {
     #[test]
     fn i_tetromino_rotation_is_correct() {
         let empty_grid = TetrisGrid::default();
-        let mut i_tetromino = Tetromino::from(TetrominoKind::I);
-        let mut naive_i_tetromino = Tetromino::from(TetrominoKind::I);
+        let mut i_tetromino = Tetromino::new(TetrominoKind::I);
+        let mut naive_i_tetromino = Tetromino::new(TetrominoKind::I);
         naive_i_tetromino.kind = TetrominoKind::T;
 
         println!(

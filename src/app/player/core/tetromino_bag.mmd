@@ -1,0 +1,11 @@
+graph LR
+    %% objects
+    BagType[BagType]
+    TetrominoBag[[TetrominoBag]]
+
+    subgraph tetromino
+        TetrominoKind
+    end
+
+    TetrominoBag --o BagType
+    TetrominoBag --o TetrominoKind

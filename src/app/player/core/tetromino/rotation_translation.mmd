@@ -1,0 +1,11 @@
+graph LR
+    RotationTranslation[[RotationTranslation]]
+    RotationType[RotationType]
+    Position[[Position]]
+
+    subgraph spatial_primitives
+        Position
+    end
+
+    RotationTranslation --o RotationType
+    RotationTranslation --o Position

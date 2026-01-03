@@ -1,0 +1,31 @@
+graph LR
+    %% objects
+    TetrominoMove[TetrominoMove]
+    TetrisGrid[[TetrisGrid]]
+    GameOverError[GameOverError]
+    Tetromino[[Tetromino]]
+    Position[[Position]]
+    TetrominoKind[TetrominoKind]
+    TetrominoBag[[TetrominoBag]]
+
+    subgraph tetromino_move
+        TetrominoMove
+    end
+
+    subgraph tetromino_bag
+        TetrominoBag
+    end
+
+    subgraph tetromino
+        Tetromino --o TetrominoKind
+        Tetromino --o Position
+    end
+
+    tetromino_move ~~~ tetris_grid
+
+    subgraph tetris_grid
+        direction LR
+        TetrisGrid -.-> GameOverError
+    end
+    Tetromino -.-> tetris_grid
+    TetrominoBag --o TetrominoKind

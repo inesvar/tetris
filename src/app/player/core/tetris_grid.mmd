@@ -1,0 +1,19 @@
+graph LR
+    %% objects
+    TetrisGrid[[TetrisGrid]]
+    GameOverError[GameOverError]
+    TetrisColor[TetrisColor]
+    Position[[Position]]
+
+    subgraph tetris_color
+        TetrisColor
+    end
+
+    subgraph tetromino
+        Position
+    end
+
+    TetrisGrid --o TetrisColor
+    TetrisGrid -.-> GameOverError
+    TetrisGrid -.-> Position
+

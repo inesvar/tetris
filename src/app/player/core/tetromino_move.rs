@@ -1,6 +1,11 @@
+//! Define `enum` [TetrominoMove].
+#![doc = mermaid!("tetromino_move.mmd")]
+
 use super::tetromino::RotationType;
 use super::Position;
+use simple_mermaid::mermaid;
 
+/// Tetromino movement orders.
 #[derive(Clone, Copy, PartialEq)]
 pub(in crate::app::player) enum TetrominoMove {
     Right,

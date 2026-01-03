@@ -1,0 +1,18 @@
+graph LR
+    ApplyRotationTranslation([ApplyRotationTranslation])
+    RotationTranslation[[RotationTranslation]]
+    Position[[Position]]
+    Direction[Direction]
+
+    subgraph spatial_primitives
+        Direction ~~~ Position
+    end
+
+    subgraph rotation_translation
+        RotationTranslation ~~~ RotationType
+    end
+
+    ApplyRotationTranslation ==> Position
+    ApplyRotationTranslation ==> Direction
+    ApplyRotationTranslation -.-> RotationTranslation
+    ApplyRotationTranslation -.-> RotationType
