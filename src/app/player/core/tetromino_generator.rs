@@ -16,12 +16,19 @@ pub(in crate::app::player) struct TetrominoGenerator {
 }
 
 /// Type of tetromino bag.
+/// 
+/// Using a shuffled bag instead of choosing each tetromino randomly
+/// helps prevent tetromino repetition.
 #[derive(Copy, Clone, Default, Serialize, Deserialize)]
 pub(in crate::app::player) enum BagType {
-    CompletelyRandom,
+    /// Each tetromino is chosen randomly using uniform distribution.
+    NoBag,
     #[default]
     /// Default.
+    /// 
+    /// One occurence of each tetromino per bag.
     Bag7,
+    /// Two occurences of each tetromino per bag.
     Bag14,
 }
 
@@ -68,7 +75,7 @@ impl TetrominoGenerator {
 impl BagType {
     fn occurrences_per_kind(&self) -> Option<usize> {
         match self {
-            BagType::CompletelyRandom => None,
+            BagType::NoBag => None,
             BagType::Bag7 => Some(1),
             BagType::Bag14 => Some(2),
         }
@@ -82,7 +89,7 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case::completely_random(BagType::CompletelyRandom, None)]
+    #[case::completely_random(BagType::NoBag, None)]
     #[case::bag7(BagType::Bag7, Some(1))]
     #[case::bag14(BagType::Bag14, Some(2))]
     fn occurrences_per_kind_is_correct(
@@ -93,7 +100,7 @@ mod tests {
     }
 
     #[rstest]
-    #[case::completely_random(BagType::CompletelyRandom, 7)]
+    #[case::completely_random(BagType::NoBag, 7)]
     #[case::bag7(BagType::Bag7, 7)]
     #[case::bag14(BagType::Bag14, 14)]
     fn tetrominos_is_not_empty_after_draw_new_bag(
@@ -109,7 +116,7 @@ mod tests {
     }
 
     #[rstest]
-    #[case::completely_random(BagType::CompletelyRandom)]
+    #[case::completely_random(BagType::NoBag)]
     #[case::bag7(BagType::Bag7)]
     #[case::bag14(BagType::Bag14)]
     fn get_doesnt_panic_after_new(#[case] bag_type: BagType) {
@@ -119,7 +126,7 @@ mod tests {
     }
 
     #[rstest]
-    #[case::completely_random(BagType::CompletelyRandom)]
+    #[case::completely_random(BagType::NoBag)]
     #[case::bag7(BagType::Bag7)]
     #[case::bag14(BagType::Bag14)]
     fn get_chunk_doesnt_panic_when_chunk_is_very_big(#[case] bag_type: BagType) {
