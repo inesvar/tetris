@@ -1,4 +1,4 @@
-//! Define `struct` [TetrisGrid] and `enum` [GameOverError]. 
+//! Define `struct` [TetrisGrid] and `enum` [GameOverError].
 #![doc = mermaid!("tetris_grid.mmd")]
 
 use super::{Position, TetrisColor};

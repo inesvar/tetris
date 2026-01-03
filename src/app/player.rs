@@ -14,7 +14,7 @@ mod update_player;
 pub(in crate::app::player) use self::core::Tetromino;
 use self::{
     circular_array::CircularArray,
-    core::{TetrisGrid, TetrominoBag},
+    core::{TetrisGrid, TetrominoGenerator},
     pressed_keys::PressedKeys,
 };
 use crate::settings::NB_NEXT_TETROMINO;
@@ -42,7 +42,7 @@ pub struct LocalPlayer {
     ///
     /// freeze_frame is updated when a tetromino reaches the bottom of the grid.
     freeze_frame: u64,
-    bag_of_tetromino: TetrominoBag,
+    bag_of_tetromino: TetrominoGenerator,
     /// Whether information has to be sent to the remote or not.
     sender: bool,
     remote_ip: String,

@@ -1,5 +1,5 @@
 //! Define `trait` [ApplyRotationTranslation] for [Position] and [Direction].
-#![doc = mermaid!("moving_primitives.mmd")] 
+#![doc = mermaid!("moving_primitives.mmd")]
 
 use super::{Direction, Position, RotationTranslation, RotationType};
 use simple_mermaid::mermaid;

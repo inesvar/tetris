@@ -1,5 +1,5 @@
 //! Define `struct` [RotationTranslation] and `enum` [RotationType].
-#![doc = mermaid!("rotation_translation.mmd")] 
+#![doc = mermaid!("rotation_translation.mmd")]
 
 use super::Position;
 use simple_mermaid::mermaid;

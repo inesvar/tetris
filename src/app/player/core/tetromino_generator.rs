@@ -1,16 +1,16 @@
-//! Define `struct` [TetrominoBag] and `enum` [BagType].
-#![doc = mermaid!("tetromino_bag.mmd")]
+//! Define `struct` [TetrominoGenerator] and `enum` [BagType].
+#![doc = mermaid!("tetromino_generator.mmd")]
 
 use super::TetrominoKind;
-use simple_mermaid::mermaid;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
+use simple_mermaid::mermaid;
 use std::array;
 
-/// Tetromino bag.
+/// Tetromino generator.
 #[derive(Serialize, Deserialize, Default)]
-pub(in crate::app::player) struct TetrominoBag {
+pub(in crate::app::player) struct TetrominoGenerator {
     tetrominos: Vec<TetrominoKind>,
     bag_type: BagType,
 }
@@ -25,7 +25,7 @@ pub(in crate::app::player) enum BagType {
     Bag14,
 }
 
-impl TetrominoBag {
+impl TetrominoGenerator {
     pub(in crate::app::player) fn new(bag_type: BagType) -> Self {
         Self {
             tetrominos: Vec::new(),
@@ -100,7 +100,7 @@ mod tests {
         #[case] bag_type: BagType,
         #[case] bag_size: usize,
     ) {
-        let mut bag = TetrominoBag::new(bag_type);
+        let mut bag = TetrominoGenerator::new(bag_type);
 
         bag.draw_new_bag(&mut Pcg32::seed_from_u64(0));
 
@@ -113,7 +113,7 @@ mod tests {
     #[case::bag7(BagType::Bag7)]
     #[case::bag14(BagType::Bag14)]
     fn get_doesnt_panic_after_new(#[case] bag_type: BagType) {
-        let mut bag = TetrominoBag::new(bag_type);
+        let mut bag = TetrominoGenerator::new(bag_type);
 
         bag.get(&mut Pcg32::seed_from_u64(0));
     }
@@ -123,7 +123,7 @@ mod tests {
     #[case::bag7(BagType::Bag7)]
     #[case::bag14(BagType::Bag14)]
     fn get_chunk_doesnt_panic_when_chunk_is_very_big(#[case] bag_type: BagType) {
-        let mut bag = TetrominoBag::new(bag_type);
+        let mut bag = TetrominoGenerator::new(bag_type);
 
         bag.get_chunk::<50>(&mut Pcg32::seed_from_u64(0));
     }
@@ -132,7 +132,7 @@ mod tests {
     #[case::bag7(BagType::Bag7)]
     #[case::bag14(BagType::Bag14)]
     fn get_chunk_14_with_classic_bag_types_is_correct(#[case] bag_type: BagType) {
-        let mut bag = TetrominoBag::new(bag_type);
+        let mut bag = TetrominoGenerator::new(bag_type);
 
         let tetrominos = Vec::from(bag.get_chunk::<14>(&mut Pcg32::seed_from_u64(0)));
 
@@ -144,7 +144,7 @@ mod tests {
     #[rstest]
     #[case::bag7(BagType::Bag7)]
     fn get_chunk_7_with_bag_type_7_is_correct(#[case] bag_type: BagType) {
-        let mut bag = TetrominoBag::new(bag_type);
+        let mut bag = TetrominoGenerator::new(bag_type);
 
         let tetrominos = Vec::from(bag.get_chunk::<7>(&mut Pcg32::seed_from_u64(0)));
 

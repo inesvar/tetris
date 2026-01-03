@@ -1,5 +1,5 @@
 //! Define the general implementation of [LocalPlayer].
-use super::core::{GameOverError, TetrisGrid, Tetromino, TetrominoBag};
+use super::core::{GameOverError, TetrisGrid, Tetromino, TetrominoGenerator};
 use super::{circular_array::CircularArray, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen};
 use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
 use rand::SeedableRng;
@@ -10,7 +10,7 @@ impl LocalPlayer {
     pub fn new(player_config: &PlayerConfig) -> Self {
         let grid = TetrisGrid::default();
         let rng = Pcg32::seed_from_u64(0);
-        let bag_of_tetromino = TetrominoBag::default();
+        let bag_of_tetromino = TetrominoGenerator::default();
         let first_tetromino = Tetromino::default();
         let fifo_next_tetromino = CircularArray::new([Tetromino::default(); NB_NEXT_TETROMINO]);
         let mut remote_ip = String::from("");
@@ -54,7 +54,7 @@ impl LocalPlayer {
         self.player_screen.saved_tetromino = None;
         self.player_screen.ghost_tetromino = None;
         self.rng = Pcg32::seed_from_u64(seed);
-        self.bag_of_tetromino = TetrominoBag::default();
+        self.bag_of_tetromino = TetrominoGenerator::default();
         self.player_screen.active_tetromino = self.bag_of_tetromino.get(&mut self.rng).into();
         self.player_screen.fifo_next_tetromino = CircularArray::new(
             self.bag_of_tetromino
