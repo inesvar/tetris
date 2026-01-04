@@ -11,8 +11,10 @@ use self::{
     spatial_primitives::Direction,
 };
 use super::{GameOverError, TetrisColor, TetrisGrid, TetrominoMove};
+use crate::concatln;
 use serde::{Deserialize, Serialize};
 use simple_mermaid::mermaid;
+use std::fmt::Display;
 
 pub(super) use rotation_translation::RotationType;
 pub(in crate::app::player) use spatial_primitives::Position;
@@ -74,10 +76,8 @@ impl Tetromino {
     ) -> bool {
         if tetromino_move.get_rotation_type() == RotationType::Identity {
             self.apply_translation(tetromino_move, grid)
-        } else if self.kind != TetrominoKind::O {
-            self.apply_rotation(tetromino_move, grid)
         } else {
-            false // the O tetromino doesn't move when turned
+            self.apply_rotation(tetromino_move, grid)
         }
     }
 
@@ -157,90 +157,196 @@ impl Default for Tetromino {
     }
 }
 
-#[cfg(test)]
-impl Tetromino {
-    fn i_tetromino_rotation_correction(&mut self, movement: &RotationTranslation) -> Position {
-        match (self.direction, movement.rotation_type) {
-            (Direction::North, RotationType::Clockwise) => Position::RIGHT,
-            (Direction::East, RotationType::Counterclockwise) => Position::LEFT,
-            (Direction::East, RotationType::Clockwise) => Position::FALL,
-            (Direction::South, RotationType::Counterclockwise) => Position::RISE,
-            (Direction::South, RotationType::Clockwise) => Position::LEFT,
-            (Direction::West, RotationType::Counterclockwise) => Position::RIGHT,
-            (Direction::West, RotationType::Clockwise) => Position::RISE,
-            (Direction::North, RotationType::Counterclockwise) => Position::FALL,
-            (_, _) => todo!(),
+impl Display for Tetromino {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut buffer: Vec<char> = concatln!("         ", "         ", "         ", "         ",)
+            .chars()
+            .collect();
+
+        for block in self.blocks {
+            buffer[10 * block.y() as usize + block.x() as usize] = '#';
         }
+        buffer[10 * self.center.y() as usize + self.center.x() as usize] = 'C';
+
+        let buffer = String::from_iter(buffer);
+
+        write!(f, "{buffer}")
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::concatln;
+    use rstest::rstest;
 
-    #[test]
-    fn i_tetromino_rotation_is_correct() {
+    #[rstest]
+    #[case::o_north(TetrominoKind::O, Direction::North, concatln!(
+            " C#      ",
+            " ##      ",
+            "         ",
+            "         ",
+        ))]
+    #[case::o_east(TetrominoKind::O, Direction::East, concatln!(
+            " C#      ",
+            " ##      ",
+            "         ",
+            "         ",
+        ))]
+    #[case::o_south(TetrominoKind::O, Direction::South, concatln!(
+            " C#      ",
+            " ##      ",
+            "         ",
+            "         ",
+        ))]
+    #[case::o_west(TetrominoKind::O, Direction::West, concatln!(
+            " C#      ",
+            " ##      ",
+            "         ",
+            "         ",
+        ))]
+    #[case::i_north(TetrominoKind::I, Direction::North, concatln!(
+            "         ",
+            "#C##     ",
+            "         ",
+            "         ",
+        ))]
+    #[case::i_east(TetrominoKind::I, Direction::East, concatln!(
+            "  #      ",
+            " C#      ",
+            "  #      ",
+            "  #      ",
+        ))]
+    #[case::i_south(TetrominoKind::I, Direction::South, concatln!(
+            "         ",
+            " C       ",
+            "####     ",
+            "         ",
+        ))]
+    #[case::i_west(TetrominoKind::I, Direction::West, concatln!(
+            " #       ",
+            " C       ",
+            " #       ",
+            " #       ",
+        ))]
+    #[case::l_north(TetrominoKind::L, Direction::North, concatln!(
+            "  #      ",
+            "#C#      ",
+            "         ",
+            "         ",
+        ))]
+    #[case::l_east(TetrominoKind::L, Direction::East, concatln!(
+            " #       ",
+            " C       ",
+            " ##      ",
+            "         ",
+        ))]
+    #[case::l_south(TetrominoKind::L, Direction::South, concatln!(
+            "         ",
+            "#C#      ",
+            "#        ",
+            "         ",
+        ))]
+    #[case::l_west(TetrominoKind::L, Direction::West, concatln!(
+            "##       ",
+            " C       ",
+            " #       ",
+            "         ",
+        ))]
+    #[case::j_north(TetrominoKind::J, Direction::North, concatln!(
+            "#        ",
+            "#C#      ",
+            "         ",
+            "         ",
+        ))]
+    #[case::j_east(TetrominoKind::J, Direction::East, concatln!(
+            " ##      ",
+            " C       ",
+            " #       ",
+            "         ",
+        ))]
+    #[case::j_south(TetrominoKind::J, Direction::South, concatln!(
+            "         ",
+            "#C#      ",
+            "  #      ",
+            "         ",
+        ))]
+    #[case::j_west(TetrominoKind::J, Direction::West, concatln!(
+            " #       ",
+            " C       ",
+            "##       ",
+            "         ",
+        ))]
+    #[case::s_north(TetrominoKind::S, Direction::North, concatln!(
+            " ##      ",
+            "#C       ",
+            "         ",
+            "         ",
+        ))]
+    #[case::s_east(TetrominoKind::S, Direction::East, concatln!(
+            " #       ",
+            " C#      ",
+            "  #      ",
+            "         ",
+        ))]
+    #[case::s_south(TetrominoKind::S, Direction::South, concatln!(
+            "         ",
+            " C#      ",
+            "##       ",
+            "         ",
+        ))]
+    #[case::s_west(TetrominoKind::S, Direction::West, concatln!(
+            "#        ",
+            "#C       ",
+            " #       ",
+            "         ",
+        ))]
+    #[case::z_north(TetrominoKind::Z, Direction::North, concatln!(
+            "##       ",
+            " C#      ",
+            "         ",
+            "         ",
+        ))]
+    #[case::z_east(TetrominoKind::Z, Direction::East, concatln!(
+            "  #      ",
+            " C#      ",
+            " #       ",
+            "         ",
+        ))]
+    #[case::z_south(TetrominoKind::Z, Direction::South, concatln!(
+            "         ",
+            "#C       ",
+            " ##      ",
+            "         ",
+        ))]
+    #[case::z_west(TetrominoKind::Z, Direction::West, concatln!(
+            " #       ",
+            "#C       ",
+            "#        ",
+            "         ",
+        ))]
+    fn tetromino_rotation_is_correct(
+        #[case] kind: TetrominoKind,
+        #[case] direction: Direction,
+        #[case] expected_blocks: &str,
+    ) {
+        let mut tetromino = Tetromino::new(kind);
         let empty_grid = TetrisGrid::default();
-        let mut i_tetromino = Tetromino::new(TetrominoKind::I);
-        let mut naive_i_tetromino = Tetromino::new(TetrominoKind::I);
-        naive_i_tetromino.kind = TetrominoKind::T;
 
-        println!(
-            "{:?}\n{:?}\n{:?}\n{:?}",
-            i_tetromino.blocks,
-            naive_i_tetromino.blocks,
-            i_tetromino.center,
-            naive_i_tetromino.center
-        );
-        assert_eq!(i_tetromino.blocks, naive_i_tetromino.blocks);
-
-        for _ in 0..4 {
-            let rotation = RotationTranslation {
-                rotation_type: RotationType::Clockwise,
-                rotation_center: naive_i_tetromino.center,
-                translation: Position::new(0, 0),
-            };
-
-            let translation = naive_i_tetromino.i_tetromino_rotation_correction(&rotation);
-            let mut corrected_rotation = rotation;
-            corrected_rotation.translation = translation;
-            let _ = naive_i_tetromino.try_move(&empty_grid, &corrected_rotation);
-
-            i_tetromino.apply(TetrominoMove::Clockwise, &empty_grid);
-
-            println!(
-                "{:?}\n{:?}\n{:?}\n{:?}",
-                i_tetromino.blocks,
-                naive_i_tetromino.blocks,
-                i_tetromino.center,
-                naive_i_tetromino.center
-            );
-
-            assert_eq!(i_tetromino.blocks, naive_i_tetromino.blocks);
+        match direction {
+            Direction::North => {}
+            Direction::East => {
+                tetromino.apply(TetrominoMove::Clockwise, &empty_grid);
+            }
+            Direction::South => {
+                tetromino.apply(TetrominoMove::HalfTurn, &empty_grid);
+            }
+            Direction::West => {
+                tetromino.apply(TetrominoMove::Counterclockwise, &empty_grid);
+            }
         }
 
-        for _ in 0..4 {
-            let rotation = RotationTranslation {
-                rotation_type: RotationType::Counterclockwise,
-                rotation_center: naive_i_tetromino.center,
-                translation: Position::new(0, 0),
-            };
-            let translation = naive_i_tetromino.i_tetromino_rotation_correction(&rotation);
-            let mut corrected_rotation = rotation;
-            corrected_rotation.translation = translation;
-            let _ = naive_i_tetromino.try_move(&empty_grid, &corrected_rotation);
-
-            i_tetromino.apply(TetrominoMove::Counterclockwise, &empty_grid);
-
-            println!(
-                "{:?}\n{:?}\n{:?}\n{:?}",
-                i_tetromino.blocks,
-                naive_i_tetromino.blocks,
-                i_tetromino.center,
-                naive_i_tetromino.center
-            );
-
-            assert_eq!(i_tetromino.blocks, naive_i_tetromino.blocks);
-        }
+        assert_eq!(tetromino.to_string(), expected_blocks, "{}", tetromino);
+        assert_eq!(tetromino.direction, direction);
     }
 }

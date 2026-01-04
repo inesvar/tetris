@@ -166,6 +166,34 @@ impl From<TetrominoKind> for TetrisColor {
 #[cfg(test)]
 mod tests {
     use super::{Direction, Position, RotationType, TetrominoKind};
+    use crate::concatln;
+    use rstest::rstest;
+
+    impl Position {
+        fn from_str(string: &str) -> (Position, Vec<Position>) {
+            let lines: Vec<&str> = string.split('\n').collect();
+
+            let mut positions = Vec::new();
+            let mut center: Position = Position::default();
+
+            for (row, line) in lines.iter().enumerate() {
+                for (col, cell) in line.char_indices() {
+                    match cell {
+                        'C' => {
+                            center = Position::new(col as i32, row as i32);
+                            positions.push(center);
+                        }
+                        '#' => {
+                            positions.push(Position::new(col as i32, row as i32));
+                        }
+                        _ => continue,
+                    }
+                }
+            }
+
+            (center, positions)
+        }
+    }
 
     macro_rules! positions {
         ($(($x:expr, $y:expr)),+ $(,)?) => {
@@ -173,37 +201,45 @@ mod tests {
         };
     }
 
-    #[test]
-    fn spawn_positions_are_correct() {
-        assert_eq!(
-            TetrominoKind::I.get_initial_position(),
-            positions!((4, 1), (3, 1), (4, 1), (5, 1), (6, 1))
-        );
+    #[rstest]
+    // NOTE: according to the *Tetris Guideline*, all tetrominos centers
+    // are at the same place. For the O tetromino, we make an exception
+    // to ensure that even if the tetromino is rotated around the bottom
+    // right corner of the center, it will not move.
+    #[case::o(TetrominoKind::O, concatln!(
+            " C#      ",
+            " ##      ",
+        ))]
+    #[case::i(TetrominoKind::I, concatln!(
+            "         ",
+            "#C##     ",
+        ))]
+    #[case::t(TetrominoKind::T, concatln!(
+            " #       ",
+            "#C#      ",
+        ))]
+    #[case::l(TetrominoKind::L, concatln!(
+            "  #      ",
+            "#C#      ",
+        ))]
+    #[case::j(TetrominoKind::J, concatln!(
+            "#        ",
+            "#C#      ",
+        ))]
+    #[case::s(TetrominoKind::S, concatln!(
+            " ##      ",
+            "#C       ",
+        ))]
+    #[case::z(TetrominoKind::Z, concatln!(
+            "##       ",
+            " C#      ",
+        ))]
+    fn get_initial_position_is_correct(#[case] kind: TetrominoKind, #[case] expected: &str) {
+        let expected = Position::from_str(expected);
+        let actual = kind.get_initial_position();
 
-        assert_eq!(
-            TetrominoKind::O.get_initial_position(),
-            positions!((5, 1), (4, 0), (5, 0), (4, 1), (5, 1))
-        );
-        assert_eq!(
-            TetrominoKind::T.get_initial_position(),
-            positions!((4, 1), (4, 0), (3, 1), (4, 1), (5, 1))
-        );
-        assert_eq!(
-            TetrominoKind::J.get_initial_position(),
-            positions!((4, 1), (3, 0), (3, 1), (4, 1), (5, 1))
-        );
-        assert_eq!(
-            TetrominoKind::L.get_initial_position(),
-            positions!((4, 1), (5, 0), (3, 1), (4, 1), (5, 1))
-        );
-        assert_eq!(
-            TetrominoKind::S.get_initial_position(),
-            positions!((4, 1), (4, 0), (5, 0), (3, 1), (4, 1))
-        );
-        assert_eq!(
-            TetrominoKind::Z.get_initial_position(),
-            positions!((4, 1), (3, 0), (4, 0), (4, 1), (5, 1))
-        );
+        assert_eq!(actual[0], expected.0);
+        assert_eq!(actual[1..], expected.1);
     }
 
     #[test]

@@ -439,13 +439,8 @@ impl Default for TetrisGrid {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::concatln;
     use rstest::{fixture, rstest};
-
-    macro_rules! concatln {
-        ( $( $line:expr ),* $(,)? ) => {
-            concat!( $( $line, "\n", )*)
-        };
-    }
 
     impl TetrisGrid {
         const COMPACT_NB_COLUMNS: u32 = 9;

@@ -16,7 +16,7 @@ pub(in crate::app::player) struct TetrominoGenerator {
 }
 
 /// Type of tetromino bag.
-/// 
+///
 /// Using a shuffled bag instead of choosing each tetromino randomly
 /// helps prevent tetromino repetition.
 #[derive(Copy, Clone, Default, Serialize, Deserialize)]
@@ -25,7 +25,7 @@ pub(in crate::app::player) enum BagType {
     NoBag,
     #[default]
     /// Default.
-    /// 
+    ///
     /// One occurence of each tetromino per bag.
     Bag7,
     /// Two occurences of each tetromino per bag.

@@ -15,3 +15,10 @@ macro_rules! once {
         }
     };
 }
+
+#[macro_export]
+macro_rules! concatln {
+    ( $( $line:expr ),* $(,)? ) => {
+        concat!( $( $line, "\n", )*)
+    };
+}
