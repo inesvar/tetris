@@ -5,11 +5,11 @@ use serde::{Deserialize, Serialize};
 /// Seven types of Tetromino.
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
 pub(in crate::app::player) enum TetrominoKind {
-    I,
     O,
+    I,
     T,
-    J,
     L,
+    J,
     S,
     Z,
 }
@@ -26,17 +26,22 @@ macro_rules! const_map {
     };
 }
 
-const UP_TO_RIGHT_WALL_KICKS: [Position; 5] = [
+// source : Tetris Guideline
+const NORTH_TO_EAST_WALL_KICKS: [Position; 5] = [
     Position::new(0, 0),
     Position::new(-1, 0),
-    Position::new(-1, 1),
-    Position::new(0, -2),
-    Position::new(-1, -2),
+    Position::new(-1, -1),
+    Position::new(0, 2),
+    Position::new(-1, 2),
 ];
 
-const RIGHT_TO_UP_WALL_KICKS: [Position; 5] = const_map!(UP_TO_RIGHT_WALL_KICKS, neg);
-const DOWN_TO_LEFT_WALL_KICKS: [Position; 5] = const_map!(UP_TO_RIGHT_WALL_KICKS, mirror_x);
-const LEFT_TO_DOWN_WALL_KICKS: [Position; 5] = const_map!(UP_TO_RIGHT_WALL_KICKS, mirror_y);
+const NORTH_TO_WEST_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, mirror_x);
+const EAST_TO_SOUTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg);
+const EAST_TO_NORTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg);
+const SOUTH_TO_WEST_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, mirror_x);
+const SOUTH_TO_EAST_WALL_KICKS: [Position; 5] = NORTH_TO_EAST_WALL_KICKS;
+const WEST_TO_NORTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, mirror_y);
+const WEST_TO_SOUTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, mirror_y);
 
 const UP_TO_RIGHT_I_WALL_KICKS: [Position; 5] = [
     Position::new(0, 0),
@@ -68,12 +73,12 @@ const fn init(x: i32, y: i32) -> Position {
 
 impl TetrominoKind {
     pub(in crate::app::player::core) const ALL: [Self; 7] = [
-        Self::I,
-        Self::J,
-        Self::L,
         Self::O,
-        Self::S,
+        Self::I,
         Self::T,
+        Self::L,
+        Self::J,
+        Self::S,
         Self::Z,
     ];
 
@@ -97,18 +102,22 @@ impl TetrominoKind {
         *self != TetrominoKind::I && *self != TetrominoKind::O
     }
 
-    /// Return an array of the 5 SRS wall-kick translations.
+    /// Return wall-kick translations.
     pub(super) fn wall_kick_translations(
         &self,
         rtype: RotationType,
         rotation_status: Direction,
-    ) -> &'static [Position] {
-        // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
+    ) -> impl Iterator<Item = &'static Position> {
         match self {
-            // it's useless calling this function for the O tetromino, since it doesn't move when turned
-            TetrominoKind::O => &NO_WALL_KICKS,
-            TetrominoKind::I => Self::i_wall_kick_translations(rtype, rotation_status),
-            _ => Self::generic_wall_kick_translations(rtype, rotation_status),
+            TetrominoKind::O => NO_WALL_KICKS[..].iter(),
+            TetrominoKind::I => Self::i_wall_kick_translations(rtype, rotation_status).iter(),
+            TetrominoKind::T
+            if rotation_status == Direction::North || rotation_status == Direction::South =>
+            {
+                // NOTE : T tetromino has some weird additional stuff (missing kicks)
+                Self::generic_wall_kick_translations(rtype, rotation_status).iter()
+            }
+            _ => Self::generic_wall_kick_translations(rtype, rotation_status).iter(),
         }
     }
 
@@ -116,7 +125,6 @@ impl TetrominoKind {
         rtype: RotationType,
         rotation_status: Direction,
     ) -> &'static [Position] {
-        // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
         match (rotation_status, rtype) {
             (Direction::North, RotationType::Clockwise) => &UP_TO_RIGHT_I_WALL_KICKS,
             (Direction::East, RotationType::Counterclockwise) => &RIGHT_TO_UP_I_WALL_KICKS,
@@ -129,21 +137,19 @@ impl TetrominoKind {
             (_, _) => &NO_WALL_KICKS,
         }
     }
-
     fn generic_wall_kick_translations(
         rtype: RotationType,
         rotation_status: Direction,
     ) -> &'static [Position] {
-        // cf https://tetris.fandom.com/wiki/SRS#Wall_Kicks
         match (rotation_status, rtype) {
-            (Direction::North, RotationType::Clockwise) => &UP_TO_RIGHT_WALL_KICKS,
-            (Direction::East, RotationType::Counterclockwise) => &RIGHT_TO_UP_WALL_KICKS,
-            (Direction::East, RotationType::Clockwise) => &RIGHT_TO_UP_WALL_KICKS,
-            (Direction::South, RotationType::Counterclockwise) => &UP_TO_RIGHT_WALL_KICKS,
-            (Direction::South, RotationType::Clockwise) => &DOWN_TO_LEFT_WALL_KICKS,
-            (Direction::West, RotationType::Counterclockwise) => &LEFT_TO_DOWN_WALL_KICKS,
-            (Direction::West, RotationType::Clockwise) => &LEFT_TO_DOWN_WALL_KICKS,
-            (Direction::North, RotationType::Counterclockwise) => &DOWN_TO_LEFT_WALL_KICKS,
+            (Direction::North, RotationType::Clockwise) => &NORTH_TO_EAST_WALL_KICKS,
+            (Direction::East, RotationType::Counterclockwise) => &EAST_TO_NORTH_WALL_KICKS,
+            (Direction::East, RotationType::Clockwise) => &EAST_TO_SOUTH_WALL_KICKS,
+            (Direction::South, RotationType::Counterclockwise) => &SOUTH_TO_EAST_WALL_KICKS,
+            (Direction::South, RotationType::Clockwise) => &SOUTH_TO_WEST_WALL_KICKS,
+            (Direction::West, RotationType::Counterclockwise) => &WEST_TO_SOUTH_WALL_KICKS,
+            (Direction::West, RotationType::Clockwise) => &WEST_TO_NORTH_WALL_KICKS,
+            (Direction::North, RotationType::Counterclockwise) => &NORTH_TO_WEST_WALL_KICKS,
             (_, _) => &NO_WALL_KICKS,
         }
     }
