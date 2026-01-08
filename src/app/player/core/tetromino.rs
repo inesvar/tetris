@@ -1,5 +1,5 @@
 //! Define `struct` [Tetromino], re-export `struct` [Position] and `enum`s [TetrominoKind] and [RotationType].
-#![doc = mermaid!("tetromino/tetromino.mmd")]
+#![doc = simple_mermaid::mermaid!("tetromino/tetromino.mmd")]
 
 mod moving_primitives;
 mod rotation_translation;
@@ -11,9 +11,7 @@ use self::{
     spatial_primitives::Direction,
 };
 use super::{GameOverError, TetrisColor, TetrisGrid, TetrominoMove};
-use crate::concatln;
 use serde::{Deserialize, Serialize};
-use simple_mermaid::mermaid;
 use std::fmt::Display;
 
 pub(super) use rotation_translation::RotationType;
@@ -41,7 +39,7 @@ impl From<TetrominoKind> for Tetromino {
     }
 }
 
-#[doc = mermaid!("tetromino/tetromino_internals.mmd")]
+#[doc = simple_mermaid::mermaid!("tetromino/tetromino_internals.mmd")]
 impl Tetromino {
     pub(in crate::app::player) fn new(kind: TetrominoKind) -> Self {
         Self::from(kind)
@@ -159,7 +157,7 @@ impl Default for Tetromino {
 
 impl Display for Tetromino {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut buffer: Vec<char> = concatln!("         ", "         ", "         ", "         ",)
+        let mut buffer: Vec<char> = crate::concatln!("         ", "         ", "         ", "         ",)
             .chars()
             .collect();
 

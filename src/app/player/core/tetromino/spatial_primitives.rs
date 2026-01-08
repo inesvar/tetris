@@ -1,4 +1,5 @@
 //! Define `struct` [Position] and `enum` [Direction].
+
 use serde::{Deserialize, Serialize};
 
 /// Position on a discrete grid.

@@ -1,11 +1,10 @@
 //! Define `struct` [TetrisGrid] and `enum` [GameOverError].
-#![doc = mermaid!("tetris_grid.mmd")]
+#![doc = simple_mermaid::mermaid!("tetris_grid.mmd")]
 
 use super::{Position, TetrisColor};
 use crate::settings::{MAX_SMALL_UNSIGNED, NB_VISIBLE_BUFFER_ROWS};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use simple_mermaid::mermaid;
 use std::fmt::Display;
 use std::ops::Index;
 
@@ -146,7 +145,7 @@ impl TetrisGrid {
 
 /// In [tetris_grid](super::tetris_grid), methods used  by
 /// [Tetromino](super::tetromino::Tetromino) to enter, move and then lock down in the grid.
-#[doc = mermaid!("tetris_grid_internals.mmd")]
+#[doc = simple_mermaid::mermaid!("tetris_grid_internals.mmd")]
 impl TetrisGrid {
     /// Return the translation needed for `blocks` to enter the grid.
     ///

@@ -1,11 +1,10 @@
 //! Define `struct` [TetrominoGenerator] and `enum` [BagType].
-#![doc = mermaid!("tetromino_generator.mmd")]
+#![doc = simple_mermaid::mermaid!("tetromino_generator.mmd")]
 
 use super::TetrominoKind;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
-use simple_mermaid::mermaid;
 use std::array;
 
 /// Tetromino generator.

@@ -1,8 +1,7 @@
 //! Define `trait` [ApplyRotationTranslation] for [Position] and [Direction].
-#![doc = mermaid!("moving_primitives.mmd")]
+#![doc = simple_mermaid::mermaid!("moving_primitives.mmd")]
 
 use super::{Direction, Position, RotationTranslation, RotationType};
-use simple_mermaid::mermaid;
 
 /// Apply a [RotationTranslation] to a spatial primitive ([Position] or [Direction]).
 pub(super) trait ApplyRotationTranslation {
