@@ -40,17 +40,15 @@ impl Position {
         Position { x, y }
     }
 
-    // Using `const` is useful here so that well-kicks can be evaluated at compile-time in the future.
-    // TODO create a const trait PositionArithmetic when it will be possible
     pub(super) const fn neg(&self) -> Self {
         Position::new(-self.x, -self.y)
     }
 
-    pub(super) const fn mirror_x(&self) -> Self {
+    pub(super) const fn neg_x(&self) -> Self {
         Position::new(-self.x, self.y)
     }
 
-    pub(super) const fn mirror_y(&self) -> Self {
+    pub(super) const fn neg_y(&self) -> Self {
         Position::new(self.x, -self.y)
     }
 
@@ -136,8 +134,8 @@ mod tests {
     #[case(Position::RIGHT, Position::LEFT)]
     #[case(Position::FALL, Position::FALL)]
     #[case(Position::LEFT, Position::RIGHT)]
-    fn position_mirror_x_is_correct(#[case] input: Position, #[case] expected: Position) {
-        assert_eq!(input.mirror_x(), expected);
+    fn position_neg_x_is_correct(#[case] input: Position, #[case] expected: Position) {
+        assert_eq!(input.neg_x(), expected);
     }
 
     #[rstest]
@@ -145,8 +143,8 @@ mod tests {
     #[case(Position::RIGHT, Position::RIGHT)]
     #[case(Position::FALL, Position::RISE)]
     #[case(Position::LEFT, Position::LEFT)]
-    fn position_mirror_y_is_correct(#[case] input: Position, #[case] expected: Position) {
-        assert_eq!(input.mirror_y(), expected);
+    fn position_neg_y_is_correct(#[case] input: Position, #[case] expected: Position) {
+        assert_eq!(input.neg_y(), expected);
     }
 
     #[rstest]

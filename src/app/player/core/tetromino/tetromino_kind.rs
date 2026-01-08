@@ -26,7 +26,7 @@ macro_rules! const_map {
     };
 }
 
-// source : Tetris Guideline
+// source: Tetris Guideline
 const NORTH_TO_EAST_WALL_KICKS: [Position; 5] = [
     Position::new(0, 0),
     Position::new(-1, 0),
@@ -35,13 +35,13 @@ const NORTH_TO_EAST_WALL_KICKS: [Position; 5] = [
     Position::new(-1, 2),
 ];
 
-const NORTH_TO_WEST_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, mirror_x);
+const NORTH_TO_WEST_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_x);
 const EAST_TO_SOUTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg);
 const EAST_TO_NORTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg);
-const SOUTH_TO_WEST_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, mirror_x);
+const SOUTH_TO_WEST_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_x);
 const SOUTH_TO_EAST_WALL_KICKS: [Position; 5] = NORTH_TO_EAST_WALL_KICKS;
-const WEST_TO_NORTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, mirror_y);
-const WEST_TO_SOUTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, mirror_y);
+const WEST_TO_NORTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_y);
+const WEST_TO_SOUTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_y);
 
 const UP_TO_RIGHT_I_WALL_KICKS: [Position; 5] = [
     Position::new(0, 0),
@@ -84,7 +84,7 @@ impl TetrominoKind {
 
     /// Return the initial position of the center and the blocks.
     pub(super) fn get_initial_position(&self) -> [Position; 5] {
-        // cf https://tetris.fandom.com/wiki/SRS#Spawn_Orientation_and_Location
+        // source: Tetris Guideline
         match self {
             // in order : center_x, center_y, first_block_x, first_block_y, second_block_x, second_block_y...
             TetrominoKind::I => [init(1, 1), init(0, 1), init(1, 1), init(2, 1), init(3, 1)],
