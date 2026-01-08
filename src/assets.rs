@@ -1,8 +1,12 @@
 //! Assets include Tetromino block textures and fonts.
+use graphics::glyph_cache::rusttype::GlyphCache;
 use include_assets::NamedArchive;
 use opengl_graphics::*;
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
+use std::{
+    fmt::{Debug, Display},
+    path::PathBuf,
+};
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub enum TetrisColor {
@@ -52,6 +56,21 @@ impl TryFrom<char> for TetrisColor {
     }
 }
 
+impl TetrisColor {
+    fn get_texture_filename(&self) -> &str {
+        match self {
+            Self::Cyan => "cyan",
+            Self::Yellow => "yellow",
+            Self::Purple => "purple",
+            Self::Blue => "blue",
+            Self::Orange => "orange",
+            Self::Green => "green",
+            Self::Red => "red",
+            Self::Grey => "grey",
+        }
+    }
+}
+
 pub struct Assets<'a> {
     pub cyan_texture: Texture,
     pub yellow_texture: Texture,
@@ -61,43 +80,42 @@ pub struct Assets<'a> {
     pub green_texture: Texture,
     pub red_texture: Texture,
     pub grey_texture: Texture,
+    #[allow(unused)]
     pub sprite_sheet_texture: Texture,
-    pub tetris_font: GlyphCache<'a>,
-    pub main_font: GlyphCache<'a>,
+    pub tetris_font: GlyphCache<'a, (), Texture>,
+    pub main_font: GlyphCache<'a, (), Texture>,
+}
+
+const TEXTURE_FOLDER: &str = "src/assets/textures";
+const TEXTURE_EXTENSION: &str = "bmp";
+
+fn get_texture(filename: &str) -> Texture {
+    let path = PathBuf::from(format!("{TEXTURE_FOLDER}/{filename}.{TEXTURE_EXTENSION}"));
+
+    Texture::from_path(&path, &TextureSettings::new()).unwrap()
+}
+
+fn get_font<'a>(archive: &'a NamedArchive, path: &str) -> GlyphCache<'a, (), Texture> {
+    let path = PathBuf::from(path);
+    let tetris_font_bytes = archive.get(&path.to_string_lossy()).unwrap();
+
+    GlyphCache::from_bytes(tetris_font_bytes, (), TextureSettings::new()).unwrap()
 }
 
 impl<'a> Assets<'a> {
     pub fn new(assets: &'a NamedArchive) -> Self {
-        let cyan_bytes = assets.get("textures/cyan.bmp").unwrap();
-        let yellow_bytes = assets.get("textures/yellow.bmp").unwrap();
-        let purple_bytes = assets.get("textures/purple.bmp").unwrap();
-        let blue_bytes = assets.get("textures/blue.bmp").unwrap();
-        let orange_bytes = assets.get("textures/orange.bmp").unwrap();
-        let green_bytes = assets.get("textures/green.bmp").unwrap();
-        let red_bytes = assets.get("textures/red.bmp").unwrap();
-        let grey_bytes = assets.get("textures/grey.bmp").unwrap();
-        let sprite_sheet_bytes = assets.get("textures/sprite_sheet.bmp").unwrap();
+        let cyan_texture = get_texture(TetrisColor::Cyan.get_texture_filename());
+        let yellow_texture = get_texture(TetrisColor::Yellow.get_texture_filename());
+        let purple_texture = get_texture(TetrisColor::Purple.get_texture_filename());
+        let blue_texture = get_texture(TetrisColor::Blue.get_texture_filename());
+        let orange_texture = get_texture(TetrisColor::Orange.get_texture_filename());
+        let green_texture = get_texture(TetrisColor::Green.get_texture_filename());
+        let red_texture = get_texture(TetrisColor::Red.get_texture_filename());
+        let grey_texture = get_texture(TetrisColor::Grey.get_texture_filename());
+        let sprite_sheet_texture = get_texture("sprite_sheet");
 
-        let cyan_texture = Texture::from_bytes(cyan_bytes, &TextureSettings::new()).unwrap();
-        let yellow_texture = Texture::from_bytes(yellow_bytes, &TextureSettings::new()).unwrap();
-        let purple_texture = Texture::from_bytes(purple_bytes, &TextureSettings::new()).unwrap();
-        let blue_texture = Texture::from_bytes(blue_bytes, &TextureSettings::new()).unwrap();
-        let orange_texture = Texture::from_bytes(orange_bytes, &TextureSettings::new()).unwrap();
-        let green_texture = Texture::from_bytes(green_bytes, &TextureSettings::new()).unwrap();
-        let red_texture = Texture::from_bytes(red_bytes, &TextureSettings::new()).unwrap();
-        let grey_texture = Texture::from_bytes(grey_bytes, &TextureSettings::new()).unwrap();
-        let sprite_sheet_texture =
-            Texture::from_bytes(sprite_sheet_bytes, &TextureSettings::new()).unwrap();
-
-        let tetris_font_bytes = assets
-            .get("fonts/tetris-blocks-font/TetrisBlocks-P99g.ttf")
-            .unwrap();
-        let main_font_bytes = assets.get("fonts/digitalt/Digitalt.otf").unwrap();
-
-        let tetris_font =
-            GlyphCache::from_bytes(tetris_font_bytes, (), TextureSettings::new()).unwrap();
-        let main_font =
-            GlyphCache::from_bytes(main_font_bytes, (), TextureSettings::new()).unwrap();
+        let tetris_font = get_font(assets, "fonts/tetris-blocks-font/TetrisBlocks-P99g.ttf");
+        let main_font = get_font(assets, "fonts/digitalt/Digitalt.otf");
 
         Assets {
             cyan_texture,
@@ -114,7 +132,7 @@ impl<'a> Assets<'a> {
         }
     }
 
-    pub fn texture_from_tetris_color(&self, color: &TetrisColor) -> &Texture {
+    pub fn texture_for(&self, color: &TetrisColor) -> &Texture {
         match color {
             TetrisColor::Cyan => &self.cyan_texture,
             TetrisColor::Yellow => &self.yellow_texture,

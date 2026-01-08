@@ -137,7 +137,7 @@ fn render_tetris_block(
     );
 
     Image::new().rect(dims).draw(
-        gl_ctx.assets.texture_from_tetris_color(tetris_color),
+        gl_ctx.assets.texture_for(tetris_color),
         &gl_ctx.draw_state,
         gl_ctx.transform,
         gl_ctx.gl,
