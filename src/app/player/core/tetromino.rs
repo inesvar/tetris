@@ -157,9 +157,10 @@ impl Default for Tetromino {
 
 impl Display for Tetromino {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut buffer: Vec<char> = crate::concatln!("         ", "         ", "         ", "         ",)
-            .chars()
-            .collect();
+        let mut buffer: Vec<char> =
+            crate::concatln!("         ", "         ", "         ", "         ",)
+                .chars()
+                .collect();
 
         for block in self.blocks {
             buffer[10 * block.y() as usize + block.x() as usize] = '#';

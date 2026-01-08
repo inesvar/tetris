@@ -7,21 +7,21 @@ use super::{Direction, Position, RotationTranslation, RotationType};
 pub(super) trait ApplyRotationTranslation {
     /// Turn then translate as described by `movement` (turning around the center of the `movement.rotation_center` block).
     fn move_by(&mut self, movement: &RotationTranslation) {
-        self.turn_around_block_center(movement);
+        self.turn_around(movement);
         self.translate_by(movement);
     }
     /// Turn then translate as described by `movement` (turning around the bottom right corner of the `movement.rotation_center` block).
     fn move_by_with_offset(&mut self, movement: &RotationTranslation) {
-        self.turn_around_block_corner(movement);
+        self.turn_around_corner(movement);
         self.translate_by(movement);
     }
 
     /// Translate by `movement.translation`.
     fn translate_by(&mut self, movement: &RotationTranslation);
     /// Turn around the center of the `movement.rotation_center` block by `movement.rotation_type`.
-    fn turn_around_block_center(&mut self, movement: &RotationTranslation);
+    fn turn_around(&mut self, movement: &RotationTranslation);
     /// Turn around the bottom right corner of the `movement.rotation_center` block by `movement.rotation_type`.
-    fn turn_around_block_corner(&mut self, movement: &RotationTranslation);
+    fn turn_around_corner(&mut self, movement: &RotationTranslation);
 }
 
 impl ApplyRotationTranslation for Position {
@@ -29,7 +29,7 @@ impl ApplyRotationTranslation for Position {
         *self += movement.translation;
     }
 
-    fn turn_around_block_center(&mut self, movement: &RotationTranslation) {
+    fn turn_around(&mut self, movement: &RotationTranslation) {
         let center: Position = movement.rotation_center;
         match movement.rotation_type {
             RotationType::Clockwise => {
@@ -48,20 +48,20 @@ impl ApplyRotationTranslation for Position {
         }
     }
 
-    fn turn_around_block_corner(&mut self, movement: &RotationTranslation) {
-        let zoomed_rotation = movement.with_corner_rotation_center();
-        let mut zoomed = self.to_zoomed_2x();
+    fn turn_around_corner(&mut self, movement: &RotationTranslation) {
+        let mut zoomed_self = self.zoom_in_2x();
+        let corner_rotation = movement.zoom_in_corner_2x();
 
-        zoomed.turn_around_block_center(&zoomed_rotation);
+        zoomed_self.turn_around(&corner_rotation);
 
-        *self = zoomed.from_zoomed_2x();
+        *self = zoomed_self.zoom_out_2x();
     }
 }
 
 impl ApplyRotationTranslation for Direction {
     fn translate_by(&mut self, _movement: &RotationTranslation) {}
 
-    fn turn_around_block_center(&mut self, movement: &RotationTranslation) {
+    fn turn_around(&mut self, movement: &RotationTranslation) {
         match movement.rotation_type {
             RotationType::Clockwise => {
                 self.turn_clockwise();
@@ -77,8 +77,8 @@ impl ApplyRotationTranslation for Direction {
         }
     }
 
-    fn turn_around_block_corner(&mut self, movement: &RotationTranslation) {
-        self.turn_around_block_center(movement);
+    fn turn_around_corner(&mut self, movement: &RotationTranslation) {
+        self.turn_around(movement);
     }
 }
 
@@ -89,19 +89,18 @@ impl ApplyRotationTranslation for Direction {
 /// Most tetrominos rotate around a block center.
 impl Position {
     /// Get 2x zoomed coordinates for the block center.
-    fn to_zoomed_2x(self) -> Self {
-        Self::new(2 * self.x, 2 * self.y)
+    fn zoom_in_2x(&self) -> Self {
+        self.apply(|x: i32| 2 * x)
     }
 
     /// Get 2x zoomed coordinates for the block bottom right corner.
-    fn to_zoomed_2x_corner(self) -> Self {
-        Self::new(2 * self.x + 1, 2 * self.y + 1)
+    fn zoom_in_corner_2x(&self) -> Self {
+        self.apply(|x: i32| 2 * x + 1)
     }
 
     /// Get block coordinates from 2x zoomed coordinates.
-    #[allow(clippy::wrong_self_convention)]
-    fn from_zoomed_2x(self) -> Self {
-        Self::new(self.x.div_euclid(2), self.y.div_euclid(2))
+    fn zoom_out_2x(&self) -> Self {
+        self.apply(|x: i32| x.div_euclid(2))
     }
 }
 
@@ -111,11 +110,11 @@ impl Position {
 /// These functions are used by [ApplyRotationTranslation] to rotate the I tetromino, which rotates around a block corner.
 /// Most tetrominos rotate around a block center.
 impl RotationTranslation {
-    fn with_corner_rotation_center(&self) -> Self {
-        let mut copy = *self;
-        copy.rotation_center = copy.rotation_center.to_zoomed_2x_corner();
-
-        copy
+    fn zoom_in_corner_2x(&self) -> Self {
+        Self {
+            rotation_center: self.rotation_center.zoom_in_corner_2x(),
+            ..*self
+        }
     }
 }
 
@@ -155,7 +154,7 @@ mod tests {
     #[case(Position::new(-1, 0), Position::new(-2, 0))]
     #[case(Position::new(0, -1), Position::new(0, -2))]
     fn to_zoomed_2x_is_correct(#[case] input: Position, #[case] expected: Position) {
-        assert_eq!(input.to_zoomed_2x(), expected);
+        assert_eq!(input.zoom_in_2x(), expected);
     }
 
     #[rstest]
@@ -165,7 +164,7 @@ mod tests {
     #[case(Position::new(-1, 0), Position::new(-1, 1))]
     #[case(Position::new(0, -1), Position::new(1, -1))]
     fn to_zoomed_2x_corner_is_correct(#[case] input: Position, #[case] expected: Position) {
-        assert_eq!(input.to_zoomed_2x_corner(), expected);
+        assert_eq!(input.zoom_in_corner_2x(), expected);
     }
 
     #[rstest]
@@ -180,7 +179,7 @@ mod tests {
     #[case(Position::new(-2, 0), Position::new(-1, 0))]
     #[case(Position::new(0, -2), Position::new(0, -1))]
     fn from_zoomed_2x_is_correct(#[case] input: Position, #[case] expected: Position) {
-        assert_eq!(input.from_zoomed_2x(), expected);
+        assert_eq!(input.zoom_out_2x(), expected);
     }
 
     const RIGHT_TRANSLATION: RotationTranslation = RotationTranslation::right();
@@ -217,8 +216,8 @@ mod tests {
         let mut actual2 = input;
         let rotation = RotationTranslation::centered_rotation(rotation_type);
 
-        actual1.turn_around_block_center(&rotation);
-        actual2.turn_around_block_corner(&rotation);
+        actual1.turn_around(&rotation);
+        actual2.turn_around_corner(&rotation);
 
         assert_eq!(actual1, expected);
         assert_eq!(actual2, expected);
@@ -262,7 +261,7 @@ mod tests {
         let mut actual = rotation_center + input;
         let rotation = RotationTranslation::rotation(rotation_type, &rotation_center);
 
-        actual.turn_around_block_center(&rotation);
+        actual.turn_around(&rotation);
 
         assert_eq!(actual, rotation_center + expected);
     }
@@ -285,7 +284,7 @@ mod tests {
         let mut actual = rotation_center + input;
         let rotation = RotationTranslation::rotation(rotation_type, &rotation_center);
 
-        actual.turn_around_block_corner(&rotation);
+        actual.turn_around_corner(&rotation);
 
         assert_eq!(actual, rotation_center + expected);
     }

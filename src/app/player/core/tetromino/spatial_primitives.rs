@@ -6,9 +6,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
 pub(in crate::app::player) struct Position {
     /// Horizontal coordinate, from left to right.
-    pub(super) x: i32, // TODO: make private
+    x: i32,
     /// Vertical coordinate, *from top to bottom*.
-    pub(super) y: i32,
+    y: i32,
 }
 
 impl Position {
@@ -37,27 +37,34 @@ pub(super) enum Direction {
 /// (also used by [tetromino_kind](super::tetromino_kind)).
 impl Position {
     pub(in crate::app::player) const fn new(x: i32, y: i32) -> Self {
-        Position { x, y }
+        Self { x, y }
     }
 
     pub(super) const fn neg(&self) -> Self {
-        Position::new(-self.x, -self.y)
+        Self::new(-self.x, -self.y)
     }
 
     pub(super) const fn neg_x(&self) -> Self {
-        Position::new(-self.x, self.y)
+        Self::new(-self.x, self.y)
     }
 
     pub(super) const fn neg_y(&self) -> Self {
-        Position::new(self.x, -self.y)
+        Self::new(self.x, -self.y)
     }
 
     pub(super) const fn turned_clockwise(&self) -> Self {
-        Position::new(-self.y, self.x)
+        Self::new(-self.y, self.x)
     }
 
     pub(super) const fn turned_counterclockwise(&self) -> Self {
-        Position::new(self.y, -self.x)
+        Self::new(self.y, -self.x)
+    }
+
+    pub(super) fn apply<F>(&self, f: F) -> Self
+    where
+        F: Fn(i32) -> i32,
+    {
+        Self::new(f(self.x), f(self.y))
     }
 }
 

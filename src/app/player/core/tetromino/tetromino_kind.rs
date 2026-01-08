@@ -112,7 +112,7 @@ impl TetrominoKind {
             TetrominoKind::O => NO_WALL_KICKS[..].iter(),
             TetrominoKind::I => Self::i_wall_kick_translations(rtype, rotation_status).iter(),
             TetrominoKind::T
-            if rotation_status == Direction::North || rotation_status == Direction::South =>
+                if rotation_status == Direction::North || rotation_status == Direction::South =>
             {
                 // NOTE : T tetromino has some weird additional stuff (missing kicks)
                 Self::generic_wall_kick_translations(rtype, rotation_status).iter()
