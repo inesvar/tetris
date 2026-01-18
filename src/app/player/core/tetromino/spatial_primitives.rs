@@ -22,7 +22,6 @@ impl Position {
 
 /// Four cardinal directions.
 #[derive(Clone, Copy, Default, Serialize, Deserialize, Debug, PartialEq)]
-#[cfg_attr(test, derive(enum_iterator::Sequence))]
 pub(super) enum Direction {
     #[default]
     /// Default.
