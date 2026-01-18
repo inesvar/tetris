@@ -13,3 +13,4 @@ pub(in crate::app) use tetromino::Tetromino;
 pub(in crate::app::player) use tetromino::TetrominoKind;
 pub(in crate::app::player) use tetromino_generator::TetrominoGenerator;
 pub(in crate::app::player) use tetromino_move::TetrominoMove;
+pub(in crate::app::player) use tetris_grid::NB_VISIBLE_BUFFER_ROWS;

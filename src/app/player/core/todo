@@ -1,10 +1,6 @@
 - make more tetris_grid unit tests
 - rework tetromino_kind
 
-- fix settings use in tetris grid
-- remove enum iterator
-- fix concatln
-
 # problems
 - the clock should pause during a game pause (partially revert blinking changes)
 - serialize a PlayerScreen(PlayerScreen) instead of doing black magic
