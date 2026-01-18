@@ -18,6 +18,7 @@ use self::{
     pressed_keys::PressedKeys,
 };
 use crate::settings::NB_NEXT_TETROMINO;
+pub use core::TetrisColor;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};

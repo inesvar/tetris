@@ -4,18 +4,20 @@
 mod moving_primitives;
 mod rotation_translation;
 mod spatial_primitives;
+mod tetris_color;
 mod tetromino_kind;
 
 use self::{
     moving_primitives::ApplyRotationTranslation, rotation_translation::RotationTranslation,
     spatial_primitives::Direction,
 };
-use super::{GameOverError, TetrisColor, TetrisGrid, TetrominoMove};
+use super::{GameOverError, TetrisGrid, TetrominoMove};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 pub(super) use rotation_translation::RotationType;
 pub(in crate::app::player) use spatial_primitives::Position;
+pub use tetris_color::TetrisColor;
 pub(in crate::app::player) use tetromino_kind::TetrominoKind;
 
 /// Tetromino.

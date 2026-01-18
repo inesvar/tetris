@@ -11,6 +11,7 @@ use crate::{
     app::App,
     settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION},
 };
+pub use app::TetrisColor;
 use glfw_window::GlfwWindow;
 use include_assets::{include_dir, NamedArchive};
 use piston::{

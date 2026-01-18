@@ -1,10 +1,10 @@
 //! Define `trait` [Render] for [LocalPlayer], [PlayerScreen], [Tetromino], [TetrisGrid].
 use super::core::{Position, TetrisGrid, Tetromino};
+use super::TetrisColor;
 use crate::app::player::LocalPlayer;
 use crate::app::render_app::{Piston2dGraphicsArguments, Render};
 use crate::app::ui::text::Text;
 use crate::app::PlayerScreen;
-use crate::assets::TetrisColor;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_FONT_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
     GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO, NB_VISIBLE_BUFFER_ROWS,
