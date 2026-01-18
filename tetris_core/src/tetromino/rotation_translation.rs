@@ -5,15 +5,15 @@ use super::Position;
 
 /// Movement (a rotation followed by a translation).
 #[derive(Clone, Copy, Default)]
-pub(super) struct RotationTranslation {
-    pub(super) rotation_type: RotationType,
-    pub(super) rotation_center: Position,
-    pub(super) translation: Position,
+pub struct RotationTranslation {
+    pub rotation_type: RotationType,
+    pub rotation_center: Position,
+    pub translation: Position,
 }
 
 /// Four 90° rotation types.
 #[derive(Clone, Copy, Default, PartialEq, Debug)]
-pub(in crate::app::player::core) enum RotationType {
+pub enum RotationType {
     #[default]
     /// Default.
     Identity,
@@ -24,7 +24,7 @@ pub(in crate::app::player::core) enum RotationType {
 
 /// In [rotation_translation](super::rotation_translation), constructors used to move the [Tetromino](super::Tetromino).
 impl RotationTranslation {
-    pub(super) const fn new(
+    pub const fn new(
         translation: &Position,
         rotation_type: RotationType,
         rotation_center: &Position,
@@ -37,7 +37,7 @@ impl RotationTranslation {
     }
 
     // TODO: remove when const traits are allowed
-    pub(super) const fn identity() -> Self {
+    pub const fn identity() -> Self {
         Self::new(
             &Position::new(0, 0),
             RotationType::Identity,
@@ -46,7 +46,7 @@ impl RotationTranslation {
     }
 
     // why not by reference ?
-    pub(super) const fn translation(translation: Position) -> Self {
+    pub const fn translation(translation: Position) -> Self {
         Self {
             translation,
             ..Self::identity()

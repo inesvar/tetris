@@ -1,0 +1,11 @@
+[package]
+name = "tetris_core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rand = { workspace = true }
+serde = { workspace = true }
+rand_pcg = { workspace = true }
+simple-mermaid = { workspace = true }
+rstest = { workspace = true }

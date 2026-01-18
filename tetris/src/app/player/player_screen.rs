@@ -1,7 +1,7 @@
 //! Define the [constructor](PlayerScreen::empty()) of [PlayerScreen].
-use super::core::{TetrisGrid, Tetromino};
 use super::{CircularArray, PlayerScreen};
 use crate::settings::NB_NEXT_TETROMINO;
+use tetris_core::{TetrisGrid, Tetromino};
 
 impl PlayerScreen {
     pub fn empty() -> Self {

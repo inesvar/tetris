@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// Seven types of Tetromino.
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
-pub(in crate::app::player) enum TetrominoKind {
+pub enum TetrominoKind {
     O,
     I,
     T,
@@ -72,7 +72,7 @@ const fn init(x: i32, y: i32) -> Position {
 }
 
 impl TetrominoKind {
-    pub(in crate::app::player::core) const ALL: [Self; 7] = [
+    pub const ALL: [Self; 7] = [
         Self::O,
         Self::I,
         Self::T,
@@ -83,7 +83,7 @@ impl TetrominoKind {
     ];
 
     /// Return the initial position of the center and the blocks.
-    pub(super) fn get_initial_position(&self) -> [Position; 5] {
+    pub fn get_initial_position(&self) -> [Position; 5] {
         // source: Tetris Guideline
         match self {
             // in order : center_x, center_y, first_block_x, first_block_y, second_block_x, second_block_y...
@@ -98,12 +98,12 @@ impl TetrominoKind {
     }
 
     /// Return if the rotation center is on a block center.
-    pub(super) fn is_rotation_center_on_block_center(&self) -> bool {
+    pub fn is_rotation_center_on_block_center(&self) -> bool {
         *self != TetrominoKind::I && *self != TetrominoKind::O
     }
 
     /// Return wall-kick translations.
-    pub(super) fn wall_kick_translations(
+    pub fn wall_kick_translations(
         &self,
         rtype: RotationType,
         rotation_status: Direction,

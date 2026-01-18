@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// Position on a discrete grid.
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
-pub(in crate::app::player) struct Position {
+pub struct Position {
     /// Horizontal coordinate, from left to right.
     x: i32,
     /// Vertical coordinate, *from top to bottom*.
@@ -14,15 +14,15 @@ pub(in crate::app::player) struct Position {
 impl Position {
     // y increases from top to bottom
     #[cfg(test)]
-    pub(in crate::app::player::core) const RISE: Position = Position::new(0, -1);
-    pub(in crate::app::player::core) const RIGHT: Position = Position::new(1, 0);
-    pub(in crate::app::player::core) const FALL: Position = Position::new(0, 1);
-    pub(in crate::app::player::core) const LEFT: Position = Position::new(-1, 0);
+    pub const RISE: Position = Position::new(0, -1);
+    pub const RIGHT: Position = Position::new(1, 0);
+    pub const FALL: Position = Position::new(0, 1);
+    pub const LEFT: Position = Position::new(-1, 0);
 }
 
 /// Four cardinal directions.
 #[derive(Clone, Copy, Default, Serialize, Deserialize, Debug, PartialEq)]
-pub(super) enum Direction {
+pub enum Direction {
     #[default]
     /// Default.
     North,
@@ -35,31 +35,31 @@ pub(super) enum Direction {
 /// to implement [ApplyRotationTranslation](super::moving_primitives::ApplyRotationTranslation) for [Position]
 /// (also used by [tetromino_kind](super::tetromino_kind)).
 impl Position {
-    pub(in crate::app::player) const fn new(x: i32, y: i32) -> Self {
+    pub const fn new(x: i32, y: i32) -> Self {
         Self { x, y }
     }
 
-    pub(super) const fn neg(&self) -> Self {
+    pub const fn neg(&self) -> Self {
         Self::new(-self.x, -self.y)
     }
 
-    pub(super) const fn neg_x(&self) -> Self {
+    pub const fn neg_x(&self) -> Self {
         Self::new(-self.x, self.y)
     }
 
-    pub(super) const fn neg_y(&self) -> Self {
+    pub const fn neg_y(&self) -> Self {
         Self::new(self.x, -self.y)
     }
 
-    pub(super) const fn turned_clockwise(&self) -> Self {
+    pub const fn turned_clockwise(&self) -> Self {
         Self::new(-self.y, self.x)
     }
 
-    pub(super) const fn turned_counterclockwise(&self) -> Self {
+    pub const fn turned_counterclockwise(&self) -> Self {
         Self::new(self.y, -self.x)
     }
 
-    pub(super) fn apply<F>(&self, f: F) -> Self
+    pub fn apply<F>(&self, f: F) -> Self
     where
         F: Fn(i32) -> i32,
     {
@@ -69,11 +69,11 @@ impl Position {
 
 /// In [spatial_primitives](super::spatial_primitives), getters used by [player::render](crate::app::player::render).
 impl Position {
-    pub(in crate::app::player) fn x(&self) -> i32 {
+    pub fn x(&self) -> i32 {
         self.x
     }
 
-    pub(in crate::app::player) fn y(&self) -> i32 {
+    pub fn y(&self) -> i32 {
         self.y
     }
 }
@@ -82,7 +82,7 @@ impl Position {
 /// [moving_primitives](super::moving_primitives) to implement
 /// [ApplyRotationTranslation](super::moving_primitives::ApplyRotationTranslation) for [Direction].
 impl Direction {
-    pub(super) fn turn_clockwise(&mut self) {
+    pub fn turn_clockwise(&mut self) {
         match self {
             Direction::North => *self = Direction::East,
             Direction::East => *self = Direction::South,
@@ -91,7 +91,7 @@ impl Direction {
         }
     }
 
-    pub(super) fn turn_counterclockwise(&mut self) {
+    pub fn turn_counterclockwise(&mut self) {
         match self {
             Direction::North => *self = Direction::West,
             Direction::West => *self = Direction::South,

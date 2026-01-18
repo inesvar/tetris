@@ -1,10 +1,10 @@
 //! Define the general implementation of [LocalPlayer].
-use super::core::{GameOverError, TetrisGrid, Tetromino, TetrominoGenerator};
 use super::{circular_array::CircularArray, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen};
 use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
+use tetris_core::{GameOverError, TetrisGrid, Tetromino, TetrominoGenerator};
 
 impl LocalPlayer {
     pub fn new(player_config: &PlayerConfig) -> Self {

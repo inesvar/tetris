@@ -15,17 +15,17 @@ use super::{GameOverError, TetrisGrid, TetrominoMove};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
-pub(super) use rotation_translation::RotationType;
-pub(in crate::app::player) use spatial_primitives::Position;
+pub use rotation_translation::RotationType;
+pub use spatial_primitives::Position;
 pub use tetris_color::TetrisColor;
-pub(in crate::app::player) use tetromino_kind::TetrominoKind;
+pub use tetromino_kind::TetrominoKind;
 
 /// Tetromino.
 #[derive(Clone, Copy, Serialize, Deserialize, Debug)]
-pub(in crate::app) struct Tetromino {
+pub struct Tetromino {
     kind: TetrominoKind,
     center: Position,
-    pub(super) blocks: [Position; 4],
+    pub blocks: [Position; 4],
     direction: Direction,
 }
 
@@ -43,18 +43,15 @@ impl From<TetrominoKind> for Tetromino {
 
 #[doc = simple_mermaid::mermaid!("tetromino/tetromino_internals.mmd")]
 impl Tetromino {
-    pub(in crate::app::player) fn new(kind: TetrominoKind) -> Self {
+    pub fn new(kind: TetrominoKind) -> Self {
         Self::from(kind)
     }
 
-    pub(in crate::app::player) fn reset(&mut self) {
+    pub fn reset(&mut self) {
         *self = Self::from(self.kind)
     }
 
-    pub(in crate::app::player) fn can_enter_grid(
-        &mut self,
-        grid: &TetrisGrid,
-    ) -> Result<(), GameOverError> {
+    pub fn can_enter_grid(&mut self, grid: &TetrisGrid) -> Result<(), GameOverError> {
         let offset = grid.can_blocks_spawn_on(&self.blocks)?;
         let translation = RotationTranslation::translation(offset);
 
@@ -62,18 +59,11 @@ impl Tetromino {
         Ok(())
     }
 
-    pub(in crate::app::player) fn lock_down(
-        self,
-        grid: &mut TetrisGrid,
-    ) -> Result<u64, GameOverError> {
+    pub fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
         grid.add_blocks_and_clear_lines(&self.blocks, self.color())
     }
 
-    pub(in crate::app::player) fn apply(
-        &mut self,
-        tetromino_move: TetrominoMove,
-        grid: &TetrisGrid,
-    ) -> bool {
+    pub fn apply(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
         if tetromino_move.get_rotation_type() == RotationType::Identity {
             self.apply_translation(tetromino_move, grid)
         } else {
@@ -135,11 +125,11 @@ impl Tetromino {
         self.center.translate_by(movement);
     }
 
-    pub(in crate::app::player) fn blocks(&self) -> &[Position] {
+    pub fn blocks(&self) -> &[Position] {
         &self.blocks
     }
 
-    pub(in crate::app::player) fn color(&self) -> TetrisColor {
+    pub fn color(&self) -> TetrisColor {
         self.kind.into()
     }
 }

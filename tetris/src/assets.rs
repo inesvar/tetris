@@ -5,21 +5,6 @@ use include_assets::NamedArchive;
 use opengl_graphics::*;
 use std::path::PathBuf;
 
-impl TetrisColor {
-    fn get_texture_filename(&self) -> &str {
-        match self {
-            Self::Cyan => "cyan",
-            Self::Yellow => "yellow",
-            Self::Purple => "purple",
-            Self::Blue => "blue",
-            Self::Orange => "orange",
-            Self::Green => "green",
-            Self::Red => "red",
-            Self::Grey => "grey",
-        }
-    }
-}
-
 pub struct Assets<'a> {
     pub cyan_texture: Texture,
     pub yellow_texture: Texture,
@@ -53,14 +38,14 @@ fn get_font<'a>(archive: &'a NamedArchive, path: &str) -> GlyphCache<'a, (), Tex
 
 impl<'a> Assets<'a> {
     pub fn new(assets: &'a NamedArchive) -> Self {
-        let cyan_texture = get_texture(TetrisColor::Cyan.get_texture_filename());
-        let yellow_texture = get_texture(TetrisColor::Yellow.get_texture_filename());
-        let purple_texture = get_texture(TetrisColor::Purple.get_texture_filename());
-        let blue_texture = get_texture(TetrisColor::Blue.get_texture_filename());
-        let orange_texture = get_texture(TetrisColor::Orange.get_texture_filename());
-        let green_texture = get_texture(TetrisColor::Green.get_texture_filename());
-        let red_texture = get_texture(TetrisColor::Red.get_texture_filename());
-        let grey_texture = get_texture(TetrisColor::Grey.get_texture_filename());
+        let cyan_texture = get_texture(TetrisColor::Cyan.lowercase_name());
+        let yellow_texture = get_texture(TetrisColor::Yellow.lowercase_name());
+        let purple_texture = get_texture(TetrisColor::Purple.lowercase_name());
+        let blue_texture = get_texture(TetrisColor::Blue.lowercase_name());
+        let orange_texture = get_texture(TetrisColor::Orange.lowercase_name());
+        let green_texture = get_texture(TetrisColor::Green.lowercase_name());
+        let red_texture = get_texture(TetrisColor::Red.lowercase_name());
+        let grey_texture = get_texture(TetrisColor::Grey.lowercase_name());
         let sprite_sheet_texture = get_texture("sprite_sheet");
 
         let tetris_font = get_font(assets, "fonts/tetris-blocks-font/TetrisBlocks-P99g.ttf");

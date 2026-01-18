@@ -22,7 +22,7 @@ pub const NB_VISIBLE_BUFFER_ROWS: u32 = 2;
 /// - **Buffer Zone**: "a 10-cell wide x 20-cell high invisible area above the Matrix used to detect Lock
 ///   Out, Block Out, and Top Out **Game Over Conditions**."
 #[derive(PartialEq, Serialize, Deserialize)]
-pub(in crate::app) struct TetrisGrid {
+pub struct TetrisGrid {
     /// Number of columns in the **Matrix** and **Buffer Zone**.
     ///
     /// Has to be between 4 and [TETRIS_GRID_MAX].
@@ -48,7 +48,7 @@ pub(in crate::app) struct TetrisGrid {
 /// **Tetris Guideline** Game Over Conditions.
 #[derive(Debug, PartialEq)]
 #[allow(clippy::enum_variant_names)]
-pub(in crate::app) enum GameOverError {
+pub enum GameOverError {
     /// According to the **Tetris Guideline** :
     ///
     /// "[...] occurs when part of a newly-generated tetrimino is blocked due to
@@ -75,11 +75,7 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If [TetrisGrid::nb_columns] or [TetrisGrid::nb_matrix_rows] or [TetrisGrid::nb_buffer_rows] aren't in the expected range.
-    pub(in crate::app::player) fn new(
-        nb_columns: u32,
-        nb_matrix_rows: u32,
-        nb_buffer_rows: u32,
-    ) -> Self {
+    pub fn new(nb_columns: u32, nb_matrix_rows: u32, nb_buffer_rows: u32) -> Self {
         if nb_columns > TETRIS_GRID_MAX
             || nb_matrix_rows > TETRIS_GRID_MAX
             || nb_buffer_rows > TETRIS_GRID_MAX
@@ -116,7 +112,7 @@ impl TetrisGrid {
     }
 
     /// Empty the grid.
-    pub(in crate::app::player) fn reset(&mut self) {
+    pub fn reset(&mut self) {
         *self = Self::new(
             self.nb_columns as u32,
             self.nb_matrix_rows as u32,
@@ -125,10 +121,7 @@ impl TetrisGrid {
     }
 
     /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
-    pub(in crate::app::player) fn add_garbage(
-        &mut self,
-        completed_lines: u64,
-    ) -> Result<(), GameOverError> {
+    pub fn add_garbage(&mut self, completed_lines: u64) -> Result<(), GameOverError> {
         let lines_to_add = match completed_lines {
             x if x < 2 => return Ok(()),
             x if x < 4 => x - 1,
@@ -158,10 +151,7 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If any of the `blocks` is outside the tetris grid.
-    pub(super) fn can_blocks_spawn_on(
-        &self,
-        blocks: &[Position],
-    ) -> Result<Position, GameOverError> {
+    pub fn can_blocks_spawn_on(&self, blocks: &[Position]) -> Result<Position, GameOverError> {
         let offset = Position::new(self.nb_columns / 2 - 2, 0);
         let can_spawn_on = blocks
             .iter()
@@ -174,7 +164,7 @@ impl TetrisGrid {
     }
 
     /// Return true if the `block` is inside the grid in an empty slot.
-    pub(super) fn is_block_available(&self, block: &Position) -> bool {
+    pub fn is_block_available(&self, block: &Position) -> bool {
         self.is_in_grid(block) && self.is_block_empty(block)
     }
 
@@ -183,7 +173,7 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If any of the `blocks` is outside the tetris grid or not empty.
-    pub(super) fn add_blocks_and_clear_lines(
+    pub fn add_blocks_and_clear_lines(
         &mut self,
         blocks: &[Position],
         tetris_color: TetrisColor,
@@ -293,15 +283,15 @@ impl TetrisGrid {
 /// In [tetris_grid](super::tetris_grid), helpers used by [player::render](crate::app::player::render)
 /// to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
-    pub(in crate::app::player) const fn nb_matrix_rows_i32(&self) -> i32 {
+    pub const fn nb_matrix_rows_i32(&self) -> i32 {
         self.nb_matrix_rows
     }
 
-    pub(in crate::app::player) const fn nb_columns_i32(&self) -> i32 {
+    pub const fn nb_columns_i32(&self) -> i32 {
         self.nb_columns
     }
 
-    pub(in crate::app::player) fn positions(&self) -> impl Iterator<Item = Position> + use<'_> {
+    pub fn positions(&self) -> impl Iterator<Item = Position> + use<'_> {
         let h = self.nb_matrix_rows + self.nb_buffer_rows;
         let w = self.nb_columns;
         (0..h).flat_map(move |y| {
@@ -330,7 +320,7 @@ impl TetrisGrid {
     }
 
     /// Draw a 1 with blocks of the same color as tetromino.
-    pub(in crate::app::player) fn one(&mut self, tetris_color: TetrisColor) {
+    pub fn one(&mut self, tetris_color: TetrisColor) {
         let one = [
             self.init(0, -2),
             self.init(-1, -1),
@@ -347,7 +337,7 @@ impl TetrisGrid {
     }
 
     /// Draw a 2 with blocks of the same color as tetromino.
-    pub(in crate::app::player) fn two(&mut self, tetris_color: TetrisColor) {
+    pub fn two(&mut self, tetris_color: TetrisColor) {
         let two = [
             self.init(-1, -2),
             self.init(0, -2),
@@ -365,7 +355,7 @@ impl TetrisGrid {
     }
 
     /// Draw a 3 with blocks of the same color as tetromino.
-    pub(in crate::app::player) fn three(&mut self, tetris_color: TetrisColor) {
+    pub fn three(&mut self, tetris_color: TetrisColor) {
         let three = [
             self.init(-1, -2),
             self.init(0, -2),

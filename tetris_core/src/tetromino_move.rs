@@ -6,7 +6,7 @@ use super::Position;
 
 /// Tetromino movement orders.
 #[derive(Clone, Copy, PartialEq)]
-pub(in crate::app::player) enum TetrominoMove {
+pub enum TetrominoMove {
     Right,
     Left,
     Fall,
@@ -17,11 +17,11 @@ pub(in crate::app::player) enum TetrominoMove {
 }
 
 impl TetrominoMove {
-    pub(super) fn is_repeated(&self) -> bool {
+    pub fn is_repeated(&self) -> bool {
         *self == Self::HardDrop
     }
 
-    pub(super) fn get_translation(&self) -> Position {
+    pub fn get_translation(&self) -> Position {
         match self {
             Self::Fall | Self::HardDrop => Position::FALL,
             Self::Right => Position::RIGHT,
@@ -30,7 +30,7 @@ impl TetrominoMove {
         }
     }
 
-    pub(super) fn get_rotation_type(&self) -> RotationType {
+    pub fn get_rotation_type(&self) -> RotationType {
         match self {
             Self::Clockwise => RotationType::Clockwise,
             Self::Counterclockwise => RotationType::Counterclockwise,

@@ -4,7 +4,7 @@
 use super::{Direction, Position, RotationTranslation, RotationType};
 
 /// Apply a [RotationTranslation] to a spatial primitive ([Position] or [Direction]).
-pub(super) trait ApplyRotationTranslation {
+pub trait ApplyRotationTranslation {
     /// Turn then translate as described by `movement` (turning around the center of the `movement.rotation_center` block).
     fn move_by(&mut self, movement: &RotationTranslation) {
         self.turn_around(movement);

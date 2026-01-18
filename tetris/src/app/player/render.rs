@@ -1,5 +1,4 @@
 //! Define `trait` [Render] for [LocalPlayer], [PlayerScreen], [Tetromino], [TetrisGrid].
-use super::core::{Position, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS};
 use super::TetrisColor;
 use crate::app::player::LocalPlayer;
 use crate::app::render_app::{Piston2dGraphicsArguments, Render};
@@ -12,6 +11,7 @@ use crate::settings::{
 };
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
+use tetris_core::{Position, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS};
 
 impl Render<Piston2dGraphicsArguments<'_, '_>> for LocalPlayer {
     fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments) {
@@ -51,7 +51,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
         // drawing a border for the hold piece
         gl_ctx.transform = grid_transform.trans(
             -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
-            self.grid.hidden_height(),
+            hidden_height(&self.grid),
         );
         let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
@@ -71,8 +71,8 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
 
         // drawing a border for the fifo of next pieces
         gl_ctx.transform = grid_transform.trans(
-            self.grid.total_width() + BLOCK_SIZE,
-            self.grid.hidden_height(),
+            total_width(&self.grid) + BLOCK_SIZE,
+            hidden_height(&self.grid),
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;
@@ -84,7 +84,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
         // drawing the next pieces
         for i in 0..NB_NEXT_TETROMINO {
             gl_ctx.transform = grid_transform.trans(
-                self.grid.total_width() + 2.0 * BLOCK_SIZE,
+                total_width(&self.grid) + 2.0 * BLOCK_SIZE,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
             if let Some(tetromino) = self.fifo_next_tetromino.get(i) {
@@ -100,9 +100,9 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisGrid {
     fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>) {
         let empty_dims: Rectangle = [
             0.0,
-            self.hidden_height(),
-            self.total_width(),
-            self.visible_height(),
+            hidden_height(self),
+            total_width(self),
+            visible_height(self),
         ];
         rectangle(GRID_BG_COLOR, empty_dims, gl_ctx.transform, gl_ctx.gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
@@ -144,17 +144,15 @@ fn render_tetris_block(
     );
 }
 
-/// In [player::render](super::render), helpers used to implement [crate::app::render_app::Render] for [TetrisGrid].
-impl TetrisGrid {
-    fn total_width(&self) -> f64 {
-        self.nb_columns_i32() as f64 * BLOCK_SIZE
-    }
+fn total_width(grid: &TetrisGrid) -> f64 {
+    grid.nb_columns_i32() as f64 * BLOCK_SIZE
+}
 
-    fn visible_height(&self) -> f64 {
-        self.nb_matrix_rows_i32() as f64 * BLOCK_SIZE
-    }
+fn visible_height(grid: &TetrisGrid) -> f64 {
+    grid.nb_matrix_rows_i32() as f64 * BLOCK_SIZE
+}
 
-    fn hidden_height(&self) -> f64 {
-        NB_VISIBLE_BUFFER_ROWS as f64 * BLOCK_SIZE
-    }
+// TODO: fix this
+fn hidden_height(_grid: &TetrisGrid) -> f64 {
+    NB_VISIBLE_BUFFER_ROWS as f64 * BLOCK_SIZE
 }
