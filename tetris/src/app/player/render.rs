@@ -7,8 +7,8 @@ use crate::app::ui::text::Text;
 use crate::app::PlayerScreen;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_FONT_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
-    GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO,
-    TETROMINO_MAX_HEIGHT, TETROMINO_MAX_WIDTH, TEXT_COLOR,
+    GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO, TETROMINO_MAX_HEIGHT,
+    TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};

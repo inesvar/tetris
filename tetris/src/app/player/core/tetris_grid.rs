@@ -496,6 +496,7 @@ mod tests {
     }
 
     #[test]
+    // TODO: fix case
     fn TETRIS_GRID_MAX_is_safe_to_cast() {
         assert!(i32::try_from(TETRIS_GRID_MAX).is_ok());
         assert!(usize::try_from(TETRIS_GRID_MAX).is_ok());
