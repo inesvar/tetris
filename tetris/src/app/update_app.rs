@@ -5,7 +5,7 @@ use super::ui::interactive_widget_manager::ButtonType;
 use super::{remote::MessageType, App, Countdown, PlayerConfig, RunningState, ViewState};
 use piston::UpdateArgs;
 
-impl App<'_> {
+impl App {
     /// update is called before each render so that the informations on the screen are as recent as possible.
     ///
     /// It's responsible for the following :

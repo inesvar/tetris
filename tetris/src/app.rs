@@ -16,7 +16,6 @@ use crate::app::remote::MessageType;
 use crate::assets::Assets;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
-use include_assets::NamedArchive;
 use local_ip_address::local_ip;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::MouseButton;
@@ -98,13 +97,13 @@ pub enum RunningState {
     Starting,
 }
 
-pub struct App<'a> {
+pub struct App {
     gl: GlGraphics,
     local_players: Vec<LocalPlayer>,
     remote_player: Vec<RemotePlayer>,
     pub player_config: PlayerConfig,
     view_state: ViewState,
-    assets: Assets<'a>,
+    assets: Assets,
     pub clock: f64,
     frame_counter: u64,
     running: RunningState,
@@ -122,8 +121,8 @@ pub struct App<'a> {
     freeze: u64,
 }
 
-impl<'a> App<'a> {
-    pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> App<'a> {
+impl App {
+    pub fn new(gl_version: OpenGL) -> App {
         let mut rng = rand::thread_rng();
         let seed: u64 = rng.gen();
         let is_host = false;
@@ -133,7 +132,7 @@ impl<'a> App<'a> {
         let players: Vec<LocalPlayer> = vec![local_player];
         let rem_players: Vec<RemotePlayer> = vec![];
 
-        let assets = Assets::new(assets_archive);
+        let assets = Assets::new();
         let settings_manager = Settings::new(seed, &player_config);
 
         App {

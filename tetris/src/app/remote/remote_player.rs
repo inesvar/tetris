@@ -130,7 +130,7 @@ impl RemotePlayer {
     }
 }
 
-impl Render<Piston2dGraphicsArguments<'_, '_>> for RemotePlayer {
+impl Render<Piston2dGraphicsArguments<'_>> for RemotePlayer {
     fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments) {
         if !*self.first_screen_received.lock().unwrap() {
             return;

@@ -9,20 +9,20 @@ use graphics::Transformed;
 use opengl_graphics::GlGraphics;
 use piston::RenderArgs;
 
-pub(super) struct Piston2dGraphicsArguments<'short, 'long> {
+pub(super) struct Piston2dGraphicsArguments<'short> {
     pub(super) transform: Matrix2d,
     pub(super) draw_state: DrawState,
     pub(super) gl: &'short mut GlGraphics,
-    pub(super) assets: &'short mut Assets<'long>,
+    pub(super) assets: &'short mut Assets,
     pub(super) elapsed_secs: f64,
 }
 
-impl<'short, 'long> Piston2dGraphicsArguments<'short, 'long> {
+impl<'short> Piston2dGraphicsArguments<'short> {
     pub(in crate::app) fn new(
         transform: Matrix2d,
         draw_state: DrawState,
         gl: &'short mut GlGraphics,
-        assets: &'short mut Assets<'long>,
+        assets: &'short mut Assets,
         elapsed_secs: f64,
     ) -> Self {
         Self {
@@ -41,7 +41,7 @@ pub(super) trait Render<GlCtx> {
     fn render(&self, graphics_args: &mut GlCtx);
 }
 
-impl App<'_> {
+impl App {
     pub fn render(&mut self, args: &RenderArgs) {
         self.gl.draw(args.viewport(), |ctx, gl| {
             // Clear the screen.
@@ -57,42 +57,32 @@ impl App<'_> {
 
             match &self.view_state {
                 ViewState::MainMenu => {
-                    self.title_text.render(&mut gl_ctx);
                     self.widget_manager[0].render(&mut gl_ctx)
                 }
                 ViewState::Settings => {
-                    self.title_text.render(&mut gl_ctx);
                     for widget_manager in &mut self.widget_manager {
                         widget_manager.render(&mut gl_ctx);
                     }
                 }
                 ViewState::CreateRoom => {
-                    self.title_text.render(&mut gl_ctx);
                     self.widget_manager[0].render(&mut gl_ctx)
                 }
                 ViewState::JoinRoom => {
-                    self.title_text.render(&mut gl_ctx);
                     self.widget_manager[0].render(&mut gl_ctx)
                 }
                 a if a.is_game() => {
                     self.widget_manager[0].render(&mut gl_ctx);
                     if self.running == RunningState::Running {
-                        self.title_text.render(&mut gl_ctx);
                         self.timer_text.set_text(format_seconds(self.clock));
                     } else if self.running == RunningState::NotRunning {
-                        self.restart_text.render(&mut gl_ctx);
                         self.timer_text
                             .set_text(format!("Elapsed: {:.2}s", self.clock));
                     } else if self.running == RunningState::Paused {
-                        self.pause_text.render(&mut gl_ctx);
                         self.timer_text
                             .set_text(format!("Elapsed: {:.2}s", self.clock));
                     } else if self.running == RunningState::Starting {
-                        self.title_text.render(&mut gl_ctx);
                         self.timer_text.set_text("Elapsed: 0.00s".to_string());
                     }
-
-                    self.timer_text.render(&mut gl_ctx);
 
                     for player in &mut self.local_players {
                         player.render(&mut gl_ctx);

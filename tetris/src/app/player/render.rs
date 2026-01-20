@@ -13,24 +13,14 @@ use crate::settings::{
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
 
-impl Render<Piston2dGraphicsArguments<'_, '_>> for LocalPlayer {
+impl Render<Piston2dGraphicsArguments<'_>> for LocalPlayer {
     fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments) {
         self.player_screen.render(gl_ctx);
     }
 }
 
-impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
+impl Render<Piston2dGraphicsArguments<'_>> for PlayerScreen {
     fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments) {
-        let score_text = Text::new(
-            format!("Score: {}", self.score).as_str(),
-            DEFAULT_FONT_SIZE,
-            // the score is centered under the hold piece rectangle
-            DEFAULT_GRID_X - 4.0 * BLOCK_SIZE, // 4.0 = 1.0 (margin between borders) + 1.0 (margin inside) + 2.0 (half TETROMINO_MAX_WIDTH)
-            DEFAULT_SCORE_TEXT_Y,
-            TEXT_COLOR,
-        );
-        score_text.render(gl_ctx);
-
         let old_transform = gl_ctx.transform;
         let grid_transform = gl_ctx.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
         gl_ctx.transform = grid_transform;
@@ -96,8 +86,8 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
     }
 }
 
-impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisGrid {
-    fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>) {
+impl Render<Piston2dGraphicsArguments<'_>> for TetrisGrid {
+    fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments<'_>) {
         let empty_dims: Rectangle = [
             0.0,
             self.hidden_height(),
@@ -116,8 +106,8 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisGrid {
     }
 }
 
-impl Render<Piston2dGraphicsArguments<'_, '_>> for Tetromino {
-    fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>) {
+impl Render<Piston2dGraphicsArguments<'_>> for Tetromino {
+    fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments<'_>) {
         for block in self.blocks() {
             render_tetris_block(block, &self.color(), gl_ctx);
         }
@@ -128,7 +118,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for Tetromino {
 fn render_tetris_block(
     position: &Position,
     tetris_color: &TetrisColor,
-    gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>,
+    gl_ctx: &mut Piston2dGraphicsArguments<'_>,
 ) {
     let dims = rectangle::square(
         position.x() as Scalar * BLOCK_SIZE,
