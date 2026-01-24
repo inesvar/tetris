@@ -22,7 +22,7 @@ pub const NB_VISIBLE_BUFFER_ROWS: u32 = 2;
 /// - **Buffer Zone**: "a 10-cell wide x 20-cell high invisible area above the Matrix used to detect Lock
 ///   Out, Block Out, and Top Out **Game Over Conditions**."
 #[derive(PartialEq, Serialize, Deserialize)]
-pub(in crate::app) struct TetrisGrid {
+pub struct TetrisGrid {
     /// Number of columns in the **Matrix** and **Buffer Zone**.
     ///
     /// Has to be between 4 and [TETRIS_GRID_MAX].
@@ -48,7 +48,7 @@ pub(in crate::app) struct TetrisGrid {
 /// **Tetris Guideline** Game Over Conditions.
 #[derive(Debug, PartialEq)]
 #[allow(clippy::enum_variant_names)]
-pub(in crate::app) enum GameOverError {
+pub enum GameOverError {
     /// According to the **Tetris Guideline** :
     ///
     /// "[...] occurs when part of a newly-generated tetrimino is blocked due to
@@ -75,7 +75,7 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If [TetrisGrid::nb_columns] or [TetrisGrid::nb_matrix_rows] or [TetrisGrid::nb_buffer_rows] aren't in the expected range.
-    pub(in crate::app::player) fn new(
+    pub fn new(
         nb_columns: u32,
         nb_matrix_rows: u32,
         nb_buffer_rows: u32,
@@ -116,7 +116,7 @@ impl TetrisGrid {
     }
 
     /// Empty the grid.
-    pub(in crate::app::player) fn reset(&mut self) {
+    pub fn reset(&mut self) {
         *self = Self::new(
             self.nb_columns as u32,
             self.nb_matrix_rows as u32,
@@ -125,7 +125,7 @@ impl TetrisGrid {
     }
 
     /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
-    pub(in crate::app::player) fn add_garbage(
+    pub fn add_garbage(
         &mut self,
         completed_lines: u64,
     ) -> Result<(), GameOverError> {
@@ -293,15 +293,15 @@ impl TetrisGrid {
 /// In [tetris_grid](super::tetris_grid), helpers used by [player::render](crate::app::player::render)
 /// to implement [crate::app::render_app::Render] for [TetrisGrid].
 impl TetrisGrid {
-    pub(in crate::app::player) const fn nb_matrix_rows_i32(&self) -> i32 {
+    pub const fn nb_matrix_rows_i32(&self) -> i32 {
         self.nb_matrix_rows
     }
 
-    pub(in crate::app::player) const fn nb_columns_i32(&self) -> i32 {
+    pub const fn nb_columns_i32(&self) -> i32 {
         self.nb_columns
     }
 
-    pub(in crate::app::player) fn positions(&self) -> impl Iterator<Item = Position> + use<'_> {
+    pub fn positions(&self) -> impl Iterator<Item = Position> + use<'_> {
         let h = self.nb_matrix_rows + self.nb_buffer_rows;
         let w = self.nb_columns;
         (0..h).flat_map(move |y| {
@@ -330,7 +330,7 @@ impl TetrisGrid {
     }
 
     /// Draw a 1 with blocks of the same color as tetromino.
-    pub(in crate::app::player) fn one(&mut self, tetris_color: TetrisColor) {
+    pub fn one(&mut self, tetris_color: TetrisColor) {
         let one = [
             self.init(0, -2),
             self.init(-1, -1),
@@ -347,7 +347,7 @@ impl TetrisGrid {
     }
 
     /// Draw a 2 with blocks of the same color as tetromino.
-    pub(in crate::app::player) fn two(&mut self, tetris_color: TetrisColor) {
+    pub fn two(&mut self, tetris_color: TetrisColor) {
         let two = [
             self.init(-1, -2),
             self.init(0, -2),
@@ -365,7 +365,7 @@ impl TetrisGrid {
     }
 
     /// Draw a 3 with blocks of the same color as tetromino.
-    pub(in crate::app::player) fn three(&mut self, tetris_color: TetrisColor) {
+    pub fn three(&mut self, tetris_color: TetrisColor) {
         let three = [
             self.init(-1, -2),
             self.init(0, -2),
@@ -444,7 +444,6 @@ impl Default for TetrisGrid {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::concatln;
     use rstest::{fixture, rstest};
 
     impl TetrisGrid {
@@ -572,18 +571,18 @@ mod tests {
 
     #[rstest]
     fn reset_is_empty(#[from(empty_compact_grid)] expected: String) {
-        let mut grid = TetrisGrid::from_str(concatln!(
-            "---------",
-            "         ",
-            "       XX",
-            "---------",
-            "      X X",
-            "      XXX",
-            "     XX X",
-            "    X XXX",
-            "      XXX",
-            "    XXXXX",
-            "---------",
+        let mut grid = TetrisGrid::from_str(concat!(
+            "---------\n",
+            "         \n",
+            "       XX\n",
+            "---------\n",
+            "      X X\n",
+            "      XXX\n",
+            "     XX X\n",
+            "    X XXX\n",
+            "      XXX\n",
+            "    XXXXX\n",
+            "---------\n",
         ));
 
         grid.reset();
@@ -593,18 +592,18 @@ mod tests {
 
     #[test]
     fn add_garbage_is_correct() {
-        let mut grid = TetrisGrid::from_str(concatln!(
-            "---------",
-            "         ",
-            "         ",
-            "---------",
-            "         ",
-            "         ",
-            "        X",
-            "X        ",
-            "XX       ",
-            "XXX      ",
-            "---------",
+        let mut grid = TetrisGrid::from_str(concat!(
+            "---------\n",
+            "         \n",
+            "         \n",
+            "---------\n",
+            "         \n",
+            "         \n",
+            "        X\n",
+            "X        \n",
+            "XX       \n",
+            "XXX      \n",
+            "---------\n",
         ));
 
         assert!(grid.add_garbage_row(0).is_ok());
@@ -613,18 +612,18 @@ mod tests {
 
         assert_eq!(
             grid.to_string(),
-            concatln!(
-                "---------",
-                "         ",
-                "        X",
-                "---------",
-                "X        ",
-                "XX       ",
-                "XXX      ",
-                " XXXXXXXX",
-                "X XXXXXXX",
-                "XXX XXXXX",
-                "---------",
+            concat!(
+                "---------\n",
+                "         \n",
+                "        X\n",
+                "---------\n",
+                "X        \n",
+                "XX       \n",
+                "XXX      \n",
+                " XXXXXXXX\n",
+                "X XXXXXXX\n",
+                "XXX XXXXX\n",
+                "---------\n",
             ),
             "Actual grid:\n{}",
             grid
@@ -633,18 +632,18 @@ mod tests {
 
     #[test]
     fn add_garbage_returns_error_on_top_out() {
-        let mut grid = TetrisGrid::from_str(concatln!(
-            "---------",
-            "         ",
-            "         ",
-            "---------",
-            "        X",
-            "        X",
-            "        X",
-            "        X",
-            "        X",
-            "        X",
-            "---------",
+        let mut grid = TetrisGrid::from_str(concat!(
+            "---------\n",
+            "         \n",
+            "         \n",
+            "---------\n",
+            "        X\n",
+            "        X\n",
+            "        X\n",
+            "        X\n",
+            "        X\n",
+            "        X\n",
+            "---------\n",
         ));
 
         assert!(grid.add_garbage_row(0).is_ok());
@@ -681,18 +680,18 @@ mod tests {
 
     #[test]
     fn is_block_empty_is_correct() {
-        let grid = TetrisGrid::from_str(concatln!(
-            "---------",
-            "        X",
-            "X       X",
-            "---------",
-            "X        ",
-            "         ",
-            "         ",
-            "         ",
-            "         ",
-            "X       X",
-            "---------",
+        let grid = TetrisGrid::from_str(concat!(
+            "---------\n",
+            "        X\n",
+            "X       X\n",
+            "---------\n",
+            "X        \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "X       X\n",
+            "---------\n",
         ));
 
         assert!(grid.is_block_empty(&Position::new(0, 0)));
@@ -750,36 +749,36 @@ mod tests {
 
     #[test]
     fn pop_row_is_correct() {
-        let mut tetris_grid = TetrisGrid::from_str(concatln!(
-            "-------------",
-            "             ",
-            "             ",
-            "-------------",
-            "             ",
-            "             ",
-            "XX XX X X X X",
-            " X X X XX XX ",
-            "X X XX XX X X",
-            "XXXXXXXXXXXXX",
-            "-------------",
+        let mut tetris_grid = TetrisGrid::from_str(concat!(
+            "-------------\n",
+            "             \n",
+            "             \n",
+            "-------------\n",
+            "             \n",
+            "             \n",
+            "XX XX X X X X\n",
+            " X X X XX XX \n",
+            "X X XX XX X X\n",
+            "XXXXXXXXXXXXX\n",
+            "-------------\n",
         ));
 
         tetris_grid.pop_row(3);
 
         assert_eq!(
             tetris_grid.to_string(),
-            concatln!(
-                "-------------",
-                "             ",
-                "             ",
-                "-------------",
-                "             ",
-                "             ",
-                "             ",
-                " X X X XX XX ",
-                "X X XX XX X X",
-                "XXXXXXXXXXXXX",
-                "-------------",
+            concat!(
+                "-------------\n",
+                "             \n",
+                "             \n",
+                "-------------\n",
+                "             \n",
+                "             \n",
+                "             \n",
+                " X X X XX XX \n",
+                "X X XX XX X X\n",
+                "XXXXXXXXXXXXX\n",
+                "-------------\n",
             ),
             "Actual grid:\n{}",
             tetris_grid

@@ -1,7 +1,7 @@
 //! Define the update function of [LocalPlayer].
 //!
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
-use super::core::TetrominoMove;
+use tetris_core::TetrominoMove;
 use super::LocalPlayer;
 use crate::settings::Keybindings;
 

@@ -6,7 +6,7 @@ use super::Position;
 
 /// Tetromino movement orders.
 #[derive(Clone, Copy, PartialEq)]
-pub(in crate::app::player) enum TetrominoMove {
+pub enum TetrominoMove {
     Right,
     Left,
     Fall,

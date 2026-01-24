@@ -21,7 +21,6 @@ use local_ip_address::local_ip;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::MouseButton;
 use piston_window::Key;
-pub use player::TetrisColor;
 use rand::Rng;
 use render_app::Piston2dGraphicsArguments;
 use serde::{Deserialize, Serialize};

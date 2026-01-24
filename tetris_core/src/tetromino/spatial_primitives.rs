@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// Position on a discrete grid.
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq, Debug)]
-pub(in crate::app::player) struct Position {
+pub struct Position {
     /// Horizontal coordinate, from left to right.
     x: i32,
     /// Vertical coordinate, *from top to bottom*.
@@ -14,10 +14,10 @@ pub(in crate::app::player) struct Position {
 impl Position {
     // y increases from top to bottom
     #[cfg(test)]
-    pub(in crate::app::player::core) const RISE: Position = Position::new(0, -1);
-    pub(in crate::app::player::core) const RIGHT: Position = Position::new(1, 0);
-    pub(in crate::app::player::core) const FALL: Position = Position::new(0, 1);
-    pub(in crate::app::player::core) const LEFT: Position = Position::new(-1, 0);
+    pub(crate) const RISE: Position = Position::new(0, -1);
+    pub(crate) const RIGHT: Position = Position::new(1, 0);
+    pub(crate) const FALL: Position = Position::new(0, 1);
+    pub(crate) const LEFT: Position = Position::new(-1, 0);
 }
 
 /// Four cardinal directions.
@@ -35,7 +35,7 @@ pub(super) enum Direction {
 /// to implement [ApplyRotationTranslation](super::moving_primitives::ApplyRotationTranslation) for [Position]
 /// (also used by [tetromino_kind](super::tetromino_kind)).
 impl Position {
-    pub(in crate::app::player) const fn new(x: i32, y: i32) -> Self {
+    pub const fn new(x: i32, y: i32) -> Self {
         Self { x, y }
     }
 
@@ -69,11 +69,11 @@ impl Position {
 
 /// In [spatial_primitives](super::spatial_primitives), getters used by [player::render](crate::app::player::render).
 impl Position {
-    pub(in crate::app::player) fn x(&self) -> i32 {
+    pub fn x(&self) -> i32 {
         self.x
     }
 
-    pub(in crate::app::player) fn y(&self) -> i32 {
+    pub fn y(&self) -> i32 {
         self.y
     }
 }

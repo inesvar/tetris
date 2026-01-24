@@ -1,5 +1,5 @@
 //! Define the general implementation of [LocalPlayer].
-use super::core::{GameOverError, TetrisGrid, Tetromino, TetrominoGenerator};
+use tetris_core::{GameOverError, TetrisGrid, Tetromino, TetrominoGenerator};
 use super::{circular_array::CircularArray, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen};
 use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
 use rand::SeedableRng;

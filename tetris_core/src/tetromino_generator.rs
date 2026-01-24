@@ -9,7 +9,7 @@ use std::array;
 
 /// Tetromino generator.
 #[derive(Serialize, Deserialize, Default)]
-pub(in crate::app::player) struct TetrominoGenerator {
+pub struct TetrominoGenerator {
     tetrominos: Vec<TetrominoKind>,
     bag_type: BagType,
 }
@@ -19,7 +19,7 @@ pub(in crate::app::player) struct TetrominoGenerator {
 /// Using a shuffled bag instead of choosing each tetromino randomly
 /// helps prevent tetromino repetition.
 #[derive(Copy, Clone, Default, Serialize, Deserialize)]
-pub(in crate::app::player) enum BagType {
+pub enum BagType {
     /// Each tetromino is chosen randomly using uniform distribution.
     NoBag,
     #[default]
@@ -32,21 +32,21 @@ pub(in crate::app::player) enum BagType {
 }
 
 impl TetrominoGenerator {
-    pub(in crate::app::player) fn new(bag_type: BagType) -> Self {
+    pub fn new(bag_type: BagType) -> Self {
         Self {
             tetrominos: Vec::new(),
             bag_type,
         }
     }
 
-    pub(in crate::app::player) fn get_chunk<const N: usize>(
+    pub fn get_chunk<const N: usize>(
         &mut self,
         rng: &mut Pcg32,
     ) -> [TetrominoKind; N] {
         array::from_fn(|_| self.get(rng))
     }
 
-    pub(in crate::app::player) fn get(&mut self, rng: &mut Pcg32) -> TetrominoKind {
+    pub fn get(&mut self, rng: &mut Pcg32) -> TetrominoKind {
         self.tetrominos.pop().unwrap_or_else(|| {
             self.draw_new_bag(rng);
             self.tetrominos

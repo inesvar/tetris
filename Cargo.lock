@@ -2519,6 +2519,18 @@ dependencies = [
  "serde",
  "serde_cbor",
  "simple-mermaid",
+ "tetris_core",
+]
+
+[[package]]
+name = "tetris_core"
+version = "0.1.0"
+dependencies = [
+ "rand",
+ "rand_pcg",
+ "rstest",
+ "serde",
+ "simple-mermaid",
 ]
 
 [[package]]

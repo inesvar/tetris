@@ -1,5 +1,5 @@
 //! Define the [constructor](PlayerScreen::empty()) of [PlayerScreen].
-use super::core::{TetrisGrid, Tetromino};
+use tetris_core::{TetrisGrid, Tetromino};
 use super::{CircularArray, PlayerScreen};
 use crate::settings::NB_NEXT_TETROMINO;
 

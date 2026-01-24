@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// Seven types of Tetromino.
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
-pub(in crate::app::player) enum TetrominoKind {
+pub enum TetrominoKind {
     O,
     I,
     T,
@@ -72,7 +72,7 @@ const fn init(x: i32, y: i32) -> Position {
 }
 
 impl TetrominoKind {
-    pub(in crate::app::player::core) const ALL: [Self; 7] = [
+    pub(crate) const ALL: [Self; 7] = [
         Self::O,
         Self::I,
         Self::T,
@@ -172,7 +172,6 @@ impl From<TetrominoKind> for TetrisColor {
 #[cfg(test)]
 mod tests {
     use super::{Direction, Position, RotationType, TetrominoKind};
-    use crate::concatln;
     use rstest::rstest;
 
     impl Position {
@@ -212,33 +211,33 @@ mod tests {
     // are at the same place. For the O tetromino, we make an exception
     // to ensure that even if the tetromino is rotated around the bottom
     // right corner of the center, it will not move.
-    #[case::o(TetrominoKind::O, concatln!(
-            " C#      ",
-            " ##      ",
+    #[case::o(TetrominoKind::O, concat!(
+            " C#      \n",
+            " ##      \n",
         ))]
-    #[case::i(TetrominoKind::I, concatln!(
-            "         ",
-            "#C##     ",
+    #[case::i(TetrominoKind::I, concat!(
+            "         \n",
+            "#C##     \n",
         ))]
-    #[case::t(TetrominoKind::T, concatln!(
-            " #       ",
-            "#C#      ",
+    #[case::t(TetrominoKind::T, concat!(
+            " #       \n",
+            "#C#      \n",
         ))]
-    #[case::l(TetrominoKind::L, concatln!(
-            "  #      ",
-            "#C#      ",
+    #[case::l(TetrominoKind::L, concat!(
+            "  #      \n",
+            "#C#      \n",
         ))]
-    #[case::j(TetrominoKind::J, concatln!(
-            "#        ",
-            "#C#      ",
+    #[case::j(TetrominoKind::J, concat!(
+            "#        \n",
+            "#C#      \n",
         ))]
-    #[case::s(TetrominoKind::S, concatln!(
-            " ##      ",
-            "#C       ",
+    #[case::s(TetrominoKind::S, concat!(
+            " ##      \n",
+            "#C       \n",
         ))]
-    #[case::z(TetrominoKind::Z, concatln!(
-            "##       ",
-            " C#      ",
+    #[case::z(TetrominoKind::Z, concat!(
+            "##       \n",
+            " C#      \n",
         ))]
     fn get_initial_position_is_correct(#[case] kind: TetrominoKind, #[case] expected: &str) {
         let expected = Position::from_str(expected);

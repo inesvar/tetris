@@ -1,24 +1,9 @@
 //! Assets include Tetromino block textures and fonts.
-use crate::TetrisColor;
+use tetris_core::TetrisColor;
 use graphics::glyph_cache::rusttype::GlyphCache;
 use include_assets::NamedArchive;
 use opengl_graphics::*;
 use std::path::PathBuf;
-
-impl TetrisColor {
-    fn get_texture_filename(&self) -> &str {
-        match self {
-            Self::Cyan => "cyan",
-            Self::Yellow => "yellow",
-            Self::Purple => "purple",
-            Self::Blue => "blue",
-            Self::Orange => "orange",
-            Self::Green => "green",
-            Self::Red => "red",
-            Self::Grey => "grey",
-        }
-    }
-}
 
 pub struct Assets<'a> {
     pub cyan_texture: Texture,

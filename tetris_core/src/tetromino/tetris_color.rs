@@ -48,3 +48,18 @@ impl TryFrom<char> for TetrisColor {
         }
     }
 }
+
+impl TetrisColor {
+    pub fn get_texture_filename(&self) -> &str {
+        match self {
+            Self::Cyan => "cyan",
+            Self::Yellow => "yellow",
+            Self::Purple => "purple",
+            Self::Blue => "blue",
+            Self::Orange => "orange",
+            Self::Green => "green",
+            Self::Red => "red",
+            Self::Grey => "grey",
+        }
+    }
+}

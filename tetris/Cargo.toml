@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+tetris_core = { path = "../tetris_core" }
 piston_window = { workspace = true }
 piston = { workspace = true }
 piston2d-graphics = { workspace = true }

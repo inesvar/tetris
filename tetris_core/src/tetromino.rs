@@ -16,13 +16,13 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 pub(super) use rotation_translation::RotationType;
-pub(in crate::app::player) use spatial_primitives::Position;
+pub use spatial_primitives::Position;
 pub use tetris_color::TetrisColor;
-pub(in crate::app::player) use tetromino_kind::TetrominoKind;
+pub use tetromino_kind::TetrominoKind;
 
 /// Tetromino.
 #[derive(Clone, Copy, Serialize, Deserialize, Debug)]
-pub(in crate::app) struct Tetromino {
+pub struct Tetromino {
     kind: TetrominoKind,
     center: Position,
     pub(super) blocks: [Position; 4],
@@ -43,15 +43,15 @@ impl From<TetrominoKind> for Tetromino {
 
 #[doc = simple_mermaid::mermaid!("tetromino/tetromino_internals.mmd")]
 impl Tetromino {
-    pub(in crate::app::player) fn new(kind: TetrominoKind) -> Self {
+    pub fn new(kind: TetrominoKind) -> Self {
         Self::from(kind)
     }
 
-    pub(in crate::app::player) fn reset(&mut self) {
+    pub fn reset(&mut self) {
         *self = Self::from(self.kind)
     }
 
-    pub(in crate::app::player) fn can_enter_grid(
+    pub fn can_enter_grid(
         &mut self,
         grid: &TetrisGrid,
     ) -> Result<(), GameOverError> {
@@ -62,14 +62,14 @@ impl Tetromino {
         Ok(())
     }
 
-    pub(in crate::app::player) fn lock_down(
+    pub fn lock_down(
         self,
         grid: &mut TetrisGrid,
     ) -> Result<u64, GameOverError> {
         grid.add_blocks_and_clear_lines(&self.blocks, self.color())
     }
 
-    pub(in crate::app::player) fn apply(
+    pub fn apply(
         &mut self,
         tetromino_move: TetrominoMove,
         grid: &TetrisGrid,
@@ -135,11 +135,11 @@ impl Tetromino {
         self.center.translate_by(movement);
     }
 
-    pub(in crate::app::player) fn blocks(&self) -> &[Position] {
+    pub fn blocks(&self) -> &[Position] {
         &self.blocks
     }
 
-    pub(in crate::app::player) fn color(&self) -> TetrisColor {
+    pub fn color(&self) -> TetrisColor {
         self.kind.into()
     }
 }
@@ -160,7 +160,7 @@ impl Default for Tetromino {
 impl Display for Tetromino {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer: Vec<char> =
-            crate::concatln!("         ", "         ", "         ", "         ",)
+            concat!("         \n", "         \n", "         \n", "         \n",)
                 .chars()
                 .collect();
 
@@ -178,153 +178,152 @@ impl Display for Tetromino {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::concatln;
     use rstest::rstest;
 
     #[rstest]
-    #[case::o_north(TetrominoKind::O, Direction::North, concatln!(
-            " C#      ",
-            " ##      ",
-            "         ",
-            "         ",
+    #[case::o_north(TetrominoKind::O, Direction::North, concat!(
+            " C#      \n",
+            " ##      \n",
+            "         \n",
+            "         \n",
         ))]
-    #[case::o_east(TetrominoKind::O, Direction::East, concatln!(
-            " C#      ",
-            " ##      ",
-            "         ",
-            "         ",
+    #[case::o_east(TetrominoKind::O, Direction::East, concat!(
+            " C#      \n",
+            " ##      \n",
+            "         \n",
+            "         \n",
         ))]
-    #[case::o_south(TetrominoKind::O, Direction::South, concatln!(
-            " C#      ",
-            " ##      ",
-            "         ",
-            "         ",
+    #[case::o_south(TetrominoKind::O, Direction::South, concat!(
+            " C#      \n",
+            " ##      \n",
+            "         \n",
+            "         \n",
         ))]
-    #[case::o_west(TetrominoKind::O, Direction::West, concatln!(
-            " C#      ",
-            " ##      ",
-            "         ",
-            "         ",
+    #[case::o_west(TetrominoKind::O, Direction::West, concat!(
+            " C#      \n",
+            " ##      \n",
+            "         \n",
+            "         \n",
         ))]
-    #[case::i_north(TetrominoKind::I, Direction::North, concatln!(
+    #[case::i_north(TetrominoKind::I, Direction::North, concat!(
             "         ",
             "#C##     ",
             "         ",
             "         ",
         ))]
-    #[case::i_east(TetrominoKind::I, Direction::East, concatln!(
-            "  #      ",
-            " C#      ",
-            "  #      ",
-            "  #      ",
+    #[case::i_east(TetrominoKind::I, Direction::East, concat!(
+            "  #      \n",
+            " C#      \n",
+            "  #      \n",
+            "  #      \n",
         ))]
-    #[case::i_south(TetrominoKind::I, Direction::South, concatln!(
-            "         ",
-            " C       ",
-            "####     ",
-            "         ",
+    #[case::i_south(TetrominoKind::I, Direction::South, concat!(
+            "         \n",
+            " C       \n",
+            "####     \n",
+            "         \n",
         ))]
-    #[case::i_west(TetrominoKind::I, Direction::West, concatln!(
-            " #       ",
-            " C       ",
-            " #       ",
-            " #       ",
+    #[case::i_west(TetrominoKind::I, Direction::West, concat!(
+            " #       \n",
+            " C       \n",
+            " #       \n",
+            " #       \n",
         ))]
-    #[case::l_north(TetrominoKind::L, Direction::North, concatln!(
-            "  #      ",
-            "#C#      ",
-            "         ",
-            "         ",
+    #[case::l_north(TetrominoKind::L, Direction::North, concat!(
+            "  #      \n",
+            "#C#      \n",
+            "         \n",
+            "         \n",
         ))]
-    #[case::l_east(TetrominoKind::L, Direction::East, concatln!(
-            " #       ",
-            " C       ",
-            " ##      ",
-            "         ",
+    #[case::l_east(TetrominoKind::L, Direction::East, concat!(
+            " #       \n",
+            " C       \n",
+            " ##      \n",
+            "         \n",
         ))]
-    #[case::l_south(TetrominoKind::L, Direction::South, concatln!(
-            "         ",
-            "#C#      ",
-            "#        ",
-            "         ",
+    #[case::l_south(TetrominoKind::L, Direction::South, concat!(
+            "         \n",
+            "#C#      \n",
+            "#        \n",
+            "         \n",
         ))]
-    #[case::l_west(TetrominoKind::L, Direction::West, concatln!(
-            "##       ",
-            " C       ",
-            " #       ",
-            "         ",
+    #[case::l_west(TetrominoKind::L, Direction::West, concat!(
+            "##       \n",
+            " C       \n",
+            " #       \n",
+            "         \n",
         ))]
-    #[case::j_north(TetrominoKind::J, Direction::North, concatln!(
-            "#        ",
-            "#C#      ",
-            "         ",
-            "         ",
+    #[case::j_north(TetrominoKind::J, Direction::North, concat!(
+            "#        \n",
+            "#C#      \n",
+            "         \n",
+            "         \n",
         ))]
-    #[case::j_east(TetrominoKind::J, Direction::East, concatln!(
-            " ##      ",
-            " C       ",
-            " #       ",
-            "         ",
+    #[case::j_east(TetrominoKind::J, Direction::East, concat!(
+            " ##      \n",
+            " C       \n",
+            " #       \n",
+            "         \n",
         ))]
-    #[case::j_south(TetrominoKind::J, Direction::South, concatln!(
-            "         ",
-            "#C#      ",
-            "  #      ",
-            "         ",
+    #[case::j_south(TetrominoKind::J, Direction::South, concat!(
+            "         \n",
+            "#C#      \n",
+            "  #      \n",
+            "         \n",
         ))]
-    #[case::j_west(TetrominoKind::J, Direction::West, concatln!(
-            " #       ",
-            " C       ",
-            "##       ",
-            "         ",
+    #[case::j_west(TetrominoKind::J, Direction::West, concat!(
+            " #       \n",
+            " C       \n",
+            "##       \n",
+            "         \n",
         ))]
-    #[case::s_north(TetrominoKind::S, Direction::North, concatln!(
-            " ##      ",
-            "#C       ",
-            "         ",
-            "         ",
+    #[case::s_north(TetrominoKind::S, Direction::North, concat!(
+            " ##      \n",
+            "#C       \n",
+            "         \n",
+            "         \n",
         ))]
-    #[case::s_east(TetrominoKind::S, Direction::East, concatln!(
-            " #       ",
-            " C#      ",
-            "  #      ",
-            "         ",
+    #[case::s_east(TetrominoKind::S, Direction::East, concat!(
+            " #       \n",
+            " C#      \n",
+            "  #      \n",
+            "         \n",
         ))]
-    #[case::s_south(TetrominoKind::S, Direction::South, concatln!(
-            "         ",
-            " C#      ",
-            "##       ",
-            "         ",
+    #[case::s_south(TetrominoKind::S, Direction::South, concat!(
+            "         \n",
+            " C#      \n",
+            "##       \n",
+            "         \n",
         ))]
-    #[case::s_west(TetrominoKind::S, Direction::West, concatln!(
-            "#        ",
-            "#C       ",
-            " #       ",
-            "         ",
+    #[case::s_west(TetrominoKind::S, Direction::West, concat!(
+            "#        \n",
+            "#C       \n",
+            " #       \n",
+            "         \n",
         ))]
-    #[case::z_north(TetrominoKind::Z, Direction::North, concatln!(
-            "##       ",
-            " C#      ",
-            "         ",
-            "         ",
+    #[case::z_north(TetrominoKind::Z, Direction::North, concat!(
+            "##       \n",
+            " C#      \n",
+            "         \n",
+            "         \n",
         ))]
-    #[case::z_east(TetrominoKind::Z, Direction::East, concatln!(
-            "  #      ",
-            " C#      ",
-            " #       ",
-            "         ",
+    #[case::z_east(TetrominoKind::Z, Direction::East, concat!(
+            "  #      \n",
+            " C#      \n",
+            " #       \n",
+            "         \n",
         ))]
-    #[case::z_south(TetrominoKind::Z, Direction::South, concatln!(
-            "         ",
-            "#C       ",
-            " ##      ",
-            "         ",
+    #[case::z_south(TetrominoKind::Z, Direction::South, concat!(
+            "         \n",
+            "#C       \n",
+            " ##      \n",
+            "         \n",
         ))]
-    #[case::z_west(TetrominoKind::Z, Direction::West, concatln!(
-            " #       ",
-            "#C       ",
-            "#        ",
-            "         ",
+    #[case::z_west(TetrominoKind::Z, Direction::West, concat!(
+            " #       \n",
+            "#C       \n",
+            "#        \n",
+            "         \n",
         ))]
     fn tetromino_rotation_is_correct(
         #[case] kind: TetrominoKind,
