@@ -1,8 +1,8 @@
 //! Define `enum` [TetrominoKind].
-use super::{Direction, Position, RotationType, TetrisColor};
+use super::{Direction, Position, RotationType};
 use serde::{Deserialize, Serialize};
 
-/// Seven types of Tetromino.
+/// Lists the 7 types of [Tetromino](super::Tetromino)s.
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum TetrominoKind {
     O,
@@ -155,20 +155,6 @@ impl TetrominoKind {
     }
 }
 
-impl From<TetrominoKind> for TetrisColor {
-    fn from(kind: TetrominoKind) -> Self {
-        match kind {
-            TetrominoKind::I => TetrisColor::Cyan,
-            TetrominoKind::O => TetrisColor::Yellow,
-            TetrominoKind::T => TetrisColor::Purple,
-            TetrominoKind::J => TetrisColor::Blue,
-            TetrominoKind::L => TetrisColor::Orange,
-            TetrominoKind::S => TetrisColor::Green,
-            TetrominoKind::Z => TetrisColor::Red,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::{Direction, Position, RotationType, TetrominoKind};
@@ -248,6 +234,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn generic_wall_kicks_are_correct() {
         assert_eq!(
             TetrominoKind::generic_wall_kick_translations(

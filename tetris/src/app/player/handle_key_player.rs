@@ -99,7 +99,7 @@ impl LocalPlayer {
             // rotate once the tetromino
             self.player_screen
                 .active_tetromino
-                .apply(TetrominoMove::Clockwise, &self.player_screen.grid);
+                .try_apply(TetrominoMove::Clockwise, &self.player_screen.grid);
         }
         // it's not an if else in case the player put the same keybindings for both clock and counter...
         if self
@@ -109,7 +109,7 @@ impl LocalPlayer {
             // rotate once the tetromino
             self.player_screen
                 .active_tetromino
-                .apply(TetrominoMove::Counterclockwise, &self.player_screen.grid);
+                .try_apply(TetrominoMove::Counterclockwise, &self.player_screen.grid);
         }
 
         if self
@@ -119,27 +119,27 @@ impl LocalPlayer {
             // rotate once the tetromino
             self.player_screen
                 .active_tetromino
-                .apply(TetrominoMove::HalfTurn, &self.player_screen.grid);
+                .try_apply(TetrominoMove::HalfTurn, &self.player_screen.grid);
         }
 
         // move the tetromino left or right
         if self.keyboard.was_just_pressed(&keybindings.left_keys) {
             self.player_screen
                 .active_tetromino
-                .apply(TetrominoMove::Left, &self.player_screen.grid);
+                .try_apply(TetrominoMove::Left, &self.player_screen.grid);
         }
         // it's not an if else in case the player put the same keybindings for both left and right...
         if self.keyboard.was_just_pressed(&keybindings.right_keys) {
             self.player_screen
                 .active_tetromino
-                .apply(TetrominoMove::Right, &self.player_screen.grid);
+                .try_apply(TetrominoMove::Right, &self.player_screen.grid);
         }
 
         if self.keyboard.was_just_pressed(&keybindings.hard_drop_keys) {
             // hard drop the tetromino
             self.player_screen
                 .active_tetromino
-                .apply(TetrominoMove::HardDrop, &self.player_screen.grid);
+                .try_apply(TetrominoMove::HardDrop, &self.player_screen.grid);
             if self.lock_down_tetromino().is_err() {
                 return GameFlowChange::GameOver;
             }

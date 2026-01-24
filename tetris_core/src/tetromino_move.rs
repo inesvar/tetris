@@ -4,7 +4,7 @@
 use super::tetromino::RotationType;
 use super::Position;
 
-/// Tetromino movement orders.
+/// Describes all possible [Tetromino](super::Tetromino) movements in the [TetrisGrid](super::TetrisGrid).
 #[derive(Clone, Copy, PartialEq)]
 pub enum TetrominoMove {
     Right,

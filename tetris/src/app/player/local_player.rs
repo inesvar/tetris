@@ -123,7 +123,7 @@ impl LocalPlayer {
         self.player_screen
             .fifo_next_tetromino
             .get_front_push_back(&mut swap);
-        if swap.can_enter_grid(&self.player_screen.grid) == Err(GameOverError::BlockOut) {
+        if swap.try_enter_grid(&self.player_screen.grid) == Err(GameOverError::BlockOut) {
             // Set the game_over flag and return the tetromino to the bag.
             self.declare_game_over();
             self.player_screen

@@ -49,7 +49,7 @@ impl LocalPlayer {
                 && !self
                     .player_screen
                     .active_tetromino
-                    .apply(TetrominoMove::Fall, &self.player_screen.grid)
+                    .try_apply(TetrominoMove::Fall, &self.player_screen.grid)
                 && self.freeze_frame < frame_counter
             {
                 // if the tetromino reaches the bottom, set the freeze_frame
@@ -61,14 +61,14 @@ impl LocalPlayer {
             {
                 self.player_screen
                     .active_tetromino
-                    .apply(TetrominoMove::Left, &self.player_screen.grid);
+                    .try_apply(TetrominoMove::Left, &self.player_screen.grid);
             }
             if self.keyboard.is_long_pressed(&keybindings.right_keys)
                 && !self.keyboard.is_long_pressed(&keybindings.left_keys)
             {
                 self.player_screen
                     .active_tetromino
-                    .apply(TetrominoMove::Right, &self.player_screen.grid);
+                    .try_apply(TetrominoMove::Right, &self.player_screen.grid);
             }
         }
 
@@ -84,7 +84,7 @@ impl LocalPlayer {
             && !self
                 .player_screen
                 .active_tetromino
-                .apply(TetrominoMove::Fall, &self.player_screen.grid)
+                .try_apply(TetrominoMove::Fall, &self.player_screen.grid)
             && self.freeze_frame < frame_counter
         {
             // if the tetromino reaches the bottom, set the freeze_frame
@@ -102,7 +102,7 @@ impl LocalPlayer {
             && !self
                 .player_screen
                 .active_tetromino
-                .apply(TetrominoMove::Fall, &self.player_screen.grid)
+                .try_apply(TetrominoMove::Fall, &self.player_screen.grid)
         {
             let _ = self.lock_down_tetromino();
         }
@@ -118,7 +118,7 @@ impl LocalPlayer {
 
         // Updates the ghost_tetromino
         let mut ghost = self.player_screen.active_tetromino;
-        ghost.apply(TetrominoMove::HardDrop, &self.player_screen.grid);
+        ghost.try_apply(TetrominoMove::HardDrop, &self.player_screen.grid);
         self.player_screen.ghost_tetromino = Some(ghost);
 
         // Send the player_screen data if necessary

@@ -1,7 +1,10 @@
 //! Define `struct` [TetrisGrid] and `enum` [GameOverError].
 #![doc = simple_mermaid::mermaid!("tetris_grid.mmd")]
 
-use super::{Position, TetrisColor};
+mod tetris_color;
+
+use super::Position;
+pub use tetris_color::TetrisColor;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;

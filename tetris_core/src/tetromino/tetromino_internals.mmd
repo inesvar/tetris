@@ -8,7 +8,7 @@ graph LR
     is_block_available(is_block_available)
     can_blocks_spawn_on(can_blocks_spawn_on)
     add_blocks(add_blocks_and_clear_lines)
-    apply(apply)
+    try_apply(try_apply)
     apply_rotation(apply_rotation)
     apply_translation(apply_translation)
     try_move(try_move)
@@ -44,8 +44,8 @@ graph LR
         lock_down
         subgraph apply_group[ ]
             direction LR
-            apply -.-> apply_translation
-            apply -.-> apply_rotation
+            try_apply -.-> apply_translation
+            try_apply -.-> apply_rotation
             apply_translation -.-> try_move
             apply_rotation -.-> try_move
         end

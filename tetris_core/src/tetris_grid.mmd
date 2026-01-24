@@ -5,15 +5,15 @@ graph LR
     TetrisColor[TetrisColor]
     Position[[Position]]
 
-    subgraph tetris_color
-        TetrisColor
-    end
-
     subgraph tetromino
+        TetrominoKind
         Position
     end
 
-    TetrisGrid --o TetrisColor
-    TetrisGrid -.-> GameOverError
-    TetrisGrid -.-> Position
+    subgraph tetris_grid
+        TetrisGrid --o TetrisColor
+        TetrisGrid -.-> GameOverError
+        TetrisGrid -.-> Position
+        TetrisColor -.-> TetrominoKind
+    end
 

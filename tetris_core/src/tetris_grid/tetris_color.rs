@@ -1,3 +1,4 @@
+use crate::TetrominoKind;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -60,6 +61,20 @@ impl TetrisColor {
             Self::Green => "green",
             Self::Red => "red",
             Self::Grey => "grey",
+        }
+    }
+}
+
+impl From<TetrominoKind> for TetrisColor {
+    fn from(kind: TetrominoKind) -> Self {
+        match kind {
+            TetrominoKind::I => TetrisColor::Cyan,
+            TetrominoKind::O => TetrisColor::Yellow,
+            TetrominoKind::T => TetrisColor::Purple,
+            TetrominoKind::J => TetrisColor::Blue,
+            TetrominoKind::L => TetrisColor::Orange,
+            TetrominoKind::S => TetrisColor::Green,
+            TetrominoKind::Z => TetrisColor::Red,
         }
     }
 }
