@@ -10,16 +10,13 @@ mod pressed_keys;
 mod render;
 mod update_player;
 
-use tetris_core::{Tetromino, TetrisGrid, TetrominoGenerator};
-use self::{
-    circular_array::CircularArray,
-    pressed_keys::PressedKeys,
-};
+use self::{circular_array::CircularArray, pressed_keys::PressedKeys};
 use crate::settings::NB_NEXT_TETROMINO;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
+use tetris_core::{TetrisGrid, Tetromino, TetrominoGenerator};
 
 /// Local player contains all the informations relative to one player.
 ///

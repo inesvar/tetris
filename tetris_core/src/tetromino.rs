@@ -51,10 +51,7 @@ impl Tetromino {
         *self = Self::from(self.kind)
     }
 
-    pub fn can_enter_grid(
-        &mut self,
-        grid: &TetrisGrid,
-    ) -> Result<(), GameOverError> {
+    pub fn can_enter_grid(&mut self, grid: &TetrisGrid) -> Result<(), GameOverError> {
         let offset = grid.can_blocks_spawn_on(&self.blocks)?;
         let translation = RotationTranslation::translation(offset);
 
@@ -62,18 +59,11 @@ impl Tetromino {
         Ok(())
     }
 
-    pub fn lock_down(
-        self,
-        grid: &mut TetrisGrid,
-    ) -> Result<u64, GameOverError> {
+    pub fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
         grid.add_blocks_and_clear_lines(&self.blocks, self.color())
     }
 
-    pub fn apply(
-        &mut self,
-        tetromino_move: TetrominoMove,
-        grid: &TetrisGrid,
-    ) -> bool {
+    pub fn apply(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
         if tetromino_move.get_rotation_type() == RotationType::Identity {
             self.apply_translation(tetromino_move, grid)
         } else {

@@ -75,11 +75,7 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If [TetrisGrid::nb_columns] or [TetrisGrid::nb_matrix_rows] or [TetrisGrid::nb_buffer_rows] aren't in the expected range.
-    pub fn new(
-        nb_columns: u32,
-        nb_matrix_rows: u32,
-        nb_buffer_rows: u32,
-    ) -> Self {
+    pub fn new(nb_columns: u32, nb_matrix_rows: u32, nb_buffer_rows: u32) -> Self {
         if nb_columns > TETRIS_GRID_MAX
             || nb_matrix_rows > TETRIS_GRID_MAX
             || nb_buffer_rows > TETRIS_GRID_MAX
@@ -125,10 +121,7 @@ impl TetrisGrid {
     }
 
     /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
-    pub fn add_garbage(
-        &mut self,
-        completed_lines: u64,
-    ) -> Result<(), GameOverError> {
+    pub fn add_garbage(&mut self, completed_lines: u64) -> Result<(), GameOverError> {
         let lines_to_add = match completed_lines {
             x if x < 2 => return Ok(()),
             x if x < 4 => x - 1,

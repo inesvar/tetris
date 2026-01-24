@@ -1,16 +1,16 @@
 //! Define `trait` [Render] for [LocalPlayer], [PlayerScreen], [Tetromino], [TetrisGrid].
-use tetris_core::{Position, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS, TetrisColor};
 use crate::app::player::LocalPlayer;
 use crate::app::render_app::{Piston2dGraphicsArguments, Render};
 use crate::app::ui::text::Text;
 use crate::app::PlayerScreen;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_FONT_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
-    GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO,
-    TETROMINO_MAX_HEIGHT, TETROMINO_MAX_WIDTH, TEXT_COLOR,
+    GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO, TETROMINO_MAX_HEIGHT,
+    TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
+use tetris_core::{Position, TetrisColor, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS};
 
 impl Render<Piston2dGraphicsArguments<'_, '_>> for LocalPlayer {
     fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments) {

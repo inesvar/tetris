@@ -39,10 +39,7 @@ impl TetrominoGenerator {
         }
     }
 
-    pub fn get_chunk<const N: usize>(
-        &mut self,
-        rng: &mut Pcg32,
-    ) -> [TetrominoKind; N] {
+    pub fn get_chunk<const N: usize>(&mut self, rng: &mut Pcg32) -> [TetrominoKind; N] {
         array::from_fn(|_| self.get(rng))
     }
 

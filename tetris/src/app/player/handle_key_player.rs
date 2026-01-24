@@ -2,13 +2,13 @@
 //!
 //! [handle_key_press()](LocalPlayer::handle_key_press()) is called when a key is pressed.
 //! [handle_key_release()](LocalPlayer::handle_key_release()) is called when a key is released.
-use tetris_core::TetrominoMove;
 use super::LocalPlayer;
 use crate::{
     app::{GameFlowChange, RunningState},
     settings::{Keybindings, PAUSE_KEYS, RESTART_KEYS},
 };
 use piston::Key;
+use tetris_core::TetrominoMove;
 
 impl LocalPlayer {
     /// handle_key_press is called when a key is pressed.
