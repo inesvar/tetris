@@ -196,10 +196,10 @@ mod tests {
             "         \n",
         ))]
     #[case::i_north(TetrominoKind::I, Direction::North, concat!(
-            "         ",
-            "#C##     ",
-            "         ",
-            "         ",
+            "         \n",
+            "#C##     \n",
+            "         \n",
+            "         \n",
         ))]
     #[case::i_east(TetrominoKind::I, Direction::East, concat!(
             "  #      \n",
