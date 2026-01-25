@@ -5,18 +5,16 @@ graph LR
     GameOverError[GameOverError]
     Tetromino[[Tetromino]]
     Position[[Position]]
-    TetrominoKind[TetrominoKind]
     TetrisColor[TetrisColor]
     TetrominoGenerator[[TetrominoGenerator]]
 
     subgraph tetromino_generator
         TetrominoGenerator
     end
-    TetrominoGenerator --o TetrominoKind
+    TetrominoGenerator
     TetrominoGenerator -.-> Tetromino
 
     subgraph tetromino
-        Tetromino --o TetrominoKind
         Tetromino --o Position
         TetrominoMove -.-> Position
         Tetromino -.-> TetrominoMove
@@ -30,4 +28,3 @@ graph LR
 
     Tetromino -.-> tetris_grid
     TetrisGrid -.-> Position
-    TetrisColor -.-> TetrominoKind
