@@ -36,7 +36,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
 
         self.grid.render(gl_ctx);
 
-        if let Some(ghost) = self.ghost_tetromino {
+        if let Some(ghost) = &self.ghost_tetromino {
             let old_draw_state = gl_ctx.draw_state;
             gl_ctx.draw_state = gl_ctx
                 .draw_state
@@ -60,7 +60,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
         outline_rect.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, gl_ctx.gl);
 
         // drawing the hold piece
-        if let Some(saved) = self.saved_tetromino {
+        if let Some(saved) = &self.saved_tetromino {
             gl_ctx.transform = grid_transform.trans(
                 -TETROMINO_MAX_WIDTH - 2.0 * BLOCK_SIZE,
                 TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
