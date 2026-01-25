@@ -13,14 +13,13 @@ graph LR
         TetrominoGenerator
     end
     TetrominoGenerator --o TetrominoKind
+    TetrominoGenerator -.-> Tetromino
 
     subgraph tetromino
         Tetromino --o TetrominoKind
         Tetromino --o Position
-    end
-
-    subgraph tetromino_move
-        TetrominoMove
+        TetrominoMove -.-> Position
+        Tetromino -.-> TetrominoMove
     end
 
     subgraph tetris_grid
@@ -30,3 +29,5 @@ graph LR
     end
 
     Tetromino -.-> tetris_grid
+    TetrisGrid -.-> Position
+    TetrisColor -.-> TetrominoKind

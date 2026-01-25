@@ -1,8 +1,7 @@
 //! Define `enum` [TetrominoMove].
 #![doc = simple_mermaid::mermaid!("tetromino_move.mmd")]
 
-use super::tetromino::RotationType;
-use super::Position;
+use super::{Position, RotationType};
 
 /// Describes all possible [Tetromino](super::Tetromino) movements in the [TetrisGrid](super::TetrisGrid).
 #[derive(Clone, Copy, PartialEq)]

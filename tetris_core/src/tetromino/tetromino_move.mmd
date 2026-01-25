@@ -4,10 +4,5 @@ graph LR
     Position[[Position]]
     RotationType[RotationType]
 
-    subgraph tetromino
-        Position
-        RotationType
-    end
-
     TetrominoMove -.-> Position
     TetrominoMove -.-> RotationType

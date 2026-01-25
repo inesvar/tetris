@@ -7,6 +7,7 @@ graph LR
     ApplyRotationTranslation([ApplyRotationTranslation])
     Tetromino[[Tetromino]]
     TetrominoKind[TetrominoKind]
+    TetrominoMove[TetrominoMove]
 
     subgraph spatial_primitives
         Direction ~~~ Position
@@ -27,6 +28,13 @@ graph LR
     ApplyRotationTranslation -.-> RotationTranslation
 
     Tetromino -.-> ApplyRotationTranslation
+
+    subgraph tetromino_move
+        TetrominoMove
+    end
+    Tetromino -.-> TetrominoMove
+    TetrominoMove -.-> rotation_translation
+    %% TetrominoMove -.-> spatial_primitives
 
     subgraph tetromino_kind
         TetrominoKind

@@ -5,18 +5,20 @@ mod moving_primitives;
 mod rotation_translation;
 mod spatial_primitives;
 mod tetromino_kind;
+mod tetromino_move;
 
 use self::{
     moving_primitives::ApplyRotationTranslation, rotation_translation::RotationTranslation,
     spatial_primitives::Direction,
 };
-use super::{GameOverError, TetrisColor, TetrisGrid, TetrominoMove};
+use super::{GameOverError, TetrisColor, TetrisGrid};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 pub(super) use rotation_translation::RotationType;
 pub use spatial_primitives::Position;
 pub use tetromino_kind::TetrominoKind;
+pub use tetromino_move::TetrominoMove;
 
 /// Tetromino.
 ///
