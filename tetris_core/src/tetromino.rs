@@ -49,8 +49,9 @@ impl Tetromino {
     /// Returns `self`'s associated [TetrisColor].
     /// # Examples
     /// ```
-    /// # use tetris_core::{Tetromino, TetrominoKind, TetrisColor};
-    /// let o_tetromino = Tetromino::new(TetrominoKind::O);
+    /// # use tetris_core::{Tetromino, TetrisColor};
+    /// // The O Tetromino was arbitrarily chosen as the default one
+    /// let o_tetromino = Tetromino::default();
     /// assert_eq!(o_tetromino.color(), TetrisColor::Yellow);
     /// ```
     pub fn color(&self) -> TetrisColor {
@@ -59,12 +60,6 @@ impl Tetromino {
 
     #[cfg(test)]
     /// Returns `self`'s [TetrominoKind].
-    /// # Examples
-    /// ```
-    /// # use tetris_core::{Tetromino, TetrominoKind};
-    /// let o_tetromino = Tetromino::new(TetrominoKind::O);
-    /// assert_eq!(o_tetromino.kind(), TetrominoKind::O);
-    /// ```
     pub(super) fn kind(&self) -> TetrominoKind {
         self.kind
     }
@@ -72,14 +67,7 @@ impl Tetromino {
 
 impl Tetromino {
     /// Creates a new [Tetromino] of [TetrominoKind] `kind` in the default position and orientation.
-    ///
-    /// # Examples
-    /// ```
-    /// # use tetris_core::{Tetromino, TetrominoKind};
-    /// // The O Tetromino was arbitrarily chosen as the default one
-    /// assert_eq!(Tetromino::new(TetrominoKind::O), Tetromino::default());
-    /// ```
-    pub fn new(kind: TetrominoKind) -> Self {
+    pub(super) fn new(kind: TetrominoKind) -> Self {
         let positions = kind.get_initial_position();
         Tetromino {
             kind,
@@ -89,18 +77,19 @@ impl Tetromino {
         }
     }
 
-    /// Resets `self` in the default position and orientation, keeping the same [TetrominoKind].
+    /// Resets `self` in the default position and orientation.
     ///
     /// # Examples
     /// ```
-    /// # use tetris_core::{Tetromino, TetrominoKind, TetrisGrid, TetrominoMove};
+    /// # use tetris_core::{Tetromino, TetrisGrid, TetrominoMove};
     /// # let mut o_tetromino = Tetromino::default();
     /// # let empty_grid = TetrisGrid::default();
     /// # o_tetromino.try_apply(TetrominoMove::HardDrop, &empty_grid);
     /// #
-    /// assert_ne!(o_tetromino, Tetromino::new(TetrominoKind::O));
+    /// // The O Tetromino was arbitrarily chosen as the default one
+    /// assert_ne!(o_tetromino, Tetromino::default());
     /// o_tetromino.reset();
-    /// assert_eq!(o_tetromino, Tetromino::new(TetrominoKind::O));
+    /// assert_eq!(o_tetromino, Tetromino::default());
     /// ```
     pub fn reset(&mut self) {
         *self = Self::new(self.kind)
