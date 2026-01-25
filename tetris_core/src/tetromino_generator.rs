@@ -32,6 +32,7 @@ pub enum BagType {
 }
 
 impl TetrominoGenerator {
+    /// Creates a new [TetrominoGenerator] with [BagType] `bag_type`.
     pub fn new(bag_type: BagType) -> Self {
         Self {
             tetrominos: Vec::new(),
@@ -39,10 +40,12 @@ impl TetrominoGenerator {
         }
     }
 
+    /// Returns an array of `N` [Tetromino]'s.
     pub fn get_chunk<const N: usize>(&mut self, rng: &mut Pcg32) -> [Tetromino; N] {
         array::from_fn(|_| self.get(rng))
     }
 
+    /// Returns one [Tetromino].
     pub fn get(&mut self, rng: &mut Pcg32) -> Tetromino {
         Tetromino::new(self.tetrominos.pop().unwrap_or_else(|| {
             self.draw_new_bag(rng);

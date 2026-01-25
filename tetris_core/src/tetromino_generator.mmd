@@ -2,10 +2,12 @@ graph LR
     %% objects
     BagType[BagType]
     TetrominoGenerator[[TetrominoGenerator]]
+    Tetromino[[Tetromino]]
 
     subgraph tetromino
-        TetrominoKind
+        Tetromino --o TetrominoKind
     end
 
     TetrominoGenerator --o BagType
     TetrominoGenerator --o TetrominoKind
+    TetrominoGenerator -.-> Tetromino

@@ -7,9 +7,10 @@ graph LR
     Position[[Position]]
     TetrisColor[TetrisColor]
     TetrominoGenerator[[TetrominoGenerator]]
+    BagType[BagType]
 
     subgraph tetromino_generator
-        TetrominoGenerator
+        TetrominoGenerator --o BagType
     end
     TetrominoGenerator
     TetrominoGenerator -.-> Tetromino
