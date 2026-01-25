@@ -27,6 +27,9 @@ pub use tetromino_move::TetrominoMove;
 /// > "There are seven differently shaped tetriminos that fall into a rectangular **Matrix**.
 /// > As tetriminos fall, a player may rotate, move, or drop them into their final resting place.
 /// > If a row or more of cells is completely filled with **Blocks**, then the line or lines are cleared from the **Matrix**"
+///
+/// [Tetromino] state machine :
+#[doc = simple_mermaid::mermaid!("tetromino/tetromino_state.mmd")]
 #[derive(Clone, Copy, Serialize, Deserialize, Debug, PartialEq)]
 pub struct Tetromino {
     kind: TetrominoKind,
@@ -35,20 +38,38 @@ pub struct Tetromino {
     direction: Direction,
 }
 
-impl From<TetrominoKind> for Tetromino {
-    fn from(kind: TetrominoKind) -> Tetromino {
-        let positions = kind.get_initial_position();
-        Tetromino {
-            kind,
-            center: positions[0],
-            blocks: [positions[1], positions[2], positions[3], positions[4]],
-            direction: Direction::default(),
-        }
+// #[doc = simple_mermaid::mermaid!("tetromino/tetromino_internals.mmd")]
+/// Getters.
+impl Tetromino {
+    /// Returns `self`'s blocks.
+    pub fn blocks(&self) -> &[Position] {
+        &self.blocks
+    }
+
+    /// Returns `self`'s associated [TetrisColor].
+    /// # Examples
+    /// ```
+    /// # use tetris_core::{Tetromino, TetrominoKind, TetrisColor};
+    /// let o_tetromino = Tetromino::new(TetrominoKind::O);
+    /// assert_eq!(o_tetromino.color(), TetrisColor::Yellow);
+    /// ```
+    pub fn color(&self) -> TetrisColor {
+        self.kind.into()
+    }
+
+    #[cfg(test)]
+    /// Returns `self`'s [TetrominoKind].
+    /// # Examples
+    /// ```
+    /// # use tetris_core::{Tetromino, TetrominoKind};
+    /// let o_tetromino = Tetromino::new(TetrominoKind::O);
+    /// assert_eq!(o_tetromino.kind(), TetrominoKind::O);
+    /// ```
+    pub(super) fn kind(&self) -> TetrominoKind {
+        self.kind
     }
 }
 
-// #[doc = simple_mermaid::mermaid!("tetromino/tetromino_internals.mmd")]
-/// Constructors and getters.
 impl Tetromino {
     /// Creates a new [Tetromino] of [TetrominoKind] `kind` in the default position and orientation.
     ///
@@ -59,7 +80,13 @@ impl Tetromino {
     /// assert_eq!(Tetromino::new(TetrominoKind::O), Tetromino::default());
     /// ```
     pub fn new(kind: TetrominoKind) -> Self {
-        Self::from(kind)
+        let positions = kind.get_initial_position();
+        Tetromino {
+            kind,
+            center: positions[0],
+            blocks: [positions[1], positions[2], positions[3], positions[4]],
+            direction: Direction::default(),
+        }
     }
 
     /// Resets `self` in the default position and orientation, keeping the same [TetrominoKind].
@@ -76,34 +103,9 @@ impl Tetromino {
     /// assert_eq!(o_tetromino, Tetromino::new(TetrominoKind::O));
     /// ```
     pub fn reset(&mut self) {
-        *self = Self::from(self.kind)
+        *self = Self::new(self.kind)
     }
 
-    /// Returns `self`'s blocks.
-    pub fn blocks(&self) -> &[Position] {
-        &self.blocks
-    }
-
-    /// Returns `self`'s associated color.
-    /// # Examples
-    /// ```
-    /// # use tetris_core::{Tetromino, TetrominoKind, TetrisColor};
-    /// let o_tetromino = Tetromino::new(TetrominoKind::O);
-    /// assert_eq!(o_tetromino.color(), TetrisColor::Yellow);
-    /// ```
-    pub fn color(&self) -> TetrisColor {
-        self.kind.into()
-    }
-
-    #[cfg(test)]
-    pub(super) fn kind(&self) -> TetrominoKind {
-        self.kind
-    }
-}
-
-/// [Tetromino] state machine :
-#[doc = simple_mermaid::mermaid!("tetromino/tetromino_state.mmd")]
-impl Tetromino {
     /// Translates `self` to its starting position in [TetrisGrid] `grid` if the blocks are free, otherwise returns [GameOverError::BlockOut].
     ///
     /// Note that:
@@ -155,21 +157,20 @@ impl Tetromino {
     /// otherwise returns the number of cleared lines.
     ///
     /// Note that `self` is assumed to be on free blocks of `grid`, ie [try_enter_grid](Tetromino::try_enter_grid) was called successfully
-    /// and since then, only [try_apply](Tetromino::try_apply) was called on `self`.
-    ///
-    /// The state machine of the [Tetromino] is drawn below.
+    /// and since then, only `self` was only mutated by [try_apply](Tetromino::try_apply) (see state machine schematic).
     ///
     /// # Examples
     /// ```
     /// # use tetris_core::{Tetromino, TetrisGrid, GameOverError, TetrominoMove};
     /// # let mut empty_grid = TetrisGrid::default();
-    /// # let mut o_tetromino = Tetromino::default();
     /// #
-    /// o_tetromino.reset();
+    /// let mut o_tetromino = Tetromino::default();
     /// assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
     /// assert_eq!(o_tetromino.lock_down(&mut empty_grid), Err(GameOverError::LockOut));
     ///
-    /// o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid);
+    /// let mut o_tetromino = Tetromino::default();
+    /// assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
+    /// assert!(o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid));
     /// assert!(o_tetromino.lock_down(&mut empty_grid).is_ok());
     /// ```
     pub fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
@@ -233,7 +234,7 @@ impl Tetromino {
 
 impl Default for Tetromino {
     fn default() -> Self {
-        Tetromino::from(TetrominoKind::O)
+        Tetromino::new(TetrominoKind::O)
     }
 }
 

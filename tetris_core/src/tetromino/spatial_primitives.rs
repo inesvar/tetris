@@ -31,11 +31,8 @@ pub(super) enum Direction {
     West,
 }
 
-/// In [spatial_primitives](super::spatial_primitives), helpers used by [moving_primitives](super::moving_primitives)
-/// to implement [ApplyRotationTranslation](super::moving_primitives::ApplyRotationTranslation) for [Position]
-/// (also used by [tetromino_kind](super::tetromino_kind)).
 impl Position {
-    pub const fn new(x: i32, y: i32) -> Self {
+    pub(crate) const fn new(x: i32, y: i32) -> Self {
         Self { x, y }
     }
 
@@ -67,7 +64,7 @@ impl Position {
     }
 }
 
-/// In [spatial_primitives](super::spatial_primitives), getters used by [player::render](crate::app::player::render).
+/// Getters.
 impl Position {
     pub fn x(&self) -> i32 {
         self.x

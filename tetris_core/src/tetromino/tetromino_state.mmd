@@ -1,19 +1,30 @@
 graph LR
     %% objects
     start[ ]
+    start2[ ]
     state0[default position and orientation]
-    state2[valid position and orientation wrt. grid]
     ending[ ]
+    state2[valid position and orientation wrt. grid]
 
-    start --"new(TetrominoKind)"--> state0
-    state0 --"try_enter_grid(&mut self, &TetrisGrid)"--> state2
-    subgraph g1[ ]
+    subgraph middle[ ]
         direction TB
+        ending ~~~~ state2
+        state2 --"lock_down(self, &mut TetrisGrid)"--> ending
         state2 --"try_apply(&mut self, TetrominoMove, &TetrisGrid)"--> state2
     end
-    state2 --"reset(&mut self)"--> state0
-    state2 --"lock_down(self)"--> ending
+    left --"try_enter_grid(&mut self, &TetrisGrid)"--> middle
+    middle --"reset(&mut self)"--> left
+
+    subgraph left[ ]
+        direction TB
+        start --"new(TetrominoKind)"---> state0
+        state0 ~~~ start
+        state0 ~~~~ start2
+    end
+
 
     style start stroke: none, fill:none;
+    style start2 stroke: none, fill:none;
+    style left stroke: none, fill:none;
     style ending stroke: none, fill:none;
-    style g1 stroke:none, fill:none;
+    style middle stroke: none, fill:none;
