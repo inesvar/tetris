@@ -28,7 +28,7 @@ impl LocalPlayer {
             player_screen,
             keyboard: PressedKeys::new(),
             freeze_frame: 0, // that's about 10 billion years at 60fps
-            bag_of_tetromino: tetromino_bag,
+            tetromino_bag,
             sender,
             remote_ip,
             garbage_to_be_added: 0,
@@ -36,16 +36,16 @@ impl LocalPlayer {
         }
     }
 
-    pub fn renew(&mut self, seed: u64) {
+    pub fn reset(&mut self, seed: u64) {
         self.player_screen.grid.reset();
         self.player_screen.score = 0;
         self.player_screen.saved_tetromino = None;
         self.player_screen.ghost_tetromino = None;
         self.rng = Pcg32::seed_from_u64(seed);
-        self.bag_of_tetromino = TetrominoGenerator::default();
-        self.player_screen.active_tetromino = self.bag_of_tetromino.get(&mut self.rng);
+        self.tetromino_bag = TetrominoGenerator::default();
+        self.player_screen.active_tetromino = self.tetromino_bag.get(&mut self.rng);
         self.player_screen.fifo_next_tetromino = CircularArray::new(
-            self.bag_of_tetromino
+            self.tetromino_bag
                 .get_chunk::<NB_NEXT_TETROMINO>(&mut self.rng),
         );
         self.freeze_frame = 0;
@@ -106,7 +106,7 @@ impl LocalPlayer {
         // Check if there's enough place on the grid for a new tetromino
         // TODO this should be done using the grid method and probably all other calls
         // using null()...
-        let mut swap = self.bag_of_tetromino.get(&mut self.rng);
+        let mut swap = self.tetromino_bag.get(&mut self.rng);
         self.player_screen
             .fifo_next_tetromino
             .get_front_push_back(&mut swap);

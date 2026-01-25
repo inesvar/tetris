@@ -332,7 +332,7 @@ impl<'a> App<'a> {
                 self.settings_manager.bag_size = new_settings.bag_size;
                 self.settings_manager.nb_next_tetromino = new_settings.nb_next_tetromino;
                 for player in &mut self.local_players {
-                    player.renew(new_settings.seed);
+                    player.reset(new_settings.seed);
                 }
                 self.is_synchronized = true;
                 if self.is_host {
@@ -473,7 +473,7 @@ impl<'a> App<'a> {
                 let mut rng = rand::thread_rng();
                 self.settings_manager.seed = rng.gen();
                 for player in &mut self.local_players {
-                    player.renew(self.settings_manager.seed);
+                    player.reset(self.settings_manager.seed);
                 }
             }
             PlayerConfig::Local => {
@@ -482,7 +482,7 @@ impl<'a> App<'a> {
                 let mut rng = rand::thread_rng();
                 self.settings_manager.seed = rng.gen();
                 for player in &mut self.local_players {
-                    player.renew(self.settings_manager.seed);
+                    player.reset(self.settings_manager.seed);
                 }
             }
             _ => {
