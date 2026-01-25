@@ -19,9 +19,9 @@ pub use spatial_primitives::Position;
 pub use tetromino_kind::TetrominoKind;
 
 /// Tetromino.
-/// 
+///
 /// According to the **Tetris Guideline**, a tetromino is a "\[shape\] made from four connected squares":
-/// 
+///
 /// > "There are seven differently shaped tetriminos that fall into a rectangular **Matrix**.
 /// > As tetriminos fall, a player may rotate, move, or drop them into their final resting place.
 /// > If a row or more of cells is completely filled with **Blocks**, then the line or lines are cleared from the **Matrix**"
@@ -49,7 +49,7 @@ impl From<TetrominoKind> for Tetromino {
 /// Constructors and getters.
 impl Tetromino {
     /// Creates a new [Tetromino] of [TetrominoKind] `kind` in the default position and orientation.
-    /// 
+    ///
     /// # Examples
     /// ```
     /// # use tetris_core::{Tetromino, TetrominoKind};
@@ -61,7 +61,7 @@ impl Tetromino {
     }
 
     /// Resets `self` in the default position and orientation, keeping the same [TetrominoKind].
-    /// 
+    ///
     /// # Examples
     /// ```
     /// # use tetris_core::{Tetromino, TetrominoKind, TetrisGrid, TetrominoMove};
@@ -99,16 +99,15 @@ impl Tetromino {
     }
 }
 
-
 /// [Tetromino] state machine :
 #[doc = simple_mermaid::mermaid!("tetromino/tetromino_state.mmd")]
 impl Tetromino {
     /// Translates `self` to its starting position in [TetrisGrid] `grid` if the blocks are free, otherwise returns [GameOverError::BlockOut].
-    /// 
+    ///
     /// Note that:
     /// - `self` is assumed to be in its default position and orientation;
     /// - the translation applied depends on the size of `grid`.
-    /// 
+    ///
     /// # Examples
     /// ```
     /// # use tetris_core::{Tetromino, TetrominoMove, TetrisGrid, GameOverError};
@@ -120,7 +119,7 @@ impl Tetromino {
     /// # let mut empty_grid = TetrisGrid::default();
     /// #
     /// assert!(Tetromino::default().try_enter_grid(&empty_grid).is_ok());
-    /// 
+    ///
     /// assert_eq!(Tetromino::default().try_enter_grid(&full_grid), Err(GameOverError::BlockOut));
     /// ```
     pub fn try_enter_grid(&mut self, grid: &TetrisGrid) -> Result<(), GameOverError> {
@@ -131,7 +130,7 @@ impl Tetromino {
     }
 
     /// Applies [TetrominoMove] `tetromino_move` to `self` if the target blocks are free and inside the grid, otherwise returns `false`.
-    /// 
+    ///
     /// # Examples
     /// ```
     /// # use tetris_core::{Tetromino, TetrisGrid, TetrominoMove};
@@ -152,12 +151,12 @@ impl Tetromino {
 
     /// Adds `self`'s blocks to [TetrisGrid] `grid`. If these blocks are all above the **Skyline**, returns [GameOverError::LockOut],
     /// otherwise returns the number of cleared lines.
-    /// 
+    ///
     /// Note that `self` is assumed to be on free blocks of `grid`, ie [try_enter_grid](Tetromino::try_enter_grid) was called successfully
     /// and since then, only [try_apply](Tetromino::try_apply) was called on `self`.
-    /// 
-    /// The state machine of the [Tetromino] is drawn below. 
-    /// 
+    ///
+    /// The state machine of the [Tetromino] is drawn below.
+    ///
     /// # Examples
     /// ```
     /// # use tetris_core::{Tetromino, TetrisGrid, GameOverError, TetrominoMove};
@@ -167,7 +166,7 @@ impl Tetromino {
     /// o_tetromino.reset();
     /// assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
     /// assert_eq!(o_tetromino.lock_down(&mut empty_grid), Err(GameOverError::LockOut));
-    /// 
+    ///
     /// o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid);
     /// assert!(o_tetromino.lock_down(&mut empty_grid).is_ok());
     /// ```

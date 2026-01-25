@@ -4,11 +4,11 @@
 mod tetris_color;
 
 use super::Position;
-pub use tetris_color::TetrisColor;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::ops::Index;
+pub use tetris_color::TetrisColor;
 
 /// A reasonable maximum for "small unsigned numbers".
 /// Any [u32] less than or equal to [TETRIS_GRID_MAX] is safe to cast to [i32] and [usize].

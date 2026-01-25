@@ -46,7 +46,7 @@ impl LocalPlayer {
         self.player_screen.active_tetromino = self.bag_of_tetromino.get(&mut self.rng);
         self.player_screen.fifo_next_tetromino = CircularArray::new(
             self.bag_of_tetromino
-                .get_chunk::<NB_NEXT_TETROMINO>(&mut self.rng)
+                .get_chunk::<NB_NEXT_TETROMINO>(&mut self.rng),
         );
         self.freeze_frame = 0;
         self.player_screen.game_over = false;
