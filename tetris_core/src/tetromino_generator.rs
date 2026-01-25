@@ -1,7 +1,7 @@
 //! Define `struct` [TetrominoGenerator] and `enum` [BagType].
 #![doc = simple_mermaid::mermaid!("tetromino_generator.mmd")]
 
-use super::TetrominoKind;
+use super::{Tetromino, TetrominoKind};
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
@@ -39,17 +39,17 @@ impl TetrominoGenerator {
         }
     }
 
-    pub fn get_chunk<const N: usize>(&mut self, rng: &mut Pcg32) -> [TetrominoKind; N] {
+    pub fn get_chunk<const N: usize>(&mut self, rng: &mut Pcg32) -> [Tetromino; N] {
         array::from_fn(|_| self.get(rng))
     }
 
-    pub fn get(&mut self, rng: &mut Pcg32) -> TetrominoKind {
-        self.tetrominos.pop().unwrap_or_else(|| {
+    pub fn get(&mut self, rng: &mut Pcg32) -> Tetromino {
+        Tetromino::new(self.tetrominos.pop().unwrap_or_else(|| {
             self.draw_new_bag(rng);
             self.tetrominos
                 .pop()
                 .expect("`draw_new_bag` shouldn't have left `tetrominos` empty")
-        })
+        }))
     }
 
     fn draw_new_bag(&mut self, rng: &mut Pcg32) {
@@ -140,7 +140,7 @@ mod tests {
         let tetrominos = Vec::from(bag.get_chunk::<14>(&mut Pcg32::seed_from_u64(0)));
 
         for kind in TetrominoKind::ALL {
-            assert_eq!(tetrominos.iter().filter(|&k| *k == kind).count(), 2);
+            assert_eq!(tetrominos.iter().filter(|&t| t.kind() == kind).count(), 2);
         }
     }
 
@@ -152,7 +152,7 @@ mod tests {
         let tetrominos = Vec::from(bag.get_chunk::<7>(&mut Pcg32::seed_from_u64(0)));
 
         for kind in TetrominoKind::ALL {
-            assert_eq!(tetrominos.iter().filter(|&k| *k == kind).count(), 1);
+            assert_eq!(tetrominos.iter().filter(|&t| t.kind() == kind).count(), 1);
         }
     }
 }

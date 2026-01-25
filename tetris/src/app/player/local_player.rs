@@ -4,15 +4,13 @@ use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
-use tetris_core::{GameOverError, TetrisGrid, Tetromino, TetrominoGenerator};
+use tetris_core::{GameOverError, TetrominoGenerator};
 
 impl LocalPlayer {
     pub fn new(player_config: &PlayerConfig) -> Self {
-        let grid = TetrisGrid::default();
-        let rng = Pcg32::seed_from_u64(0);
-        let bag_of_tetromino = TetrominoGenerator::default();
-        let first_tetromino = Tetromino::default();
-        let fifo_next_tetromino = CircularArray::new([Tetromino::default(); NB_NEXT_TETROMINO]);
+        let mut rng = Pcg32::seed_from_u64(0);
+        let mut tetromino_bag = TetrominoGenerator::default();
+
         let mut remote_ip = String::from("");
         let mut sender = false;
         if let PlayerConfig::TwoRemote {
@@ -24,23 +22,13 @@ impl LocalPlayer {
             remote_ip = ip.to_string();
         }
 
-        let player_screen = PlayerScreen {
-            grid,
-            score: 0,
-            game_over: false,
-            new_completed_lines: 0,
-            active_tetromino: first_tetromino,
-            saved_tetromino: None,
-            fifo_next_tetromino,
-            ghost_tetromino: None,
-            serialize_as_msg: true.into(),
-        };
+        let player_screen = PlayerScreen::new(&mut rng, &mut tetromino_bag);
 
         LocalPlayer {
             player_screen,
             keyboard: PressedKeys::new(),
             freeze_frame: 0, // that's about 10 billion years at 60fps
-            bag_of_tetromino,
+            bag_of_tetromino: tetromino_bag,
             sender,
             remote_ip,
             garbage_to_be_added: 0,
@@ -55,11 +43,10 @@ impl LocalPlayer {
         self.player_screen.ghost_tetromino = None;
         self.rng = Pcg32::seed_from_u64(seed);
         self.bag_of_tetromino = TetrominoGenerator::default();
-        self.player_screen.active_tetromino = self.bag_of_tetromino.get(&mut self.rng).into();
+        self.player_screen.active_tetromino = self.bag_of_tetromino.get(&mut self.rng);
         self.player_screen.fifo_next_tetromino = CircularArray::new(
             self.bag_of_tetromino
                 .get_chunk::<NB_NEXT_TETROMINO>(&mut self.rng)
-                .map(|kind| kind.into()),
         );
         self.freeze_frame = 0;
         self.player_screen.game_over = false;
@@ -119,7 +106,7 @@ impl LocalPlayer {
         // Check if there's enough place on the grid for a new tetromino
         // TODO this should be done using the grid method and probably all other calls
         // using null()...
-        let mut swap = self.bag_of_tetromino.get(&mut self.rng).into();
+        let mut swap = self.bag_of_tetromino.get(&mut self.rng);
         self.player_screen
             .fifo_next_tetromino
             .get_front_push_back(&mut swap);

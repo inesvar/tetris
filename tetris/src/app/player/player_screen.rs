@@ -1,18 +1,24 @@
-//! Define the [constructor](PlayerScreen::empty()) of [PlayerScreen].
+//! Implement [PlayerScreen].
 use super::{CircularArray, PlayerScreen};
 use crate::settings::NB_NEXT_TETROMINO;
-use tetris_core::{TetrisGrid, Tetromino};
+use rand_pcg::Pcg32;
+use tetris_core::{TetrisGrid, TetrominoGenerator};
 
 impl PlayerScreen {
-    pub fn empty() -> Self {
+    pub fn new(rng: &mut Pcg32, tetromino_bag: &mut TetrominoGenerator) -> Self {
+        let grid = TetrisGrid::default();
+        let active_tetromino = tetromino_bag.get(rng);
+        let next_tetrominos = tetromino_bag.get_chunk::<NB_NEXT_TETROMINO>(rng);
+        let fifo_next_tetromino = CircularArray::new(next_tetrominos);
+
         PlayerScreen {
-            grid: TetrisGrid::default(),
+            grid,
             score: 0,
             game_over: false,
             new_completed_lines: 0,
-            active_tetromino: Tetromino::default(),
+            active_tetromino,
             saved_tetromino: None,
-            fifo_next_tetromino: CircularArray::new([Tetromino::default(); NB_NEXT_TETROMINO]),
+            fifo_next_tetromino,
             ghost_tetromino: None,
             serialize_as_msg: true.into(),
         }

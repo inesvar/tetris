@@ -5,7 +5,7 @@ use std::fmt::Formatter;
 
 /// Push back pop front circular buffer.
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CircularArray<const K: usize, T: Default + Copy + Serialize + Debug>
+pub struct CircularArray<const K: usize, T: Copy + Serialize + Debug>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
@@ -13,7 +13,7 @@ where
     begin: usize,
 }
 
-impl<const K: usize, T: Default + Copy + Serialize + Debug> Display for CircularArray<K, T>
+impl<const K: usize, T: Copy + Serialize + Debug> Display for CircularArray<K, T>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
@@ -26,7 +26,7 @@ where
     }
 }
 
-impl<const K: usize, T: Default + Copy + Serialize + Debug> CircularArray<K, T>
+impl<const K: usize, T: Copy + Serialize + Debug> CircularArray<K, T>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {

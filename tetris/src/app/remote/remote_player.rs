@@ -3,11 +3,14 @@ use crate::{
     app::{render_app::Render, GameFlowChange, Piston2dGraphicsArguments, PlayerScreen},
     once,
 };
+use rand::SeedableRng;
+use rand_pcg::Pcg32;
 use std::{
     net::{TcpListener, TcpStream},
     sync::{Arc, Mutex},
     thread,
 };
+use tetris_core::TetrominoGenerator;
 
 pub struct RemotePlayer {
     screen: Arc<Mutex<PlayerScreen>>,
@@ -17,7 +20,9 @@ pub struct RemotePlayer {
 
 impl RemotePlayer {
     pub fn new() -> Self {
-        let arc = Arc::new(Mutex::new(PlayerScreen::empty()));
+        let mut rng = Pcg32::seed_from_u64(0);
+        let mut tetromino_bag = TetrominoGenerator::default();
+        let arc = Arc::new(Mutex::new(PlayerScreen::new(&mut rng, &mut tetromino_bag)));
         RemotePlayer {
             screen: arc,
             first_screen_received: Arc::new(Mutex::new(false)),

@@ -92,6 +92,11 @@ impl Tetromino {
     pub fn color(&self) -> TetrisColor {
         self.kind.into()
     }
+
+    #[cfg(test)]
+    pub(super) fn kind(&self) -> TetrominoKind {
+        self.kind
+    }
 }
 
 
@@ -225,8 +230,6 @@ impl Tetromino {
     }
 }
 
-// TODO remove this...
-/// `Tetromino::default` is far from the origin and is not renderer on the screen.
 impl Default for Tetromino {
     fn default() -> Self {
         Tetromino::from(TetrominoKind::O)
