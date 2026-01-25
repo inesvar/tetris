@@ -5,7 +5,7 @@ use std::fmt::Formatter;
 
 /// Push back pop front circular buffer.
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CircularArray<const K: usize, T: Copy + Serialize + Debug>
+pub struct CircularArray<const K: usize, T: Debug>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
@@ -13,7 +13,7 @@ where
     begin: usize,
 }
 
-impl<const K: usize, T: Copy + Serialize + Debug> Display for CircularArray<K, T>
+impl<const K: usize, T: Debug> Display for CircularArray<K, T>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
@@ -26,7 +26,7 @@ where
     }
 }
 
-impl<const K: usize, T: Copy + Serialize + Debug> CircularArray<K, T>
+impl<const K: usize, T: Debug> CircularArray<K, T>
 where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
@@ -48,10 +48,10 @@ where
     }
 
     /// Get the i-th element in the buffer.
-    pub(super) fn get(&self, i: usize) -> Option<T> {
+    pub(super) fn get(&self, i: usize) -> Option<&T> {
         //println!("getting {i} from {}", self);
         if i < K {
-            Some(self.array[(self.begin + i) % K])
+            Some(&self.array[(self.begin + i) % K])
         } else {
             None
         }
@@ -74,6 +74,18 @@ mod tests {
     }
 
     #[rstest]
+    #[case(CircularArray::new([0, 1, 2, 3, 4]), "begin 0, content 0 1 2 3 4")]
+    #[case(CircularArray::new([3, 3, 3]), "begin 0, content 3 3 3")]
+    fn display_is_correct<const K: usize>(
+        #[case] circ_array: CircularArray<K, i32>,
+        #[case] expected: &str,
+    ) where
+        [i32; K]: Serialize + for<'a> Deserialize<'a>,
+    {
+        assert_eq!(&circ_array.to_string(), expected);
+    }
+
+    #[rstest]
     #[case(CircularArray::new([0, 1, 2, 3, 4]))]
     #[case(CircularArray::new([0, 1, 2, 3]))]
     fn get_is_correct<const K: usize>(#[case] buffer: CircularArray<K, usize>)
@@ -81,7 +93,7 @@ mod tests {
         [usize; K]: Serialize + for<'a> Deserialize<'a>,
     {
         for i in 0..K {
-            assert_eq!(buffer.get(i), Some(i));
+            assert_eq!(buffer.get(i), Some(&i));
         }
         assert_eq!(buffer.get(K), None);
     }
@@ -98,12 +110,12 @@ mod tests {
             replacement = i;
             assert_eq!(buffer.begin, i, "{}", buffer);
             buffer.get_front_push_back(&mut replacement);
-            assert_eq!(buffer.get(K - 1), Some(i), "{}", buffer);
+            assert_eq!(buffer.get(K - 1), Some(&i), "{}", buffer);
         }
         replacement = K;
         assert_eq!(buffer.begin, 0, "{}", buffer);
         buffer.get_front_push_back(&mut replacement);
-        assert_eq!(buffer.get(K - 1), Some(K), "{}", buffer);
+        assert_eq!(buffer.get(K - 1), Some(&K), "{}", buffer);
     }
 
     #[rstest]
@@ -118,11 +130,11 @@ mod tests {
             replacement = i;
             assert_eq!(buffer.begin, (K - i) % K, "{}", buffer);
             buffer.get_back_push_front(&mut replacement);
-            assert_eq!(buffer.get(0), Some(i), "{}", buffer);
+            assert_eq!(buffer.get(0), Some(&i), "{}", buffer);
         }
         replacement = K;
         assert_eq!(buffer.begin, 0, "{}", buffer);
         buffer.get_back_push_front(&mut replacement);
-        assert_eq!(buffer.get(0), Some(K), "{}", buffer);
+        assert_eq!(buffer.get(0), Some(&K), "{}", buffer);
     }
 }
