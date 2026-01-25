@@ -1,6 +1,6 @@
 //! Define the general implementation of [LocalPlayer].
-use super::{circular_array::CircularArray, pressed_keys::PressedKeys, LocalPlayer, PlayerScreen};
-use crate::{app::Countdown, app::PlayerConfig, once, settings::*};
+use super::{pressed_keys::PressedKeys, LocalPlayer, PlayerScreen};
+use crate::{app::Countdown, app::PlayerConfig, once};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
@@ -37,19 +37,10 @@ impl LocalPlayer {
     }
 
     pub fn reset(&mut self, seed: u64) {
-        self.player_screen.grid.reset();
-        self.player_screen.score = 0;
-        self.player_screen.saved_tetromino = None;
-        self.player_screen.ghost_tetromino = None;
         self.rng = Pcg32::seed_from_u64(seed);
         self.tetromino_bag = TetrominoGenerator::default();
-        self.player_screen.active_tetromino = self.tetromino_bag.get(&mut self.rng);
-        self.player_screen.fifo_next_tetromino = CircularArray::new(
-            self.tetromino_bag
-                .get_chunk::<NB_NEXT_TETROMINO>(&mut self.rng),
-        );
+        self.player_screen = PlayerScreen::new(&mut self.rng, &mut self.tetromino_bag);
         self.freeze_frame = 0;
-        self.player_screen.game_over = false;
     }
 
     pub fn add_garbage(&mut self, completed_lines: u64) {

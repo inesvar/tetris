@@ -93,6 +93,7 @@ impl RemotePlayer {
     fn update_screen(&self, new_screen: PlayerScreen) {
         {
             let mut local_screen = self.screen.lock().unwrap();
+            // TODO this should be simpler
             // if the new_completed_lines haven't been read yet, ensure it's not rewritten
             if local_screen.new_completed_lines != 0 {
                 let a = local_screen.new_completed_lines;
