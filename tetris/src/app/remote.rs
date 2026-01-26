@@ -1,7 +1,6 @@
 //! Define the remote components for multi-player mode.
 //!
 //! There's a listener thread devoted for each remote player updating a remote player stub with a render method.
-mod custom_serialize_as_msg;
 mod remote_player;
 
 pub use self::remote_player::RemotePlayer;

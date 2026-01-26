@@ -4,16 +4,15 @@
 //! It also generates new tetromino pieces and handles the queue of next pieces.
 mod handle_key_player;
 mod local_player;
-mod player_screen;
 mod pressed_keys;
 mod render;
 mod update_player;
 
 use self::pressed_keys::PressedKeys;
-pub use player_screen::PlayerScreen;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
+pub use tetris_core::PlayerScreen;
 use tetris_core::TetrominoGenerator;
 
 /// Local player contains all the informations relative to one player.

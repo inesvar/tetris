@@ -10,6 +10,15 @@ graph LR
     TetrominoGenerator[[TetrominoGenerator]]
     BagType[BagType]
     CircularArray[[CircularArray]]
+    PlayerScreen[[PlayerScreen]]
+
+    subgraph player_screen
+        PlayerScreen
+    end
+    PlayerScreen --o TetrisGrid
+    PlayerScreen --o Tetromino
+    PlayerScreen --o CircularArray
+    PlayerScreen -.-> TetrominoGenerator
 
     subgraph tetromino_generator
         TetrominoGenerator --o BagType
@@ -21,12 +30,6 @@ graph LR
         CircularArray
     end
 
-    subgraph tetromino
-        Tetromino --o Position
-        TetrominoMove -.-> Position
-        Tetromino -.-> TetrominoMove
-    end
-
     subgraph tetris_grid
         direction LR
         TetrisGrid -.-> GameOverError
@@ -34,8 +37,13 @@ graph LR
         TetrisResult --o GameOverError
         TetrisGrid --o TetrisColor
     end
-
     Tetromino -.-> tetris_grid
     TetrisGrid -.-> Position
+
+    subgraph tetromino
+        Tetromino --o Position
+        TetrominoMove -.-> Position
+        Tetromino -.-> TetrominoMove
+    end
 
     style TetrisResult stroke-dasharray: 5 5;

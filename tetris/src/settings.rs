@@ -5,7 +5,7 @@ use std::{cell::RefCell, net::TcpStream};
 use crate::{app::PlayerConfig, app::TetrisCommand, once};
 use opengl_graphics::OpenGL;
 use piston::Key;
-use serde::Deserialize;
+use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
 const SCALE_FACTOR: f64 = 1.0;
 pub const HOST_PORT: &str = ":26000";
@@ -285,3 +285,34 @@ pub const BAG_SIZE: u32 = 7;
 // typical sizes are 7 and 14, 1 is entirely random
 // for size 7 * n + k, k < 7, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
 pub const NB_NEXT_TETROMINO: usize = 6;
+
+impl Serialize for Settings {
+    /// Serializes this value.
+    ///
+    /// It is serialized as SettingsMsg(self) if serialize_as_msg is set to true.
+    /// Otherwise, it's serialized as it would with #[derive(Serialize)].
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        if !*self.serialize_as_msg.borrow() {
+            let mut s = serializer.serialize_struct("Settings", 4)?;
+            s.serialize_field("seed", &self.seed)?;
+            s.serialize_field("bag_size", &self.bag_size)?;
+            s.serialize_field("nb_next_tetromino", &self.nb_next_tetromino)?;
+            s.serialize_field("serialize_as_msg", &self.serialize_as_msg)?;
+            s.end()
+        } else {
+            {
+                let mut a = self.serialize_as_msg.borrow_mut();
+                *a = false;
+            }
+            let s = serializer.serialize_newtype_variant("MessageType", 1, "Settings", self);
+            {
+                let mut a = self.serialize_as_msg.borrow_mut();
+                *a = true;
+            }
+            s
+        }
+    }
+}
