@@ -36,16 +36,16 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
 
         self.grid.render(gl_ctx);
 
-        if let Some(ghost) = &self.ghost_tetromino {
+        if !self.active_tetromino.is_in_default_state() {
+            self.active_tetromino.render(gl_ctx);
+
             let old_draw_state = gl_ctx.draw_state;
             gl_ctx.draw_state = gl_ctx
                 .draw_state
                 .blend(graphics::draw_state::Blend::Multiply);
-            ghost.render(gl_ctx);
+            self.ghost_tetromino.render(gl_ctx);
             gl_ctx.draw_state = old_draw_state;
         }
-
-        self.active_tetromino.render(gl_ctx);
 
         // drawing a border for the hold piece
         gl_ctx.transform = grid_transform.trans(

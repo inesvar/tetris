@@ -1,7 +1,7 @@
 graph LR
     %% objects
-    state0[default position and orientation]
-    state2[valid position and orientation wrt. grid]
+    state0[default state]
+    state2[valid state wrt. grid]
     ending[ ]
 
     state0 --"try_enter_grid(&mut self, &TetrisGrid)"--> state2

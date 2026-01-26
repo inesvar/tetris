@@ -58,25 +58,22 @@ impl LocalPlayer {
 
     pub fn start(&mut self) {
         self.player_screen.grid.reset();
-        let _ = self.player_screen.active_tetromino.try_enter_grid(&self.player_screen.grid);
+        let _ = self
+            .player_screen
+            .active_tetromino
+            .try_enter_grid(&self.player_screen.grid);
     }
 
     pub(in crate::app) fn countdown(&mut self, i: &Countdown) {
         match i {
-            Countdown::One => self.player_screen.grid.one(
-                self.player_screen
-                    .fifo_next_tetromino
-                    .get(1)
-                    .unwrap()
-                    .color(),
-            ),
-            Countdown::Two => self.player_screen.grid.two(
-                self.player_screen
-                    .fifo_next_tetromino
-                    .get(0)
-                    .unwrap()
-                    .color(),
-            ),
+            Countdown::One => self
+                .player_screen
+                .grid
+                .one(self.player_screen.active_tetromino.color()),
+            Countdown::Two => self
+                .player_screen
+                .grid
+                .two(self.player_screen.active_tetromino.color()),
             Countdown::Three => self
                 .player_screen
                 .grid

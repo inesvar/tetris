@@ -64,7 +64,7 @@ pub struct PlayerScreen {
     /// Next tetromino pieces rendered on the side.
     pub(in crate::app) fifo_next_tetromino: CircularArray<NB_NEXT_TETROMINO, Tetromino>,
     /// The shade of the active tetromino after hard drop.
-    pub(in crate::app) ghost_tetromino: Option<Tetromino>,
+    pub(in crate::app) ghost_tetromino: Tetromino,
     /// Flag not to be modified except in Serialize. Set to true.
     pub(in crate::app) serialize_as_msg: RefCell<bool>,
 }

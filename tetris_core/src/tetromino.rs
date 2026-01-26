@@ -66,7 +66,7 @@ impl Tetromino {
 }
 
 impl Tetromino {
-    /// Creates a new [Tetromino] of [TetrominoKind] `kind` in the default position and orientation.
+    /// Creates a new [Tetromino] of [TetrominoKind] `kind` in the default state.
     pub(super) fn new(kind: TetrominoKind) -> Self {
         let positions = kind.get_initial_position();
         Tetromino {
@@ -77,7 +77,7 @@ impl Tetromino {
         }
     }
 
-    /// Resets `self` in the default position and orientation.
+    /// Resets `self` in the default state.
     ///
     /// # Examples
     /// ```
@@ -93,6 +93,13 @@ impl Tetromino {
     /// ```
     pub fn reset(&mut self) {
         *self = Self::new(self.kind)
+    }
+
+    /// Returns whether `self` is in the default state.
+    pub fn is_in_default_state(&self) -> bool {
+        let mut copy = self.clone();
+        copy.reset();
+        *self == copy
     }
 
     /// Translates `self` to its starting position in [TetrisGrid] `grid` if the blocks are free, otherwise returns [GameOverError::BlockOut].

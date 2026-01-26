@@ -63,18 +63,18 @@ impl App<'_> {
                 }
             }
             // update
-            let update_res = self
-                .local_players
-                .iter_mut()
-                .enumerate()
-                .try_for_each(|(id, player)| {
-                    player.update(
-                        &self.keybindings_manager[id],
-                        self.frame_counter,
-                        self.fall_speed_divide,
-                        self.freeze,
-                    )
-                });
+            let update_res =
+                self.local_players
+                    .iter_mut()
+                    .enumerate()
+                    .try_for_each(|(id, player)| {
+                        player.update(
+                            &self.keybindings_manager[id],
+                            self.frame_counter,
+                            self.fall_speed_divide,
+                            self.freeze,
+                        )
+                    });
             // taking into account the player states after a new piece was added
             // two options :
             // either the player didn't lose => nothing to do

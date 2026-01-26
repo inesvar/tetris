@@ -117,9 +117,10 @@ impl LocalPlayer {
         self.keyboard.update();
 
         // Updates the ghost_tetromino
-        let mut ghost = self.player_screen.active_tetromino.clone();
-        ghost.try_apply(TetrominoMove::HardDrop, &self.player_screen.grid);
-        self.player_screen.ghost_tetromino = Some(ghost);
+        self.player_screen.ghost_tetromino = self.player_screen.active_tetromino.clone();
+        self.player_screen
+            .ghost_tetromino
+            .try_apply(TetrominoMove::HardDrop, &self.player_screen.grid);
 
         // Send the player_screen data if necessary
         if self.sender {
