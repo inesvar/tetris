@@ -58,16 +58,6 @@ impl LocalPlayer {
 
     pub fn start(&mut self) {
         self.player_screen.grid.reset();
-        self.player_screen.game_over = false;
-    }
-
-    pub fn get_game_over(&self) -> bool {
-        self.player_screen.game_over
-    }
-
-    pub fn declare_game_over(&mut self) {
-        self.player_screen.game_over = true;
-        self.player_screen.saved_tetromino = None;
     }
 
     pub(in crate::app) fn countdown(&mut self, i: &Countdown) {

@@ -55,8 +55,6 @@ pub struct PlayerScreen {
     pub(in crate::app) grid: TetrisGrid,
     /// Number of lines cleared.
     pub(in crate::app) score: u64,
-    /// Indicates if the game is lost by the current player.
-    pub(in crate::app) game_over: bool,
     /// Is set and reset during the update resp. when lines are cleared and when data is sent to the remote players
     pub(in crate::app) new_completed_lines: u64,
     /// The falling tetromino.

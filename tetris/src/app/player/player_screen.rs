@@ -14,7 +14,6 @@ impl PlayerScreen {
         PlayerScreen {
             grid,
             score: 0,
-            game_over: false,
             new_completed_lines: 0,
             active_tetromino,
             saved_tetromino: None,

@@ -3,7 +3,7 @@
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
 use super::LocalPlayer;
 use crate::settings::Keybindings;
-use tetris_core::TetrominoMove;
+use tetris_core::{GameOverError, TetrominoMove};
 
 impl LocalPlayer {
     /// update is called before each render so that the informations on the screen are as recent as possible.
@@ -26,7 +26,7 @@ impl LocalPlayer {
         frame_counter: u64,
         fall_speed_divide: u64,
         freeze: u64,
-    ) {
+    ) -> Result<(), GameOverError> {
         /* Actions in this function have to be carefully ordered so that there are no uncoherences.
          *
          * For instance, garbage has to be added AFTER the tetromino is moved because it hasn't been rendered yet
@@ -104,7 +104,7 @@ impl LocalPlayer {
                 .active_tetromino
                 .try_apply(TetrominoMove::Fall, &self.player_screen.grid)
         {
-            let _ = self.lock_down();
+            self.lock_down()?;
         }
 
         /**********************************
@@ -125,5 +125,7 @@ impl LocalPlayer {
         if self.sender {
             self.send_serialized();
         }
+
+        Ok(())
     }
 }

@@ -278,6 +278,8 @@ impl<'a> App<'a> {
             }
             ViewState::JoinRoom => self.widget_manager[0].handle_key_press(key),
             a if a.is_game() => {
+                // TODO: this is wrong for multiple players...
+                // the GameFlow should be handled only once, not per player.
                 for (id, player) in self.local_players.iter_mut().enumerate() {
                     game_key_press =
                         player.handle_key_press(&self.keybindings_manager[id], key, self.running)

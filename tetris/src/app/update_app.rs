@@ -63,33 +63,23 @@ impl App<'_> {
                 }
             }
             // update
-            for (id, player) in self.local_players.iter_mut().enumerate() {
-                player.update(
-                    &self.keybindings_manager[id],
-                    self.frame_counter,
-                    self.fall_speed_divide,
-                    self.freeze,
-                );
-            }
+            let update_res = self
+                .local_players
+                .iter_mut()
+                .enumerate()
+                .try_for_each(|(id, player)| {
+                    player.update(
+                        &self.keybindings_manager[id],
+                        self.frame_counter,
+                        self.fall_speed_divide,
+                        self.freeze,
+                    )
+                });
             // taking into account the player states after a new piece was added
             // two options :
             // either the player didn't lose => nothing to do
             // there was a game over => the running must be set to NotRunning
-            let mut game_over = false;
-            for player in &self.local_players {
-                if player.get_game_over() {
-                    game_over = true;
-                }
-            }
-
-            /* // same for remote players
-            for player in &self.remote_player {
-                if player.get_game_flow() == GameFlowChange::GameOver {
-                    game_over = true;
-                }
-            } */
-
-            if game_over {
+            if update_res.is_err() {
                 self.game_over();
             }
 

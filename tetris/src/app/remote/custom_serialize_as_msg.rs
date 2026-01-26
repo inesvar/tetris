@@ -49,7 +49,6 @@ impl Serialize for PlayerScreen {
             let mut s = serializer.serialize_struct("PlayerScreen", 8)?;
             s.serialize_field("grid", &self.grid)?;
             s.serialize_field("score", &self.score)?;
-            s.serialize_field("game_over", &self.game_over)?;
             s.serialize_field("new_completed_lines", &self.new_completed_lines)?;
             s.serialize_field("active_tetromino", &self.active_tetromino)?;
             s.serialize_field("saved_tetromino", &self.saved_tetromino)?;
