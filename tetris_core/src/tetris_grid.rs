@@ -47,6 +47,8 @@ pub struct TetrisGrid {
     line_sum: Vec<i32>,
 }
 
+pub type TetrisResult = Result<(), GameOverError>;
+
 // same visibility as TetrisColor
 /// **Tetris Guideline** Game Over Conditions.
 #[derive(Debug, PartialEq)]
@@ -124,7 +126,7 @@ impl TetrisGrid {
     }
 
     /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
-    pub fn add_garbage(&mut self, completed_lines: u64) -> Result<(), GameOverError> {
+    pub fn add_garbage(&mut self, completed_lines: u64) -> TetrisResult {
         let lines_to_add = match completed_lines {
             x if x < 2 => return Ok(()),
             x if x < 4 => x - 1,
@@ -154,10 +156,7 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If any of the `blocks` is outside the tetris grid.
-    pub(super) fn try_spawn_blocks(
-        &self,
-        blocks: &[Position],
-    ) -> Result<Position, GameOverError> {
+    pub(super) fn try_spawn_blocks(&self, blocks: &[Position]) -> Result<Position, GameOverError> {
         let offset = Position::new(self.nb_columns / 2 - 2, 0);
         let blocks_empty = blocks
             .iter()
@@ -249,7 +248,7 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If `empty` is greater or equal to `self.nb_columns`, or `self.line_sum` is empty.
-    fn add_garbage_row(&mut self, empty: usize) -> Result<(), GameOverError> {
+    fn add_garbage_row(&mut self, empty: usize) -> TetrisResult {
         if *self.line_sum.last().unwrap() > 0 {
             return Err(GameOverError::TopOut);
         }

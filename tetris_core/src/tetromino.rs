@@ -11,7 +11,7 @@ use self::{
     moving_primitives::ApplyRotationTranslation, rotation_translation::RotationTranslation,
     spatial_primitives::Direction,
 };
-use super::{GameOverError, TetrisColor, TetrisGrid};
+use super::{GameOverError, TetrisColor, TetrisGrid, TetrisResult};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
@@ -122,7 +122,7 @@ impl Tetromino {
     ///
     /// assert_eq!(Tetromino::default().try_enter_grid(&full_grid), Err(GameOverError::BlockOut));
     /// ```
-    pub fn try_enter_grid(&mut self, grid: &TetrisGrid) -> Result<(), GameOverError> {
+    pub fn try_enter_grid(&mut self, grid: &TetrisGrid) -> TetrisResult {
         let offset = grid.try_spawn_blocks(&self.blocks)?;
 
         self.translate(&RotationTranslation::translation(offset));

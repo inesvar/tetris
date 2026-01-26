@@ -3,6 +3,7 @@ graph LR
     TetrominoMove[TetrominoMove]
     TetrisGrid[[TetrisGrid]]
     GameOverError[GameOverError]
+    TetrisResult[TetrisResult]
     Tetromino[[Tetromino]]
     Position[[Position]]
     TetrisColor[TetrisColor]
@@ -24,8 +25,12 @@ graph LR
     subgraph tetris_grid
         direction LR
         TetrisGrid -.-> GameOverError
+        TetrisGrid -.-> TetrisResult
+        TetrisResult --o GameOverError
         TetrisGrid --o TetrisColor
     end
 
     Tetromino -.-> tetris_grid
     TetrisGrid -.-> Position
+
+    style TetrisResult stroke-dasharray: 5 5;

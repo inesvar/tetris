@@ -7,7 +7,7 @@ use crate::{
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
-use tetris_core::{GameOverError, Tetromino, TetrominoGenerator};
+use tetris_core::{TetrisResult, Tetromino, TetrominoGenerator};
 
 impl LocalPlayer {
     pub fn new(player_config: &PlayerConfig) -> Self {
@@ -106,7 +106,7 @@ impl LocalPlayer {
         }
     }
 
-    pub(super) fn stash(&mut self) -> Result<(), GameOverError> {
+    pub(super) fn stash(&mut self) -> TetrisResult {
         let mut previously_active = self.replace_active_tetromino_using_stash();
         previously_active.reset();
         self.player_screen.saved_tetromino = Some(previously_active);
@@ -120,7 +120,7 @@ impl LocalPlayer {
         self.player_screen.score += new_completed_lines;
     }
 
-    pub(super) fn lock_down(&mut self) -> Result<(), GameOverError> {
+    pub(super) fn lock_down(&mut self) -> TetrisResult {
         let previously_active = self.replace_active_tetromino();
 
         let new_completed_lines = previously_active.lock_down(&mut self.player_screen.grid)?;
