@@ -1,8 +1,8 @@
 //! Implement [PlayerScreen].
-use super::{CircularArray, PlayerScreen};
+use super::PlayerScreen;
 use crate::settings::NB_NEXT_TETROMINO;
 use rand_pcg::Pcg32;
-use tetris_core::{TetrisGrid, TetrominoGenerator};
+use tetris_core::{CircularArray, TetrisGrid, TetrominoGenerator};
 
 impl PlayerScreen {
     pub fn new(rng: &mut Pcg32, tetromino_bag: &mut TetrominoGenerator) -> Self {

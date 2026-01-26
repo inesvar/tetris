@@ -31,24 +31,24 @@ where
     [T; K]: Serialize + for<'a> Deserialize<'a>,
 {
     /// Construct a new circular buffer of size K for type T.
-    pub(super) fn new(array: [T; K]) -> Self {
+    pub fn new(array: [T; K]) -> Self {
         CircularArray::<K, T> { array, begin: 0 }
     }
 
-    pub(super) fn get_front_push_back(&mut self, replacement: &mut T) {
+    pub fn get_front_push_back(&mut self, replacement: &mut T) {
         std::mem::swap(replacement, &mut self.array[self.begin]);
         self.begin += 1;
         self.begin %= K;
     }
 
-    pub(super) fn get_back_push_front(&mut self, replacement: &mut T) {
+    pub fn get_back_push_front(&mut self, replacement: &mut T) {
         self.begin += K - 1;
         self.begin %= K;
         std::mem::swap(replacement, &mut self.array[self.begin]);
     }
 
     /// Get the i-th element in the buffer.
-    pub(super) fn get(&self, i: usize) -> Option<&T> {
+    pub fn get(&self, i: usize) -> Option<&T> {
         //println!("getting {i} from {}", self);
         if i < K {
             Some(&self.array[(self.begin + i) % K])

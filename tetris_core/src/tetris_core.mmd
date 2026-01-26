@@ -9,12 +9,17 @@ graph LR
     TetrisColor[TetrisColor]
     TetrominoGenerator[[TetrominoGenerator]]
     BagType[BagType]
+    CircularArray[[CircularArray]]
 
     subgraph tetromino_generator
         TetrominoGenerator --o BagType
     end
     TetrominoGenerator
     TetrominoGenerator -.-> Tetromino
+
+    subgraph circular_array
+        CircularArray
+    end
 
     subgraph tetromino
         Tetromino --o Position
