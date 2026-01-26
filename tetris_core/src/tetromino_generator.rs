@@ -18,7 +18,7 @@ pub struct TetrominoGenerator {
 ///
 /// Using a shuffled bag instead of choosing each tetromino randomly
 /// helps prevent tetromino repetition.
-#[derive(Copy, Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 pub enum BagType {
     /// Each tetromino is chosen randomly using uniform distribution.
     NoBag,

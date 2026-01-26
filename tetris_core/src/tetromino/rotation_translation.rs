@@ -4,7 +4,7 @@
 use super::Position;
 
 /// Movement (a rotation followed by a translation).
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Default)]
 pub(super) struct RotationTranslation {
     pub(super) rotation_type: RotationType,
     pub(super) rotation_center: Position,
