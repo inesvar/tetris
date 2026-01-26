@@ -10,12 +10,11 @@ mod render;
 mod update_player;
 
 use self::pressed_keys::PressedKeys;
-use crate::settings::NB_NEXT_TETROMINO;
+pub use player_screen::PlayerScreen;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
-use std::cell::RefCell;
-use tetris_core::{CircularArray, TetrisGrid, Tetromino, TetrominoGenerator};
+use tetris_core::TetrominoGenerator;
 
 /// Local player contains all the informations relative to one player.
 ///
@@ -45,27 +44,6 @@ pub struct LocalPlayer {
     /// Random generator for the next pieces of tetromino.
     #[serde(skip, default = "new_pcg")]
     rng: Pcg32,
-}
-
-/// Player screen contains all the elements that will appear on the screen relative to one player.
-#[derive(Deserialize)]
-pub struct PlayerScreen {
-    /// Tetris grid.
-    pub(in crate::app) grid: TetrisGrid,
-    /// Number of lines cleared.
-    pub(in crate::app) score: u64,
-    /// Is set and reset during the update resp. when lines are cleared and when data is sent to the remote players
-    pub(in crate::app) new_completed_lines: u64,
-    /// The falling tetromino.
-    pub(in crate::app) active_tetromino: Tetromino,
-    /// The held tetromino piece rendered in the corner.
-    pub(in crate::app) saved_tetromino: Option<Tetromino>,
-    /// Next tetromino pieces rendered on the side.
-    pub(in crate::app) fifo_next_tetromino: CircularArray<NB_NEXT_TETROMINO, Tetromino>,
-    /// The shade of the active tetromino after hard drop.
-    pub(in crate::app) ghost_tetromino: Tetromino,
-    /// Flag not to be modified except in Serialize. Set to true.
-    pub(in crate::app) serialize_as_msg: RefCell<bool>,
 }
 
 /// Constructor for the random generator.
