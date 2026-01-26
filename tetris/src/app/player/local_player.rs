@@ -58,6 +58,7 @@ impl LocalPlayer {
 
     pub fn start(&mut self) {
         self.player_screen.grid.reset();
+        let _ = self.player_screen.active_tetromino.try_enter_grid(&self.player_screen.grid);
     }
 
     pub(in crate::app) fn countdown(&mut self, i: &Countdown) {
