@@ -30,7 +30,7 @@ pub use tetromino_move::TetrominoMove;
 ///
 /// [Tetromino] state machine :
 #[doc = simple_mermaid::mermaid!("tetromino/tetromino_state.mmd")]
-#[derive(Clone, Copy, Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub struct Tetromino {
     kind: TetrominoKind,
     center: Position,
