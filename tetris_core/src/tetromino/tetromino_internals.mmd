@@ -6,7 +6,7 @@ graph LR
     add_block(add_block)
     clear_lines(clear_lines)
     is_block_available(is_block_available)
-    can_blocks_spawn_on(can_blocks_spawn_on)
+    try_spawn_blocks(try_spawn_blocks)
     add_blocks(add_blocks_and_clear_lines)
     try_apply(try_apply)
     apply_rotation(apply_rotation)
@@ -29,7 +29,7 @@ graph LR
     subgraph tetris_grid
         is_block_available -.-> is_in_grid
         is_block_available -.-> is_block_empty
-        can_blocks_spawn_on -.-> is_block_empty
+        try_spawn_blocks -.-> is_block_empty
         add_blocks -.-> add_block
         add_blocks -.-> clear_lines
         add_blocks -.-> is_above_skyline
@@ -66,5 +66,5 @@ graph LR
     apply_group -.-> is_rotation_center_on_block_center
     apply_group -.-> wall_kick_translations
     apply_group -.-> ApplyRotationTranslation
-    can_enter_grid_group -.-> can_blocks_spawn_on
+    can_enter_grid_group -.-> try_spawn_blocks
     lock_down -.-> add_blocks

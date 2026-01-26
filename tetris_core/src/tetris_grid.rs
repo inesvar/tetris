@@ -154,15 +154,15 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If any of the `blocks` is outside the tetris grid.
-    pub(super) fn can_blocks_spawn_on(
+    pub(super) fn try_spawn_blocks(
         &self,
         blocks: &[Position],
     ) -> Result<Position, GameOverError> {
         let offset = Position::new(self.nb_columns / 2 - 2, 0);
-        let can_spawn_on = blocks
+        let blocks_empty = blocks
             .iter()
             .all(|block| self.is_block_empty(&(*block + offset)));
-        if can_spawn_on {
+        if blocks_empty {
             Ok(offset)
         } else {
             Err(GameOverError::BlockOut)

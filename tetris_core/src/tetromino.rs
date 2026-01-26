@@ -123,7 +123,7 @@ impl Tetromino {
     /// assert_eq!(Tetromino::default().try_enter_grid(&full_grid), Err(GameOverError::BlockOut));
     /// ```
     pub fn try_enter_grid(&mut self, grid: &TetrisGrid) -> Result<(), GameOverError> {
-        let offset = grid.can_blocks_spawn_on(&self.blocks)?;
+        let offset = grid.try_spawn_blocks(&self.blocks)?;
 
         self.translate(&RotationTranslation::translation(offset));
         Ok(())
