@@ -8,7 +8,7 @@ use crate::{
     settings::{Keybindings, PAUSE_KEYS, RESTART_KEYS},
 };
 use piston::Key;
-use tetris_core::TetrominoMove;
+use tetris_core::{GameOverError, TetrominoMove};
 
 impl LocalPlayer {
     /// handle_key_press is called when a key is pressed.
@@ -69,17 +69,19 @@ impl LocalPlayer {
         /******************************
          *         ACTIVE GAME        *
          ******************************/
-        self.move_active_tetromino(keybindings)
+        if self.move_active_tetromino(keybindings).is_err() {
+            GameFlowChange::GameOver
+        } else {
+            GameFlowChange::NoChange
+        }
     }
 
-    fn move_active_tetromino(&mut self, keybindings: &Keybindings) -> GameFlowChange {
+    fn move_active_tetromino(&mut self, keybindings: &Keybindings) -> Result<(), GameOverError> {
         if self
             .keyboard
             .was_just_pressed(&keybindings.hold_tetromino_keys)
         {
-            if self.stash().is_err() {
-                return GameFlowChange::GameOver;
-            }
+            self.stash()?;
         }
 
         // Pressed once events
@@ -131,12 +133,10 @@ impl LocalPlayer {
             self.player_screen
                 .active_tetromino
                 .try_apply(TetrominoMove::HardDrop, &self.player_screen.grid);
-            if self.lock_down().is_err() {
-                return GameFlowChange::GameOver;
-            }
+            self.lock_down()?;
         }
 
-        GameFlowChange::NoChange
+        Ok(())
     }
 
     pub fn handle_key_release(&mut self, key: Key) {
