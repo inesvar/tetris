@@ -104,7 +104,7 @@ impl LocalPlayer {
                 .active_tetromino
                 .try_apply(TetrominoMove::Fall, &self.player_screen.grid)
         {
-            let _ = self.lock_down_tetromino();
+            let _ = self.lock_down();
         }
 
         /**********************************

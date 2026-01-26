@@ -77,17 +77,8 @@ impl LocalPlayer {
             .keyboard
             .was_just_pressed(&keybindings.hold_tetromino_keys)
         {
-            // hold the tetromino
-            if let Some(mut saved) = self.player_screen.saved_tetromino {
-                self.player_screen.active_tetromino.reset();
-
-                std::mem::swap(&mut saved, &mut self.player_screen.active_tetromino);
-                self.player_screen.saved_tetromino = Some(saved);
-            } else {
-                self.player_screen.active_tetromino.reset();
-
-                self.player_screen.saved_tetromino = Some(self.player_screen.active_tetromino);
-                self.get_new_tetromino();
+            if self.stash().is_err() {
+                return GameFlowChange::GameOver;
             }
         }
 
@@ -140,7 +131,7 @@ impl LocalPlayer {
             self.player_screen
                 .active_tetromino
                 .try_apply(TetrominoMove::HardDrop, &self.player_screen.grid);
-            if self.lock_down_tetromino().is_err() {
+            if self.lock_down().is_err() {
                 return GameFlowChange::GameOver;
             }
         }

@@ -1,10 +1,13 @@
 //! Define the general implementation of [LocalPlayer].
 use super::{pressed_keys::PressedKeys, LocalPlayer, PlayerScreen};
-use crate::{app::Countdown, app::PlayerConfig, once};
+use crate::{
+    app::{Countdown, PlayerConfig},
+    once,
+};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
-use tetris_core::{GameOverError, TetrominoGenerator};
+use tetris_core::{GameOverError, Tetromino, TetrominoGenerator};
 
 impl LocalPlayer {
     pub fn new(player_config: &PlayerConfig) -> Self {
@@ -92,24 +95,57 @@ impl LocalPlayer {
 }
 
 impl LocalPlayer {
-    /// Sets a new active_tetromino when the precedent one is frozen.
-    pub(super) fn get_new_tetromino(&mut self) {
-        // Check if there's enough place on the grid for a new tetromino
-        // TODO this should be done using the grid method and probably all other calls
-        // using null()...
+    /// Replace the active tetromino by a tetromino from the next queue and return
+    /// the previously active tetromino.
+    fn replace_active_tetromino(&mut self) -> Tetromino {
         let mut swap = self.tetromino_bag.get(&mut self.rng);
         self.player_screen
             .fifo_next_tetromino
             .get_front_push_back(&mut swap);
-        if swap.try_enter_grid(&self.player_screen.grid) == Err(GameOverError::BlockOut) {
-            // Set the game_over flag and return the tetromino to the bag.
-            self.declare_game_over();
-            self.player_screen
-                .fifo_next_tetromino
-                .get_back_push_front(&mut swap);
-            return;
+        std::mem::swap(&mut self.player_screen.active_tetromino, &mut swap);
+
+        swap
+    }
+
+    /// Replace the active tetromino by the saved tetromino if it exists (or by a tetromino
+    /// from the next queue) and return the previously active tetromino.
+    fn replace_active_tetromino_using_stash(&mut self) -> Tetromino {
+        if let Some(mut swap) = self.player_screen.saved_tetromino.take() {
+            std::mem::swap(&mut swap, &mut self.player_screen.active_tetromino);
+            swap
+        } else {
+            self.replace_active_tetromino()
         }
-        self.player_screen.active_tetromino = swap;
+    }
+
+    pub(super) fn stash(&mut self) -> Result<(), GameOverError> {
+        let mut previously_active = self.replace_active_tetromino_using_stash();
+        previously_active.reset();
+        self.player_screen.saved_tetromino = Some(previously_active);
+        self.player_screen
+            .active_tetromino
+            .try_enter_grid(&self.player_screen.grid)
+    }
+
+    fn record_new_completed_lines(&mut self, new_completed_lines: u64) {
+        self.player_screen.new_completed_lines += new_completed_lines;
+        self.player_screen.score += new_completed_lines;
+    }
+
+    pub(super) fn lock_down(&mut self) -> Result<(), GameOverError> {
+        let previously_active = self.replace_active_tetromino();
+
+        let new_completed_lines = previously_active.lock_down(&mut self.player_screen.grid)?;
+        self.record_new_completed_lines(new_completed_lines);
+
+        self.player_screen
+            .grid
+            .add_garbage(self.garbage_to_be_added)?;
+        self.garbage_to_be_added = 0;
+
+        self.player_screen
+            .active_tetromino
+            .try_enter_grid(&self.player_screen.grid)
     }
 
     /// Sends the player screen to the remote player and resets the new_completed_lines attribute.
@@ -126,49 +162,5 @@ impl LocalPlayer {
             );
             self.player_screen.new_completed_lines = 0;
         }
-    }
-
-    pub(super) fn lock_down_tetromino(&mut self) -> Result<(), ()> {
-        println!("Locking down the active tetromino");
-        let res = self
-            .player_screen
-            .active_tetromino
-            .lock_down(&mut self.player_screen.grid);
-        match res {
-            // if lines were clearing by freezing the tetromino, set the attribute new_completed_lines
-            Ok(completed_lines) => {
-                self.player_screen.new_completed_lines = completed_lines;
-                if self.player_screen.new_completed_lines != 0 {
-                    println!(
-                        "{} lines were completed",
-                        self.player_screen.new_completed_lines
-                    );
-                }
-                self.player_screen.score += self.player_screen.new_completed_lines;
-                self.get_new_tetromino();
-            }
-            // if the tetromino froze above the visible grid, it's game over !
-            Err(GameOverError::LockOut) => {
-                self.declare_game_over();
-                return Err(());
-            }
-            _ => unreachable!(),
-        }
-
-        // Adds garbage to the grid
-        match self
-            .player_screen
-            .grid
-            .add_garbage(self.garbage_to_be_added)
-        {
-            Ok(()) => self.garbage_to_be_added = 0,
-            Err(GameOverError::TopOut) => {
-                self.declare_game_over();
-                return Err(());
-            }
-            _ => unreachable!(),
-        }
-
-        Ok(())
     }
 }
