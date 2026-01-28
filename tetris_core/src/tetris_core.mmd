@@ -9,7 +9,7 @@ graph LR
     TetrisColor[TetrisColor]
     TetrominoGenerator[[TetrominoGenerator]]
     BagType[BagType]
-    CircularArray[[CircularArray]]
+    CircularBuffer[[CircularBuffer]]
     PlayerScreen[[PlayerScreen]]
 
     subgraph player_screen
@@ -17,7 +17,7 @@ graph LR
     end
     PlayerScreen --o TetrisGrid
     PlayerScreen --o Tetromino
-    PlayerScreen --o CircularArray
+    PlayerScreen --o CircularBuffer
     PlayerScreen -.-> TetrominoGenerator
 
     subgraph tetromino_generator
@@ -26,8 +26,8 @@ graph LR
     TetrominoGenerator
     TetrominoGenerator -.-> Tetromino
 
-    subgraph circular_array
-        CircularArray
+    subgraph circular_buffer
+        CircularBuffer
     end
 
     subgraph tetris_grid

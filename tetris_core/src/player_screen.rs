@@ -1,5 +1,5 @@
 //! Implement [PlayerScreen].
-use super::{CircularArray, TetrisGrid, Tetromino, TetrominoGenerator};
+use super::{CircularBuffer, TetrisGrid, Tetromino, TetrominoGenerator};
 use rand_pcg::Pcg32;
 use serde::Deserialize;
 use std::cell::RefCell;
@@ -22,7 +22,7 @@ pub struct PlayerScreen {
     /// The held tetromino piece rendered in the corner.
     pub saved_tetromino: Option<Tetromino>,
     /// Next tetromino pieces rendered on the side.
-    pub fifo_next_tetromino: CircularArray<NB_NEXT_TETROMINO, Tetromino>,
+    pub fifo_next_tetromino: CircularBuffer<Tetromino>,
     /// The shade of the active tetromino after hard drop.
     pub ghost_tetromino: Tetromino,
     /// Flag not to be modified except in Serialize. Set to true.
@@ -35,7 +35,7 @@ impl PlayerScreen {
         let active_tetromino = tetromino_bag.get(rng);
         let ghost_tetromino = active_tetromino.clone();
         let next_tetrominos = tetromino_bag.get_chunk::<NB_NEXT_TETROMINO>(rng);
-        let fifo_next_tetromino = CircularArray::new(next_tetrominos);
+        let fifo_next_tetromino = CircularBuffer::new(next_tetrominos);
 
         PlayerScreen {
             grid,
