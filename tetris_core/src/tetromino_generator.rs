@@ -5,7 +5,6 @@ use super::{Tetromino, TetrominoKind};
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
-use std::array;
 
 /// Tetromino generator.
 #[derive(Serialize, Deserialize, Default)]
@@ -41,8 +40,8 @@ impl TetrominoGenerator {
     }
 
     /// Returns an array of `N` [Tetromino]'s.
-    pub fn get_chunk<const N: usize>(&mut self, rng: &mut Pcg32) -> [Tetromino; N] {
-        array::from_fn(|_| self.get(rng))
+    pub fn get_chunk(&mut self, rng: &mut Pcg32, size: usize) -> Vec<Tetromino> {
+        (0..size).map(|_| self.get(rng)).collect()
     }
 
     /// Returns one [Tetromino].
@@ -131,7 +130,7 @@ mod tests {
     fn get_chunk_doesnt_panic_when_chunk_is_very_big(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        bag.get_chunk::<50>(&mut Pcg32::seed_from_u64(0));
+        bag.get_chunk(&mut Pcg32::seed_from_u64(0), 50);
     }
 
     #[rstest]
@@ -140,7 +139,7 @@ mod tests {
     fn get_chunk_14_with_classic_bag_types_is_correct(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        let tetrominos = Vec::from(bag.get_chunk::<14>(&mut Pcg32::seed_from_u64(0)));
+        let tetrominos = bag.get_chunk(&mut Pcg32::seed_from_u64(0), 14);
 
         for kind in TetrominoKind::ALL {
             assert_eq!(tetrominos.iter().filter(|&t| t.kind() == kind).count(), 2);
@@ -152,7 +151,7 @@ mod tests {
     fn get_chunk_7_with_bag_type_7_is_correct(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        let tetrominos = Vec::from(bag.get_chunk::<7>(&mut Pcg32::seed_from_u64(0)));
+        let tetrominos = bag.get_chunk(&mut Pcg32::seed_from_u64(0), 7);
 
         for kind in TetrominoKind::ALL {
             assert_eq!(tetrominos.iter().filter(|&t| t.kind() == kind).count(), 1);

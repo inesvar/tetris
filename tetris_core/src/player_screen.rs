@@ -6,7 +6,7 @@ use std::cell::RefCell;
 
 mod custom_serialize_as_msg;
 
-pub const NB_NEXT_TETROMINO: usize = 6;
+pub const NEXT_QUEUE_MAX_SIZE: usize = 6;
 
 /// Player screen contains all the elements that will appear on the screen relative to one player.
 #[derive(Deserialize)]
@@ -34,7 +34,7 @@ impl PlayerScreen {
         let grid = TetrisGrid::default();
         let active_tetromino = tetromino_bag.get(rng);
         let ghost_tetromino = active_tetromino.clone();
-        let next_tetrominos = tetromino_bag.get_chunk::<NB_NEXT_TETROMINO>(rng);
+        let next_tetrominos = tetromino_bag.get_chunk(rng, NEXT_QUEUE_MAX_SIZE);
         let fifo_next_tetromino = CircularBuffer::new(next_tetrominos);
 
         PlayerScreen {

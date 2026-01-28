@@ -23,11 +23,12 @@ impl<T: Debug> Display for CircularBuffer<T> {
 
 impl<T: Debug> CircularBuffer<T> {
     /// Construct a new circular buffer of size K for type T.
-    pub fn new<const K: usize>(array: [T; K]) -> Self {
+    pub fn new(array: Vec<T>) -> Self {
+        let size = array.len();
         CircularBuffer::<T> {
-            array: Vec::from(array),
+            array,
             begin: 0,
-            size: K,
+            size,
         }
     }
 
@@ -60,22 +61,22 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case(CircularBuffer::new([0; 5]))]
-    #[case(CircularBuffer::new([10; 4]))]
+    #[case(CircularBuffer::new(vec![0; 5]))]
+    #[case(CircularBuffer::new(vec![10; 4]))]
     fn new_is_correct(#[case] buffer: CircularBuffer<usize>) {
         assert_eq!(buffer.begin, 0);
     }
 
     #[rstest]
-    #[case(CircularBuffer::new([0, 1, 2, 3, 4]), "begin 0, content 0 1 2 3 4")]
-    #[case(CircularBuffer::new([3, 3, 3]), "begin 0, content 3 3 3")]
+    #[case(CircularBuffer::new(vec![0, 1, 2, 3, 4]), "begin 0, content 0 1 2 3 4")]
+    #[case(CircularBuffer::new(vec![3, 3, 3]), "begin 0, content 3 3 3")]
     fn display_is_correct(#[case] circ_array: CircularBuffer<i32>, #[case] expected: &str) {
         assert_eq!(&circ_array.to_string(), expected);
     }
 
     #[rstest]
-    #[case(CircularBuffer::new([0, 1, 2, 3, 4]))]
-    #[case(CircularBuffer::new([0, 1, 2, 3]))]
+    #[case(CircularBuffer::new(vec![0, 1, 2, 3, 4]))]
+    #[case(CircularBuffer::new(vec![0, 1, 2, 3]))]
     fn get_is_correct(#[case] buffer: CircularBuffer<usize>) {
         for i in 0..buffer.size {
             assert_eq!(buffer.get(i), Some(&i));
@@ -84,8 +85,8 @@ mod tests {
     }
 
     #[rstest]
-    #[case(CircularBuffer::new([55, 22, 33]))]
-    #[case(CircularBuffer::new([44, 66, 0, 88]))]
+    #[case(CircularBuffer::new(vec![55, 22, 33]))]
+    #[case(CircularBuffer::new(vec![44, 66, 0, 88]))]
     fn get_front_push_back_is_correct(#[case] mut buffer: CircularBuffer<usize>) {
         let mut replacement;
         for i in 0..buffer.size {
@@ -106,8 +107,8 @@ mod tests {
     }
 
     #[rstest]
-    #[case(CircularBuffer::new([55, 22, 33]))]
-    #[case(CircularBuffer::new([44, 66, 0, 88]))]
+    #[case(CircularBuffer::new(vec![55, 22, 33]))]
+    #[case(CircularBuffer::new(vec![44, 66, 0, 88]))]
     fn get_back_push_front_is_correct(#[case] mut buffer: CircularBuffer<usize>) {
         let mut replacement;
         for i in 0..buffer.size {
