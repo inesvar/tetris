@@ -1,9 +1,10 @@
 //! Define [PressedKeys] that stores the pressed keys and the last pressed key.
-use crate::settings::{KEY_REPEAT_DELAY, Keybindings};
+use crate::keybindings::Keybindings;
+use crate::settings::KEY_REPEAT_DELAY;
 use piston::Key;
 use serde::{Deserialize, Serialize};
-use tetris_core::{TetrisOrder, TetrominoMove};
 use std::collections::HashMap;
+use tetris_core::{TetrisOrder, TetrominoMove};
 
 // TODO :
 // it would be more natural to have a hashmap associating a `Key` to an `Option<Command>`.
@@ -21,14 +22,22 @@ pub(super) struct PressedKeys {
 
 pub fn get_order_from_key(keybindings: &Keybindings, key: Key) -> Option<TetrisOrder> {
     match key {
-        key if keybindings.hold_tetromino_keys.contains(&key) => Some(TetrisOrder::PlayerStashesTetromino),
+        key if keybindings.hold_tetromino_keys.contains(&key) => {
+            Some(TetrisOrder::PlayerStashesTetromino)
+        }
         key if keybindings.fall_keys.contains(&key) => Some(TetrominoMove::Fall.into()),
         key if keybindings.hard_drop_keys.contains(&key) => Some(TetrominoMove::HardDrop.into()),
         key if keybindings.left_keys.contains(&key) => Some(TetrominoMove::Left.into()),
         key if keybindings.right_keys.contains(&key) => Some(TetrominoMove::Right.into()),
-        key if keybindings.rotate_clockwise_keys.contains(&key) => Some(TetrominoMove::Clockwise.into()),
-        key if keybindings.rotate_counterclockwise_keys.contains(&key) => Some(TetrominoMove::Counterclockwise.into()),
-        key if keybindings.rotate_half_turn_keys.contains(&key) => Some(TetrominoMove::HalfTurn.into()),
+        key if keybindings.rotate_clockwise_keys.contains(&key) => {
+            Some(TetrominoMove::Clockwise.into())
+        }
+        key if keybindings.rotate_counterclockwise_keys.contains(&key) => {
+            Some(TetrominoMove::Counterclockwise.into())
+        }
+        key if keybindings.rotate_half_turn_keys.contains(&key) => {
+            Some(TetrominoMove::HalfTurn.into())
+        }
         _ => None,
     }
 }

@@ -1,6 +1,7 @@
 use super::{button::Button, key_input::KeyInput, text_input::TextInput};
+use crate::keybindings::Keybindings;
 use crate::settings::{
-    Keybindings, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
+    DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
     DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
     GUEST_PORT, HOST_PORT,
 };

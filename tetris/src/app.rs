@@ -14,6 +14,7 @@ use self::ui::{
 };
 use crate::app::remote::MessageType;
 use crate::assets::Assets;
+use crate::keybindings::Keybindings;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
 use include_assets::NamedArchive;

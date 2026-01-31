@@ -2,7 +2,7 @@
 //!
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
 use super::LocalPlayer;
-use crate::settings::Keybindings;
+use crate::keybindings::Keybindings;
 use tetris_core::{TetrisOrder, TetrisResult, TetrominoMove};
 
 impl LocalPlayer {

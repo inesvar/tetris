@@ -4,8 +4,9 @@
 //! [handle_key_release()](LocalPlayer::handle_key_release()) is called when a key is released.
 use super::LocalPlayer;
 use crate::{
-    app::{GameFlowChange, RunningState, player::pressed_keys::get_order_from_key},
-    settings::{Keybindings, PAUSE_KEYS, RESTART_KEYS},
+    app::{player::pressed_keys::get_order_from_key, GameFlowChange, RunningState},
+    keybindings::Keybindings,
+    settings::{PAUSE_KEYS, RESTART_KEYS},
 };
 use piston::Key;
 use tetris_core::TetrisResult;
@@ -77,7 +78,9 @@ impl LocalPlayer {
     }
 
     fn move_active_tetromino(&mut self, keybindings: &Keybindings) -> TetrisResult {
-        if let Some(tetris_order) = get_order_from_key(keybindings, self.keyboard.last_pressed_key()) {
+        if let Some(tetris_order) =
+            get_order_from_key(keybindings, self.keyboard.last_pressed_key())
+        {
             self.player_screen.try_apply(tetris_order, &mut self.rng)?;
         }
         Ok(())

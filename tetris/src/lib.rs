@@ -24,6 +24,7 @@ use std::time::SystemTime;
 
 mod app;
 mod assets;
+mod keybindings;
 mod settings;
 mod utils;
 

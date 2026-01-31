@@ -38,6 +38,7 @@ impl<T: Debug> CircularBuffer<T> {
         self.begin %= self.size;
     }
 
+    #[cfg(test)]
     pub(super) fn get_back_push_front(&mut self, replacement: &mut T) {
         self.begin += self.size - 1;
         self.begin %= self.size;
