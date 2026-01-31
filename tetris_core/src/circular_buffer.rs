@@ -23,7 +23,7 @@ impl<T: Debug> Display for CircularBuffer<T> {
 
 impl<T: Debug> CircularBuffer<T> {
     /// Construct a new circular buffer of size K for type T.
-    pub fn new(array: Vec<T>) -> Self {
+    pub(super) fn new(array: Vec<T>) -> Self {
         let size = array.len();
         CircularBuffer::<T> {
             array,
@@ -32,13 +32,13 @@ impl<T: Debug> CircularBuffer<T> {
         }
     }
 
-    pub fn get_front_push_back(&mut self, replacement: &mut T) {
+    pub(super) fn get_front_push_back(&mut self, replacement: &mut T) {
         std::mem::swap(replacement, &mut self.array[self.begin]);
         self.begin += 1;
         self.begin %= self.size;
     }
 
-    pub fn get_back_push_front(&mut self, replacement: &mut T) {
+    pub(super) fn get_back_push_front(&mut self, replacement: &mut T) {
         self.begin += self.size - 1;
         self.begin %= self.size;
         std::mem::swap(replacement, &mut self.array[self.begin]);
