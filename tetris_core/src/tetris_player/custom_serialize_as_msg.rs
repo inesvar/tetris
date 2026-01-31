@@ -1,21 +1,21 @@
-//! Define custom Serialize for [Settings] and [PlayerScreen].
+//! Define custom Serialize for [Settings] and [TetrisPlayer].
 //!
-//! PlayerScreen can be serialized as [MessageType::PlayerScreen](super::MessageType::PlayerScreen).
+//! TetrisPlayer can be serialized as [MessageType::TetrisPlayer](super::MessageType::TetrisPlayer).
 //! Settings can be serialized as [MessageType::Settings](super::MessageType::Settings).
-use super::PlayerScreen;
+use super::TetrisPlayer;
 use serde::{ser::SerializeStruct, Serialize, Serializer};
 
-impl Serialize for PlayerScreen {
+impl Serialize for TetrisPlayer {
     /// Serializes this value.
     ///
-    /// It is serialized as PlayerScreenMsg(self) if serialize_as_msg is set to true.
+    /// It is serialized as TetrisPlayerMsg(self) if serialize_as_msg is set to true.
     /// Otherwise, it's serialized as it would with #[derive(Serialize)].
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
         if !*self.serialize_as_msg.borrow() {
-            let mut s = serializer.serialize_struct("PlayerScreen", 8)?;
+            let mut s = serializer.serialize_struct("TetrisPlayer", 8)?;
             s.serialize_field("grid", &self.grid)?;
             s.serialize_field("score", &self.score)?;
             s.serialize_field("new_completed_lines", &self.new_completed_lines)?;
@@ -30,7 +30,7 @@ impl Serialize for PlayerScreen {
                 let mut a = self.serialize_as_msg.borrow_mut();
                 *a = false;
             }
-            let s = serializer.serialize_newtype_variant("MessageType", 0, "PlayerScreen", self);
+            let s = serializer.serialize_newtype_variant("MessageType", 0, "TetrisPlayer", self);
             {
                 let mut a = self.serialize_as_msg.borrow_mut();
                 *a = true;

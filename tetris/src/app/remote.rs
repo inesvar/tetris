@@ -5,14 +5,14 @@ mod remote_player;
 
 pub use self::remote_player::RemotePlayer;
 
-use crate::{app::PlayerScreen, settings::Settings};
+use crate::{app::TetrisPlayer, settings::Settings};
 use serde::{Deserialize, Serialize};
 
 /// MessageType represents all different kinds of messages that can be sent.
 ///
-/// To avoid copying uselessly, structs PlayerScreen and Settings
+/// To avoid copying uselessly, structs TetrisPlayer and Settings
 /// are serialized directly into the corresponding enum variants
-/// PlayerScreenMsg { player_screen: PlayerScreen } and
+/// TetrisPlayerMsg { player_screen: TetrisPlayer } and
 /// SettingsMsg { settings: Settings }.
 ///
 /// Their serializations rely on the position of their fields (0 and 1)
@@ -20,7 +20,7 @@ use serde::{Deserialize, Serialize};
 /// accordingly in case of change of MessageType.
 #[derive(Serialize, Deserialize)]
 pub enum MessageType {
-    PlayerScreen(PlayerScreen), // not acknowledged as it's sent regularly
+    TetrisPlayer(TetrisPlayer), // not acknowledged as it's sent regularly
     Settings(Settings),         // sent by the host of the room
     Restart,
     Pause,

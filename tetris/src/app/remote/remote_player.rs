@@ -1,6 +1,6 @@
 use super::MessageType;
 use crate::{
-    app::{render_app::Render, GameFlowChange, Piston2dGraphicsArguments, PlayerScreen},
+    app::{render_app::Render, GameFlowChange, Piston2dGraphicsArguments, TetrisPlayer},
     once,
 };
 use rand::SeedableRng;
@@ -13,7 +13,7 @@ use std::{
 use tetris_core::TetrominoGenerator;
 
 pub struct RemotePlayer {
-    screen: Arc<Mutex<PlayerScreen>>,
+    screen: Arc<Mutex<TetrisPlayer>>,
     first_screen_received: Arc<Mutex<bool>>,
     game_flow_message: Arc<Mutex<GameFlowChange>>,
 }
@@ -22,7 +22,7 @@ impl RemotePlayer {
     pub fn new() -> Self {
         let mut rng = Pcg32::seed_from_u64(0);
         let mut tetromino_bag = TetrominoGenerator::default();
-        let arc = Arc::new(Mutex::new(PlayerScreen::new(&mut rng, &mut tetromino_bag)));
+        let arc = Arc::new(Mutex::new(TetrisPlayer::new(&mut rng, &mut tetromino_bag)));
         RemotePlayer {
             screen: arc,
             first_screen_received: Arc::new(Mutex::new(false)),
@@ -50,7 +50,7 @@ impl RemotePlayer {
                 let message = serde_cbor::from_reader::<MessageType, TcpStream>(stream).unwrap();
                 once!("unwrapped from packet from remote");
                 match message {
-                    MessageType::PlayerScreen(new_screen) => {
+                    MessageType::TetrisPlayer(new_screen) => {
                         self_for_listener.update_screen(new_screen)
                     }
                     MessageType::Settings(new_settings) => {
@@ -90,7 +90,7 @@ impl RemotePlayer {
     }
 
     /// Updates the remote player with the new_screen received.
-    fn update_screen(&self, new_screen: PlayerScreen) {
+    fn update_screen(&self, new_screen: TetrisPlayer) {
         {
             let mut local_screen = self.screen.lock().unwrap();
             // TODO this should be simpler

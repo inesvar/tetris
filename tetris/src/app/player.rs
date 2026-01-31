@@ -12,7 +12,7 @@ use self::pressed_keys::PressedKeys;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
-pub use tetris_core::PlayerScreen;
+pub use tetris_core::TetrisPlayer;
 use tetris_core::TetrominoGenerator;
 
 /// Local player contains all the informations relative to one player.
@@ -25,9 +25,9 @@ pub struct LocalPlayer {
     /// player_screen contains all attributes visible on the screen
     /// like the TetrisGrid, the active Tetromino, the file of next Tetromino, etc.
     ///
-    /// PlayerScreen, not LocalPlayer, is rendered.
-    /// PlayerScreen, not LocalPlayer, will be sent to the remote.
-    player_screen: PlayerScreen,
+    /// TetrisPlayer, not LocalPlayer, is rendered.
+    /// TetrisPlayer, not LocalPlayer, will be sent to the remote.
+    player_screen: TetrisPlayer,
     /// keyboards keeps track of which keys are pressed and if they were pressed for a long time.
     keyboard: PressedKeys,
     /// freeze_frame indicates when to freeze the active_tetromino and get a new one.

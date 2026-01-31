@@ -10,15 +10,15 @@ graph LR
     TetrominoGenerator[[TetrominoGenerator]]
     BagType[BagType]
     CircularBuffer[[CircularBuffer]]
-    PlayerScreen[[PlayerScreen]]
+    TetrisPlayer[[TetrisPlayer]]
 
-    subgraph player_screen
-        PlayerScreen
+    subgraph tetris_player
+        TetrisPlayer
     end
-    PlayerScreen --o TetrisGrid
-    PlayerScreen --o Tetromino
-    PlayerScreen --o CircularBuffer
-    PlayerScreen -.-> TetrominoGenerator
+    TetrisPlayer --o TetrisGrid
+    TetrisPlayer --o Tetromino
+    TetrisPlayer --o CircularBuffer
+    TetrisPlayer -.-> TetrominoGenerator
 
     subgraph tetromino_generator
         TetrominoGenerator --o BagType

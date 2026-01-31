@@ -1,4 +1,4 @@
-//! Implement [PlayerScreen].
+//! Implement [TetrisPlayer].
 use super::{CircularBuffer, TetrisGrid, Tetromino, TetrominoGenerator};
 use rand_pcg::Pcg32;
 use serde::Deserialize;
@@ -10,7 +10,7 @@ pub const NEXT_QUEUE_MAX_SIZE: usize = 6;
 
 /// Player screen contains all the elements that will appear on the screen relative to one player.
 #[derive(Deserialize)]
-pub struct PlayerScreen {
+pub struct TetrisPlayer {
     /// Tetris grid.
     pub grid: TetrisGrid,
     /// Number of lines cleared.
@@ -29,7 +29,7 @@ pub struct PlayerScreen {
     pub serialize_as_msg: RefCell<bool>,
 }
 
-impl PlayerScreen {
+impl TetrisPlayer {
     pub fn new(rng: &mut Pcg32, tetromino_bag: &mut TetrominoGenerator) -> Self {
         let grid = TetrisGrid::default();
         let active_tetromino = tetromino_bag.get(rng);
@@ -37,7 +37,7 @@ impl PlayerScreen {
         let next_tetrominos = tetromino_bag.get_chunk(rng, NEXT_QUEUE_MAX_SIZE);
         let fifo_next_tetromino = CircularBuffer::new(next_tetrominos);
 
-        PlayerScreen {
+        TetrisPlayer {
             grid,
             score: 0,
             new_completed_lines: 0,

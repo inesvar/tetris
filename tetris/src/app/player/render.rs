@@ -1,8 +1,8 @@
-//! Define `trait` [Render] for [LocalPlayer], [PlayerScreen], [Tetromino], [TetrisGrid].
+//! Define `trait` [Render] for [LocalPlayer], [TetrisPlayer], [Tetromino], [TetrisGrid].
 use crate::app::player::LocalPlayer;
 use crate::app::render_app::{Piston2dGraphicsArguments, Render};
 use crate::app::ui::text::Text;
-use crate::app::PlayerScreen;
+use crate::app::TetrisPlayer;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_FONT_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
     GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO, TETROMINO_MAX_HEIGHT,
@@ -18,7 +18,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for LocalPlayer {
     }
 }
 
-impl Render<Piston2dGraphicsArguments<'_, '_>> for PlayerScreen {
+impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisPlayer {
     fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments) {
         let score_text = Text::new(
             format!("Score: {}", self.score).as_str(),

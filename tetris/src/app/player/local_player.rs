@@ -1,5 +1,5 @@
 //! Define the general implementation of [LocalPlayer].
-use super::{pressed_keys::PressedKeys, LocalPlayer, PlayerScreen};
+use super::{pressed_keys::PressedKeys, LocalPlayer, TetrisPlayer};
 use crate::{
     app::{Countdown, PlayerConfig},
     once,
@@ -25,7 +25,7 @@ impl LocalPlayer {
             remote_ip = ip.to_string();
         }
 
-        let player_screen = PlayerScreen::new(&mut rng, &mut tetromino_bag);
+        let player_screen = TetrisPlayer::new(&mut rng, &mut tetromino_bag);
 
         LocalPlayer {
             player_screen,
@@ -42,7 +42,7 @@ impl LocalPlayer {
     pub fn reset(&mut self, seed: u64) {
         self.rng = Pcg32::seed_from_u64(seed);
         self.tetromino_bag = TetrominoGenerator::default();
-        self.player_screen = PlayerScreen::new(&mut self.rng, &mut self.tetromino_bag);
+        self.player_screen = TetrisPlayer::new(&mut self.rng, &mut self.tetromino_bag);
         self.freeze_frame = 0;
     }
 
@@ -139,7 +139,7 @@ impl LocalPlayer {
     /// Sends the player screen to the remote player and resets the new_completed_lines attribute.
     pub(in crate::app) fn send_serialized(&mut self) {
         if let Ok(stream) = TcpStream::connect(&self.remote_ip) {
-            serde_cbor::to_writer::<TcpStream, PlayerScreen>(stream, &self.player_screen).unwrap();
+            serde_cbor::to_writer::<TcpStream, TetrisPlayer>(stream, &self.player_screen).unwrap();
         }
         once!("sent serialized data to the remote");
         // Set the number of completed lines to 0

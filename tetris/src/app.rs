@@ -6,7 +6,7 @@ mod ui;
 mod update_app;
 
 use self::player::LocalPlayer;
-pub use self::player::PlayerScreen;
+pub use self::player::TetrisPlayer;
 use self::remote::RemotePlayer;
 use self::ui::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
