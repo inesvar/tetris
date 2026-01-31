@@ -13,7 +13,6 @@ use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
 pub use tetris_core::TetrisPlayer;
-use tetris_core::TetrominoGenerator;
 
 /// Local player contains all the informations relative to one player.
 ///
@@ -34,7 +33,6 @@ pub struct LocalPlayer {
     ///
     /// freeze_frame is updated when a tetromino reaches the bottom of the grid.
     freeze_frame: u64,
-    tetromino_bag: TetrominoGenerator,
     /// Whether information has to be sent to the remote or not.
     sender: bool,
     remote_ip: String,

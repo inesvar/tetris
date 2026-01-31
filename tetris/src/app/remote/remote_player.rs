@@ -10,7 +10,6 @@ use std::{
     sync::{Arc, Mutex},
     thread,
 };
-use tetris_core::TetrominoGenerator;
 
 pub struct RemotePlayer {
     screen: Arc<Mutex<TetrisPlayer>>,
@@ -21,8 +20,7 @@ pub struct RemotePlayer {
 impl RemotePlayer {
     pub fn new() -> Self {
         let mut rng = Pcg32::seed_from_u64(0);
-        let mut tetromino_bag = TetrominoGenerator::default();
-        let arc = Arc::new(Mutex::new(TetrisPlayer::new(&mut rng, &mut tetromino_bag)));
+        let arc = Arc::new(Mutex::new(TetrisPlayer::new(&mut rng)));
         RemotePlayer {
             screen: arc,
             first_screen_received: Arc::new(Mutex::new(false)),

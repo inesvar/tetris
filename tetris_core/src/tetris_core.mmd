@@ -7,7 +7,6 @@ graph LR
     Tetromino[[Tetromino]]
     Position[[Position]]
     TetrisColor[TetrisColor]
-    TetrominoGenerator[[TetrominoGenerator]]
     BagType[BagType]
     CircularBuffer[[CircularBuffer]]
     TetrisPlayer[[TetrisPlayer]]
@@ -18,13 +17,10 @@ graph LR
     TetrisPlayer --o TetrisGrid
     TetrisPlayer --o Tetromino
     TetrisPlayer --o CircularBuffer
-    TetrisPlayer -.-> TetrominoGenerator
 
     subgraph tetromino_generator
-        TetrominoGenerator --o BagType
+        BagType
     end
-    TetrominoGenerator
-    TetrominoGenerator -.-> Tetromino
 
     subgraph circular_buffer
         CircularBuffer

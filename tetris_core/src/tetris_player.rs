@@ -25,13 +25,15 @@ pub struct TetrisPlayer {
     pub fifo_next_tetromino: CircularBuffer<Tetromino>,
     /// The shade of the active tetromino after hard drop.
     pub ghost_tetromino: Tetromino,
+    pub tetromino_bag: TetrominoGenerator,
     /// Flag not to be modified except in Serialize. Set to true.
     pub serialize_as_msg: RefCell<bool>,
 }
 
 impl TetrisPlayer {
-    pub fn new(rng: &mut Pcg32, tetromino_bag: &mut TetrominoGenerator) -> Self {
+    pub fn new(rng: &mut Pcg32) -> Self {
         let grid = TetrisGrid::default();
+        let mut tetromino_bag = TetrominoGenerator::default();
         let active_tetromino = tetromino_bag.get(rng);
         let ghost_tetromino = active_tetromino.clone();
         let next_tetrominos = tetromino_bag.get_chunk(rng, NEXT_QUEUE_MAX_SIZE);
@@ -45,7 +47,29 @@ impl TetrisPlayer {
             saved_tetromino: None,
             fifo_next_tetromino,
             ghost_tetromino,
+            tetromino_bag,
             serialize_as_msg: true.into(),
+        }
+    }
+
+    /// Replace the active tetromino by a tetromino from the next queue and return
+    /// the previously active tetromino.
+    pub fn replace_active_tetromino(&mut self, rng: &mut Pcg32) -> Tetromino {
+        let mut swap = self.tetromino_bag.get(rng);
+        self.fifo_next_tetromino.get_front_push_back(&mut swap);
+        std::mem::swap(&mut self.active_tetromino, &mut swap);
+
+        swap
+    }
+
+    /// Replace the active tetromino by the saved tetromino if it exists (or by a tetromino
+    /// from the next queue) and return the previously active tetromino.
+    pub fn replace_active_tetromino_using_stash(&mut self, rng: &mut Pcg32) -> Tetromino {
+        if let Some(mut swap) = self.saved_tetromino.take() {
+            std::mem::swap(&mut swap, &mut self.active_tetromino);
+            swap
+        } else {
+            self.replace_active_tetromino(rng)
         }
     }
 }
