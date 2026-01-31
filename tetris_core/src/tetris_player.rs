@@ -73,7 +73,7 @@ impl TetrisPlayer {
 
     /// Replace the active tetromino by a tetromino from the next queue and return
     /// the previously active tetromino.
-    pub fn replace_active_tetromino(&mut self, rng: &mut Pcg32) -> Tetromino {
+    fn replace_active_tetromino(&mut self, rng: &mut Pcg32) -> Tetromino {
         let mut swap = self.tetromino_bag.get(rng);
         self.fifo_next_tetromino.get_front_push_back(&mut swap);
         std::mem::swap(&mut self.active_tetromino, &mut swap);
@@ -83,7 +83,7 @@ impl TetrisPlayer {
 
     /// Replace the active tetromino by the saved tetromino if it exists (or by a tetromino
     /// from the next queue) and return the previously active tetromino.
-    pub fn replace_active_tetromino_using_stash(&mut self, rng: &mut Pcg32) -> Tetromino {
+    fn replace_active_tetromino_using_stash(&mut self, rng: &mut Pcg32) -> Tetromino {
         if let Some(mut swap) = self.saved_tetromino.take() {
             std::mem::swap(&mut swap, &mut self.active_tetromino);
             swap
@@ -92,7 +92,7 @@ impl TetrisPlayer {
         }
     }
 
-    pub fn stash(&mut self, rng: &mut Pcg32) -> TetrisResult {
+    fn stash(&mut self, rng: &mut Pcg32) -> TetrisResult {
         let mut previously_active = self.replace_active_tetromino_using_stash(rng);
         previously_active.reset();
         self.saved_tetromino = Some(previously_active);
@@ -104,7 +104,7 @@ impl TetrisPlayer {
         self.score += new_completed_lines;
     }
 
-    pub fn lock_down(&mut self, rng: &mut Pcg32) -> TetrisResult {
+    fn lock_down(&mut self, rng: &mut Pcg32) -> TetrisResult {
         let previously_active = self.replace_active_tetromino(rng);
 
         let new_completed_lines = previously_active.lock_down(&mut self.grid)?;
@@ -131,7 +131,11 @@ impl TetrisPlayer {
         let _ = self.active_tetromino.try_enter_grid(&self.grid);
     }
 
-    pub fn try_apply(&mut self, order: TetrisOrder, rng: &mut Pcg32) -> Result<bool, GameOverError> {
+    pub fn try_apply(
+        &mut self,
+        order: TetrisOrder,
+        rng: &mut Pcg32,
+    ) -> Result<bool, GameOverError> {
         match order {
             TetrisOrder::PlayerMovesTetromino(tetromino_move) => {
                 Ok(self.active_tetromino.try_apply(tetromino_move, &self.grid))

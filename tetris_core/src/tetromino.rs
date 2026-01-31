@@ -142,7 +142,7 @@ impl Tetromino {
     /// assert!(o_tetromino.try_apply(TetrominoMove::HardDrop, &empty_grid));
     /// assert!(!o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid));
     /// ```
-    pub fn try_apply(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
+    pub(crate) fn try_apply(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
         if tetromino_move.get_rotation_type() == RotationType::Identity {
             self.apply_translation(tetromino_move, grid)
         } else {

@@ -8,7 +8,7 @@ use crate::{
     settings::{Keybindings, PAUSE_KEYS, RESTART_KEYS},
 };
 use piston::Key;
-use tetris_core::{TetrisResult, TetrominoMove};
+use tetris_core::{TetrisOrder, TetrisResult, TetrominoMove};
 
 impl LocalPlayer {
     /// handle_key_press is called when a key is pressed.
@@ -81,7 +81,8 @@ impl LocalPlayer {
             .keyboard
             .was_just_pressed(&keybindings.hold_tetromino_keys)
         {
-            self.player_screen.stash(&mut self.rng)?;
+            self.player_screen
+                .try_apply(TetrisOrder::PlayerStashesTetromino, &mut self.rng)?;
         }
 
         // Pressed once events
@@ -91,8 +92,7 @@ impl LocalPlayer {
         {
             // rotate once the tetromino
             self.player_screen
-                .active_tetromino
-                .try_apply(TetrominoMove::Clockwise, &self.player_screen.grid);
+                .try_apply(TetrominoMove::Clockwise.into(), &mut self.rng)?;
         }
         // it's not an if else in case the player put the same keybindings for both clock and counter...
         if self
@@ -101,8 +101,7 @@ impl LocalPlayer {
         {
             // rotate once the tetromino
             self.player_screen
-                .active_tetromino
-                .try_apply(TetrominoMove::Counterclockwise, &self.player_screen.grid);
+                .try_apply(TetrominoMove::Counterclockwise.into(), &mut self.rng)?;
         }
 
         if self
@@ -111,29 +110,26 @@ impl LocalPlayer {
         {
             // rotate once the tetromino
             self.player_screen
-                .active_tetromino
-                .try_apply(TetrominoMove::HalfTurn, &self.player_screen.grid);
+                .try_apply(TetrominoMove::HalfTurn.into(), &mut self.rng)?;
         }
 
         // move the tetromino left or right
         if self.keyboard.was_just_pressed(&keybindings.left_keys) {
             self.player_screen
-                .active_tetromino
-                .try_apply(TetrominoMove::Left, &self.player_screen.grid);
+                .try_apply(TetrominoMove::Left.into(), &mut self.rng)?;
         }
         // it's not an if else in case the player put the same keybindings for both left and right...
         if self.keyboard.was_just_pressed(&keybindings.right_keys) {
             self.player_screen
-                .active_tetromino
-                .try_apply(TetrominoMove::Right, &self.player_screen.grid);
+                .try_apply(TetrominoMove::Right.into(), &mut self.rng)?;
         }
 
         if self.keyboard.was_just_pressed(&keybindings.hard_drop_keys) {
             // hard drop the tetromino
             self.player_screen
-                .active_tetromino
-                .try_apply(TetrominoMove::HardDrop, &self.player_screen.grid);
-            self.player_screen.lock_down(&mut self.rng)?;
+                .try_apply(TetrominoMove::HardDrop.into(), &mut self.rng)?;
+            self.player_screen
+                .try_apply(TetrisOrder::TetrominoLocksDown, &mut self.rng)?;
         }
 
         Ok(())

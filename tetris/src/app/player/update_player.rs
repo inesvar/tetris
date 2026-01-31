@@ -3,7 +3,7 @@
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
 use super::LocalPlayer;
 use crate::settings::Keybindings;
-use tetris_core::{TetrisResult, TetrominoMove};
+use tetris_core::{TetrisOrder, TetrisResult, TetrominoMove};
 
 impl LocalPlayer {
     /// update is called before each render so that the informations on the screen are as recent as possible.
@@ -48,8 +48,7 @@ impl LocalPlayer {
             if self.keyboard.is_long_pressed(&keybindings.fall_keys)
                 && !self
                     .player_screen
-                    .active_tetromino
-                    .try_apply(TetrominoMove::Fall, &self.player_screen.grid)
+                    .try_apply(TetrominoMove::Fall.into(), &mut self.rng)?
                 && self.freeze_frame < frame_counter
             {
                 // if the tetromino reaches the bottom, set the freeze_frame
@@ -60,15 +59,13 @@ impl LocalPlayer {
                 && !self.keyboard.is_long_pressed(&keybindings.right_keys)
             {
                 self.player_screen
-                    .active_tetromino
-                    .try_apply(TetrominoMove::Left, &self.player_screen.grid);
+                    .try_apply(TetrominoMove::Left.into(), &mut self.rng)?;
             }
             if self.keyboard.is_long_pressed(&keybindings.right_keys)
                 && !self.keyboard.is_long_pressed(&keybindings.left_keys)
             {
                 self.player_screen
-                    .active_tetromino
-                    .try_apply(TetrominoMove::Right, &self.player_screen.grid);
+                    .try_apply(TetrominoMove::Right.into(), &mut self.rng)?;
             }
         }
 
@@ -83,8 +80,7 @@ impl LocalPlayer {
         if frame_counter % fall_speed_divide == 0
             && !self
                 .player_screen
-                .active_tetromino
-                .try_apply(TetrominoMove::Fall, &self.player_screen.grid)
+                .try_apply(TetrominoMove::Fall.into(), &mut self.rng)?
             && self.freeze_frame < frame_counter
         {
             // if the tetromino reaches the bottom, set the freeze_frame
@@ -101,10 +97,10 @@ impl LocalPlayer {
         if frame_counter == self.freeze_frame
             && !self
                 .player_screen
-                .active_tetromino
-                .try_apply(TetrominoMove::Fall, &self.player_screen.grid)
+                .try_apply(TetrominoMove::Fall.into(), &mut self.rng)?
         {
-            self.player_screen.lock_down(&mut self.rng)?;
+            self.player_screen
+                .try_apply(TetrisOrder::TetrominoLocksDown, &mut self.rng)?;
         }
 
         /**********************************
@@ -115,12 +111,6 @@ impl LocalPlayer {
 
         // Updates the time for the keyboard
         self.keyboard.update();
-
-        // Updates the ghost_tetromino
-        self.player_screen.ghost_tetromino = self.player_screen.active_tetromino.clone();
-        self.player_screen
-            .ghost_tetromino
-            .try_apply(TetrominoMove::HardDrop, &self.player_screen.grid);
 
         // Send the player_screen data if necessary
         if self.sender {
