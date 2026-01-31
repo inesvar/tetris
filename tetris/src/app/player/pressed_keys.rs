@@ -1,7 +1,8 @@
 //! Define [PressedKeys] that stores the pressed keys and the last pressed key.
-use crate::settings::KEY_REPEAT_DELAY;
+use crate::settings::{KEY_REPEAT_DELAY, Keybindings};
 use piston::Key;
 use serde::{Deserialize, Serialize};
+use tetris_core::{TetrisOrder, TetrominoMove};
 use std::collections::HashMap;
 
 // TODO :
@@ -16,6 +17,20 @@ pub(super) struct PressedKeys {
     last_pressed_key: Key,
     /// the countdown is initialized on a key press, then is decremented until it reaches 0 and long press is triggered.
     timer_countdown: HashMap<Key, u64>,
+}
+
+pub fn get_order_from_key(keybindings: &Keybindings, key: Key) -> Option<TetrisOrder> {
+    match key {
+        key if keybindings.hold_tetromino_keys.contains(&key) => Some(TetrisOrder::PlayerStashesTetromino),
+        key if keybindings.fall_keys.contains(&key) => Some(TetrominoMove::Fall.into()),
+        key if keybindings.hard_drop_keys.contains(&key) => Some(TetrominoMove::HardDrop.into()),
+        key if keybindings.left_keys.contains(&key) => Some(TetrominoMove::Left.into()),
+        key if keybindings.right_keys.contains(&key) => Some(TetrominoMove::Right.into()),
+        key if keybindings.rotate_clockwise_keys.contains(&key) => Some(TetrominoMove::Clockwise.into()),
+        key if keybindings.rotate_counterclockwise_keys.contains(&key) => Some(TetrominoMove::Counterclockwise.into()),
+        key if keybindings.rotate_half_turn_keys.contains(&key) => Some(TetrominoMove::HalfTurn.into()),
+        _ => None,
+    }
 }
 
 impl PressedKeys {
@@ -48,6 +63,10 @@ impl PressedKeys {
         for countdown in self.timer_countdown.values_mut() {
             *countdown = countdown.saturating_sub(1);
         }
+    }
+
+    pub(super) fn last_pressed_key(&self) -> Key {
+        self.last_pressed_key
     }
 
     fn is_delay_pressed(&self, key: Key) -> bool {
