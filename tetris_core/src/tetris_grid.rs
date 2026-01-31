@@ -173,13 +173,13 @@ impl TetrisGrid {
     ) -> Result<u64, GameOverError> {
         let all_above_skyline = blocks.iter().all(|block| self.is_above_skyline(block));
 
+        for block in blocks {
+            self.add_block(block, tetris_color);
+        }
+
         // Only continue playing if there's a block below the skyline
         if all_above_skyline {
             return Err(GameOverError::LockOut);
-        }
-
-        for block in blocks {
-            self.add_block(block, tetris_color);
         }
 
         Ok(self.clear_lines())
