@@ -133,6 +133,11 @@ impl TetrisPlayer {
         rng: &mut Pcg32,
     ) -> Result<bool, GameOverError> {
         match order {
+            TetrisOrder::PlayerMovesTetromino(TetrominoMove::HardDrop) => {
+                self.active_tetromino
+                    .try_apply(TetrominoMove::HardDrop, &self.grid);
+                self.lock_down(rng).map(|_| true)
+            }
             TetrisOrder::PlayerMovesTetromino(tetromino_move) => {
                 Ok(self.active_tetromino.try_apply(tetromino_move, &self.grid))
             }

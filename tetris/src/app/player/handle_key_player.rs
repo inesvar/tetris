@@ -128,8 +128,6 @@ impl LocalPlayer {
             // hard drop the tetromino
             self.player_screen
                 .try_apply(TetrominoMove::HardDrop.into(), &mut self.rng)?;
-            self.player_screen
-                .try_apply(TetrisOrder::TetrominoLocksDown, &mut self.rng)?;
         }
 
         Ok(())
