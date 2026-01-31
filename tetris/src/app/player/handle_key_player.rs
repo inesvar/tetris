@@ -81,7 +81,7 @@ impl LocalPlayer {
             .keyboard
             .was_just_pressed(&keybindings.hold_tetromino_keys)
         {
-            self.stash()?;
+            self.player_screen.stash(&mut self.rng)?;
         }
 
         // Pressed once events
@@ -133,7 +133,7 @@ impl LocalPlayer {
             self.player_screen
                 .active_tetromino
                 .try_apply(TetrominoMove::HardDrop, &self.player_screen.grid);
-            self.lock_down()?;
+            self.player_screen.lock_down(&mut self.rng)?;
         }
 
         Ok(())

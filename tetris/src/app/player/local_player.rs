@@ -7,7 +7,6 @@ use crate::{
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
-use tetris_core::TetrisResult;
 
 impl LocalPlayer {
     pub fn new(player_config: &PlayerConfig) -> Self {
@@ -32,7 +31,6 @@ impl LocalPlayer {
             freeze_frame: 0, // that's about 10 billion years at 60fps
             sender,
             remote_ip,
-            garbage_to_be_added: 0,
             rng,
         }
     }
@@ -44,21 +42,15 @@ impl LocalPlayer {
     }
 
     pub fn add_garbage(&mut self, completed_lines: u64) {
-        self.garbage_to_be_added += completed_lines;
+        self.player_screen.add_garbage(completed_lines);
     }
 
     pub fn get_lines_completed(&mut self) -> u64 {
-        let lines = self.player_screen.new_completed_lines;
-        self.player_screen.new_completed_lines = 0;
-        lines
+        self.player_screen.get_lines_completed()
     }
 
     pub fn start(&mut self) {
-        self.player_screen.grid.reset();
-        let _ = self
-            .player_screen
-            .active_tetromino
-            .try_enter_grid(&self.player_screen.grid);
+        self.player_screen.start();
     }
 
     pub(in crate::app) fn countdown(&mut self, i: &Countdown) {
@@ -80,38 +72,6 @@ impl LocalPlayer {
 }
 
 impl LocalPlayer {
-    pub(super) fn stash(&mut self) -> TetrisResult {
-        let mut previously_active = self
-            .player_screen
-            .replace_active_tetromino_using_stash(&mut self.rng);
-        previously_active.reset();
-        self.player_screen.saved_tetromino = Some(previously_active);
-        self.player_screen
-            .active_tetromino
-            .try_enter_grid(&self.player_screen.grid)
-    }
-
-    fn record_new_completed_lines(&mut self, new_completed_lines: u64) {
-        self.player_screen.new_completed_lines += new_completed_lines;
-        self.player_screen.score += new_completed_lines;
-    }
-
-    pub(super) fn lock_down(&mut self) -> TetrisResult {
-        let previously_active = self.player_screen.replace_active_tetromino(&mut self.rng);
-
-        let new_completed_lines = previously_active.lock_down(&mut self.player_screen.grid)?;
-        self.record_new_completed_lines(new_completed_lines);
-
-        self.player_screen
-            .grid
-            .add_garbage(self.garbage_to_be_added)?;
-        self.garbage_to_be_added = 0;
-
-        self.player_screen
-            .active_tetromino
-            .try_enter_grid(&self.player_screen.grid)
-    }
-
     /// Sends the player screen to the remote player and resets the new_completed_lines attribute.
     pub(in crate::app) fn send_serialized(&mut self) {
         if let Ok(stream) = TcpStream::connect(&self.remote_ip) {

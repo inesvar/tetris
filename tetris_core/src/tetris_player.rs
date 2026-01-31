@@ -1,5 +1,5 @@
 //! Implement [TetrisPlayer].
-use super::{CircularBuffer, TetrisGrid, Tetromino, TetrominoGenerator};
+use super::{CircularBuffer, TetrisGrid, Tetromino, TetrominoGenerator, TetrisResult};
 use rand_pcg::Pcg32;
 use serde::Deserialize;
 use std::cell::RefCell;
@@ -26,6 +26,8 @@ pub struct TetrisPlayer {
     /// The shade of the active tetromino after hard drop.
     pub ghost_tetromino: Tetromino,
     pub tetromino_bag: TetrominoGenerator,
+    /// garbage_to_be_added is set before the update and reset during the update.
+    pub garbage_to_be_added: u64,
     /// Flag not to be modified except in Serialize. Set to true.
     pub serialize_as_msg: RefCell<bool>,
 }
@@ -48,6 +50,7 @@ impl TetrisPlayer {
             fifo_next_tetromino,
             ghost_tetromino,
             tetromino_bag,
+            garbage_to_be_added: 0,
             serialize_as_msg: true.into(),
         }
     }
@@ -71,5 +74,54 @@ impl TetrisPlayer {
         } else {
             self.replace_active_tetromino(rng)
         }
+    }
+
+    pub fn stash(&mut self, rng: &mut Pcg32) -> TetrisResult {
+        let mut previously_active = self
+            .replace_active_tetromino_using_stash(rng);
+        previously_active.reset();
+        self.saved_tetromino = Some(previously_active);
+        self
+            .active_tetromino
+            .try_enter_grid(&self.grid)
+    }
+
+    fn record_new_completed_lines(&mut self, new_completed_lines: u64) {
+        self.new_completed_lines += new_completed_lines;
+        self.score += new_completed_lines;
+    }
+
+    pub fn lock_down(&mut self, rng: &mut Pcg32) -> TetrisResult {
+        let previously_active = self.replace_active_tetromino(rng);
+
+        let new_completed_lines = previously_active.lock_down(&mut self.grid)?;
+        self.record_new_completed_lines(new_completed_lines);
+
+        self
+            .grid
+            .add_garbage(self.garbage_to_be_added)?;
+        self.garbage_to_be_added = 0;
+
+        self
+            .active_tetromino
+            .try_enter_grid(&self.grid)
+    }
+
+
+    pub fn add_garbage(&mut self, completed_lines: u64) {
+        self.garbage_to_be_added += completed_lines;
+    }
+
+    pub fn get_lines_completed(&mut self) -> u64 {
+        let lines = self.new_completed_lines;
+        self.new_completed_lines = 0;
+        lines
+    }
+
+    pub fn start(&mut self) {
+        self.grid.reset();
+        let _ = self
+            .active_tetromino
+            .try_enter_grid(&self.grid);
     }
 }
