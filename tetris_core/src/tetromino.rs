@@ -123,10 +123,11 @@ impl Tetromino {
     /// assert_eq!(Tetromino::default().try_enter_grid(&full_grid), Err(GameOverError::BlockOut));
     /// ```
     pub fn try_enter_grid(&mut self, grid: &TetrisGrid) -> TetrisResult {
-        let offset = grid.try_spawn_blocks(&self.blocks)?;
+        let translation = RotationTranslation::translation(grid.get_starting_position());
 
-        self.translate(&RotationTranslation::translation(offset));
-        Ok(())
+        self.try_move(grid, &translation)
+            .then_some(())
+            .ok_or(GameOverError::BlockOut)
     }
 
     /// Applies [TetrominoMove] `tetromino_move` to `self` if the target blocks are free and inside the grid, otherwise returns `false`.
@@ -217,14 +218,6 @@ impl Tetromino {
         self.direction.move_by(movement);
         self.center.translate_by(movement);
         true
-    }
-
-    /// Translate the tetromino.
-    fn translate(&mut self, movement: &RotationTranslation) {
-        for block in self.blocks.iter_mut() {
-            block.translate_by(movement);
-        }
-        self.center.translate_by(movement);
     }
 }
 

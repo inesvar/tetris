@@ -152,20 +152,8 @@ impl TetrisGrid {
 #[doc = simple_mermaid::mermaid!("tetris_grid_internals.mmd")]
 impl TetrisGrid {
     /// Return the translation needed for `blocks` to enter the grid.
-    ///
-    /// # Panics
-    ///
-    /// If any of the `blocks` is outside the tetris grid.
-    pub(super) fn try_spawn_blocks(&self, blocks: &[Position]) -> Result<Position, GameOverError> {
-        let offset = Position::new(self.nb_columns / 2 - 2, 0);
-        let blocks_empty = blocks
-            .iter()
-            .all(|block| self.is_block_empty(&(*block + offset)));
-        if blocks_empty {
-            Ok(offset)
-        } else {
-            Err(GameOverError::BlockOut)
-        }
+    pub fn get_starting_position(&self) -> Position {
+        Position::new(self.nb_columns / 2 - 2, 0)
     }
 
     /// Return true if the `block` is inside the grid in an empty slot.
