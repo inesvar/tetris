@@ -26,8 +26,6 @@ pub struct TetrisPlayer {
     pub saved_tetromino: Option<Tetromino>,
     /// Next tetromino pieces rendered on the side.
     pub fifo_next_tetromino: CircularBuffer<Tetromino>,
-    /// The shade of the active tetromino after hard drop.
-    pub ghost_tetromino: Tetromino,
     pub tetromino_bag: TetrominoGenerator,
     /// garbage_to_be_added is set before the update and reset during the update.
     pub garbage_to_be_added: u64,
@@ -53,7 +51,6 @@ impl TetrisPlayer {
         let grid = TetrisGrid::default();
         let mut tetromino_bag = TetrominoGenerator::default();
         let active_tetromino = tetromino_bag.get(rng);
-        let ghost_tetromino = active_tetromino.clone();
         let next_tetrominos = tetromino_bag.get_chunk(rng, NEXT_QUEUE_MAX_SIZE);
         let fifo_next_tetromino = CircularBuffer::new(next_tetrominos);
 
@@ -64,7 +61,6 @@ impl TetrisPlayer {
             active_tetromino,
             saved_tetromino: None,
             fifo_next_tetromino,
-            ghost_tetromino,
             tetromino_bag,
             garbage_to_be_added: 0,
             serialize_as_msg: true.into(),
@@ -146,5 +142,11 @@ impl TetrisPlayer {
             TetrisOrder::PlayerStashesTetromino => self.stash(rng).map(|_| true),
             TetrisOrder::TetrominoLocksDown => self.lock_down(rng).map(|_| true),
         }
+    }
+
+    pub fn get_ghost_tetromino(&self) -> Tetromino {
+        let mut ghost_tetromino = self.active_tetromino.clone();
+        ghost_tetromino.try_apply(TetrominoMove::HardDrop, &self.grid);
+        ghost_tetromino
     }
 }

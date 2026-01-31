@@ -15,14 +15,13 @@ impl Serialize for TetrisPlayer {
         S: Serializer,
     {
         if !*self.serialize_as_msg.borrow() {
-            let mut s = serializer.serialize_struct("TetrisPlayer", 10)?;
+            let mut s = serializer.serialize_struct("TetrisPlayer", 9)?;
             s.serialize_field("grid", &self.grid)?;
             s.serialize_field("score", &self.score)?;
             s.serialize_field("new_completed_lines", &self.new_completed_lines)?;
             s.serialize_field("active_tetromino", &self.active_tetromino)?;
             s.serialize_field("saved_tetromino", &self.saved_tetromino)?;
             s.serialize_field("fifo_next_tetromino", &self.fifo_next_tetromino)?;
-            s.serialize_field("ghost_tetromino", &self.ghost_tetromino)?;
             s.serialize_field("tetromino_bag", &self.tetromino_bag)?;
             s.serialize_field("garbage_to_be_added", &self.garbage_to_be_added)?;
             s.serialize_field("serialize_as_msg", &self.serialize_as_msg)?;

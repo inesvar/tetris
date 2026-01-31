@@ -55,7 +55,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisPlayer {
             gl_ctx.draw_state = gl_ctx
                 .draw_state
                 .blend(graphics::draw_state::Blend::Multiply);
-            self.ghost_tetromino.render(gl_ctx);
+            self.get_ghost_tetromino().render(gl_ctx);
             gl_ctx.draw_state = old_draw_state;
         }
 
