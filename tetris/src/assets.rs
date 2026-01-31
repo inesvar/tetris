@@ -1,4 +1,4 @@
-//! Assets include Tetromino block textures and fonts.
+//! Assets include tetromino block textures and fonts.
 use graphics::glyph_cache::rusttype::GlyphCache;
 use include_assets::NamedArchive;
 use opengl_graphics::*;

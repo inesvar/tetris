@@ -22,7 +22,6 @@ pub use tetris_core::TetrisPlayer;
 #[derive(Serialize, Deserialize)]
 pub struct LocalPlayer {
     /// player_screen contains all attributes visible on the screen
-    /// like the TetrisGrid, the active Tetromino, the file of next Tetromino, etc.
     ///
     /// TetrisPlayer, not LocalPlayer, is rendered.
     /// TetrisPlayer, not LocalPlayer, will be sent to the remote.
