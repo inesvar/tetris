@@ -1,5 +1,8 @@
 //! Implement [TetrisPlayer].
-use super::{CircularBuffer, TetrisGrid, TetrisResult, Tetromino, TetrominoGenerator};
+use super::{
+    CircularBuffer, GameOverError, TetrisGrid, TetrisResult, Tetromino, TetrominoGenerator,
+    TetrominoMove,
+};
 use rand_pcg::Pcg32;
 use serde::Deserialize;
 use std::cell::RefCell;
@@ -30,6 +33,19 @@ pub struct TetrisPlayer {
     pub garbage_to_be_added: u64,
     /// Flag not to be modified except in Serialize. Set to true.
     pub serialize_as_msg: RefCell<bool>,
+}
+
+pub enum TetrisOrder {
+    PlayerMovesTetromino(TetrominoMove),
+    PlayerStashesTetromino,
+    TetrominoFalls,
+    TetrominoLocksDown,
+}
+
+impl From<TetrominoMove> for TetrisOrder {
+    fn from(value: TetrominoMove) -> Self {
+        TetrisOrder::PlayerMovesTetromino(value)
+    }
 }
 
 impl TetrisPlayer {
@@ -113,5 +129,18 @@ impl TetrisPlayer {
     pub fn start(&mut self) {
         self.grid.reset();
         let _ = self.active_tetromino.try_enter_grid(&self.grid);
+    }
+
+    pub fn try_apply(&mut self, order: TetrisOrder, rng: &mut Pcg32) -> Result<bool, GameOverError> {
+        match order {
+            TetrisOrder::PlayerMovesTetromino(tetromino_move) => {
+                Ok(self.active_tetromino.try_apply(tetromino_move, &self.grid))
+            }
+            TetrisOrder::TetrominoFalls => Ok(self
+                .active_tetromino
+                .try_apply(TetrominoMove::Fall, &self.grid)),
+            TetrisOrder::PlayerStashesTetromino => self.stash(rng).map(|_| true),
+            TetrisOrder::TetrominoLocksDown => self.lock_down(rng).map(|_| true),
+        }
     }
 }
