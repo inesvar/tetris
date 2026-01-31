@@ -126,7 +126,7 @@ impl TetrisGrid {
     }
 
     /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
-    pub fn add_garbage(&mut self, completed_lines: u64) -> TetrisResult {
+    pub fn apply_received_garbage(&mut self, completed_lines: u64) -> TetrisResult {
         let lines_to_add = match completed_lines {
             x if x < 2 => return Ok(()),
             x if x < 4 => x - 1,

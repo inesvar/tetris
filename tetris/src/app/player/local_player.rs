@@ -41,8 +41,8 @@ impl LocalPlayer {
         self.freeze_frame = 0;
     }
 
-    pub fn add_garbage(&mut self, completed_lines: u64) {
-        self.player_screen.add_garbage(completed_lines);
+    pub fn push_garbage(&mut self, completed_lines: u64) {
+        self.player_screen.push_garbage(completed_lines);
     }
 
     pub fn get_lines_completed(&mut self) -> u64 {

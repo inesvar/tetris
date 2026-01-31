@@ -1,5 +1,5 @@
 //! Implement [TetrisPlayer].
-use super::{CircularBuffer, TetrisGrid, Tetromino, TetrominoGenerator, TetrisResult};
+use super::{CircularBuffer, TetrisGrid, TetrisResult, Tetromino, TetrominoGenerator};
 use rand_pcg::Pcg32;
 use serde::Deserialize;
 use std::cell::RefCell;
@@ -77,13 +77,10 @@ impl TetrisPlayer {
     }
 
     pub fn stash(&mut self, rng: &mut Pcg32) -> TetrisResult {
-        let mut previously_active = self
-            .replace_active_tetromino_using_stash(rng);
+        let mut previously_active = self.replace_active_tetromino_using_stash(rng);
         previously_active.reset();
         self.saved_tetromino = Some(previously_active);
-        self
-            .active_tetromino
-            .try_enter_grid(&self.grid)
+        self.active_tetromino.try_enter_grid(&self.grid)
     }
 
     fn record_new_completed_lines(&mut self, new_completed_lines: u64) {
@@ -97,18 +94,13 @@ impl TetrisPlayer {
         let new_completed_lines = previously_active.lock_down(&mut self.grid)?;
         self.record_new_completed_lines(new_completed_lines);
 
-        self
-            .grid
-            .add_garbage(self.garbage_to_be_added)?;
+        self.grid.apply_received_garbage(self.garbage_to_be_added)?;
         self.garbage_to_be_added = 0;
 
-        self
-            .active_tetromino
-            .try_enter_grid(&self.grid)
+        self.active_tetromino.try_enter_grid(&self.grid)
     }
 
-
-    pub fn add_garbage(&mut self, completed_lines: u64) {
+    pub fn push_garbage(&mut self, completed_lines: u64) {
         self.garbage_to_be_added += completed_lines;
     }
 
@@ -120,8 +112,6 @@ impl TetrisPlayer {
 
     pub fn start(&mut self) {
         self.grid.reset();
-        let _ = self
-            .active_tetromino
-            .try_enter_grid(&self.grid);
+        let _ = self.active_tetromino.try_enter_grid(&self.grid);
     }
 }
