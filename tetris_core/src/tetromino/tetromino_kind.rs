@@ -26,6 +26,18 @@ macro_rules! const_map {
     };
 }
 
+macro_rules! const_swap_map {
+    ($array:expr, $func:ident) => {
+        [
+            $array[0].$func(),
+            $array[2].$func(),
+            $array[1].$func(),
+            $array[4].$func(),
+            $array[3].$func(),
+        ]
+    };
+}
+
 // source: Tetris Guideline
 const NORTH_TO_EAST_WALL_KICKS: [Position; 5] = [
     Position::new(0, 0),
@@ -43,24 +55,21 @@ const SOUTH_TO_EAST_WALL_KICKS: [Position; 5] = NORTH_TO_EAST_WALL_KICKS;
 const WEST_TO_NORTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_y);
 const WEST_TO_SOUTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_y);
 
-const UP_TO_RIGHT_I_WALL_KICKS: [Position; 5] = [
+const NORTH_TO_EAST_I_WALL_KICKS: [Position; 5] = [
     Position::new(0, 0),
     Position::new(-2, 0),
     Position::new(1, 0),
-    Position::new(-2, -1),
-    Position::new(1, 2),
+    Position::new(-2, 1),
+    Position::new(1, -2),
 ];
 
-const RIGHT_TO_BOTTOM_I_WALL_KICKS: [Position; 5] = [
-    Position::new(0, 0),
-    Position::new(-1, 0),
-    Position::new(2, 0),
-    Position::new(-1, 2),
-    Position::new(2, -1),
-];
-
-const RIGHT_TO_UP_I_WALL_KICKS: [Position; 5] = const_map!(UP_TO_RIGHT_I_WALL_KICKS, neg);
-const BOTTOM_TO_RIGHT_I_WALL_KICKS: [Position; 5] = const_map!(RIGHT_TO_BOTTOM_I_WALL_KICKS, neg);
+const NORTH_TO_WEST_I_WALL_KICKS: [Position; 5] = const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_x);
+const EAST_TO_SOUTH_I_WALL_KICKS: [Position; 5] = const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_x);
+const EAST_TO_NORTH_I_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_I_WALL_KICKS, neg);
+const SOUTH_TO_WEST_I_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_I_WALL_KICKS, neg);
+const SOUTH_TO_EAST_I_WALL_KICKS: [Position; 5] = const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_y);
+const WEST_TO_NORTH_I_WALL_KICKS: [Position; 5] = const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_y);
+const WEST_TO_SOUTH_I_WALL_KICKS: [Position; 5] = NORTH_TO_EAST_I_WALL_KICKS;
 
 const NO_WALL_KICKS: [Position; 1] = [Position::new(0, 0)];
 
@@ -126,14 +135,14 @@ impl TetrominoKind {
         rotation_status: Direction,
     ) -> &'static [Position] {
         match (rotation_status, rtype) {
-            (Direction::North, RotationType::Clockwise) => &UP_TO_RIGHT_I_WALL_KICKS,
-            (Direction::East, RotationType::Counterclockwise) => &RIGHT_TO_UP_I_WALL_KICKS,
-            (Direction::East, RotationType::Clockwise) => &RIGHT_TO_BOTTOM_I_WALL_KICKS,
-            (Direction::South, RotationType::Counterclockwise) => &BOTTOM_TO_RIGHT_I_WALL_KICKS,
-            (Direction::South, RotationType::Clockwise) => &RIGHT_TO_UP_I_WALL_KICKS,
-            (Direction::West, RotationType::Counterclockwise) => &UP_TO_RIGHT_I_WALL_KICKS,
-            (Direction::West, RotationType::Clockwise) => &BOTTOM_TO_RIGHT_I_WALL_KICKS,
-            (Direction::North, RotationType::Counterclockwise) => &RIGHT_TO_BOTTOM_I_WALL_KICKS,
+            (Direction::North, RotationType::Clockwise) => &NORTH_TO_EAST_I_WALL_KICKS,
+            (Direction::East, RotationType::Counterclockwise) => &EAST_TO_NORTH_I_WALL_KICKS,
+            (Direction::East, RotationType::Clockwise) => &EAST_TO_SOUTH_I_WALL_KICKS,
+            (Direction::South, RotationType::Counterclockwise) => &SOUTH_TO_EAST_I_WALL_KICKS,
+            (Direction::South, RotationType::Clockwise) => &SOUTH_TO_WEST_I_WALL_KICKS,
+            (Direction::West, RotationType::Counterclockwise) => &WEST_TO_SOUTH_I_WALL_KICKS,
+            (Direction::West, RotationType::Clockwise) => &WEST_TO_NORTH_I_WALL_KICKS,
+            (Direction::North, RotationType::Counterclockwise) => &NORTH_TO_WEST_I_WALL_KICKS,
             (_, _) => &NO_WALL_KICKS,
         }
     }
@@ -234,14 +243,13 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn generic_wall_kicks_are_correct() {
         assert_eq!(
             TetrominoKind::generic_wall_kick_translations(
                 RotationType::Clockwise,
                 Direction::North
             ),
-            positions!((0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2))
+            positions!((0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2))
         );
 
         assert_eq!(
@@ -249,12 +257,12 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::East
             ),
-            positions!((0, 0), (1, 0), (1, -1), (0, 2), (1, 2))
+            positions!((0, 0), (1, 0), (1, 1), (0, -2), (1, -2))
         );
 
         assert_eq!(
             TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::East),
-            positions!((0, 0), (1, 0), (1, -1), (0, 2), (1, 2))
+            positions!((0, 0), (1, 0), (1, 1), (0, -2), (1, -2))
         );
 
         assert_eq!(
@@ -262,7 +270,7 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::South
             ),
-            positions!((0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2))
+            positions!((0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2))
         );
 
         assert_eq!(
@@ -270,7 +278,7 @@ mod tests {
                 RotationType::Clockwise,
                 Direction::South
             ),
-            positions!((0, 0), (1, 0), (1, 1), (0, -2), (1, -2))
+            positions!((0, 0), (1, 0), (1, -1), (0, 2), (1, 2))
         );
 
         assert_eq!(
@@ -278,12 +286,12 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::West
             ),
-            positions!((0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2))
+            positions!((0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2))
         );
 
         assert_eq!(
             TetrominoKind::generic_wall_kick_translations(RotationType::Clockwise, Direction::West),
-            positions!((0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2))
+            positions!((0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2))
         );
 
         assert_eq!(
@@ -291,7 +299,7 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::North
             ),
-            positions!((0, 0), (1, 0), (1, 1), (0, -2), (1, -2))
+            positions!((0, 0), (1, 0), (1, -1), (0, 2), (1, 2))
         );
     }
 
@@ -299,7 +307,7 @@ mod tests {
     fn i_wall_kicks_are_correct() {
         assert_eq!(
             TetrominoKind::i_wall_kick_translations(RotationType::Clockwise, Direction::North),
-            positions!((0, 0), (-2, 0), (1, 0), (-2, -1), (1, 2))
+            positions!((0, 0), (-2, 0), (1, 0), (-2, 1), (1, -2))
         );
 
         assert_eq!(
@@ -307,12 +315,12 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::East
             ),
-            positions!((0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2))
+            positions!((0, 0), (2, 0), (-1, 0), (2, -1), (-1, 2))
         );
 
         assert_eq!(
             TetrominoKind::i_wall_kick_translations(RotationType::Clockwise, Direction::East),
-            positions!((0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1))
+            positions!((0, 0), (-1, 0), (2, 0), (-1, -2), (2, 1))
         );
 
         assert_eq!(
@@ -320,12 +328,12 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::South
             ),
-            positions!((0, 0), (1, 0), (-2, 0), (1, -2), (-2, 1))
+            positions!((0, 0), (1, 0), (-2, 0), (1, 2), (-2, -1))
         );
 
         assert_eq!(
             TetrominoKind::i_wall_kick_translations(RotationType::Clockwise, Direction::South),
-            positions!((0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2))
+            positions!((0, 0), (2, 0), (-1, 0), (2, -1), (-1, 2))
         );
 
         assert_eq!(
@@ -333,12 +341,12 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::West
             ),
-            positions!((0, 0), (-2, 0), (1, 0), (-2, -1), (1, 2))
+            positions!((0, 0), (-2, 0), (1, 0), (-2, 1), (1, -2))
         );
 
         assert_eq!(
             TetrominoKind::i_wall_kick_translations(RotationType::Clockwise, Direction::West),
-            positions!((0, 0), (1, 0), (-2, 0), (1, -2), (-2, 1))
+            positions!((0, 0), (1, 0), (-2, 0), (1, 2), (-2, -1))
         );
 
         assert_eq!(
@@ -346,7 +354,7 @@ mod tests {
                 RotationType::Counterclockwise,
                 Direction::North
             ),
-            positions!((0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1))
+            positions!((0, 0), (-1, 0), (2, 0), (-1, -2), (2, 1))
         );
     }
 }
