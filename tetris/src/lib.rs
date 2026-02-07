@@ -40,7 +40,7 @@ pub fn event_loop() {
     let mut bigger_window_size = false;
 
     // Create the app.
-    let assets_archive = NamedArchive::load(include_dir!("src/assets"));
+    let assets_archive = NamedArchive::load(include_dir!("../assets"));
     let mut app = App::new(OPENGL_VERSION, &assets_archive);
 
     // Start the event loop.

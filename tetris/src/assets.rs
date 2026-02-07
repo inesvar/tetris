@@ -35,7 +35,7 @@ pub struct Assets<'a> {
     pub main_font: GlyphCache<'a, (), Texture>,
 }
 
-const TEXTURE_FOLDER: &str = "tetris/src/assets/textures";
+const TEXTURE_FOLDER: &str = "assets/textures";
 const TEXTURE_EXTENSION: &str = "bmp";
 
 fn get_texture(filename: &str) -> Texture {
