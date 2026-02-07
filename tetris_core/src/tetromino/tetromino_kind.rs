@@ -14,72 +14,6 @@ pub enum TetrominoKind {
     Z,
 }
 
-macro_rules! const_map {
-    ($array:expr, $func:ident) => {
-        [
-            $array[0].$func(),
-            $array[1].$func(),
-            $array[2].$func(),
-            $array[3].$func(),
-            $array[4].$func(),
-        ]
-    };
-}
-
-macro_rules! const_swap_map {
-    ($array:expr, $func:ident) => {
-        [
-            $array[0].$func(),
-            $array[2].$func(),
-            $array[1].$func(),
-            $array[4].$func(),
-            $array[3].$func(),
-        ]
-    };
-}
-
-// source: Tetris Guideline
-const NORTH_TO_EAST_WALL_KICKS: [Position; 5] = [
-    Position::new(0, 0),
-    Position::new(-1, 0),
-    Position::new(-1, -1),
-    Position::new(0, 2),
-    Position::new(-1, 2),
-];
-
-const NORTH_TO_WEST_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_x);
-const EAST_TO_SOUTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg);
-const EAST_TO_NORTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg);
-const SOUTH_TO_WEST_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_x);
-const SOUTH_TO_EAST_WALL_KICKS: [Position; 5] = NORTH_TO_EAST_WALL_KICKS;
-const WEST_TO_NORTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_y);
-const WEST_TO_SOUTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_y);
-
-const NORTH_TO_EAST_I_WALL_KICKS: [Position; 5] = [
-    Position::new(0, 0),
-    Position::new(-2, 0),
-    Position::new(1, 0),
-    Position::new(-2, 1),
-    Position::new(1, -2),
-];
-
-const NORTH_TO_WEST_I_WALL_KICKS: [Position; 5] = const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_x);
-const EAST_TO_SOUTH_I_WALL_KICKS: [Position; 5] = const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_x);
-const EAST_TO_NORTH_I_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_I_WALL_KICKS, neg);
-const SOUTH_TO_WEST_I_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_I_WALL_KICKS, neg);
-const SOUTH_TO_EAST_I_WALL_KICKS: [Position; 5] = const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_y);
-const WEST_TO_NORTH_I_WALL_KICKS: [Position; 5] = const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_y);
-const WEST_TO_SOUTH_I_WALL_KICKS: [Position; 5] = NORTH_TO_EAST_I_WALL_KICKS;
-
-const NO_WALL_KICKS: [Position; 1] = [Position::new(0, 0)];
-
-const fn init(x: i32, y: i32) -> Position {
-    match (x, y) {
-        (x @ 0..4, y @ 0..4) => Position::new(x, y),
-        _ => panic!("x and y should be between 0 and 4 excluded"),
-    }
-}
-
 impl TetrominoKind {
     pub(crate) const ALL: [Self; 7] = [
         Self::O,
@@ -129,7 +63,79 @@ impl TetrominoKind {
             _ => Self::generic_wall_kick_translations(rtype, rotation_status).iter(),
         }
     }
+}
 
+const fn init(x: i32, y: i32) -> Position {
+    match (x, y) {
+        (x @ 0..4, y @ 0..4) => Position::new(x, y),
+        _ => panic!("x and y should be between 0 and 4 excluded"),
+    }
+}
+
+macro_rules! const_map {
+    ($array:expr, $func:ident) => {
+        [
+            $array[0].$func(),
+            $array[1].$func(),
+            $array[2].$func(),
+            $array[3].$func(),
+            $array[4].$func(),
+        ]
+    };
+}
+
+macro_rules! const_swap_map {
+    ($array:expr, $func:ident) => {
+        [
+            $array[0].$func(),
+            $array[2].$func(),
+            $array[1].$func(),
+            $array[4].$func(),
+            $array[3].$func(),
+        ]
+    };
+}
+
+// source: Tetris Guideline
+const NORTH_TO_EAST_WALL_KICKS: [Position; 5] = [
+    Position::new(0, 0),
+    Position::new(-1, 0),
+    Position::new(-1, -1),
+    Position::new(0, 2),
+    Position::new(-1, 2),
+];
+
+const NORTH_TO_WEST_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_x);
+const EAST_TO_SOUTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg);
+const EAST_TO_NORTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg);
+const SOUTH_TO_WEST_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_x);
+const SOUTH_TO_EAST_WALL_KICKS: [Position; 5] = NORTH_TO_EAST_WALL_KICKS;
+const WEST_TO_NORTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_y);
+const WEST_TO_SOUTH_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_WALL_KICKS, neg_y);
+
+const NORTH_TO_EAST_I_WALL_KICKS: [Position; 5] = [
+    Position::new(0, 0),
+    Position::new(-2, 0),
+    Position::new(1, 0),
+    Position::new(-2, 1),
+    Position::new(1, -2),
+];
+
+const NORTH_TO_WEST_I_WALL_KICKS: [Position; 5] =
+    const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_x);
+const EAST_TO_SOUTH_I_WALL_KICKS: [Position; 5] =
+    const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_x);
+const EAST_TO_NORTH_I_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_I_WALL_KICKS, neg);
+const SOUTH_TO_WEST_I_WALL_KICKS: [Position; 5] = const_map!(NORTH_TO_EAST_I_WALL_KICKS, neg);
+const SOUTH_TO_EAST_I_WALL_KICKS: [Position; 5] =
+    const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_y);
+const WEST_TO_NORTH_I_WALL_KICKS: [Position; 5] =
+    const_swap_map!(NORTH_TO_EAST_I_WALL_KICKS, neg_y);
+const WEST_TO_SOUTH_I_WALL_KICKS: [Position; 5] = NORTH_TO_EAST_I_WALL_KICKS;
+
+const NO_WALL_KICKS: [Position; 1] = [Position::new(0, 0)];
+
+impl TetrominoKind {
     fn i_wall_kick_translations(
         rtype: RotationType,
         rotation_status: Direction,
