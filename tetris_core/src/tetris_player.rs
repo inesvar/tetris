@@ -33,16 +33,16 @@ pub struct TetrisPlayer {
     pub serialize_as_msg: RefCell<bool>,
 }
 
-pub enum TetrisOrder {
+pub enum TetrisCommand {
     PlayerMovesTetromino(TetrominoMove),
     PlayerStashesTetromino,
     TetrominoFalls,
     TetrominoLocksDown,
 }
 
-impl From<TetrominoMove> for TetrisOrder {
+impl From<TetrominoMove> for TetrisCommand {
     fn from(value: TetrominoMove) -> Self {
-        TetrisOrder::PlayerMovesTetromino(value)
+        TetrisCommand::PlayerMovesTetromino(value)
     }
 }
 
@@ -129,23 +129,23 @@ impl TetrisPlayer {
 
     pub fn try_apply(
         &mut self,
-        order: TetrisOrder,
+        order: TetrisCommand,
         rng: &mut Pcg32,
     ) -> Result<bool, GameOverError> {
         match order {
-            TetrisOrder::PlayerMovesTetromino(TetrominoMove::HardDrop) => {
+            TetrisCommand::PlayerMovesTetromino(TetrominoMove::HardDrop) => {
                 self.active_tetromino
                     .try_apply(TetrominoMove::HardDrop, &self.grid);
                 self.lock_down(rng).map(|_| true)
             }
-            TetrisOrder::PlayerMovesTetromino(tetromino_move) => {
+            TetrisCommand::PlayerMovesTetromino(tetromino_move) => {
                 Ok(self.active_tetromino.try_apply(tetromino_move, &self.grid))
             }
-            TetrisOrder::TetrominoFalls => Ok(self
+            TetrisCommand::TetrominoFalls => Ok(self
                 .active_tetromino
                 .try_apply(TetrominoMove::Fall, &self.grid)),
-            TetrisOrder::PlayerStashesTetromino => self.stash(rng).map(|_| true),
-            TetrisOrder::TetrominoLocksDown => self.lock_down(rng).map(|_| true),
+            TetrisCommand::PlayerStashesTetromino => self.stash(rng).map(|_| true),
+            TetrisCommand::TetrominoLocksDown => self.lock_down(rng).map(|_| true),
         }
     }
 

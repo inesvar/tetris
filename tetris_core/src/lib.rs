@@ -12,7 +12,7 @@ pub(crate) use tetromino_generator::TetrominoGenerator;
 
 // used to update the active tetromino
 pub use tetris_grid::{GameOverError, TetrisResult};
-pub use tetris_player::TetrisOrder;
+pub use tetris_player::TetrisCommand;
 pub use tetromino::TetrominoMove;
 // used to render the TetrisPlayer
 pub use tetris_grid::{TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS};

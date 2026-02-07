@@ -4,7 +4,7 @@ use crate::settings::KEY_REPEAT_DELAY;
 use piston::Key;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use tetris_core::{TetrisOrder, TetrominoMove};
+use tetris_core::{TetrisCommand, TetrominoMove};
 
 // TODO :
 // it would be more natural to have a hashmap associating a `Key` to an `Option<Command>`.
@@ -20,10 +20,10 @@ pub(super) struct PressedKeys {
     timer_countdown: HashMap<Key, u64>,
 }
 
-pub fn get_order_from_key(keybindings: &Keybindings, key: Key) -> Option<TetrisOrder> {
+pub fn get_order_from_key(keybindings: &Keybindings, key: Key) -> Option<TetrisCommand> {
     match key {
         key if keybindings.hold_tetromino_keys.contains(&key) => {
-            Some(TetrisOrder::PlayerStashesTetromino)
+            Some(TetrisCommand::PlayerStashesTetromino)
         }
         key if keybindings.fall_keys.contains(&key) => Some(TetrominoMove::Fall.into()),
         key if keybindings.hard_drop_keys.contains(&key) => Some(TetrominoMove::HardDrop.into()),
