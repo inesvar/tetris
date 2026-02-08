@@ -100,7 +100,7 @@ impl LocalPlayer {
                 .try_apply(TetrominoMove::Fall.into(), &mut self.rng)?
         {
             self.player_screen
-                .try_apply(TetrisCommand::TetrominoLocksDown, &mut self.rng)?;
+                .try_apply(TetrisCommand::LockDown, &mut self.rng)?;
         }
 
         /**********************************

@@ -22,9 +22,7 @@ pub(super) struct PressedKeys {
 
 pub fn get_order_from_key(keybindings: &Keybindings, key: Key) -> Option<TetrisCommand> {
     match key {
-        key if keybindings.hold_tetromino_keys.contains(&key) => {
-            Some(TetrisCommand::PlayerStashesTetromino)
-        }
+        key if keybindings.hold_tetromino_keys.contains(&key) => Some(TetrisCommand::Hold),
         key if keybindings.fall_keys.contains(&key) => Some(TetrominoMove::Fall.into()),
         key if keybindings.hard_drop_keys.contains(&key) => Some(TetrominoMove::HardDrop.into()),
         key if keybindings.left_keys.contains(&key) => Some(TetrominoMove::Left.into()),

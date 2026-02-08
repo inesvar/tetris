@@ -1,5 +1,10 @@
 - make more tetris_grid unit tests
-- rework tetromino_kind
+- make tetris_core integration tests
+- BUG fix : TetrisPlayer should receive the number of garbage lines to add, not the number of completed lines !!
+- improve doc
+- code getters and make fields private (TetrisPlayer)
+- add_garbage could rely on rng provided by outside of the crate
+- add possibility for mocking the random generator -> necessary for integration tests
 
 # problems
 - the clock should pause during a game pause (partially revert blinking changes)
@@ -8,7 +13,7 @@
 - today key inputs are sent to the tetris game and mouse inputs to the app... something more flexible would be great
 
 # new features
-- fix paths for Windows in assets.rs
+- fix paths for Windows in assets.rs -> done, has to be checked
 - press key s open settings (requires some planning before, the code is messy)
 - output an error when playing remote doesn't work
 # other

@@ -18,7 +18,6 @@ graph LR
     TetrisPlayer --o TetrisGrid
     TetrisPlayer --o Tetromino
     TetrisCommand --o TetrominoMove
-    TetrisPlayer -.-> TetrisResult
     TetrisPlayer --o BagType
 
     subgraph tetromino_generator
@@ -26,7 +25,6 @@ graph LR
     end
 
     subgraph tetris_grid
-        direction LR
         TetrisGrid -.-> GameOverError
         TetrisGrid -.-> TetrisResult
         TetrisResult --o GameOverError
@@ -36,7 +34,7 @@ graph LR
     TetrisGrid -.-> Position
 
     subgraph tetromino
-        TetrominoMove -.-> Position
+        TetrominoMove
         Tetromino --o Position
     end
 

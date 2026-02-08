@@ -34,22 +34,22 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisPlayer {
         let grid_transform = gl_ctx.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
         gl_ctx.transform = grid_transform;
 
-        if self.active_tetromino.is_in_default_state() {
+        if self.tetromino_in_play.is_in_default_state() {
             let old_transform = gl_ctx.transform;
-            let start = self.grid.get_starting_position();
+            let start = self.matrix.get_starting_position();
             let starting_position_transform = gl_ctx
                 .transform
                 .trans(start.x() as f64 * BLOCK_SIZE, start.y() as f64 * BLOCK_SIZE);
             gl_ctx.transform = starting_position_transform;
 
-            self.active_tetromino.render(gl_ctx);
+            self.tetromino_in_play.render(gl_ctx);
             gl_ctx.transform = old_transform;
         }
 
-        self.grid.render(gl_ctx);
+        self.matrix.render(gl_ctx);
 
-        if !self.active_tetromino.is_in_default_state() {
-            self.active_tetromino.render(gl_ctx);
+        if !self.tetromino_in_play.is_in_default_state() {
+            self.tetromino_in_play.render(gl_ctx);
 
             let old_draw_state = gl_ctx.draw_state;
             gl_ctx.draw_state = gl_ctx
@@ -62,7 +62,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisPlayer {
         // drawing a border for the hold piece
         gl_ctx.transform = grid_transform.trans(
             -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
-            hidden_height(&self.grid),
+            hidden_height(&self.matrix),
         );
         let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
@@ -72,7 +72,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisPlayer {
         outline_rect.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, gl_ctx.gl);
 
         // drawing the hold piece
-        if let Some(saved) = &self.saved_tetromino {
+        if let Some(saved) = &self.hold_queue {
             gl_ctx.transform = grid_transform.trans(
                 -TETROMINO_MAX_WIDTH - 2.0 * BLOCK_SIZE,
                 TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
@@ -82,8 +82,8 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisPlayer {
 
         // drawing a border for the fifo of next pieces
         gl_ctx.transform = grid_transform.trans(
-            total_width(&self.grid) + BLOCK_SIZE,
-            hidden_height(&self.grid),
+            total_width(&self.matrix) + BLOCK_SIZE,
+            hidden_height(&self.matrix),
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;
@@ -95,10 +95,10 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisPlayer {
         // drawing the next pieces
         for i in 0..NB_NEXT_TETROMINO {
             gl_ctx.transform = grid_transform.trans(
-                total_width(&self.grid) + 2.0 * BLOCK_SIZE,
+                total_width(&self.matrix) + 2.0 * BLOCK_SIZE,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
-            if let Some(tetromino) = self.fifo_next_tetromino.get(i) {
+            if let Some(tetromino) = self.next_queue.get(i) {
                 tetromino.render(gl_ctx);
             }
         }

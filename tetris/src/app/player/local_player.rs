@@ -54,19 +54,11 @@ impl LocalPlayer {
     }
 
     pub(in crate::app) fn countdown(&mut self, i: &Countdown) {
+        let color = self.player_screen.tetromino_in_play.color();
         match i {
-            Countdown::One => self
-                .player_screen
-                .grid
-                .one(self.player_screen.active_tetromino.color()),
-            Countdown::Two => self
-                .player_screen
-                .grid
-                .two(self.player_screen.active_tetromino.color()),
-            Countdown::Three => self
-                .player_screen
-                .grid
-                .three(self.player_screen.active_tetromino.color()),
+            Countdown::One => self.player_screen.matrix.one(color),
+            Countdown::Two => self.player_screen.matrix.two(color),
+            Countdown::Three => self.player_screen.matrix.three(color),
         }
     }
 }

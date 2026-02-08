@@ -2,6 +2,7 @@ use crate::TetrominoKind;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+/// 7 Tetromino colors and 1 garbage color.
 #[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub enum TetrisColor {
     Cyan,

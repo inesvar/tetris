@@ -91,7 +91,7 @@ impl Tetromino {
     /// o_tetromino.reset();
     /// assert_eq!(o_tetromino, Tetromino::default());
     /// ```
-    pub fn reset(&mut self) {
+    pub(crate) fn reset(&mut self) {
         *self = Self::new(self.kind)
     }
 
@@ -122,7 +122,7 @@ impl Tetromino {
     ///
     /// assert_eq!(Tetromino::default().try_enter_grid(&full_grid), Err(GameOverError::BlockOut));
     /// ```
-    pub fn try_enter_grid(&mut self, grid: &TetrisGrid) -> TetrisResult {
+    pub(crate) fn try_enter_grid(&mut self, grid: &TetrisGrid) -> TetrisResult {
         let translation = RotationTranslation::translation(grid.get_starting_position());
 
         self.try_move(grid, &translation)
@@ -170,7 +170,7 @@ impl Tetromino {
     /// assert!(o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid));
     /// assert!(o_tetromino.lock_down(&mut empty_grid).is_ok());
     /// ```
-    pub fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
+    pub(crate) fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
         grid.add_blocks_and_clear_lines(&self.blocks, self.color())
     }
 

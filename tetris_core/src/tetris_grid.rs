@@ -80,7 +80,7 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If [TetrisGrid::nb_columns] or [TetrisGrid::nb_matrix_rows] or [TetrisGrid::nb_buffer_rows] aren't in the expected range.
-    pub fn new(nb_columns: u32, nb_matrix_rows: u32, nb_buffer_rows: u32) -> Self {
+    pub(crate) fn new(nb_columns: u32, nb_matrix_rows: u32, nb_buffer_rows: u32) -> Self {
         if nb_columns > TETRIS_GRID_MAX
             || nb_matrix_rows > TETRIS_GRID_MAX
             || nb_buffer_rows > TETRIS_GRID_MAX
@@ -117,7 +117,7 @@ impl TetrisGrid {
     }
 
     /// Empty the grid.
-    pub fn reset(&mut self) {
+    pub(crate) fn reset(&mut self) {
         *self = Self::new(
             self.nb_columns as u32,
             self.nb_matrix_rows as u32,
@@ -126,7 +126,7 @@ impl TetrisGrid {
     }
 
     /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
-    pub fn apply_received_garbage(&mut self, completed_lines: u64) -> TetrisResult {
+    pub(crate) fn apply_received_garbage(&mut self, completed_lines: u64) -> TetrisResult {
         let lines_to_add = match completed_lines {
             x if x < 2 => return Ok(()),
             x if x < 4 => x - 1,
@@ -273,8 +273,7 @@ impl TetrisGrid {
     }
 }
 
-/// In [tetris_grid](super::tetris_grid), helpers used by [player::render](crate::app::player::render)
-/// to implement [crate::app::render_app::Render] for [TetrisGrid].
+/// Getters.
 impl TetrisGrid {
     pub const fn nb_matrix_rows_i32(&self) -> i32 {
         self.nb_matrix_rows
@@ -284,6 +283,7 @@ impl TetrisGrid {
         self.nb_columns
     }
 
+    /// Iterator over all the grid cells (**Matrix** and **Buffer Zone**).
     pub fn positions(&self) -> impl Iterator<Item = Position> + use<'_> {
         let h = self.nb_matrix_rows + self.nb_buffer_rows;
         let w = self.nb_columns;
@@ -312,7 +312,7 @@ impl TetrisGrid {
         }
     }
 
-    /// Draw a 1 with blocks of the same color as tetromino.
+    /// Draw a 1 with blocks of color `tetris_color`.
     pub fn one(&mut self, tetris_color: TetrisColor) {
         let one = [
             self.init(0, -2),
@@ -329,7 +329,7 @@ impl TetrisGrid {
         self.draw_on_empty_grid(&one, tetris_color);
     }
 
-    /// Draw a 2 with blocks of the same color as tetromino.
+    /// Draw a 2 with blocks of color `tetris_color`.
     pub fn two(&mut self, tetris_color: TetrisColor) {
         let two = [
             self.init(-1, -2),
@@ -347,7 +347,7 @@ impl TetrisGrid {
         self.draw_on_empty_grid(&two, tetris_color);
     }
 
-    /// Draw a 3 with blocks of the same color as tetromino.
+    /// Draw a 3 with blocks of color `tetris_color`.
     pub fn three(&mut self, tetris_color: TetrisColor) {
         let three = [
             self.init(-1, -2),
