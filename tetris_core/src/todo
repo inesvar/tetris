@@ -1,10 +1,10 @@
-- make more tetris_grid unit tests
+- add possibility for mocking the random generator -> necessary for integration tests -> fisher-yates with a method to reverse it :D
 - make tetris_core integration tests
+- code getters and make fields private (TetrisPlayer)
+- add_garbage could rely on rng provided by outside of the crate -> great for integration tests
 - BUG fix : TetrisPlayer should receive the number of garbage lines to add, not the number of completed lines !!
 - improve doc
-- code getters and make fields private (TetrisPlayer)
-- add_garbage could rely on rng provided by outside of the crate
-- add possibility for mocking the random generator -> necessary for integration tests
+- make more tetris_grid unit tests
 
 # problems
 - the clock should pause during a game pause (partially revert blinking changes)

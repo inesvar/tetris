@@ -3,7 +3,7 @@
 
 use super::{Tetromino, TetrominoKind};
 use rand::seq::SliceRandom;
-use rand_pcg::Pcg32;
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 /// Tetromino generator.
@@ -19,20 +19,20 @@ pub struct TetrominoGenerator {
 /// helps prevent tetromino repetition.
 #[derive(Clone, Default, Serialize, Deserialize)]
 pub enum BagType {
-    /// Each tetromino is chosen randomly using uniform distribution.
+    /// Each tetromino is chosen randomly using the provided random generator.
     NoBag,
     #[default]
     /// Default.
     ///
-    /// One occurence of each tetromino per bag.
+    /// One occurence of each tetromino per bag, shuffled using the provided random generator.
     Bag7,
-    /// Two occurences of each tetromino per bag.
+    /// Two occurences of each tetromino per bag, shuffled using the provided random generator.
     Bag14,
 }
 
 impl TetrominoGenerator {
     /// Creates a new [TetrominoGenerator] with [BagType] `bag_type`.
-    pub fn new(bag_type: BagType) -> Self {
+    pub(crate) fn new(bag_type: BagType) -> Self {
         Self {
             tetrominos: Vec::new(),
             bag_type,
@@ -40,12 +40,12 @@ impl TetrominoGenerator {
     }
 
     /// Returns an array of `N` [Tetromino]'s.
-    pub fn get_chunk(&mut self, rng: &mut Pcg32, size: usize) -> Vec<Tetromino> {
+    pub(crate) fn get_chunk<R: Rng>(&mut self, rng: &mut R, size: usize) -> Vec<Tetromino> {
         (0..size).map(|_| self.get(rng)).collect()
     }
 
     /// Returns one [Tetromino].
-    pub fn get(&mut self, rng: &mut Pcg32) -> Tetromino {
+    pub(crate) fn get<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
         Tetromino::new(self.tetrominos.pop().unwrap_or_else(|| {
             self.draw_new_bag(rng);
             self.tetrominos
@@ -54,7 +54,7 @@ impl TetrominoGenerator {
         }))
     }
 
-    fn draw_new_bag(&mut self, rng: &mut Pcg32) {
+    fn draw_new_bag<R: Rng>(&mut self, rng: &mut R) {
         if let Some(nb_occurrences) = self.bag_type.occurrences_per_kind() {
             self.tetrominos = TetrominoKind::ALL.repeat(nb_occurrences);
             self.tetrominos.shuffle(rng);
@@ -83,6 +83,7 @@ impl BagType {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand_pcg::Pcg32;
     use rand::SeedableRng;
     use rstest::rstest;
 
