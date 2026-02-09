@@ -4,7 +4,7 @@
 mod tetris_color;
 
 use super::Position;
-use rand::Rng;
+use rand::RngExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::ops::Index;
@@ -137,8 +137,8 @@ impl TetrisGrid {
             completed_lines, lines_to_add
         );
 
-        let mut rng = rand::thread_rng();
-        let empty = rng.gen_range(0..self.nb_columns);
+        let mut rng = rand::rng();
+        let empty = rng.random_range(0..self.nb_columns);
 
         for _ in 0..lines_to_add {
             self.add_garbage_row(empty as usize)?;

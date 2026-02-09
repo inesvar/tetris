@@ -22,7 +22,7 @@ use local_ip_address::local_ip;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::MouseButton;
 use piston_window::Key;
-use rand::Rng;
+use rand::RngExt;
 use render_app::Piston2dGraphicsArguments;
 use serde::{Deserialize, Serialize};
 use std::net::TcpStream;
@@ -124,8 +124,8 @@ pub struct App<'a> {
 
 impl<'a> App<'a> {
     pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> App<'a> {
-        let mut rng = rand::thread_rng();
-        let seed: u64 = rng.gen();
+        let mut rng = rand::rng();
+        let seed: u64 = rng.random();
         let is_host = false;
         let player_config = PlayerConfig::Local;
 
@@ -463,8 +463,8 @@ impl<'a> App<'a> {
                     self.clock = 0.0;
                 } else if self.is_host {
                     println!("HOST SYNCHRONIZE");
-                    let mut rng = rand::thread_rng();
-                    self.settings_manager.seed = rng.gen();
+                    let mut rng = rand::rng();
+                    self.settings_manager.seed = rng.random();
                     self.settings_manager.send();
                 } else {
                     self.send_message(MessageType::Restart);
@@ -473,8 +473,8 @@ impl<'a> App<'a> {
             PlayerConfig::TwoLocal => {
                 self.running = RunningState::Starting;
                 self.clock = 0.0;
-                let mut rng = rand::thread_rng();
-                self.settings_manager.seed = rng.gen();
+                let mut rng = rand::rng();
+                self.settings_manager.seed = rng.random();
                 for player in &mut self.local_players {
                     player.reset(self.settings_manager.seed);
                 }
@@ -482,8 +482,8 @@ impl<'a> App<'a> {
             PlayerConfig::Local => {
                 self.running = RunningState::Starting;
                 self.clock = 0.0;
-                let mut rng = rand::thread_rng();
-                self.settings_manager.seed = rng.gen();
+                let mut rng = rand::rng();
+                self.settings_manager.seed = rng.random();
                 for player in &mut self.local_players {
                     player.reset(self.settings_manager.seed);
                 }

@@ -2,7 +2,7 @@
 #![doc = simple_mermaid::mermaid!("tetromino_generator.mmd")]
 
 use super::{Tetromino, TetrominoKind};
-use rand::seq::SliceRandom;
+use rand::seq::{IndexedRandom, SliceRandom};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
@@ -83,8 +83,8 @@ impl BagType {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand_pcg::Pcg32;
     use rand::SeedableRng;
+    use rand_pcg::Pcg32;
     use rstest::rstest;
 
     #[rstest]
