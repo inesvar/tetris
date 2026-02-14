@@ -258,8 +258,8 @@ mod tests {
     #[rstest]
     #[case(TetrisPlayer::compact(&mut MockRng::default(), BagType::NoBag), concat!(
             "---------\n",
-            "   YY    \n",
-            "   YY    \n",
+            "   OO    \n",
+            "   OO    \n",
             "---------\n",
             "         \n",
             "         \n",
@@ -271,8 +271,8 @@ mod tests {
         ))]
     #[case(TetrisPlayer::new(&mut MockRng::default(), BagType::NoBag, TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::COMPACT_NB_MATRIX_ROWS, TetrisGrid::COMPACT_NB_BUFFER_ROWS), concat!(
             "----------\n",
-            "    YY    \n",
-            "    YY    \n",
+            "    OO    \n",
+            "    OO    \n",
             "----------\n",
             "          \n",
             "          \n",

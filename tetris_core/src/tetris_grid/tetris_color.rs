@@ -20,13 +20,13 @@ pub enum TetrisColor {
 impl fmt::Display for TetrisColor {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let str = match self {
-            Self::Cyan => "C",
-            Self::Yellow => "Y",
-            Self::Purple => "P",
-            Self::Blue => "B",
-            Self::Orange => "O",
-            Self::Green => "G",
-            Self::Red => "R",
+            Self::Cyan => "I",
+            Self::Yellow => "O",
+            Self::Purple => "T",
+            Self::Blue => "L",
+            Self::Orange => "J",
+            Self::Green => "S",
+            Self::Red => "Z",
             Self::Grey => "X",
         };
         write!(f, "{str}")
@@ -38,13 +38,13 @@ impl TryFrom<char> for TetrisColor {
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
-            'C' => Ok(Self::Cyan),
-            'Y' => Ok(Self::Yellow),
-            'P' => Ok(Self::Purple),
-            'B' => Ok(Self::Blue),
-            'O' => Ok(Self::Orange),
-            'G' => Ok(Self::Green),
-            'R' => Ok(Self::Red),
+            'I' => Ok(Self::Cyan),
+            'O' => Ok(Self::Yellow),
+            'T' => Ok(Self::Purple),
+            'L' => Ok(Self::Blue),
+            'J' => Ok(Self::Orange),
+            'S' => Ok(Self::Green),
+            'Z' => Ok(Self::Red),
             'X' => Ok(Self::Grey),
             _ => Err(()),
         }
