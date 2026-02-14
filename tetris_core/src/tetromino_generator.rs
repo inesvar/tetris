@@ -83,8 +83,7 @@ impl BagType {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::SeedableRng;
-    use rand_pcg::Pcg32;
+    use crate::MockRng;
     use rstest::rstest;
 
     #[rstest]
@@ -108,7 +107,7 @@ mod tests {
     ) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        bag.draw_new_bag(&mut Pcg32::seed_from_u64(0));
+        bag.draw_new_bag(&mut MockRng::default());
 
         assert!(!bag.tetrominos.is_empty());
         assert_eq!(bag.tetrominos.len(), bag_size);
@@ -121,7 +120,7 @@ mod tests {
     fn get_doesnt_panic_after_new(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        bag.get(&mut Pcg32::seed_from_u64(0));
+        bag.get(&mut MockRng::default());
     }
 
     #[rstest]
@@ -131,16 +130,16 @@ mod tests {
     fn get_chunk_doesnt_panic_when_chunk_is_very_big(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        bag.get_chunk(&mut Pcg32::seed_from_u64(0), 50);
+        bag.get_chunk(&mut MockRng::default(), 50);
     }
 
     #[rstest]
     #[case::bag7(BagType::Bag7)]
     #[case::bag14(BagType::Bag14)]
-    fn get_chunk_14_with_classic_bag_types_is_correct(#[case] bag_type: BagType) {
+    fn get_chunk_14_returns_2_occurences_of_each_type(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        let tetrominos = bag.get_chunk(&mut Pcg32::seed_from_u64(0), 14);
+        let tetrominos = bag.get_chunk(&mut MockRng::default(), 14);
 
         for kind in TetrominoKind::ALL {
             assert_eq!(tetrominos.iter().filter(|&t| t.kind() == kind).count(), 2);
@@ -152,10 +151,24 @@ mod tests {
     fn get_chunk_7_with_bag_type_7_is_correct(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        let tetrominos = bag.get_chunk(&mut Pcg32::seed_from_u64(0), 7);
+        let tetrominos = bag.get_chunk(&mut MockRng::default(), 7);
 
         for kind in TetrominoKind::ALL {
             assert_eq!(tetrominos.iter().filter(|&t| t.kind() == kind).count(), 1);
         }
+    }
+
+    #[rstest]
+    #[case::tetromino_kind_o(&mut MockRng::default(), vec![TetrominoKind::ALL[0]; 7])]
+    #[case::tetromino_kind_all(&mut MockRng::new(vec![u32::MAX]), vec![TetrominoKind::ALL[6]; 7])]
+    fn draw_new_bag_when_no_bag_is_correct(
+        #[case] rng: &mut MockRng,
+        #[case] expected: Vec<TetrominoKind>,
+    ) {
+        let mut bag = TetrominoGenerator::new(BagType::NoBag);
+
+        bag.draw_new_bag(rng);
+
+        assert_eq!(bag.tetrominos, expected);
     }
 }

@@ -12,8 +12,8 @@
 //! # Examples
 //!
 //! ```
-//! # use tetris_core::{TetrisPlayer, TetrisCommand};
-//! let mut rng = Pcg32::seed_from_u64(0);
+//! # use tetris_core::{TetrisPlayer, TetrisCommand, TetrominoMove, MockRng};
+//! # let mut rng = MockRng::default();
 //! let mut player = TetrisPlayer::new(&mut rng);
 //! player.start();
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng);
@@ -50,4 +50,5 @@ pub use tetris_grid::{TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS};
 pub use tetris_player::TetrisPlayer;
 pub use tetromino::{Position, Tetromino};
 // currently unused, TODO: propose different constructors for TetrisPlayer
+pub use circular_buffer::MockRng;
 pub use tetromino_generator::BagType;

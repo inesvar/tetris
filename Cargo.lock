@@ -2641,7 +2641,6 @@ name = "tetris_core"
 version = "0.1.0"
 dependencies = [
  "rand 0.10.0",
- "rand_pcg",
  "rstest",
  "serde",
  "simple-mermaid",

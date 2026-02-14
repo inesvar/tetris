@@ -1,6 +1,8 @@
 //! Define [CircularBuffer] and methods to use it.
 use core::fmt::{Debug, Display};
+use rand::TryRng;
 use serde::{Deserialize, Serialize};
+use std::convert::Infallible;
 use std::fmt::Formatter;
 
 /// Push back pop front circular buffer.
@@ -10,6 +12,8 @@ pub struct CircularBuffer<T: Debug> {
     begin: usize,
     size: usize,
 }
+
+pub type MockRng = CircularBuffer<u32>;
 
 impl<T: Debug> Display for CircularBuffer<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -53,6 +57,46 @@ impl<T: Debug> CircularBuffer<T> {
         } else {
             None
         }
+    }
+}
+
+impl MockRng {
+    fn next(&mut self) -> u32 {
+        let next = self.array[self.begin];
+        self.begin = (self.begin + 1) % self.array.len();
+        next
+    }
+}
+
+impl Default for MockRng {
+    fn default() -> Self {
+        Self {
+            array: vec![0],
+            begin: 0,
+            size: 1,
+        }
+    }
+}
+
+impl TryRng for MockRng {
+    type Error = Infallible;
+
+    fn try_next_u32(&mut self) -> Result<u32, Self::Error> {
+        Ok(self.next())
+    }
+
+    fn try_next_u64(&mut self) -> Result<u64, Self::Error> {
+        let high = self.next() as u64;
+        let low = self.next() as u64;
+        Ok(high << 32 | low)
+    }
+
+    // This is a naive implementation : it's only for tests.
+    fn try_fill_bytes(&mut self, dst: &mut [u8]) -> Result<(), Self::Error> {
+        for i in dst {
+            *i = self.next() as u8;
+        }
+        Ok(())
     }
 }
 
@@ -122,5 +166,12 @@ mod tests {
         assert_eq!(buffer.begin, 0, "{}", buffer);
         buffer.get_back_push_front(&mut replacement);
         assert_eq!(buffer.get(0), Some(&buffer.size), "{}", buffer);
+    }
+
+    #[test]
+    fn default_mock_rng_next_is_correct() {
+        let mut mock = MockRng::default();
+        assert_eq!(mock.next(), 0);
+        assert_eq!(mock.next(), 0);
     }
 }

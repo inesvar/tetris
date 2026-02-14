@@ -3,7 +3,7 @@ use super::{
     CircularBuffer, GameOverError, TetrisGrid, TetrisResult, Tetromino, TetrominoGenerator,
     TetrominoMove,
 };
-use rand_pcg::Pcg32;
+use rand::Rng;
 use serde::Deserialize;
 use std::cell::RefCell;
 
@@ -82,7 +82,7 @@ impl From<TetrominoMove> for TetrisCommand {
 
 impl TetrisPlayer {
     /// Creates a [TetrisPlayer], using `rng` to generate the first tetrominos.
-    pub fn new(rng: &mut Pcg32) -> Self {
+    pub fn new<R: Rng>(rng: &mut R) -> Self {
         let grid = TetrisGrid::default();
         let mut tetromino_bag = TetrominoGenerator::default();
         let active_tetromino = tetromino_bag.get(rng);
@@ -104,7 +104,7 @@ impl TetrisPlayer {
 
     /// Replace the active tetromino by a tetromino from the next queue and return
     /// the previously active tetromino.
-    fn replace_active_tetromino(&mut self, rng: &mut Pcg32) -> Tetromino {
+    fn replace_active_tetromino<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
         let mut swap = self.tetromino_bag.get(rng);
         self.next_queue.get_front_push_back(&mut swap);
         std::mem::swap(&mut self.tetromino_in_play, &mut swap);
@@ -114,7 +114,7 @@ impl TetrisPlayer {
 
     /// Replace the active tetromino by the saved tetromino if it exists (or by a tetromino
     /// from the next queue) and return the previously active tetromino.
-    fn replace_active_tetromino_using_stash(&mut self, rng: &mut Pcg32) -> Tetromino {
+    fn replace_active_tetromino_using_stash<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
         if let Some(mut swap) = self.hold_queue.take() {
             std::mem::swap(&mut swap, &mut self.tetromino_in_play);
             swap
@@ -123,7 +123,7 @@ impl TetrisPlayer {
         }
     }
 
-    fn stash(&mut self, rng: &mut Pcg32) -> TetrisResult {
+    fn stash<R: Rng>(&mut self, rng: &mut R) -> TetrisResult {
         let mut previously_active = self.replace_active_tetromino_using_stash(rng);
         previously_active.reset();
         self.hold_queue = Some(previously_active);
@@ -135,7 +135,7 @@ impl TetrisPlayer {
         self.score += new_completed_lines;
     }
 
-    fn lock_down(&mut self, rng: &mut Pcg32) -> TetrisResult {
+    fn lock_down<R: Rng>(&mut self, rng: &mut R) -> TetrisResult {
         let previously_active = self.replace_active_tetromino(rng);
 
         let new_completed_lines = previously_active.lock_down(&mut self.matrix)?;
@@ -170,10 +170,10 @@ impl TetrisPlayer {
     /// otherwise returns whether the [TetrisPlayer::tetromino_in_play] was moved or not.
     ///
     /// Refer to [TetrisCommand] documentation for more detail.
-    pub fn try_apply(
+    pub fn try_apply<R: Rng>(
         &mut self,
         order: TetrisCommand,
-        rng: &mut Pcg32,
+        rng: &mut R,
     ) -> Result<bool, GameOverError> {
         match order {
             TetrisCommand::Move(TetrominoMove::HardDrop) => {
