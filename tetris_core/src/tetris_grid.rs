@@ -8,6 +8,7 @@ use rand::RngExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::ops::Index;
+use std::str::FromStr;
 pub use tetris_color::TetrisColor;
 
 /// A reasonable maximum for "small unsigned numbers".
@@ -384,6 +385,17 @@ impl Index<&Position> for TetrisGrid {
     }
 }
 
+/// Tetris grid according to the **Tetris Guideline**.
+impl Default for TetrisGrid {
+    fn default() -> Self {
+        Self::new(
+            Self::DEFAULT_NB_COLUMNS,
+            Self::DEFAULT_NB_MATRIX_ROWS,
+            Self::DEFAULT_NB_BUFFER_ROWS,
+        )
+    }
+}
+
 impl Display for TetrisGrid {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let separator = "-".repeat(self.nb_columns as usize);
@@ -411,16 +423,76 @@ impl TetrisGrid {
     const DEFAULT_NB_COLUMNS: u32 = 10;
     const DEFAULT_NB_MATRIX_ROWS: u32 = 20;
     const DEFAULT_NB_BUFFER_ROWS: u32 = 20;
+
+    const COMPACT_NB_COLUMNS: u32 = 9;
+    const COMPACT_NB_MATRIX_ROWS: u32 = 6;
+    const COMPACT_NB_BUFFER_ROWS: u32 = 2;
+
+    pub fn compact_new() -> Self {
+        // smallest possible with the formatter playing nice
+        Self::new(
+            TetrisGrid::COMPACT_NB_COLUMNS,
+            TetrisGrid::COMPACT_NB_MATRIX_ROWS,
+            TetrisGrid::COMPACT_NB_BUFFER_ROWS,
+        )
+    }
 }
 
-/// Tetris grid according to the **Tetris Guideline**.
-impl Default for TetrisGrid {
-    fn default() -> Self {
-        Self::new(
-            Self::DEFAULT_NB_COLUMNS,
-            Self::DEFAULT_NB_MATRIX_ROWS,
-            Self::DEFAULT_NB_BUFFER_ROWS,
-        )
+impl FromStr for TetrisGrid {
+    type Err = String;
+
+    /// # Panics
+    ///
+    /// See [TetrisGrid::new].
+    fn from_str(string: &str) -> Result<Self, Self::Err> {
+        let lines: Vec<&str> = string.split_terminator('\n').collect();
+
+        let nb_columns = lines[0].len();
+        if !lines.iter().all(|line| line.len() == nb_columns) {
+            return Err(format!(
+                "Lines should have equal length.\nlines: {:?}",
+                lines
+            ));
+        }
+
+        let mut iter = lines.split(|line| line.chars().all(|char| char == '-'));
+
+        let Some(buffer) = iter.nth(1) else {
+            return Err(format!(
+                "There should be 3 lines of '-'.\nlines: {:?}",
+                lines
+            ));
+        };
+        let Some(matrix) = iter.next() else {
+            return Err(format!(
+                "There should be 3 lines of '-'.\nlines: {:?}",
+                lines
+            ));
+        };
+
+        let nb_matrix_rows = matrix.len();
+        let nb_buffer_rows = buffer.len();
+        let mut tetris_grid = TetrisGrid::new(
+            nb_columns as u32,
+            nb_matrix_rows as u32,
+            nb_buffer_rows as u32,
+        );
+
+        let cells = [buffer, matrix].concat();
+
+        for (row, line) in cells.iter().rev().enumerate() {
+            let pos_y = tetris_grid.convert_grid_y_to_position_y(row as i32);
+
+            for (pos_x, cell) in line.char_indices() {
+                let pos = Position::new(pos_x as i32, pos_y);
+
+                if let Ok(tetris_color) = cell.try_into() {
+                    tetris_grid.add_block(&pos, tetris_color);
+                }
+            }
+        }
+
+        Ok(tetris_grid)
     }
 }
 
@@ -429,56 +501,8 @@ mod tests {
     use super::*;
     use rstest::{fixture, rstest};
 
-    impl TetrisGrid {
-        const COMPACT_NB_COLUMNS: u32 = 9;
-        const COMPACT_NB_MATRIX_ROWS: u32 = 6;
-        const COMPACT_NB_BUFFER_ROWS: u32 = 2;
-
-        fn compact_new() -> Self {
-            // smallest possible with the formatter playing nice
-            Self::new(
-                TetrisGrid::COMPACT_NB_COLUMNS,
-                TetrisGrid::COMPACT_NB_MATRIX_ROWS,
-                TetrisGrid::COMPACT_NB_BUFFER_ROWS,
-            )
-        }
-
-        fn from_str(string: &str) -> Self {
-            let lines: Vec<&str> = string.split('\n').collect();
-            let mut iter = lines.split(|line| line.contains("-"));
-
-            let buffer = iter.nth(1).unwrap();
-            let matrix = iter.next().unwrap();
-
-            let nb_matrix_rows = matrix.len();
-            let nb_buffer_rows = buffer.len();
-            let nb_columns = matrix[0].len();
-            let mut tetris_grid = TetrisGrid::new(
-                nb_columns as u32,
-                nb_matrix_rows as u32,
-                nb_buffer_rows as u32,
-            );
-
-            let cells = [buffer, matrix].concat();
-
-            for (row, line) in cells.iter().rev().enumerate() {
-                let pos_y = tetris_grid.convert_grid_y_to_position_y(row as i32);
-
-                for (pos_x, cell) in line.char_indices() {
-                    let pos = Position::new(pos_x as i32, pos_y);
-
-                    if let Ok(tetris_color) = cell.try_into() {
-                        tetris_grid.add_block(&pos, tetris_color);
-                    }
-                }
-            }
-
-            tetris_grid
-        }
-    }
-
     #[test]
-    fn TETRIS_GRID_MAX_is_safe_to_cast() {
+    fn tetris_grid_max_is_safe_to_cast() {
         assert!(i32::try_from(TETRIS_GRID_MAX).is_ok());
         assert!(usize::try_from(TETRIS_GRID_MAX).is_ok());
     }
@@ -552,6 +576,31 @@ mod tests {
         TetrisGrid::compact_new().to_string()
     }
 
+    #[fixture]
+    fn empty_default_grid() -> String {
+        TetrisGrid::default().to_string()
+    }
+
+    #[rstest]
+    #[case::empty_compact_grid(&empty_compact_grid())]
+    #[case::empty_default_grid(&empty_default_grid())]
+    #[case::large_grid(concat!(
+            "--------------\n",
+            "              \n",
+            "              \n",
+            "--------------\n",
+            "              \n",
+            "              \n",
+            "              \n",
+            "    XX        \n",
+            " X  XXXXX     \n",
+            "XXXXXXXXX     \n",
+            "--------------\n",
+        ))]
+    fn from_str_is_successful_when_input_well_formed(#[case] grid: &str) {
+        assert!(TetrisGrid::from_str(grid).is_ok());
+    }
+
     #[rstest]
     fn reset_is_empty(#[from(empty_compact_grid)] expected: String) {
         let mut grid = TetrisGrid::from_str(concat!(
@@ -566,7 +615,8 @@ mod tests {
             "      XXX\n",
             "    XXXXX\n",
             "---------\n",
-        ));
+        ))
+        .unwrap();
 
         grid.reset();
 
@@ -587,7 +637,8 @@ mod tests {
             "XX       \n",
             "XXX      \n",
             "---------\n",
-        ));
+        ))
+        .unwrap();
 
         assert!(grid.add_garbage_row(0).is_ok());
         assert!(grid.add_garbage_row(1).is_ok());
@@ -627,7 +678,8 @@ mod tests {
             "        X\n",
             "        X\n",
             "---------\n",
-        ));
+        ))
+        .unwrap();
 
         assert!(grid.add_garbage_row(0).is_ok());
         assert!(grid.add_garbage_row(0).is_ok());
@@ -675,7 +727,8 @@ mod tests {
             "         \n",
             "X       X\n",
             "---------\n",
-        ));
+        ))
+        .unwrap();
 
         assert!(grid.is_block_empty(&Position::new(0, 0)));
         assert!(!grid.is_block_empty(&Position::new(8, 0)));
@@ -744,7 +797,8 @@ mod tests {
             "X X XX XX X X\n",
             "XXXXXXXXXXXXX\n",
             "-------------\n",
-        ));
+        ))
+        .unwrap();
 
         tetris_grid.pop_row(3);
 
