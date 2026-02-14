@@ -8,9 +8,8 @@ use std::fmt::Formatter;
 /// Push back pop front circular buffer.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CircularBuffer<T: Debug> {
-    array: Vec<T>,
+    vec: Vec<T>,
     begin: usize,
-    size: usize,
 }
 
 pub type MockRng = CircularBuffer<u32>;
@@ -18,8 +17,8 @@ pub type MockRng = CircularBuffer<u32>;
 impl<T: Debug> Display for CircularBuffer<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "begin {}, content", self.begin)?;
-        for i in 0..self.size {
-            write!(f, " {:?}", self.array[i])?;
+        for elem in &self.vec {
+            write!(f, " {elem:?}")?;
         }
         Ok(())
     }
@@ -28,32 +27,30 @@ impl<T: Debug> Display for CircularBuffer<T> {
 impl<T: Debug> CircularBuffer<T> {
     /// Construct a new circular buffer of size K for type T.
     pub(super) fn new(array: Vec<T>) -> Self {
-        let size = array.len();
         CircularBuffer::<T> {
-            array,
+            vec: array,
             begin: 0,
-            size,
         }
     }
 
     pub(super) fn get_front_push_back(&mut self, replacement: &mut T) {
-        std::mem::swap(replacement, &mut self.array[self.begin]);
+        std::mem::swap(replacement, &mut self.vec[self.begin]);
         self.begin += 1;
-        self.begin %= self.size;
+        self.begin %= self.vec.len();
     }
 
     #[cfg(test)]
     pub(super) fn get_back_push_front(&mut self, replacement: &mut T) {
-        self.begin += self.size - 1;
-        self.begin %= self.size;
-        std::mem::swap(replacement, &mut self.array[self.begin]);
+        self.begin += self.vec.len() - 1;
+        self.begin %= self.vec.len();
+        std::mem::swap(replacement, &mut self.vec[self.begin]);
     }
 
     /// Get the i-th element in the buffer.
     pub fn get(&self, i: usize) -> Option<&T> {
         //println!("getting {i} from {}", self);
-        if i < self.size {
-            Some(&self.array[(self.begin + i) % self.size])
+        if i < self.vec.len() {
+            Some(&self.vec[(self.begin + i) % self.vec.len()])
         } else {
             None
         }
@@ -62,8 +59,8 @@ impl<T: Debug> CircularBuffer<T> {
 
 impl MockRng {
     fn next(&mut self) -> u32 {
-        let next = self.array[self.begin];
-        self.begin = (self.begin + 1) % self.array.len();
+        let next = self.vec[self.begin];
+        self.begin = (self.begin + 1) % self.vec.len();
         next
     }
 }
@@ -71,9 +68,8 @@ impl MockRng {
 impl Default for MockRng {
     fn default() -> Self {
         Self {
-            array: vec![0],
+            vec: vec![0],
             begin: 0,
-            size: 1,
         }
     }
 }
@@ -123,49 +119,47 @@ mod tests {
     #[case(CircularBuffer::new(vec![0, 1, 2, 3, 4]))]
     #[case(CircularBuffer::new(vec![0, 1, 2, 3]))]
     fn get_is_correct(#[case] buffer: CircularBuffer<usize>) {
-        for i in 0..buffer.size {
+        let size = buffer.vec.len();
+        for i in 0..size {
             assert_eq!(buffer.get(i), Some(&i));
         }
-        assert_eq!(buffer.get(buffer.size), None);
+        assert_eq!(buffer.get(size), None);
     }
 
     #[rstest]
     #[case(CircularBuffer::new(vec![55, 22, 33]))]
     #[case(CircularBuffer::new(vec![44, 66, 0, 88]))]
     fn get_front_push_back_is_correct(#[case] mut buffer: CircularBuffer<usize>) {
+        let size = buffer.vec.len();
         let mut replacement;
-        for i in 0..buffer.size {
+        for i in 0..size {
             replacement = i;
             assert_eq!(buffer.begin, i, "{}", buffer);
             buffer.get_front_push_back(&mut replacement);
-            assert_eq!(buffer.get(buffer.size - 1), Some(&i), "{}", buffer);
+            assert_eq!(buffer.get(size - 1), Some(&i), "{}", buffer);
         }
-        replacement = buffer.size;
+        replacement = size;
         assert_eq!(buffer.begin, 0, "{}", buffer);
         buffer.get_front_push_back(&mut replacement);
-        assert_eq!(
-            buffer.get(buffer.size - 1),
-            Some(&buffer.size),
-            "{}",
-            buffer
-        );
+        assert_eq!(buffer.get(size - 1), Some(&size), "{}", buffer);
     }
 
     #[rstest]
     #[case(CircularBuffer::new(vec![55, 22, 33]))]
     #[case(CircularBuffer::new(vec![44, 66, 0, 88]))]
     fn get_back_push_front_is_correct(#[case] mut buffer: CircularBuffer<usize>) {
+        let size = buffer.vec.len();
         let mut replacement;
-        for i in 0..buffer.size {
+        for i in 0..size {
             replacement = i;
-            assert_eq!(buffer.begin, (buffer.size - i) % buffer.size, "{}", buffer);
+            assert_eq!(buffer.begin, (size - i) % size, "{}", buffer);
             buffer.get_back_push_front(&mut replacement);
             assert_eq!(buffer.get(0), Some(&i), "{}", buffer);
         }
-        replacement = buffer.size;
+        replacement = size;
         assert_eq!(buffer.begin, 0, "{}", buffer);
         buffer.get_back_push_front(&mut replacement);
-        assert_eq!(buffer.get(0), Some(&buffer.size), "{}", buffer);
+        assert_eq!(buffer.get(0), Some(&size), "{}", buffer);
     }
 
     #[test]
