@@ -15,7 +15,7 @@ pub enum TetrominoKind {
 }
 
 impl TetrominoKind {
-    pub(crate) const ALL: [Self; 7] = [
+    pub const ALL: [Self; 7] = [
         Self::O,
         Self::I,
         Self::T,

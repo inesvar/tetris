@@ -163,9 +163,10 @@ mod tests {
     }
 
     #[rstest]
-    #[case::tetromino_kind_o(&mut MockRng::default(), vec![TetrominoKind::ALL[0]; 7])]
-    #[case::tetromino_kind_all(&mut MockRng::new(vec![u32::MAX]), vec![TetrominoKind::ALL[6]; 7])]
-    fn draw_new_bag_when_no_bag_is_correct(
+    #[case::tetromino_kind_o(&mut MockRng::new(vec![TetrominoKind::O]), vec![TetrominoKind::O; 7])]
+    #[case::tetromino_kind_t(&mut MockRng::new(vec![TetrominoKind::T]), vec![TetrominoKind::T; 7])]
+    #[case::tetromino_kind_all(&mut MockRng::new(Vec::from(TetrominoKind::ALL)), Vec::from(TetrominoKind::ALL))]
+    fn draw_new_bag_using_no_bag_and_mock_rng_is_correct(
         #[case] rng: &mut MockRng,
         #[case] expected: Vec<TetrominoKind>,
     ) {

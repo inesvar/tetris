@@ -1,4 +1,5 @@
 //! Define [CircularBuffer] and methods to use it.
+use super::TetrominoKind;
 use core::fmt::{Debug, Display};
 use rand::TryRng;
 use serde::{Deserialize, Serialize};
@@ -12,7 +13,25 @@ pub struct CircularBuffer<T: Debug> {
     begin: usize,
 }
 
-pub type MockRng = CircularBuffer<u32>;
+/// Implements [TryRng], designed so that using
+/// [rand::seq::IndexedRandom::choose] on [TetrominoKind::ALL] will generate the values
+/// that [MockRng] was constructed with.
+///
+/// # Examples
+///
+/// ```
+/// # use tetris_core::{MockRng, TetrominoKind};
+/// # use rand::seq::IndexedRandom;
+/// let values = vec![TetrominoKind::T, TetrominoKind::L, TetrominoKind::Z];
+/// let mut mock = MockRng::new(values.clone());
+///
+/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[0]);
+/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[1]);
+/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[2]);
+/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[0]);
+/// // etc.
+/// ```
+pub type MockRng = CircularBuffer<TetrominoKind>;
 
 impl<T: Debug> Display for CircularBuffer<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -26,7 +45,7 @@ impl<T: Debug> Display for CircularBuffer<T> {
 
 impl<T: Debug> CircularBuffer<T> {
     /// Construct a new circular buffer of size K for type T.
-    pub(super) fn new(array: Vec<T>) -> Self {
+    pub fn new(array: Vec<T>) -> Self {
         CircularBuffer::<T> {
             vec: array,
             begin: 0,
@@ -58,17 +77,26 @@ impl<T: Debug> CircularBuffer<T> {
 }
 
 impl MockRng {
+    // Little retro-engineering of `rand::seq::IndexedRandom::choose` on `TetrominoKind::ALL`.
     fn next(&mut self) -> u32 {
-        let next = self.vec[self.begin];
+        let next_kind = self.vec[self.begin];
         self.begin = (self.begin + 1) % self.vec.len();
-        next
+
+        let next = TetrominoKind::ALL
+            .iter()
+            .position(|kind| *kind == next_kind)
+            .expect("All TetrominoKind variants should be in TetrominoKind::ALL")
+            as u32;
+
+        (next + 1) << 29
     }
 }
 
 impl Default for MockRng {
+    /// Creates a [MockRng] generating `vec![TetrominoKind::O]`.
     fn default() -> Self {
         Self {
-            vec: vec![0],
+            vec: vec![TetrominoKind::O],
             begin: 0,
         }
     }
@@ -99,6 +127,7 @@ impl TryRng for MockRng {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::seq::IndexedRandom;
     use rstest::rstest;
 
     #[rstest]
@@ -162,10 +191,34 @@ mod tests {
         assert_eq!(buffer.get(0), Some(&size), "{}", buffer);
     }
 
-    #[test]
-    fn default_mock_rng_next_is_correct() {
-        let mut mock = MockRng::default();
-        assert_eq!(mock.next(), 0);
-        assert_eq!(mock.next(), 0);
+    #[rstest]
+    #[case::o(TetrominoKind::O, 0x20000000)]
+    #[case::i(TetrominoKind::I, 0x40000000)]
+    #[case::t(TetrominoKind::T, 0x60000000)]
+    #[case::l(TetrominoKind::L, 0x80000000)]
+    #[case::j(TetrominoKind::J, 0xa0000000)]
+    #[case::s(TetrominoKind::S, 0xc0000000)]
+    #[case::z(TetrominoKind::Z, 0xe0000000)]
+    fn mock_rng_next_is_correct_when_there_is_one_element(
+        #[case] kind: TetrominoKind,
+        #[case] expected: u32,
+    ) {
+        let mut mock = MockRng::new(vec![kind]);
+        assert_eq!(TetrominoKind::ALL.choose(&mut mock), Some(&kind));
+        assert_eq!(mock.next(), expected);
+    }
+
+    #[rstest]
+    #[case::tetromino_kind_all(Vec::from(TetrominoKind::ALL))]
+    #[case::tetromino_kind_t_l_j(TetrominoKind::ALL[2..5].to_vec())]
+    fn mock_rng_next_is_correct(#[case] values: Vec<TetrominoKind>) {
+        let mut mock = MockRng::new(values.clone());
+
+        let generated_values = Vec::from_iter(
+            std::iter::repeat_with(|| *TetrominoKind::ALL.choose(&mut mock).unwrap())
+                .take(values.len()),
+        );
+
+        assert_eq!(generated_values, values);
     }
 }

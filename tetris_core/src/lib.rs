@@ -1,19 +1,23 @@
-#![doc = simple_mermaid::mermaid!("tetris_core.mmd")]
 //! This library crate provides core functionalities for a tetris game,
 //! the aim is to follow the **Tetris Guideline** as closely as possible.
 //!
 //! The crate namely provides `struct` [TetrisPlayer] and `enum` [TetrisCommand],
 //! which can be used by a tetris engine to implement the tetris game.
 //! This crate has no notion of time, it's pure logic (no OS interaction).
+//! This crate doesn't use a proper random generator, the tetris engine is
+//! expected to provide a random generator (this crate provides
+//! `struct` [MockRng] for test and doc purposes).
 //!
 //! [TetrisPlayer] is serializable and can be sent through the network
 //! to implement multi-player tetris games.
 //!
+#![doc = simple_mermaid::mermaid!("tetris_core.mmd")]
+//!
 //! # Examples
 //!
 //! ```
-//! # use tetris_core::{TetrisPlayer, TetrisCommand, TetrominoMove, MockRng, BagType};
-//! # let mut rng = MockRng::default();
+//! # use tetris_core::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
+//! # let mut rng = MockRng::new(Vec::from(TetrominoKind::ALL));
 //! let mut player = TetrisPlayer::default(&mut rng, BagType::default());
 //! player.start();
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng);
@@ -38,7 +42,6 @@ mod tetromino;
 mod tetromino_generator;
 
 pub(crate) use circular_buffer::CircularBuffer;
-pub(crate) use tetromino::TetrominoKind;
 pub(crate) use tetromino_generator::TetrominoGenerator;
 
 // used to update the active tetromino
@@ -48,7 +51,7 @@ pub use tetromino::TetrominoMove;
 // used to render the TetrisPlayer
 pub use tetris_grid::{TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS};
 pub use tetris_player::TetrisPlayer;
-pub use tetromino::{Position, Tetromino};
+pub use tetromino::{Position, Tetromino, TetrominoKind};
 // currently unused, TODO: propose different constructors for TetrisPlayer
 pub use circular_buffer::MockRng;
 pub use tetromino_generator::BagType;

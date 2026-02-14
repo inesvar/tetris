@@ -1,7 +1,6 @@
 graph LR
     %% objects
     BagType[BagType]
-    TetrominoMove[TetrominoMove]
     TetrisGrid[[TetrisGrid]]
     GameOverError[GameOverError]
     TetrisResult[TetrisResult]
@@ -10,6 +9,9 @@ graph LR
     TetrisColor[TetrisColor]
     TetrisPlayer[[TetrisPlayer]]
     TetrisCommand[TetrisCommand]
+    TetrominoKind[TetrominoKind]
+    MockRng[[MockRng]]
+    TetrominoMove[TetrominoMove]
 
     subgraph tetris_player
         TetrisPlayer
@@ -17,8 +19,22 @@ graph LR
     end
     TetrisPlayer --o TetrisGrid
     TetrisPlayer --o Tetromino
-    TetrisCommand --o TetrominoMove
     TetrisPlayer --o BagType
+
+    subgraph circular_buffer
+        MockRng
+    end
+    MockRng --o TetrominoKind
+    Tetromino -.-> tetris_grid
+    TetrisGrid -.-> Position
+
+
+    subgraph tetromino
+        Tetromino --o Position
+        Tetromino --o TetrominoKind
+        TetrominoMove
+    end
+    TetrisCommand --o TetrominoMove
 
     subgraph tetromino_generator
         BagType
@@ -29,13 +45,6 @@ graph LR
         TetrisGrid -.-> TetrisResult
         TetrisResult --o GameOverError
         TetrisGrid --o TetrisColor
-    end
-    Tetromino -.-> tetris_grid
-    TetrisGrid -.-> Position
-
-    subgraph tetromino
-        TetrominoMove
-        Tetromino --o Position
     end
 
     style TetrisResult stroke-dasharray: 5 5;

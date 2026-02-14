@@ -48,6 +48,7 @@ pub struct TetrisGrid {
     line_sum: Vec<i32>,
 }
 
+/// `Ok(())` on success, [GameOverError] on fail.
 pub type TetrisResult = Result<(), GameOverError>;
 
 // same visibility as TetrisColor
