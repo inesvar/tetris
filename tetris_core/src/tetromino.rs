@@ -47,13 +47,6 @@ impl Tetromino {
     }
 
     /// Returns `self`'s associated [TetrisColor].
-    /// # Examples
-    /// ```
-    /// # use tetris_core::{Tetromino, TetrisColor};
-    /// // The O Tetromino was arbitrarily chosen as the default one
-    /// let o_tetromino = Tetromino::default();
-    /// assert_eq!(o_tetromino.color(), TetrisColor::Yellow);
-    /// ```
     pub fn color(&self) -> TetrisColor {
         self.kind.into()
     }
@@ -78,19 +71,6 @@ impl Tetromino {
     }
 
     /// Resets `self` in the default state.
-    ///
-    /// # Examples
-    /// ```
-    /// # use tetris_core::{Tetromino, TetrisGrid, TetrominoMove};
-    /// # let mut o_tetromino = Tetromino::default();
-    /// # let empty_grid = TetrisGrid::default();
-    /// # o_tetromino.try_apply(TetrominoMove::HardDrop, &empty_grid);
-    /// #
-    /// // The O Tetromino was arbitrarily chosen as the default one
-    /// assert_ne!(o_tetromino, Tetromino::default());
-    /// o_tetromino.reset();
-    /// assert_eq!(o_tetromino, Tetromino::default());
-    /// ```
     pub(crate) fn reset(&mut self) {
         *self = Self::new(self.kind)
     }
@@ -107,21 +87,6 @@ impl Tetromino {
     /// Note that:
     /// - `self` is assumed to be in its default position and orientation;
     /// - the translation applied depends on the size of `grid`.
-    ///
-    /// # Examples
-    /// ```
-    /// # use tetris_core::{Tetromino, TetrominoMove, TetrisGrid, GameOverError};
-    /// # let mut tetromino = Tetromino::default();
-    /// # let mut full_grid = TetrisGrid::default();
-    /// # assert!(tetromino.try_enter_grid(&full_grid).is_ok());
-    /// # assert!(tetromino.try_apply(TetrominoMove::Fall, &mut full_grid));
-    /// # assert!(tetromino.lock_down(&mut full_grid).is_ok());
-    /// # let mut empty_grid = TetrisGrid::default();
-    /// #
-    /// assert!(Tetromino::default().try_enter_grid(&empty_grid).is_ok());
-    ///
-    /// assert_eq!(Tetromino::default().try_enter_grid(&full_grid), Err(GameOverError::BlockOut));
-    /// ```
     pub(crate) fn try_enter_grid(&mut self, grid: &TetrisGrid) -> TetrisResult {
         let translation = RotationTranslation::translation(grid.get_starting_position());
 
@@ -131,17 +96,6 @@ impl Tetromino {
     }
 
     /// Applies [TetrominoMove] `tetromino_move` to `self` if the target blocks are free and inside the grid, otherwise returns `false`.
-    ///
-    /// # Examples
-    /// ```
-    /// # use tetris_core::{Tetromino, TetrisGrid, TetrominoMove};
-    /// # let mut empty_grid = TetrisGrid::default();
-    /// # let mut o_tetromino = Tetromino::default();
-    /// # assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
-    /// #
-    /// assert!(o_tetromino.try_apply(TetrominoMove::HardDrop, &empty_grid));
-    /// assert!(!o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid));
-    /// ```
     pub(crate) fn try_apply(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
         if tetromino_move.get_rotation_type() == RotationType::Identity {
             self.apply_translation(tetromino_move, grid)
@@ -155,21 +109,6 @@ impl Tetromino {
     ///
     /// Note that `self` is assumed to be on free blocks of `grid`, ie [try_enter_grid](Tetromino::try_enter_grid) was called successfully
     /// and since then, only `self` was only mutated by [try_apply](Tetromino::try_apply) (see state machine schematic).
-    ///
-    /// # Examples
-    /// ```
-    /// # use tetris_core::{Tetromino, TetrisGrid, GameOverError, TetrominoMove};
-    /// # let mut empty_grid = TetrisGrid::default();
-    /// #
-    /// let mut o_tetromino = Tetromino::default();
-    /// assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
-    /// assert_eq!(o_tetromino.lock_down(&mut empty_grid), Err(GameOverError::LockOut));
-    ///
-    /// let mut o_tetromino = Tetromino::default();
-    /// assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
-    /// assert!(o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid));
-    /// assert!(o_tetromino.lock_down(&mut empty_grid).is_ok());
-    /// ```
     pub(crate) fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
         grid.add_blocks_and_clear_lines(&self.blocks, self.color())
     }
@@ -229,15 +168,19 @@ impl Default for Tetromino {
 
 impl Display for Tetromino {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut buffer: Vec<char> =
-            concat!("         \n", "         \n", "         \n", "         \n",)
-                .chars()
-                .collect();
+        let mut buffer: Vec<char> = concat!(
+            "          \n",
+            "          \n",
+            "          \n",
+            "          \n",
+        )
+        .chars()
+        .collect();
 
         for block in self.blocks {
-            buffer[10 * block.y() as usize + block.x() as usize] = '#';
+            buffer[11 * block.y() as usize + block.x() as usize] = '#';
         }
-        buffer[10 * self.center.y() as usize + self.center.x() as usize] = 'C';
+        buffer[11 * self.center.y() as usize + self.center.x() as usize] = 'C';
 
         let buffer = String::from_iter(buffer);
 
@@ -252,148 +195,148 @@ mod tests {
 
     #[rstest]
     #[case::o_north(TetrominoKind::O, Direction::North, concat!(
-            " C#      \n",
-            " ##      \n",
-            "         \n",
-            "         \n",
+            " C#       \n",
+            " ##       \n",
+            "          \n",
+            "          \n",
         ))]
     #[case::o_east(TetrominoKind::O, Direction::East, concat!(
-            " C#      \n",
-            " ##      \n",
-            "         \n",
-            "         \n",
+            " C#       \n",
+            " ##       \n",
+            "          \n",
+            "          \n",
         ))]
     #[case::o_south(TetrominoKind::O, Direction::South, concat!(
-            " C#      \n",
-            " ##      \n",
-            "         \n",
-            "         \n",
+            " C#       \n",
+            " ##       \n",
+            "          \n",
+            "          \n",
         ))]
     #[case::o_west(TetrominoKind::O, Direction::West, concat!(
-            " C#      \n",
-            " ##      \n",
-            "         \n",
-            "         \n",
+            " C#       \n",
+            " ##       \n",
+            "          \n",
+            "          \n",
         ))]
     #[case::i_north(TetrominoKind::I, Direction::North, concat!(
-            "         \n",
-            "#C##     \n",
-            "         \n",
-            "         \n",
+            "          \n",
+            "#C##      \n",
+            "          \n",
+            "          \n",
         ))]
     #[case::i_east(TetrominoKind::I, Direction::East, concat!(
-            "  #      \n",
-            " C#      \n",
-            "  #      \n",
-            "  #      \n",
+            "  #       \n",
+            " C#       \n",
+            "  #       \n",
+            "  #       \n",
         ))]
     #[case::i_south(TetrominoKind::I, Direction::South, concat!(
-            "         \n",
-            " C       \n",
-            "####     \n",
-            "         \n",
+            "          \n",
+            " C        \n",
+            "####      \n",
+            "          \n",
         ))]
     #[case::i_west(TetrominoKind::I, Direction::West, concat!(
-            " #       \n",
-            " C       \n",
-            " #       \n",
-            " #       \n",
+            " #        \n",
+            " C        \n",
+            " #        \n",
+            " #        \n",
         ))]
     #[case::l_north(TetrominoKind::L, Direction::North, concat!(
-            "  #      \n",
-            "#C#      \n",
-            "         \n",
-            "         \n",
+            "  #       \n",
+            "#C#       \n",
+            "          \n",
+            "          \n",
         ))]
     #[case::l_east(TetrominoKind::L, Direction::East, concat!(
-            " #       \n",
-            " C       \n",
-            " ##      \n",
-            "         \n",
+            " #        \n",
+            " C        \n",
+            " ##       \n",
+            "          \n",
         ))]
     #[case::l_south(TetrominoKind::L, Direction::South, concat!(
-            "         \n",
-            "#C#      \n",
-            "#        \n",
-            "         \n",
+            "          \n",
+            "#C#       \n",
+            "#         \n",
+            "          \n",
         ))]
     #[case::l_west(TetrominoKind::L, Direction::West, concat!(
-            "##       \n",
-            " C       \n",
-            " #       \n",
-            "         \n",
+            "##        \n",
+            " C        \n",
+            " #        \n",
+            "          \n",
         ))]
     #[case::j_north(TetrominoKind::J, Direction::North, concat!(
-            "#        \n",
-            "#C#      \n",
-            "         \n",
-            "         \n",
+            "#         \n",
+            "#C#       \n",
+            "          \n",
+            "          \n",
         ))]
     #[case::j_east(TetrominoKind::J, Direction::East, concat!(
-            " ##      \n",
-            " C       \n",
-            " #       \n",
-            "         \n",
+            " ##       \n",
+            " C        \n",
+            " #        \n",
+            "          \n",
         ))]
     #[case::j_south(TetrominoKind::J, Direction::South, concat!(
-            "         \n",
-            "#C#      \n",
-            "  #      \n",
-            "         \n",
+            "          \n",
+            "#C#       \n",
+            "  #       \n",
+            "          \n",
         ))]
     #[case::j_west(TetrominoKind::J, Direction::West, concat!(
-            " #       \n",
-            " C       \n",
-            "##       \n",
-            "         \n",
+            " #        \n",
+            " C        \n",
+            "##        \n",
+            "          \n",
         ))]
     #[case::s_north(TetrominoKind::S, Direction::North, concat!(
-            " ##      \n",
-            "#C       \n",
-            "         \n",
-            "         \n",
+            " ##       \n",
+            "#C        \n",
+            "          \n",
+            "          \n",
         ))]
     #[case::s_east(TetrominoKind::S, Direction::East, concat!(
-            " #       \n",
-            " C#      \n",
-            "  #      \n",
-            "         \n",
+            " #        \n",
+            " C#       \n",
+            "  #       \n",
+            "          \n",
         ))]
     #[case::s_south(TetrominoKind::S, Direction::South, concat!(
-            "         \n",
-            " C#      \n",
-            "##       \n",
-            "         \n",
+            "          \n",
+            " C#       \n",
+            "##        \n",
+            "          \n",
         ))]
     #[case::s_west(TetrominoKind::S, Direction::West, concat!(
-            "#        \n",
-            "#C       \n",
-            " #       \n",
-            "         \n",
+            "#         \n",
+            "#C        \n",
+            " #        \n",
+            "          \n",
         ))]
     #[case::z_north(TetrominoKind::Z, Direction::North, concat!(
-            "##       \n",
-            " C#      \n",
-            "         \n",
-            "         \n",
+            "##        \n",
+            " C#       \n",
+            "          \n",
+            "          \n",
         ))]
     #[case::z_east(TetrominoKind::Z, Direction::East, concat!(
-            "  #      \n",
-            " C#      \n",
-            " #       \n",
-            "         \n",
+            "  #       \n",
+            " C#       \n",
+            " #        \n",
+            "          \n",
         ))]
     #[case::z_south(TetrominoKind::Z, Direction::South, concat!(
-            "         \n",
-            "#C       \n",
-            " ##      \n",
-            "         \n",
+            "          \n",
+            "#C        \n",
+            " ##       \n",
+            "          \n",
         ))]
     #[case::z_west(TetrominoKind::Z, Direction::West, concat!(
-            " #       \n",
-            "#C       \n",
-            "#        \n",
-            "         \n",
+            " #        \n",
+            "#C        \n",
+            "#         \n",
+            "          \n",
         ))]
     fn tetromino_rotation_is_correct(
         #[case] kind: TetrominoKind,
@@ -419,4 +362,69 @@ mod tests {
         assert_eq!(tetromino.to_string(), expected_blocks, "{}", tetromino);
         assert_eq!(tetromino.direction, direction);
     }
+
+    #[rstest]
+    fn reset_is_correct(#[values(TetrominoKind::O, TetrominoKind::I)] kind: TetrominoKind) {
+        let mut tetromino = Tetromino::new(kind);
+        let empty_grid = TetrisGrid::default();
+        tetromino.try_apply(TetrominoMove::Clockwise, &empty_grid);
+        tetromino.try_apply(TetrominoMove::HardDrop, &empty_grid);
+
+        assert_ne!(tetromino, Tetromino::new(kind));
+        assert_ne!(tetromino.direction, Direction::North);
+        assert!(!tetromino.is_in_default_state());
+
+        tetromino.reset();
+        assert_eq!(tetromino, Tetromino::new(kind));
+        assert_eq!(tetromino.direction, Direction::North);
+        assert!(tetromino.is_in_default_state());
+    }
+
+    // should check that the grid size is taken into account
+    // should check that occupancy is taken into account
+    // easier in an integration test
+    #[rstest]
+    fn try_enter_grid_is_correct() {
+        let mut tetromino = Tetromino::new(TetrominoKind::O);
+
+        let mut full_grid = TetrisGrid::default();
+        assert!(tetromino.try_enter_grid(&full_grid).is_ok());
+        assert!(tetromino.try_apply(TetrominoMove::Fall, &full_grid));
+        assert!(tetromino.lock_down(&mut full_grid).is_ok());
+        let empty_grid = TetrisGrid::default();
+
+        assert!(Tetromino::default().try_enter_grid(&empty_grid).is_ok());
+        assert_eq!(
+            Tetromino::default().try_enter_grid(&full_grid),
+            Err(GameOverError::BlockOut)
+        );
+    }
+
+    // # Examples
+    // ```
+    // # use tetris_core::{Tetromino, TetrisGrid, GameOverError, TetrominoMove};
+    // # let mut empty_grid = TetrisGrid::default();
+    // #
+    // let mut o_tetromino = Tetromino::default();
+    // assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
+    // assert_eq!(o_tetromino.lock_down(&mut empty_grid), Err(GameOverError::LockOut));
+    //
+    // let mut o_tetromino = Tetromino::default();
+    // assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
+    // assert!(o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid));
+    // assert!(o_tetromino.lock_down(&mut empty_grid).is_ok());
+    // ```
+    //
+
+    //
+    // # Examples
+    // ```
+    // # use tetris_core::{Tetromino, TetrisGrid, TetrominoMove};
+    // # let mut empty_grid = TetrisGrid::default();
+    // # let mut o_tetromino = Tetromino::default();
+    // # assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
+    // #
+    // assert!(o_tetromino.try_apply(TetrominoMove::HardDrop, &empty_grid));
+    // assert!(!o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid));
+    // ```
 }

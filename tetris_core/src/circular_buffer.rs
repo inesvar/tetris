@@ -112,7 +112,7 @@ mod tests {
     #[case(CircularBuffer::new(vec![0, 1, 2, 3, 4]), "begin 0, content 0 1 2 3 4")]
     #[case(CircularBuffer::new(vec![3, 3, 3]), "begin 0, content 3 3 3")]
     fn display_is_correct(#[case] circ_array: CircularBuffer<i32>, #[case] expected: &str) {
-        assert_eq!(&circ_array.to_string(), expected);
+        assert_eq!(circ_array.to_string(), expected);
     }
 
     #[rstest]

@@ -79,3 +79,24 @@ impl From<TetrominoKind> for TetrisColor {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case::o(TetrominoKind::O, TetrisColor::Yellow)]
+    #[case::i(TetrominoKind::I, TetrisColor::Cyan)]
+    #[case::t(TetrominoKind::T, TetrisColor::Purple)]
+    #[case::l(TetrominoKind::L, TetrisColor::Orange)]
+    #[case::j(TetrominoKind::J, TetrisColor::Blue)]
+    #[case::s(TetrominoKind::S, TetrisColor::Green)]
+    #[case::z(TetrominoKind::Z, TetrisColor::Red)]
+    fn tetris_color_from_tetromino_kind_is_correct(
+        #[case] kind: TetrominoKind,
+        #[case] color: TetrisColor,
+    ) {
+        assert_eq!(TetrisColor::from(kind), color);
+    }
+}

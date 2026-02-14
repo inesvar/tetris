@@ -286,7 +286,7 @@ mod tests {
         player.start();
 
         assert_eq!(
-            &player.to_string(),
+            player.to_string(),
             expected,
             "player:\n{}, expected:\n{}",
             player,
