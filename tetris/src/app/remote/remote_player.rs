@@ -2,6 +2,7 @@ use super::MessageType;
 use crate::{
     app::{render_app::Render, GameFlowChange, Piston2dGraphicsArguments, TetrisPlayer},
     once,
+    settings::BAG_TYPE,
 };
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
@@ -20,7 +21,7 @@ pub struct RemotePlayer {
 impl RemotePlayer {
     pub fn new() -> Self {
         let mut rng = Pcg32::seed_from_u64(0);
-        let arc = Arc::new(Mutex::new(TetrisPlayer::new(&mut rng)));
+        let arc = Arc::new(Mutex::new(TetrisPlayer::default(&mut rng, BAG_TYPE)));
         RemotePlayer {
             screen: arc,
             first_screen_received: Arc::new(Mutex::new(false)),

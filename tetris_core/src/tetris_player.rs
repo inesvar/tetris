@@ -1,11 +1,11 @@
 //! Implement [TetrisPlayer].
 use super::{
-    CircularBuffer, GameOverError, TetrisGrid, TetrisResult, Tetromino, TetrominoGenerator,
-    TetrominoMove,
+    BagType, CircularBuffer, GameOverError, TetrisGrid, TetrisResult, Tetromino,
+    TetrominoGenerator, TetrominoMove,
 };
 use rand::Rng;
 use serde::Deserialize;
-use std::cell::RefCell;
+use std::{cell::RefCell, fmt::Display};
 
 mod custom_serialize_as_msg;
 
@@ -81,10 +81,44 @@ impl From<TetrominoMove> for TetrisCommand {
 }
 
 impl TetrisPlayer {
-    /// Creates a [TetrisPlayer], using `rng` to generate the first tetrominos.
-    pub fn new<R: Rng>(rng: &mut R) -> Self {
-        let grid = TetrisGrid::default();
-        let mut tetromino_bag = TetrominoGenerator::default();
+    /// Creates a [TetrisPlayer]:
+    /// - using `rng` and `bag_type` to generate tetrominos;
+    /// - using [TetrisGrid::DEFAULT_NB_COLUMNS], [TetrisGrid::DEFAULT_NB_MATRIX_ROWS] and [TetrisGrid::DEFAULT_NB_BUFFER_ROWS] to create the matrix.
+    pub fn default<R: Rng>(rng: &mut R, bag_type: BagType) -> Self {
+        TetrisPlayer::new(
+            rng,
+            bag_type,
+            TetrisGrid::DEFAULT_NB_COLUMNS,
+            TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
+            TetrisGrid::DEFAULT_NB_BUFFER_ROWS,
+        )
+    }
+
+    /// Creates a [TetrisPlayer]:
+    /// - using `rng` and `bag_type` to generate tetrominos;
+    /// - using [TetrisGrid::COMPACT_NB_COLUMNS], [TetrisGrid::COMPACT_NB_MATRIX_ROWS] and [TetrisGrid::COMPACT_NB_BUFFER_ROWS] to create the matrix.
+    pub fn compact<R: Rng>(rng: &mut R, bag_type: BagType) -> Self {
+        TetrisPlayer::new(
+            rng,
+            bag_type,
+            TetrisGrid::COMPACT_NB_COLUMNS,
+            TetrisGrid::COMPACT_NB_MATRIX_ROWS,
+            TetrisGrid::COMPACT_NB_BUFFER_ROWS,
+        )
+    }
+
+    /// Creates a [TetrisPlayer]:
+    /// - using `rng` and `bag_type` to generate tetrominos;
+    /// - using `nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` to create the matrix.
+    pub fn new<R: Rng>(
+        rng: &mut R,
+        bag_type: BagType,
+        nb_columns: u32,
+        nb_matrix_rows: u32,
+        nb_buffer_rows: u32,
+    ) -> Self {
+        let grid = TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows);
+        let mut tetromino_bag = TetrominoGenerator::new(bag_type);
         let active_tetromino = tetromino_bag.get(rng);
         let next_tetrominos = tetromino_bag.get_chunk(rng, NEXT_QUEUE_MAX_SIZE);
         let fifo_next_tetromino = CircularBuffer::new(next_tetrominos);
@@ -100,6 +134,10 @@ impl TetrisPlayer {
             garbage_to_be_added: 0,
             serialize_as_msg: true.into(),
         }
+    }
+
+    pub fn bag_type(&self) -> BagType {
+        self.tetromino_bag.bag_type()
     }
 
     /// Replace the active tetromino by a tetromino from the next queue and return
@@ -197,5 +235,62 @@ impl TetrisPlayer {
         let mut ghost_tetromino = self.tetromino_in_play.clone();
         ghost_tetromino.try_apply(TetrominoMove::HardDrop, &self.matrix);
         ghost_tetromino
+    }
+}
+
+impl Display for TetrisPlayer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut grid = self.matrix.clone();
+        let tetromino = self.tetromino_in_play.clone();
+
+        let _ = tetromino.lock_down(&mut grid);
+
+        write!(f, "{}", grid)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::MockRng;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(TetrisPlayer::compact(&mut MockRng::default(), BagType::NoBag), concat!(
+            "---------\n",
+            "   YY    \n",
+            "   YY    \n",
+            "---------\n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "---------\n",
+        ))]
+    #[case(TetrisPlayer::new(&mut MockRng::default(), BagType::NoBag, TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::COMPACT_NB_MATRIX_ROWS, TetrisGrid::COMPACT_NB_BUFFER_ROWS), concat!(
+            "----------\n",
+            "    YY    \n",
+            "    YY    \n",
+            "----------\n",
+            "          \n",
+            "          \n",
+            "          \n",
+            "          \n",
+            "          \n",
+            "          \n",
+            "----------\n",
+        ))]
+    fn display_is_correct(#[case] mut player: TetrisPlayer, #[case] expected: &str) {
+        player.start();
+
+        assert_eq!(
+            &player.to_string(),
+            expected,
+            "player:\n{}, expected:\n{}",
+            player,
+            expected
+        );
     }
 }

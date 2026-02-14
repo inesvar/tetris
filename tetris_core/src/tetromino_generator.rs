@@ -17,7 +17,7 @@ pub struct TetrominoGenerator {
 ///
 /// Using a shuffled bag instead of choosing each tetromino randomly
 /// helps prevent tetromino repetition.
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub enum BagType {
     /// Each tetromino is chosen randomly using the provided random generator.
     NoBag,
@@ -37,6 +37,10 @@ impl TetrominoGenerator {
             tetrominos: Vec::new(),
             bag_type,
         }
+    }
+
+    pub(crate) fn bag_type(&self) -> BagType {
+        self.bag_type
     }
 
     /// Returns an array of `N` [Tetromino]'s.

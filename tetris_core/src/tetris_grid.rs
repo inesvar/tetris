@@ -25,7 +25,7 @@ pub const NB_VISIBLE_BUFFER_ROWS: u32 = 2;
 ///   Tetriminos fall from the top-middle just above the **Skyline** (off-screen) to the bottom."
 /// - **Buffer Zone**: "a 10-cell wide x 20-cell high invisible area above the Matrix used to detect Lock
 ///   Out, Block Out, and Top Out **Game Over Conditions**."
-#[derive(PartialEq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Serialize, Deserialize)]
 pub struct TetrisGrid {
     /// Number of columns in the **Matrix** and **Buffer Zone**.
     ///
@@ -148,8 +148,7 @@ impl TetrisGrid {
     }
 }
 
-/// In [tetris_grid](super::tetris_grid), methods used  by
-/// [Tetromino](super::tetromino::Tetromino) to enter, move and then lock down in the grid.
+/// Methods used  by [Tetromino](super::tetromino::Tetromino) to enter, move and then lock down in the grid.
 #[doc = simple_mermaid::mermaid!("tetris_grid_internals.mmd")]
 impl TetrisGrid {
     /// Return the translation needed for `blocks` to enter the grid.
@@ -420,13 +419,13 @@ impl Display for TetrisGrid {
 }
 
 impl TetrisGrid {
-    const DEFAULT_NB_COLUMNS: u32 = 10;
-    const DEFAULT_NB_MATRIX_ROWS: u32 = 20;
-    const DEFAULT_NB_BUFFER_ROWS: u32 = 20;
+    pub const DEFAULT_NB_COLUMNS: u32 = 10;
+    pub const DEFAULT_NB_MATRIX_ROWS: u32 = 20;
+    pub const DEFAULT_NB_BUFFER_ROWS: u32 = 20;
 
-    const COMPACT_NB_COLUMNS: u32 = 9;
-    const COMPACT_NB_MATRIX_ROWS: u32 = 6;
-    const COMPACT_NB_BUFFER_ROWS: u32 = 2;
+    pub const COMPACT_NB_COLUMNS: u32 = 9;
+    pub const COMPACT_NB_MATRIX_ROWS: u32 = 6;
+    pub const COMPACT_NB_BUFFER_ROWS: u32 = 2;
 
     pub fn compact_new() -> Self {
         // smallest possible with the formatter playing nice

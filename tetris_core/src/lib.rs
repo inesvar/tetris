@@ -12,9 +12,9 @@
 //! # Examples
 //!
 //! ```
-//! # use tetris_core::{TetrisPlayer, TetrisCommand, TetrominoMove, MockRng};
+//! # use tetris_core::{TetrisPlayer, TetrisCommand, TetrominoMove, MockRng, BagType};
 //! # let mut rng = MockRng::default();
-//! let mut player = TetrisPlayer::new(&mut rng);
+//! let mut player = TetrisPlayer::default(&mut rng, BagType::default());
 //! player.start();
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng);
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng);

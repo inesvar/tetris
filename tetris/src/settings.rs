@@ -6,6 +6,7 @@ use crate::{app::PlayerConfig, once};
 use opengl_graphics::OpenGL;
 use piston::Key;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
+use tetris_core::BagType;
 
 const SCALE_FACTOR: f64 = 1.0;
 pub const HOST_PORT: &str = ":26000";
@@ -87,7 +88,7 @@ pub const KEY_REPEAT_DELAY: u64 = 20;
 #[derive(Deserialize, Debug, PartialEq)]
 pub struct Settings {
     pub seed: u64,
-    pub bag_size: u32,
+    pub bag_size: BagType,
     pub nb_next_tetromino: usize,
     remote_ip: Option<String>,
     /// Flag not to be modified except in Serialize. Set to true.
@@ -96,7 +97,7 @@ pub struct Settings {
 
 impl Settings {
     pub fn new(seed: u64, player_config: &PlayerConfig) -> Settings {
-        let bag_size = BAG_SIZE;
+        let bag_size = BAG_TYPE;
         let nb_next_tetromino = NB_NEXT_TETROMINO;
         let mut remote_ip = None;
         if let PlayerConfig::TwoRemote {
@@ -144,10 +145,7 @@ impl Settings {
     }
 }
 
-// TODO: this could be in the tetris back-end library
-// typical sizes are 7 and 14, 1 is entirely random
-// for size 7 * n + k, k < 7, there's n or n + 1 of each tetromino and exactly k tetrominos are present n + 1 times
-pub const BAG_SIZE: u32 = 7;
+pub const BAG_TYPE: BagType = BagType::Bag7;
 // Should be between 0 and 6
 pub const NB_NEXT_TETROMINO: usize = 6;
 
