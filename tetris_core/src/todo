@@ -1,4 +1,4 @@
-- add possibility for mocking the random generator -> necessary for integration tests -> fisher-yates with a method to reverse it :D
+- correct tetromino spawning in tetris grid with odd nb columns
 - make tetris_core integration tests
 - code getters and make fields private (TetrisPlayer)
 - add_garbage could rely on rng provided by outside of the crate -> great for integration tests
