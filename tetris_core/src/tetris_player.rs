@@ -45,6 +45,8 @@ pub struct TetrisPlayer {
     pub new_completed_lines: u64,
     /// garbage_to_be_added is set before the update and reset during the update.
     garbage_to_be_added: u64,
+    /// Whether the game is running or not
+    in_play: bool,
     /// Flag not to be modified except in Serialize. Set to true.
     serialize_as_msg: RefCell<bool>,
 }
@@ -132,6 +134,7 @@ impl TetrisPlayer {
             next_queue: fifo_next_tetromino,
             tetromino_bag,
             garbage_to_be_added: 0,
+            in_play: false,
             serialize_as_msg: true.into(),
         }
     }
@@ -140,8 +143,12 @@ impl TetrisPlayer {
         self.tetromino_bag.bag_type()
     }
 
-    /// Replace the active tetromino by a tetromino from the next queue and return
-    /// the previously active tetromino.
+    pub fn is_in_play(&self) -> bool {
+        self.in_play
+    }
+
+    /// Replace the tetromino in play by a tetromino from the **Next Queue** and return
+    /// the previous tetromino in play.
     fn replace_active_tetromino<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
         let mut swap = self.tetromino_bag.get(rng);
         self.next_queue.get_front_push_back(&mut swap);
@@ -150,8 +157,8 @@ impl TetrisPlayer {
         swap
     }
 
-    /// Replace the active tetromino by the saved tetromino if it exists (or by a tetromino
-    /// from the next queue) and return the previously active tetromino.
+    /// Replace the tetromino in play by the tetromino in the **Hold Queue** if it exists
+    /// (alternatively by a tetromino from the **Next Queue**) and return the previous tetromino in play.
     fn replace_active_tetromino_using_stash<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
         if let Some(mut swap) = self.hold_queue.take() {
             std::mem::swap(&mut swap, &mut self.tetromino_in_play);
@@ -161,7 +168,9 @@ impl TetrisPlayer {
         }
     }
 
-    fn stash<R: Rng>(&mut self, rng: &mut R) -> TetrisResult {
+    /// Put the tetromino in play in the **Hold Queue** and put the new tetromino in play
+    /// in its starting position.
+    fn hold_tetromino<R: Rng>(&mut self, rng: &mut R) -> TetrisResult {
         let mut previously_active = self.replace_active_tetromino_using_stash(rng);
         previously_active.reset();
         self.hold_queue = Some(previously_active);
@@ -202,6 +211,7 @@ impl TetrisPlayer {
     pub fn start(&mut self) {
         self.matrix.reset();
         let _ = self.tetromino_in_play.try_enter_grid(&self.matrix);
+        self.in_play = true;
     }
 
     /// Tries to apply [TetrisCommand], returns [GameOverError] if the situation is a losing one,
@@ -213,7 +223,7 @@ impl TetrisPlayer {
         order: TetrisCommand,
         rng: &mut R,
     ) -> Result<bool, GameOverError> {
-        match order {
+        let moved = match order {
             TetrisCommand::Move(TetrominoMove::HardDrop) => {
                 self.tetromino_in_play
                     .try_apply(TetrominoMove::HardDrop, &self.matrix);
@@ -225,9 +235,13 @@ impl TetrisPlayer {
             TetrisCommand::Fall => Ok(self
                 .tetromino_in_play
                 .try_apply(TetrominoMove::Fall, &self.matrix)),
-            TetrisCommand::Hold => self.stash(rng).map(|_| true),
+            TetrisCommand::Hold => self.hold_tetromino(rng).map(|_| true),
             TetrisCommand::LockDown => self.lock_down(rng).map(|_| true),
+        };
+        if moved.is_err() {
+            self.in_play = false;
         }
+        moved
     }
 
     /// Returns a hard-dropped copy of the [TetrisPlayer::tetromino_in_play].

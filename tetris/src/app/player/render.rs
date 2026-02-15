@@ -34,7 +34,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisPlayer {
         let grid_transform = gl_ctx.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
         gl_ctx.transform = grid_transform;
 
-        if self.tetromino_in_play.is_in_default_state() {
+        if !self.is_in_play() {
             let old_transform = gl_ctx.transform;
             let start = self.matrix.get_starting_position();
             let starting_position_transform = gl_ctx
@@ -48,7 +48,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisPlayer {
 
         self.matrix.render(gl_ctx);
 
-        if !self.tetromino_in_play.is_in_default_state() {
+        if self.is_in_play() {
             self.tetromino_in_play.render(gl_ctx);
 
             let old_draw_state = gl_ctx.draw_state;
