@@ -45,7 +45,14 @@ impl<T: Debug> Display for CircularBuffer<T> {
 
 impl<T: Debug> CircularBuffer<T> {
     /// Construct a new circular buffer of size K for type T.
+    ///
+    /// # Panics
+    ///
+    /// If `array` is empty.
     pub fn new(array: Vec<T>) -> Self {
+        if array.is_empty() {
+            panic!("CircularBuffer::new()'s first argument `array: Vec<T>` shouldn't be empty.")
+        }
         CircularBuffer::<T> {
             vec: array,
             begin: 0,

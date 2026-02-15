@@ -112,6 +112,10 @@ impl TetrisPlayer {
     /// Creates a [TetrisPlayer]:
     /// - using `rng` and `bag_type` to generate tetrominos;
     /// - using `nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` to create the matrix.
+    ///
+    /// # Panics
+    ///
+    /// If `nb_columns` or `nb_matrix_rows` or `nb_buffer_rows` aren't in the expected range (see [TetrisGrid::new]).
     pub fn new<R: Rng>(
         rng: &mut R,
         bag_type: BagType,
@@ -119,19 +123,20 @@ impl TetrisPlayer {
         nb_matrix_rows: u32,
         nb_buffer_rows: u32,
     ) -> Self {
-        let grid = TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows);
+        let matrix = TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows);
         let mut tetromino_bag = TetrominoGenerator::new(bag_type);
-        let active_tetromino = tetromino_bag.get(rng);
+        let mut tetromino_in_play = tetromino_bag.get(rng);
         let next_tetrominos = tetromino_bag.get_chunk(rng, NEXT_QUEUE_MAX_SIZE);
-        let fifo_next_tetromino = CircularBuffer::new(next_tetrominos);
+        let next_queue = CircularBuffer::new(next_tetrominos);
+        tetromino_in_play.try_enter_grid(&matrix).unwrap();
 
         TetrisPlayer {
-            matrix: grid,
+            matrix,
             score: 0,
             new_completed_lines: 0,
-            tetromino_in_play: active_tetromino,
+            tetromino_in_play,
             hold_queue: None,
-            next_queue: fifo_next_tetromino,
+            next_queue,
             tetromino_bag,
             garbage_to_be_added: 0,
             in_play: false,
@@ -208,9 +213,8 @@ impl TetrisPlayer {
     }
 
     /// Empties the **Matrix** and puts a tetromino in its starting position.
-    pub fn start(&mut self) {
+    pub fn reset(&mut self) {
         self.matrix.reset();
-        let _ = self.tetromino_in_play.try_enter_grid(&self.matrix);
         self.in_play = true;
     }
 
@@ -296,9 +300,7 @@ mod tests {
             "          \n",
             "----------\n",
         ))]
-    fn display_is_correct(#[case] mut player: TetrisPlayer, #[case] expected: &str) {
-        player.start();
-
+    fn display_is_correct(#[case] player: TetrisPlayer, #[case] expected: &str) {
         assert_eq!(
             player.to_string(),
             expected,
@@ -306,5 +308,27 @@ mod tests {
             player,
             expected
         );
+    }
+
+    #[rstest]
+    #[case::compact(
+        TetrisGrid::COMPACT_NB_COLUMNS,
+        TetrisGrid::COMPACT_NB_MATRIX_ROWS,
+        TetrisGrid::COMPACT_NB_BUFFER_ROWS
+    )]
+    #[case::default(
+        TetrisGrid::DEFAULT_NB_COLUMNS,
+        TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
+        TetrisGrid::DEFAULT_NB_BUFFER_ROWS
+    )]
+    #[case::minimal(4, 6, 2)]
+    fn new_does_not_panic(
+        #[values(&mut MockRng::default())] rng: &mut MockRng,
+        #[values(BagType::NoBag, BagType::Bag7, BagType::Bag14)] bag_type: BagType,
+        #[case] nb_columns: u32,
+        #[case] nb_matrix_rows: u32,
+        #[case] nb_buffer_rows: u32,
+    ) {
+        TetrisPlayer::new(rng, bag_type, nb_columns, nb_matrix_rows, nb_buffer_rows);
     }
 }

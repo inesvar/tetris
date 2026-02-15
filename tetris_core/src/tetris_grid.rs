@@ -81,6 +81,9 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If `nb_columns` or `nb_matrix_rows` or `nb_buffer_rows` aren't in the expected range.
+    /// - `nb_columns`: has to be between 4 and [TETRIS_GRID_MAX] (should be 10 according to the **Tetris Guideline**);
+    /// - `nb_matrix_rows`: has to be between 6 and [TETRIS_GRID_MAX] (should be 20 according to the **Tetris Guideline**);
+    /// - `nb_buffer_rows`: sas to be between 2 and [TETRIS_GRID_MAX] (should be 20 according to the **Tetris Guideline**).
     pub fn new(nb_columns: u32, nb_matrix_rows: u32, nb_buffer_rows: u32) -> Self {
         if nb_columns > TETRIS_GRID_MAX
             || nb_matrix_rows > TETRIS_GRID_MAX

@@ -51,7 +51,7 @@ impl LocalPlayer {
     }
 
     pub fn start(&mut self) {
-        self.player_screen.start();
+        self.player_screen.reset();
     }
 
     pub(in crate::app) fn countdown(&mut self, i: &Countdown) {

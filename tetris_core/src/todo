@@ -9,8 +9,8 @@
     So, the plan :
     - add a new `in_play` boolean to `TetrisPlayer`, use it in render to decide whether to render the ghost tetromino or not (instead of `is_in_default_state`) :OK
     - erase `is_in_default_state` :OK
-    - move `try_enter_grid` from start to `new`
-    - simplify render to not add custom transform if not `in_play`
+    - move `try_enter_grid` from start to `new` :OK
+    - simplify render to not add custom transform if not `in_play` :OK
 
     - stop modifying the grid to display the countdown
     - erase `start`

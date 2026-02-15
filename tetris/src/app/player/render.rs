@@ -35,15 +35,7 @@ impl Render<Piston2dGraphicsArguments<'_, '_>> for TetrisPlayer {
         gl_ctx.transform = grid_transform;
 
         if !self.is_in_play() {
-            let old_transform = gl_ctx.transform;
-            let start = self.matrix.get_starting_position();
-            let starting_position_transform = gl_ctx
-                .transform
-                .trans(start.x() as f64 * BLOCK_SIZE, start.y() as f64 * BLOCK_SIZE);
-            gl_ctx.transform = starting_position_transform;
-
             self.tetromino_in_play.render(gl_ctx);
-            gl_ctx.transform = old_transform;
         }
 
         self.matrix.render(gl_ctx);

@@ -39,9 +39,8 @@
 //! // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing,
 //! // `default` creates a normal 10x(20+20) tetris grid and `new` lets you choose the size.
 //! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
-//! player.start(); // empty the tetris grid, put the first tetromino in the starting position
 //! ```
-//! Once created and initialized with `start`, a [TetrisPlayer] can be controlled with [TetrisCommand]s.
+//! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s.
 //! ```
 //! # use tetris_core::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
@@ -49,7 +48,6 @@
 //! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
 //! # // `default` creates a normal 10x(20+20) tetris grid.
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
-//! # player.start(); // empty the tetris grid, put the first tetromino in its starting position
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng);
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng);
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng);
@@ -67,8 +65,7 @@
 //! # let mut rng = MockRng::new(vec![TetrominoKind::T, TetrominoKind::O]);
 //! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
 //! # // `default` creates a normal 10x(20+20) tetris grid.
-//! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
-//! player.start(); // empty the tetris grid, put the first tetromino in its starting position
+//! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    T    \n", // Buffer Zone
@@ -141,7 +138,6 @@
 //! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
 //! # // `default` creates a normal 10x(20+20) tetris grid.
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
-//! # player.start(); // empty the tetris grid, put the first tetromino in its starting position
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng);
