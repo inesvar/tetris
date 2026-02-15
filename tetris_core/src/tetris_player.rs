@@ -128,7 +128,7 @@ impl TetrisPlayer {
         let mut tetromino_in_play = tetromino_bag.get(rng);
         let next_tetrominos = tetromino_bag.get_chunk(rng, NEXT_QUEUE_MAX_SIZE);
         let next_queue = CircularBuffer::new(next_tetrominos);
-        tetromino_in_play.try_enter_grid(&matrix).unwrap();
+        tetromino_in_play.enter_grid(&matrix);
 
         TetrisPlayer {
             matrix,
@@ -152,34 +152,39 @@ impl TetrisPlayer {
         self.in_play
     }
 
+    fn swap_tetromino_in_play_with(&mut self, new: &mut Tetromino) {
+        std::mem::swap(&mut self.tetromino_in_play, new);
+        self.tetromino_in_play.enter_grid(&self.matrix);
+    }
+
     /// Replace the tetromino in play by a tetromino from the **Next Queue** and return
     /// the previous tetromino in play.
-    fn replace_active_tetromino<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
+    fn replace_tetromino_in_play<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
         let mut swap = self.tetromino_bag.get(rng);
         self.next_queue.get_front_push_back(&mut swap);
-        std::mem::swap(&mut self.tetromino_in_play, &mut swap);
+        self.swap_tetromino_in_play_with(&mut swap);
 
         swap
     }
 
     /// Replace the tetromino in play by the tetromino in the **Hold Queue** if it exists
     /// (alternatively by a tetromino from the **Next Queue**) and return the previous tetromino in play.
-    fn replace_active_tetromino_using_stash<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
+    fn replace_tetromino_in_play_using_hold_queue<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
         if let Some(mut swap) = self.hold_queue.take() {
-            std::mem::swap(&mut swap, &mut self.tetromino_in_play);
+            self.swap_tetromino_in_play_with(&mut swap);
             swap
         } else {
-            self.replace_active_tetromino(rng)
+            self.replace_tetromino_in_play(rng)
         }
     }
 
     /// Put the tetromino in play in the **Hold Queue** and put the new tetromino in play
     /// in its starting position.
     fn hold_tetromino<R: Rng>(&mut self, rng: &mut R) -> TetrisResult {
-        let mut previously_active = self.replace_active_tetromino_using_stash(rng);
+        let mut previously_active = self.replace_tetromino_in_play_using_hold_queue(rng);
         previously_active.reset();
         self.hold_queue = Some(previously_active);
-        self.tetromino_in_play.try_enter_grid(&self.matrix)
+        self.tetromino_in_play.is_valid_in_grid(&self.matrix)
     }
 
     fn record_new_completed_lines(&mut self, new_completed_lines: u64) {
@@ -188,7 +193,7 @@ impl TetrisPlayer {
     }
 
     fn lock_down<R: Rng>(&mut self, rng: &mut R) -> TetrisResult {
-        let previously_active = self.replace_active_tetromino(rng);
+        let previously_active = self.replace_tetromino_in_play(rng);
 
         let new_completed_lines = previously_active.lock_down(&mut self.matrix)?;
         self.record_new_completed_lines(new_completed_lines);
@@ -197,7 +202,7 @@ impl TetrisPlayer {
             .apply_received_garbage(self.garbage_to_be_added)?;
         self.garbage_to_be_added = 0;
 
-        self.tetromino_in_play.try_enter_grid(&self.matrix)
+        self.tetromino_in_play.is_valid_in_grid(&self.matrix)
     }
 
     /// Adds `nb_completed_lines` to the number of garbage lines to be added later (during **Lock Down**).

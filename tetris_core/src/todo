@@ -12,6 +12,11 @@
     - move `try_enter_grid` from start to `new` :OK
     - simplify render to not add custom transform if not `in_play` :OK
 
+    remaining problems :
+    - if game over, then the tetromino_in_play may be in default state instead of starting state
+    => solution : as soon as a tetromino is in_play, it's in the starting state :OK
+    => however it's only checked that it's grid valid after checking lockout and topout :OK
+
     - stop modifying the grid to display the countdown
     - erase `start`
 

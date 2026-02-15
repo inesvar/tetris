@@ -75,17 +75,27 @@ impl Tetromino {
         *self = Self::new(self.kind)
     }
 
-    /// Translates `self` to its starting position in [TetrisGrid] `grid` if the blocks are free, otherwise returns [GameOverError::BlockOut].
+    /// Translates `self` to its starting position in [TetrisGrid] `grid`.
     ///
     /// Note that:
     /// - `self` is assumed to be in its default position and orientation;
     /// - the translation applied depends on the size of `grid`.
-    pub(crate) fn try_enter_grid(&mut self, grid: &TetrisGrid) -> TetrisResult {
+    pub(crate) fn enter_grid(&mut self, grid: &TetrisGrid) {
         let translation = RotationTranslation::translation(grid.get_starting_position());
+        self.translate(&translation);
+    }
 
-        self.try_move(grid, &translation)
-            .then_some(())
-            .ok_or(GameOverError::BlockOut)
+    /// Returns [GameOverError::BlockOut] if `self` is not valid in `grid`.
+    pub(crate) fn is_valid_in_grid(&mut self, grid: &TetrisGrid) -> TetrisResult {
+        if self
+            .blocks
+            .iter()
+            .all(|block| grid.is_block_available(block))
+        {
+            Ok(())
+        } else {
+            Err(GameOverError::BlockOut)
+        }
     }
 
     /// Applies [TetrominoMove] `tetromino_move` to `self` if the target blocks are free and inside the grid, otherwise returns `false`.
@@ -150,6 +160,13 @@ impl Tetromino {
         self.direction.move_by(movement);
         self.center.translate_by(movement);
         true
+    }
+
+    fn translate(&mut self, movement: &RotationTranslation) {
+        for block in &mut self.blocks {
+            block.translate_by(movement);
+        }
+        self.center.translate_by(movement);
     }
 }
 
@@ -379,14 +396,20 @@ mod tests {
         let mut tetromino = Tetromino::new(TetrominoKind::O);
 
         let mut full_grid = TetrisGrid::default();
-        assert!(tetromino.try_enter_grid(&full_grid).is_ok());
+        tetromino.enter_grid(&full_grid);
+        assert!(tetromino.is_valid_in_grid(&full_grid).is_ok());
         assert!(tetromino.try_apply(TetrominoMove::Fall, &full_grid));
         assert!(tetromino.lock_down(&mut full_grid).is_ok());
-        let empty_grid = TetrisGrid::default();
 
-        assert!(Tetromino::default().try_enter_grid(&empty_grid).is_ok());
+        let empty_grid = TetrisGrid::default();
+        let mut tetromino = Tetromino::default();
+        tetromino.enter_grid(&empty_grid);
+        assert!(tetromino.is_valid_in_grid(&empty_grid).is_ok());
+
+        let mut tetromino = Tetromino::default();
+        tetromino.enter_grid(&full_grid);
         assert_eq!(
-            Tetromino::default().try_enter_grid(&full_grid),
+            tetromino.is_valid_in_grid(&full_grid),
             Err(GameOverError::BlockOut)
         );
     }
