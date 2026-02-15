@@ -258,8 +258,8 @@ mod tests {
     #[rstest]
     #[case(TetrisPlayer::compact(&mut MockRng::default(), BagType::NoBag), concat!(
             "---------\n",
-            "   OO    \n",
-            "   OO    \n",
+            "    OO   \n",
+            "    OO   \n",
             "---------\n",
             "         \n",
             "         \n",

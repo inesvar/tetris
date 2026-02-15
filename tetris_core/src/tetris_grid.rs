@@ -153,7 +153,7 @@ impl TetrisGrid {
 impl TetrisGrid {
     /// Return the translation needed for `blocks` to enter the grid.
     pub fn get_starting_position(&self) -> Position {
-        Position::new(self.nb_columns / 2 - 2, 0)
+        Position::new((self.nb_columns + 1) / 2 - 2, 0)
     }
 
     /// Return true if the `block` is inside the grid in an empty slot.

@@ -71,8 +71,8 @@
 //! player.start(); // empty the tetris grid, put the first tetromino in its starting position
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
-//!         "   T     \n", // Buffer Zone
-//!         "  TTT    \n",
+//!         "    T    \n", // Buffer Zone
+//!         "   TTT   \n",
 //!         "---------\n", // Skyline
 //!         "         \n", // Matrix
 //!         "         \n",
@@ -85,8 +85,8 @@
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
-//!         "  T      \n",
-//!         " TTT     \n",
+//!         "   T     \n",
+//!         "  TTT    \n",
 //!         "---------\n",
 //!         "         \n",
 //!         "         \n",
@@ -99,10 +99,10 @@
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
-//!         "  T      \n",
-//!         "  TT     \n",
+//!         "   T     \n",
+//!         "   TT    \n",
 //!         "---------\n",
-//!         "  T      \n",
+//!         "   T     \n",
 //!         "         \n",
 //!         "         \n",
 //!         "         \n",
@@ -113,15 +113,15 @@
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
-//!         "   OO    \n",
-//!         "   OO    \n",
+//!         "    OO   \n",
+//!         "    OO   \n",
 //!         "---------\n",
 //!         "         \n",
 //!         "         \n",
 //!         "         \n",
-//!         "  T      \n",
-//!         "  TT     \n",
-//!         "  T      \n",
+//!         "   T     \n",
+//!         "   TT    \n",
+//!         "   T     \n",
 //!         "---------\n",
 //!     ));
 //! ```
@@ -129,7 +129,7 @@
 //! (which is namely responsible for putting the next tetromino in the grid).
 //! However, [TetrisCommand::LockDown] has to be requested by the tetris engine in the case of a
 //! tetromino that fell to the bottom without the use of hard drop.
-//! 
+//!
 //! This may be confusing at first, but the explanation is straightforward : this crate doesn't know the time,
 //! so it doesn't know when [TetrisCommand::LockDown] should be called (which doesn't happen instantaneously after the
 //! [Tetromino] hit the bottom). Likewise, this crate does't know when to call [TetrominoMove::Fall] to make
@@ -148,15 +148,15 @@
 //! player.try_apply(TetrisCommand::Hold, &mut rng);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
-//!         "   T     \n",
-//!         "  TTT    \n",
+//!         "    T    \n",
+//!         "   TTT   \n",
 //!         "---------\n",
 //!         "         \n",
 //!         "         \n",
 //!         "         \n",
-//!         "  T      \n",
-//!         "  TT     \n",
-//!         "  T      \n",
+//!         "   T     \n",
+//!         "   TT    \n",
+//!         "   T     \n",
 //!         "---------\n",
 //!     ));
 //! player.push_garbage(4);
