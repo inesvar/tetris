@@ -75,13 +75,6 @@ impl Tetromino {
         *self = Self::new(self.kind)
     }
 
-    /// Returns whether `self` is in the default state.
-    pub fn is_in_default_state(&self) -> bool {
-        let mut copy = self.clone();
-        copy.reset();
-        *self == copy
-    }
-
     /// Translates `self` to its starting position in [TetrisGrid] `grid` if the blocks are free, otherwise returns [GameOverError::BlockOut].
     ///
     /// Note that:
@@ -372,12 +365,10 @@ mod tests {
 
         assert_ne!(tetromino, Tetromino::new(kind));
         assert_ne!(tetromino.direction, Direction::North);
-        assert!(!tetromino.is_in_default_state());
 
         tetromino.reset();
         assert_eq!(tetromino, Tetromino::new(kind));
         assert_eq!(tetromino.direction, Direction::North);
-        assert!(tetromino.is_in_default_state());
     }
 
     // should check that the grid size is taken into account
