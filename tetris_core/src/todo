@@ -1,25 +1,5 @@
-- start function : it's not possible to remove it because
-    - stupid 3, 2, 1 countdown stays on the screen => the blocks shouldn't even be in the grid, it should be pure display
-    - the ghost tetromino shows up during 3, 2, 1 countdown
-
-    furthermore, the logic of 'oh let's look at the tetromino position to offset it' is uselessly complicated
-    - the tetromino in play should always in the correct "grid" position (whether it's valid or not)
-    - whether to display the ghost tetromino should be decided by another (new) variable, a boolean in TetrisPlayer for instance (in_play or something)
-
-    So, the plan :
-    - add a new `in_play` boolean to `TetrisPlayer`, use it in render to decide whether to render the ghost tetromino or not (instead of `is_in_default_state`) :OK
-    - erase `is_in_default_state` :OK
-    - move `try_enter_grid` from start to `new` :OK
-    - simplify render to not add custom transform if not `in_play` :OK
-
-    remaining problems :
-    - if game over, then the tetromino_in_play may be in default state instead of starting state
-    => solution : as soon as a tetromino is in_play, it's in the starting state :OK
-    => however it's only checked that it's grid valid after checking lockout and topout :OK
-
-    - stop modifying the grid to display the countdown
-    - erase `start`
-
+- stop modifying the grid to display the countdown :OK
+- erase `start`
 
 - make tetris_core integration tests
 - code getters and make fields private (TetrisPlayer)

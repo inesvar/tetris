@@ -512,12 +512,6 @@ impl<'a> App<'a> {
         self.is_synchronized = false;
     }
 
-    fn countdown(&mut self, i: &Countdown) {
-        for player in &mut self.local_players {
-            player.countdown(i);
-        }
-    }
-
     /// Sends message to the remote if there's a remote.
     fn send_message(&self, message: MessageType) {
         if let PlayerConfig::TwoRemote {
@@ -530,10 +524,4 @@ impl<'a> App<'a> {
             }
         }
     }
-}
-
-enum Countdown {
-    One,
-    Two,
-    Three,
 }

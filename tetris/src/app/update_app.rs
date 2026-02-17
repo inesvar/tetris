@@ -2,7 +2,7 @@
 //!
 //! [update()](App::update()) is called before each render when the game is active.
 use super::ui::interactive_widget_manager::ButtonType;
-use super::{remote::MessageType, App, Countdown, PlayerConfig, RunningState, ViewState};
+use super::{remote::MessageType, App, PlayerConfig, RunningState, ViewState};
 use piston::UpdateArgs;
 
 impl App<'_> {
@@ -27,11 +27,8 @@ impl App<'_> {
             self.widget_manager[0].update_clipboard();
             self.widget_manager[0].update_from_text();
         } else if self.view_state.is_game() && self.running == RunningState::Starting {
-            match self.clock {
-                i if i < 1.0 => self.countdown(&Countdown::Three),
-                i if i < 2.0 => self.countdown(&Countdown::Two),
-                i if i < 3.0 => self.countdown(&Countdown::One),
-                _ => self.start(),
+            if self.clock > 3.0 {
+                self.start();
             }
             for player in &mut self.local_players {
                 player.send_serialized();

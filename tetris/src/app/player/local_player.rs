@@ -1,10 +1,6 @@
 //! Define the general implementation of [LocalPlayer].
 use super::{pressed_keys::PressedKeys, LocalPlayer, TetrisPlayer};
-use crate::{
-    app::{Countdown, PlayerConfig},
-    once,
-    settings::BAG_TYPE,
-};
+use crate::{app::PlayerConfig, once, settings::BAG_TYPE};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
@@ -52,15 +48,6 @@ impl LocalPlayer {
 
     pub fn start(&mut self) {
         self.player_screen.reset();
-    }
-
-    pub(in crate::app) fn countdown(&mut self, i: &Countdown) {
-        let color = self.player_screen.tetromino_in_play.color();
-        match i {
-            Countdown::One => self.player_screen.matrix.one(color),
-            Countdown::Two => self.player_screen.matrix.two(color),
-            Countdown::Three => self.player_screen.matrix.three(color),
-        }
     }
 }
 
