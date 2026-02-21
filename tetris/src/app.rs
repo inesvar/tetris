@@ -98,13 +98,17 @@ pub enum RunningState {
     Starting,
 }
 
-pub struct App<'a> {
+pub struct Renderer<'a> {
     gl: GlGraphics,
+    assets: Assets<'a>,
+}
+
+pub struct App<'a> {
+    pub renderer: Renderer<'a>,
     local_players: Vec<LocalPlayer>,
     remote_player: Vec<RemotePlayer>,
     pub player_config: PlayerConfig,
     view_state: ViewState,
-    assets: Assets<'a>,
     pub clock: f64,
     frame_counter: u64,
     running: RunningState,
@@ -122,8 +126,19 @@ pub struct App<'a> {
     freeze: u64,
 }
 
+impl<'a> Renderer<'a> {
+    fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
+        let assets = Assets::new(assets_archive);
+
+        Self {
+            gl: GlGraphics::new(gl_version),
+            assets,
+        }
+    }
+}
+
 impl<'a> App<'a> {
-    pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> App<'a> {
+    pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
         let mut rng = rand::rng();
         let seed: u64 = rng.random();
         let is_host = false;
@@ -133,16 +148,14 @@ impl<'a> App<'a> {
         let players: Vec<LocalPlayer> = vec![local_player];
         let rem_players: Vec<RemotePlayer> = vec![];
 
-        let assets = Assets::new(assets_archive);
         let settings_manager = Settings::new(seed, &player_config);
 
         App {
-            gl: GlGraphics::new(gl_version),
+            renderer: Renderer::new(gl_version, assets_archive),
             local_players: players,
             remote_player: rem_players,
             player_config,
             view_state: ViewState::MainMenu,
-            assets,
             title_text: Text::new_with_tetris_font(
                 "T",
                 DEFAULT_FONT_SIZE,

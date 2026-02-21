@@ -43,7 +43,7 @@ pub(super) trait Render<GlCtx> {
 
 impl App<'_> {
     pub fn render(&mut self, args: &RenderArgs) {
-        self.gl.draw(args.viewport(), |ctx, gl| {
+        self.renderer.gl.draw(args.viewport(), |ctx, gl| {
             // Clear the screen.
             graphics::clear(BG_COLOR, gl);
 
@@ -51,7 +51,7 @@ impl App<'_> {
                 ctx.transform,
                 ctx.draw_state,
                 gl,
-                &mut self.assets,
+                &mut self.renderer.assets,
                 self.clock,
             );
 
