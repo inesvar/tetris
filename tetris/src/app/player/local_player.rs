@@ -32,6 +32,10 @@ impl LocalPlayer {
         }
     }
 
+    pub fn get_player(&self) -> &TetrisPlayer {
+        &self.player_screen
+    }
+
     pub fn reset(&mut self, seed: u64) {
         self.rng = Pcg32::seed_from_u64(seed);
         self.player_screen = TetrisPlayer::default(&mut self.rng, self.player_screen.bag_type());

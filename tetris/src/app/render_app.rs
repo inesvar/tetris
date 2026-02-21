@@ -8,6 +8,7 @@ use crate::app::ui::key_input::KeyInput;
 use crate::app::ui::text::Text;
 use crate::app::ui::text_input::TextInput;
 use crate::assets::Assets;
+use crate::once;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
 use graphics::types::Matrix2d;
 use graphics::Transformed;
@@ -20,6 +21,8 @@ use tetris_core::{Position, TetrisColor, TetrisGrid, TetrisPlayer, Tetromino};
 pub trait RenderTetrisGame: RenderTetrisCore + RenderTetrisUi {
     type RenderArgs;
     fn render_app(&mut self, render_args: &RenderArgs, app: &App);
+    fn render_local_player(&mut self, local_player: &LocalPlayer);
+    fn render_remote_player(&mut self, remote_player: &RemotePlayer);
 }
 
 pub trait RenderTetrisUi {
@@ -31,8 +34,6 @@ pub trait RenderTetrisUi {
 }
 
 pub trait RenderTetrisCore: RenderTetrisUi {
-    fn render_local_player(&mut self, local_player: &LocalPlayer);
-    fn render_remote_player(&mut self, remote_player: &RemotePlayer);
     fn render_player(&mut self, player: &TetrisPlayer);
     fn render_tetris_grid(&mut self, grid: &TetrisGrid);
     fn render_tetromino(&mut self, tetromino: &Tetromino);
@@ -79,7 +80,7 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
         graphics::clear(BG_COLOR, &mut self.gl);
 
         match &app.view_state {
-            ViewState::MainMenu => {
+            ViewState::MainMenu | ViewState::CreateRoom | ViewState::JoinRoom => {
                 self.render_text(&app.title_text);
                 self.render_widget_manager(&app.widget_manager[0])
             }
@@ -89,26 +90,15 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
                     self.render_widget_manager(widget_manager);
                 }
             }
-            ViewState::CreateRoom => {
-                self.render_text(&app.title_text);
-                self.render_widget_manager(&app.widget_manager[0])
-            }
-            ViewState::JoinRoom => {
-                self.render_text(&app.title_text);
-                self.render_widget_manager(&app.widget_manager[0])
-            }
             a if a.is_game() => {
                 self.render_widget_manager(&app.widget_manager[0]);
-                if app.running == RunningState::Running {
-                    self.render_text(&app.title_text);
-                } else if app.running == RunningState::NotRunning {
-                    self.render_text(&app.restart_text);
-                } else if app.running == RunningState::Paused {
-                    self.render_text(&app.pause_text);
-                } else if app.running == RunningState::Starting {
-                    self.render_text(&app.title_text);
+                match app.running {
+                    RunningState::Running | RunningState::Starting => {
+                        self.render_text(&app.title_text)
+                    }
+                    RunningState::NotRunning => self.render_text(&app.restart_text),
+                    RunningState::Paused => self.render_text(&app.pause_text),
                 }
-
                 self.render_text(&app.timer_text);
 
                 for player in &app.local_players {
@@ -124,5 +114,20 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
         }
 
         self.gl.draw_end();
+    }
+
+    fn render_remote_player(&mut self, remote_player: &RemotePlayer) {
+        if !remote_player.received_first_screen() {
+            return;
+        }
+        {
+            let screen = remote_player.get_player();
+            self.render_player(&screen);
+        }
+        once!("render was done");
+    }
+
+    fn render_local_player(&mut self, local_player: &LocalPlayer) {
+        self.render_player(local_player.get_player());
     }
 }

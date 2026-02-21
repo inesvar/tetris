@@ -1,10 +1,7 @@
 //! Define `trait` [Render] for [LocalPlayer], [TetrisPlayer], [Tetromino], [TetrisGrid].
-use crate::app::player::LocalPlayer;
-use crate::app::remote::RemotePlayer;
 use crate::app::render_app::{Piston2dOpenGlRenderer, RenderTetrisCore, RenderTetrisUi};
 use crate::app::ui::text::Text;
 use crate::app::TetrisPlayer;
-use crate::once;
 use crate::settings::{
     BLOCK_SIZE, DEFAULT_FONT_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
     GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO, TETROMINO_MAX_HEIGHT,
@@ -15,21 +12,6 @@ use graphics::{rectangle, Image, Transformed};
 use tetris_core::{Position, TetrisColor, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS};
 
 impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
-    fn render_remote_player(&mut self, remote_player: &RemotePlayer) {
-        if !remote_player.received_first_screen() {
-            return;
-        }
-        {
-            let screen = remote_player.get_player();
-            self.render_player(&screen);
-        }
-        once!("render was done");
-    }
-
-    fn render_local_player(&mut self, local_player: &LocalPlayer) {
-        self.render_player(&local_player.player_screen);
-    }
-
     fn render_player(&mut self, player: &TetrisPlayer) {
         let score_text = Text::new(
             format!("Score: {}", player.score).as_str(),
