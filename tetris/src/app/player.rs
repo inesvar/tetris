@@ -11,7 +11,6 @@ mod update_player;
 use self::pressed_keys::PressedKeys;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
-pub use render::{render_local_player, render_remote_player};
 use serde::{Deserialize, Serialize};
 pub use tetris_core::TetrisPlayer;
 

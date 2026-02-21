@@ -1,7 +1,12 @@
 //! Define the render function of [App].
 use super::{App, RunningState, ViewState};
-use crate::app::player::{render_local_player, render_remote_player};
-use crate::app::ui::{render_text, render_widget_manager};
+use crate::app::player::LocalPlayer;
+use crate::app::remote::RemotePlayer;
+use crate::app::ui::button::Button;
+use crate::app::ui::interactive_widget_manager::InteractiveWidgetManager;
+use crate::app::ui::key_input::KeyInput;
+use crate::app::ui::text::Text;
+use crate::app::ui::text_input::TextInput;
 use crate::assets::Assets;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
 use graphics::types::Matrix2d;
@@ -10,6 +15,29 @@ use graphics::{Context, DrawState};
 use include_assets::NamedArchive;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::RenderArgs;
+use tetris_core::{Position, TetrisColor, TetrisGrid, TetrisPlayer, Tetromino};
+
+pub trait RenderTetrisGame: RenderTetrisCore + RenderTetrisUi {
+    type RenderArgs;
+    fn render_app(&mut self, render_args: &RenderArgs, app: &App);
+}
+
+pub trait RenderTetrisUi {
+    fn render_widget_manager(&mut self, manager: &InteractiveWidgetManager);
+    fn render_text(&mut self, text: &Text);
+    fn render_text_input(&mut self, input: &TextInput);
+    fn render_key_input(&mut self, input: &KeyInput);
+    fn render_button(&mut self, button: &Button);
+}
+
+pub trait RenderTetrisCore: RenderTetrisUi {
+    fn render_local_player(&mut self, local_player: &LocalPlayer);
+    fn render_remote_player(&mut self, remote_player: &RemotePlayer);
+    fn render_player(&mut self, player: &TetrisPlayer);
+    fn render_tetris_grid(&mut self, grid: &TetrisGrid);
+    fn render_tetromino(&mut self, tetromino: &Tetromino);
+    fn render_tetris_block(&mut self, ppsition: &Position, tetris_color: TetrisColor);
+}
 
 pub struct Piston2dOpenGlRenderer<'a> {
     pub gl: GlGraphics,
@@ -39,8 +67,10 @@ impl<'a> Piston2dOpenGlRenderer<'a> {
     }
 }
 
-impl Piston2dOpenGlRenderer<'_> {
-    pub fn render(&mut self, args: &RenderArgs, app: &App) {
+impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
+    type RenderArgs = RenderArgs;
+
+    fn render_app(&mut self, args: &RenderArgs, app: &App) {
         let ctx = self.gl.draw_begin(args.viewport());
 
         self.update(&ctx, app.clock);
@@ -50,43 +80,43 @@ impl Piston2dOpenGlRenderer<'_> {
 
         match &app.view_state {
             ViewState::MainMenu => {
-                render_text(&app.title_text, self);
-                render_widget_manager(&app.widget_manager[0], self)
+                self.render_text(&app.title_text);
+                self.render_widget_manager(&app.widget_manager[0])
             }
             ViewState::Settings => {
-                render_text(&app.title_text, self);
+                self.render_text(&app.title_text);
                 for widget_manager in &app.widget_manager {
-                    render_widget_manager(widget_manager, self);
+                    self.render_widget_manager(widget_manager);
                 }
             }
             ViewState::CreateRoom => {
-                render_text(&app.title_text, self);
-                render_widget_manager(&app.widget_manager[0], self)
+                self.render_text(&app.title_text);
+                self.render_widget_manager(&app.widget_manager[0])
             }
             ViewState::JoinRoom => {
-                render_text(&app.title_text, self);
-                render_widget_manager(&app.widget_manager[0], self)
+                self.render_text(&app.title_text);
+                self.render_widget_manager(&app.widget_manager[0])
             }
             a if a.is_game() => {
-                render_widget_manager(&app.widget_manager[0], self);
+                self.render_widget_manager(&app.widget_manager[0]);
                 if app.running == RunningState::Running {
-                    render_text(&app.title_text, self);
+                    self.render_text(&app.title_text);
                 } else if app.running == RunningState::NotRunning {
-                    render_text(&app.restart_text, self);
+                    self.render_text(&app.restart_text);
                 } else if app.running == RunningState::Paused {
-                    render_text(&app.pause_text, self);
+                    self.render_text(&app.pause_text);
                 } else if app.running == RunningState::Starting {
-                    render_text(&app.title_text, self);
+                    self.render_text(&app.title_text);
                 }
 
-                render_text(&app.timer_text, self);
+                self.render_text(&app.timer_text);
 
                 for player in &app.local_players {
-                    render_local_player(player, self);
+                    self.render_local_player(player);
                     self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                 }
                 for player in &app.remote_player {
-                    render_remote_player(player, self);
+                    self.render_remote_player(player);
                     self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                 }
             }

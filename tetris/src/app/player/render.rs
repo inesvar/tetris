@@ -1,8 +1,7 @@
 //! Define `trait` [Render] for [LocalPlayer], [TetrisPlayer], [Tetromino], [TetrisGrid].
 use crate::app::player::LocalPlayer;
 use crate::app::remote::RemotePlayer;
-use crate::app::render_app::Piston2dOpenGlRenderer;
-use crate::app::ui::render_text;
+use crate::app::render_app::{Piston2dOpenGlRenderer, RenderTetrisCore, RenderTetrisUi};
 use crate::app::ui::text::Text;
 use crate::app::TetrisPlayer;
 use crate::once;
@@ -15,147 +14,138 @@ use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
 use tetris_core::{Position, TetrisColor, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS};
 
-pub fn render_remote_player(remote_player: &RemotePlayer, gl_ctx: &mut Piston2dOpenGlRenderer) {
-    if !remote_player.received_first_screen() {
-        return;
-    }
-    {
-        let screen = remote_player.get_player();
-        render_player(&screen, gl_ctx);
-    }
-    once!("render was done");
-}
-
-pub fn render_local_player(local_player: &LocalPlayer, gl_ctx: &mut Piston2dOpenGlRenderer) {
-    render_player(&local_player.player_screen, gl_ctx);
-}
-
-fn render_player(player: &TetrisPlayer, gl_ctx: &mut Piston2dOpenGlRenderer) {
-    let score_text = Text::new(
-        format!("Score: {}", player.score).as_str(),
-        DEFAULT_FONT_SIZE,
-        // the score is centered under the hold piece rectangle
-        DEFAULT_GRID_X - 4.0 * BLOCK_SIZE, // 4.0 = 1.0 (margin between borders) + 1.0 (margin inside) + 2.0 (half TETROMINO_MAX_WIDTH)
-        DEFAULT_SCORE_TEXT_Y,
-        TEXT_COLOR,
-    );
-    render_text(&score_text, gl_ctx);
-
-    let old_transform = gl_ctx.transform;
-    let grid_transform = gl_ctx.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
-    gl_ctx.transform = grid_transform;
-
-    if !player.is_in_play() {
-        render_tetromino(&player.tetromino_in_play, gl_ctx);
+impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
+    fn render_remote_player(&mut self, remote_player: &RemotePlayer) {
+        if !remote_player.received_first_screen() {
+            return;
+        }
+        {
+            let screen = remote_player.get_player();
+            self.render_player(&screen);
+        }
+        once!("render was done");
     }
 
-    render_tetris_grid(&player.matrix, gl_ctx);
-
-    if player.is_in_play() {
-        render_tetromino(&player.tetromino_in_play, gl_ctx);
-
-        let old_draw_state = gl_ctx.draw_state;
-        gl_ctx.draw_state = gl_ctx
-            .draw_state
-            .blend(graphics::draw_state::Blend::Multiply);
-        render_tetromino(&player.get_ghost_tetromino(), gl_ctx);
-        gl_ctx.draw_state = old_draw_state;
+    fn render_local_player(&mut self, local_player: &LocalPlayer) {
+        self.render_player(&local_player.player_screen);
     }
 
-    // drawing a border for the hold piece
-    gl_ctx.transform = grid_transform.trans(
-        -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
-        hidden_height(&player.matrix),
-    );
-    let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
-    let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
-    let dims: Rectangle = [0.0, 0.0, rectangle_width, rectangle_height];
-    rectangle(GRID_BG_COLOR, dims, gl_ctx.transform, &mut gl_ctx.gl);
-    let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
-    outline_rect.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, &mut gl_ctx.gl);
-
-    // drawing the hold piece
-    if let Some(saved) = &player.hold_queue {
-        gl_ctx.transform = grid_transform.trans(
-            -TETROMINO_MAX_WIDTH - 2.0 * BLOCK_SIZE,
-            TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
+    fn render_player(&mut self, player: &TetrisPlayer) {
+        let score_text = Text::new(
+            format!("Score: {}", player.score).as_str(),
+            DEFAULT_FONT_SIZE,
+            // the score is centered under the hold piece rectangle
+            DEFAULT_GRID_X - 4.0 * BLOCK_SIZE, // 4.0 = 1.0 (margin between borders) + 1.0 (margin inside) + 2.0 (half TETROMINO_MAX_WIDTH)
+            DEFAULT_SCORE_TEXT_Y,
+            TEXT_COLOR,
         );
-        render_tetromino(saved, gl_ctx);
+        self.render_text(&score_text);
+
+        let old_transform = self.transform;
+        let grid_transform = self.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
+        self.transform = grid_transform;
+
+        if !player.is_in_play() {
+            self.render_tetromino(&player.tetromino_in_play);
+        }
+
+        self.render_tetris_grid(&player.matrix);
+
+        if player.is_in_play() {
+            self.render_tetromino(&player.tetromino_in_play);
+
+            let old_draw_state = self.draw_state;
+            self.draw_state = self.draw_state.blend(graphics::draw_state::Blend::Multiply);
+            self.render_tetromino(&player.get_ghost_tetromino());
+            self.draw_state = old_draw_state;
+        }
+
+        // drawing a border for the hold piece
+        self.transform = grid_transform.trans(
+            -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
+            hidden_height(&player.matrix),
+        );
+        let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
+        let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
+        let dims: Rectangle = [0.0, 0.0, rectangle_width, rectangle_height];
+        rectangle(GRID_BG_COLOR, dims, self.transform, &mut self.gl);
+        let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
+        outline_rect.draw(dims, &self.draw_state, self.transform, &mut self.gl);
+
+        // drawing the hold piece
+        if let Some(saved) = &player.hold_queue {
+            self.transform = grid_transform.trans(
+                -TETROMINO_MAX_WIDTH - 2.0 * BLOCK_SIZE,
+                TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
+            );
+            self.render_tetromino(saved);
+        }
+
+        // drawing a border for the fifo of next pieces
+        self.transform = grid_transform.trans(
+            total_width(&player.matrix) + BLOCK_SIZE,
+            hidden_height(&player.matrix),
+        );
+        let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
+        let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;
+        let dims: Rectangle = [0.0, 0.0, width, height];
+        rectangle(GRID_BG_COLOR, dims, self.transform, &mut self.gl);
+        let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
+        outline_rect.draw(dims, &self.draw_state, self.transform, &mut self.gl);
+
+        // drawing the next pieces
+        for i in 0..NB_NEXT_TETROMINO {
+            self.transform = grid_transform.trans(
+                total_width(&player.matrix) + 2.0 * BLOCK_SIZE,
+                (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
+            );
+            if let Some(tetromino) = player.next_queue.get(i) {
+                self.render_tetromino(tetromino);
+            }
+        }
+
+        self.transform = old_transform;
     }
 
-    // drawing a border for the fifo of next pieces
-    gl_ctx.transform = grid_transform.trans(
-        total_width(&player.matrix) + BLOCK_SIZE,
-        hidden_height(&player.matrix),
-    );
-    let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
-    let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;
-    let dims: Rectangle = [0.0, 0.0, width, height];
-    rectangle(GRID_BG_COLOR, dims, gl_ctx.transform, &mut gl_ctx.gl);
-    let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
-    outline_rect.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, &mut gl_ctx.gl);
+    fn render_tetris_grid(&mut self, grid: &TetrisGrid) {
+        let empty_dims: Rectangle = [
+            0.0,
+            hidden_height(grid),
+            total_width(grid),
+            visible_height(grid),
+        ];
+        rectangle(GRID_BG_COLOR, empty_dims, self.transform, &mut self.gl);
+        let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
+        outline_rect.draw(empty_dims, &self.draw_state, self.transform, &mut self.gl);
 
-    // drawing the next pieces
-    for i in 0..NB_NEXT_TETROMINO {
-        gl_ctx.transform = grid_transform.trans(
-            total_width(&player.matrix) + 2.0 * BLOCK_SIZE,
-            (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
-        );
-        if let Some(tetromino) = player.next_queue.get(i) {
-            render_tetromino(tetromino, gl_ctx);
+        for position in grid.positions() {
+            if let Some(tetris_color) = grid[&position] {
+                self.render_tetris_block(&position, tetris_color);
+            }
         }
     }
 
-    gl_ctx.transform = old_transform;
-}
-
-fn render_tetris_grid(grid: &TetrisGrid, gl_ctx: &mut Piston2dOpenGlRenderer<'_>) {
-    let empty_dims: Rectangle = [
-        0.0,
-        hidden_height(grid),
-        total_width(grid),
-        visible_height(grid),
-    ];
-    rectangle(GRID_BG_COLOR, empty_dims, gl_ctx.transform, &mut gl_ctx.gl);
-    let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
-    outline_rect.draw(
-        empty_dims,
-        &gl_ctx.draw_state,
-        gl_ctx.transform,
-        &mut gl_ctx.gl,
-    );
-
-    for position in grid.positions() {
-        if let Some(tetris_color) = grid[&position] {
-            render_tetris_block(&position, &tetris_color, gl_ctx);
+    fn render_tetromino(&mut self, tetromino: &Tetromino) {
+        for block in tetromino.blocks() {
+            self.render_tetris_block(block, tetromino.color());
         }
     }
-}
 
-fn render_tetromino(tetromino: &Tetromino, gl_ctx: &mut Piston2dOpenGlRenderer<'_>) {
-    for block in tetromino.blocks() {
-        render_tetris_block(block, &tetromino.color(), gl_ctx);
+    /// In [player::render](super::render), helper to render a tetris block at `position` with `tetris_color`.
+    fn render_tetris_block(&mut self, position: &Position, tetris_color: TetrisColor) {
+        let dims = rectangle::square(
+            position.x() as Scalar * BLOCK_SIZE,
+            position.y() as Scalar * BLOCK_SIZE,
+            BLOCK_SIZE,
+        );
+
+        Image::new().rect(dims).draw(
+            self.assets.texture_for(&tetris_color),
+            &self.draw_state,
+            self.transform,
+            &mut self.gl,
+        );
     }
-}
-
-/// In [player::render](super::render), helper to render a tetris block at `position` with `tetris_color`.
-fn render_tetris_block(
-    position: &Position,
-    tetris_color: &TetrisColor,
-    gl_ctx: &mut Piston2dOpenGlRenderer<'_>,
-) {
-    let dims = rectangle::square(
-        position.x() as Scalar * BLOCK_SIZE,
-        position.y() as Scalar * BLOCK_SIZE,
-        BLOCK_SIZE,
-    );
-
-    Image::new().rect(dims).draw(
-        gl_ctx.assets.texture_for(tetris_color),
-        &gl_ctx.draw_state,
-        gl_ctx.transform,
-        &mut gl_ctx.gl,
-    );
 }
 
 fn total_width(grid: &TetrisGrid) -> f64 {

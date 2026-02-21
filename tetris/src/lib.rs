@@ -8,7 +8,7 @@ extern crate opengl_graphics;
 extern crate piston;
 
 use crate::{
-    app::{App, Piston2dOpenGlRenderer},
+    app::{App, Piston2dOpenGlRenderer, RenderTetrisGame},
     settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION},
 };
 use glfw_window::GlfwWindow;
@@ -99,7 +99,7 @@ pub fn event_loop() {
 
         if let Some(args) = e.render_args() {
             _now = SystemTime::now();
-            renderer.render(&args, &app);
+            renderer.render_app(&args, &app);
         }
     }
 }
