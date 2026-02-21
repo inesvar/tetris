@@ -11,10 +11,6 @@ use std::ops::Index;
 use std::str::FromStr;
 pub use tetris_color::TetrisColor;
 
-/// A reasonable maximum for "small unsigned numbers".
-/// Any [u32] less than or equal to [TETRIS_GRID_MAX] is safe to cast to [i32] and [usize].
-pub const TETRIS_GRID_MAX: u32 = 100;
-
 // TODO: fix UI when the value is different from 2.
 pub const NB_VISIBLE_BUFFER_ROWS: u32 = 2;
 
@@ -29,17 +25,17 @@ pub const NB_VISIBLE_BUFFER_ROWS: u32 = 2;
 pub struct TetrisGrid {
     /// Number of columns in the **Matrix** and **Buffer Zone**.
     ///
-    /// Has to be between 4 and [TETRIS_GRID_MAX].
+    /// Has to be between 4 and [TetrisGrid::MAX].
     /// Should be 10 according to the **Tetris Guideline**.
     nb_columns: i32,
     /// Number of rows in the **Matrix**.
     ///
-    /// Has to be between 6 and [TETRIS_GRID_MAX].
+    /// Has to be between 6 and [TetrisGrid::MAX].
     /// Should be 20 according to the **Tetris Guideline**.
     nb_matrix_rows: i32,
     /// Number of buffer rows (ie in the **Buffer Zone** above the **Skyline**).
     ///
-    /// Has to be between 2 and [TETRIS_GRID_MAX].
+    /// Has to be between 2 and [TetrisGrid::MAX].
     /// Should be 20 according to the **Tetris Guideline**.
     nb_buffer_rows: i32,
     /// **Matrix** and **Buffer Zone** cells, indexed *from bottom to top*.
@@ -81,15 +77,15 @@ impl TetrisGrid {
     /// # Panics
     ///
     /// If `nb_columns` or `nb_matrix_rows` or `nb_buffer_rows` aren't in the expected range.
-    /// - `nb_columns`: has to be between 4 and [TETRIS_GRID_MAX] (should be 10 according to the **Tetris Guideline**);
-    /// - `nb_matrix_rows`: has to be between 6 and [TETRIS_GRID_MAX] (should be 20 according to the **Tetris Guideline**);
-    /// - `nb_buffer_rows`: sas to be between 2 and [TETRIS_GRID_MAX] (should be 20 according to the **Tetris Guideline**).
+    /// - `nb_columns`: has to be between 4 and [TetrisGrid::MAX] (should be 10 according to the **Tetris Guideline**);
+    /// - `nb_matrix_rows`: has to be between 6 and [TetrisGrid::MAX] (should be 20 according to the **Tetris Guideline**);
+    /// - `nb_buffer_rows`: sas to be between 2 and [TetrisGrid::MAX] (should be 20 according to the **Tetris Guideline**).
     pub fn new(nb_columns: u32, nb_matrix_rows: u32, nb_buffer_rows: u32) -> Self {
-        if nb_columns > TETRIS_GRID_MAX
-            || nb_matrix_rows > TETRIS_GRID_MAX
-            || nb_buffer_rows > TETRIS_GRID_MAX
+        if nb_columns > TetrisGrid::MAX
+            || nb_matrix_rows > TetrisGrid::MAX
+            || nb_buffer_rows > TetrisGrid::MAX
         {
-            panic!("`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `TETRIS_GRID_MAX`");
+            panic!("`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `TetrisGrid::MAX`");
         }
         if nb_columns < 4 {
             panic!("`nb_columns` should be greater than or equal to 4");
@@ -350,6 +346,10 @@ impl Display for TetrisGrid {
 }
 
 impl TetrisGrid {
+    /// A reasonable maximum for "small unsigned numbers".
+    /// Any [u32] less than or equal to [TetrisGrid::MAX] is safe to cast to [i32] and [usize].
+    pub const MAX: u32 = 100;
+
     pub const DEFAULT_NB_COLUMNS: u32 = 10;
     pub const DEFAULT_NB_MATRIX_ROWS: u32 = 20;
     pub const DEFAULT_NB_BUFFER_ROWS: u32 = 20;
@@ -433,16 +433,16 @@ mod tests {
 
     #[test]
     fn tetris_grid_max_is_safe_to_cast() {
-        assert!(i32::try_from(TETRIS_GRID_MAX).is_ok());
-        assert!(usize::try_from(TETRIS_GRID_MAX).is_ok());
+        assert!(i32::try_from(TetrisGrid::MAX).is_ok());
+        assert!(usize::try_from(TetrisGrid::MAX).is_ok());
     }
 
     #[rstest]
-    #[case(TETRIS_GRID_MAX + 1, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, TetrisGrid::DEFAULT_NB_BUFFER_ROWS)]
-    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TETRIS_GRID_MAX + 1, TetrisGrid::DEFAULT_NB_BUFFER_ROWS)]
-    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, TETRIS_GRID_MAX + 1)]
+    #[case(TetrisGrid::MAX + 1, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, TetrisGrid::DEFAULT_NB_BUFFER_ROWS)]
+    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::MAX + 1, TetrisGrid::DEFAULT_NB_BUFFER_ROWS)]
+    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, TetrisGrid::MAX + 1)]
     #[should_panic(
-        expected = "`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `TETRIS_GRID_MAX`"
+        expected = "`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `TetrisGrid::MAX`"
     )]
     fn new_panics_if_any_arg_is_too_big(
         #[case] nb_columns: u32,
@@ -476,9 +476,9 @@ mod tests {
     #[case::compact(TetrisGrid::compact_new())]
     #[case::smallest_possible_grid(TetrisGrid::new(4, 6, 2))]
     #[case::biggest_possible_grid(TetrisGrid::new(
-        TETRIS_GRID_MAX,
-        TETRIS_GRID_MAX,
-        TETRIS_GRID_MAX
+        TetrisGrid::MAX,
+        TetrisGrid::MAX,
+        TetrisGrid::MAX
     ))]
     fn new_doesnt_panic_if_all_args_are_correct(#[case] _grid: TetrisGrid) {}
 
@@ -488,7 +488,7 @@ mod tests {
         TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
         TetrisGrid::DEFAULT_NB_BUFFER_ROWS
     )]
-    #[case::biggest_possible(TETRIS_GRID_MAX, TETRIS_GRID_MAX, TETRIS_GRID_MAX)]
+    #[case::biggest_possible(TetrisGrid::MAX, TetrisGrid::MAX, TetrisGrid::MAX)]
     fn new_is_correct(
         #[case] nb_columns: u32,
         #[case] nb_matrix_rows: u32,
