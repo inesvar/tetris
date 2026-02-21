@@ -13,17 +13,15 @@ use self::ui::{
     text::Text,
 };
 use crate::app::remote::MessageType;
-use crate::assets::Assets;
 use crate::keybindings::Keybindings;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
-use include_assets::NamedArchive;
 use local_ip_address::local_ip;
-use opengl_graphics::{GlGraphics, OpenGL};
 use piston::MouseButton;
 use piston_window::Key;
 use rand::RngExt;
 use render_app::Piston2dGraphicsArguments;
+pub use render_app::Renderer;
 use serde::{Deserialize, Serialize};
 use std::net::TcpStream;
 pub use ui::TetrisCommand;
@@ -98,11 +96,6 @@ pub enum RunningState {
     Starting,
 }
 
-pub struct Renderer<'a> {
-    gl: GlGraphics,
-    assets: Assets<'a>,
-}
-
 pub struct App {
     local_players: Vec<LocalPlayer>,
     remote_player: Vec<RemotePlayer>,
@@ -123,17 +116,6 @@ pub struct App {
     is_host: bool,
     fall_speed_divide: u64,
     freeze: u64,
-}
-
-impl<'a> Renderer<'a> {
-    pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
-        let assets = Assets::new(assets_archive);
-
-        Self {
-            gl: GlGraphics::new(gl_version),
-            assets,
-        }
-    }
 }
 
 impl App {

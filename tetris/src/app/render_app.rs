@@ -1,13 +1,29 @@
 //! Define the render function of [App].
 use super::{App, RunningState, ViewState};
-use crate::app::Renderer;
 use crate::assets::Assets;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
 use graphics::types::Matrix2d;
 use graphics::DrawState;
 use graphics::Transformed;
-use opengl_graphics::GlGraphics;
+use include_assets::NamedArchive;
+use opengl_graphics::{GlGraphics, OpenGL};
 use piston::RenderArgs;
+
+pub struct Renderer<'a> {
+    gl: GlGraphics,
+    assets: Assets<'a>,
+}
+
+impl<'a> Renderer<'a> {
+    pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
+        let assets = Assets::new(assets_archive);
+
+        Self {
+            gl: GlGraphics::new(gl_version),
+            assets,
+        }
+    }
+}
 
 pub(super) struct Piston2dGraphicsArguments<'short, 'long> {
     pub(super) transform: Matrix2d,
