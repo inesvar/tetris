@@ -1,5 +1,7 @@
 - stop modifying the grid to display the countdown :OK
+- but display the countdown anyway
 - erase `start`
+- separate `ui` crate (necessary for `render` crate)
 
 - make tetris_core integration tests
 - code getters and make fields private (TetrisPlayer)
@@ -9,7 +11,9 @@
 - make more tetris_grid unit tests
 
 # problems
-- the clock should pause during a game pause (partially revert blinking changes)
+- the clock should pause during a game pause :
+    the renderer and the app should have a separate clock
+    the app should pause its clock during tetris pause, while the renderer should not
 - serialize a PlayerScreen(PlayerScreen) instead of doing black magic
 - use tokio to outsource tcp comms
 - today key inputs are sent to the tetris game and mouse inputs to the app... something more flexible would be great
