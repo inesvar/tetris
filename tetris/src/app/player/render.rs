@@ -70,9 +70,9 @@ fn render_player(player: &TetrisPlayer, gl_ctx: &mut Piston2dGraphicsArguments) 
     let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
     let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
     let dims: Rectangle = [0.0, 0.0, rectangle_width, rectangle_height];
-    rectangle(GRID_BG_COLOR, dims, gl_ctx.transform, gl_ctx.gl);
+    rectangle(GRID_BG_COLOR, dims, gl_ctx.transform, &mut gl_ctx.gl);
     let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
-    outline_rect.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, gl_ctx.gl);
+    outline_rect.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, &mut gl_ctx.gl);
 
     // drawing the hold piece
     if let Some(saved) = &player.hold_queue {
@@ -91,9 +91,9 @@ fn render_player(player: &TetrisPlayer, gl_ctx: &mut Piston2dGraphicsArguments) 
     let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
     let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;
     let dims: Rectangle = [0.0, 0.0, width, height];
-    rectangle(GRID_BG_COLOR, dims, gl_ctx.transform, gl_ctx.gl);
+    rectangle(GRID_BG_COLOR, dims, gl_ctx.transform, &mut gl_ctx.gl);
     let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
-    outline_rect.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, gl_ctx.gl);
+    outline_rect.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, &mut gl_ctx.gl);
 
     // drawing the next pieces
     for i in 0..NB_NEXT_TETROMINO {
@@ -109,16 +109,21 @@ fn render_player(player: &TetrisPlayer, gl_ctx: &mut Piston2dGraphicsArguments) 
     gl_ctx.transform = old_transform;
 }
 
-fn render_tetris_grid(grid: &TetrisGrid, gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>) {
+fn render_tetris_grid(grid: &TetrisGrid, gl_ctx: &mut Piston2dGraphicsArguments<'_>) {
     let empty_dims: Rectangle = [
         0.0,
         hidden_height(grid),
         total_width(grid),
         visible_height(grid),
     ];
-    rectangle(GRID_BG_COLOR, empty_dims, gl_ctx.transform, gl_ctx.gl);
+    rectangle(GRID_BG_COLOR, empty_dims, gl_ctx.transform, &mut gl_ctx.gl);
     let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
-    outline_rect.draw(empty_dims, &gl_ctx.draw_state, gl_ctx.transform, gl_ctx.gl);
+    outline_rect.draw(
+        empty_dims,
+        &gl_ctx.draw_state,
+        gl_ctx.transform,
+        &mut gl_ctx.gl,
+    );
 
     for position in grid.positions() {
         if let Some(tetris_color) = grid[&position] {
@@ -127,7 +132,7 @@ fn render_tetris_grid(grid: &TetrisGrid, gl_ctx: &mut Piston2dGraphicsArguments<
     }
 }
 
-fn render_tetromino(tetromino: &Tetromino, gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>) {
+fn render_tetromino(tetromino: &Tetromino, gl_ctx: &mut Piston2dGraphicsArguments<'_>) {
     for block in tetromino.blocks() {
         render_tetris_block(block, &tetromino.color(), gl_ctx);
     }
@@ -137,7 +142,7 @@ fn render_tetromino(tetromino: &Tetromino, gl_ctx: &mut Piston2dGraphicsArgument
 fn render_tetris_block(
     position: &Position,
     tetris_color: &TetrisColor,
-    gl_ctx: &mut Piston2dGraphicsArguments<'_, '_>,
+    gl_ctx: &mut Piston2dGraphicsArguments<'_>,
 ) {
     let dims = rectangle::square(
         position.x() as Scalar * BLOCK_SIZE,
@@ -149,7 +154,7 @@ fn render_tetris_block(
         gl_ctx.assets.texture_for(tetris_color),
         &gl_ctx.draw_state,
         gl_ctx.transform,
-        gl_ctx.gl,
+        &mut gl_ctx.gl,
     );
 }
 

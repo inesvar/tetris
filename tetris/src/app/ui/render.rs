@@ -26,7 +26,7 @@ pub fn render_text(text: &Text, gl_ctx: &mut Piston2dGraphicsArguments) {
             font,
             &gl_ctx.draw_state,
             gl_ctx.transform,
-            gl_ctx.gl,
+            &mut gl_ctx.gl,
         )
         .unwrap();
 
@@ -49,7 +49,7 @@ fn render_text_input(input: &TextInput, gl_ctx: &mut Piston2dGraphicsArguments) 
     };
 
     let outline_rect = graphics::Rectangle::new_border(color, 1.0);
-    outline_rect.draw(dims, &gl_ctx.draw_state, button_transform, gl_ctx.gl);
+    outline_rect.draw(dims, &gl_ctx.draw_state, button_transform, &mut gl_ctx.gl);
 
     if input.focused && gl_ctx.elapsed_secs % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0 {
         let mut text_with_cursor = input.text.clone();
@@ -82,7 +82,7 @@ fn render_key_input(key_input: &KeyInput, gl_ctx: &mut Piston2dGraphicsArguments
     };
 
     let outline_rect = graphics::Rectangle::new_border(color, 1.0);
-    outline_rect.draw(dims, &gl_ctx.draw_state, button_transform, gl_ctx.gl);
+    outline_rect.draw(dims, &gl_ctx.draw_state, button_transform, &mut gl_ctx.gl);
 
     if key_input.focused && gl_ctx.elapsed_secs % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0 {
         let mut text_with_cursor = key_input.custom_text.clone();
@@ -114,7 +114,7 @@ fn render_button(button: &Button, gl_ctx: &mut Piston2dGraphicsArguments) {
     let old_transform = gl_ctx.transform;
     gl_ctx.transform = gl_ctx.transform.trans(button.x, button.y);
 
-    rectangle.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, gl_ctx.gl);
+    rectangle.draw(dims, &gl_ctx.draw_state, gl_ctx.transform, &mut gl_ctx.gl);
 
     render_text(&button.text, gl_ctx);
 

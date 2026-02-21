@@ -8,7 +8,7 @@ extern crate opengl_graphics;
 extern crate piston;
 
 use crate::{
-    app::{App, Renderer},
+    app::{App, Piston2dGraphicsArguments},
     settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION},
 };
 use glfw_window::GlfwWindow;
@@ -42,7 +42,7 @@ pub fn event_loop() {
     // Create the app.
     let assets_archive = NamedArchive::load(include_dir!("../assets"));
     let mut app = App::new();
-    let mut renderer = Renderer::new(OPENGL_VERSION, &assets_archive);
+    let mut renderer = Piston2dGraphicsArguments::new(OPENGL_VERSION, &assets_archive);
 
     // Start the event loop.
     let mut events = Events::new(EventSettings::new());

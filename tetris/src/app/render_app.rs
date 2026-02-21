@@ -5,112 +5,94 @@ use crate::app::ui::{render_text, render_widget_manager};
 use crate::assets::Assets;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
 use graphics::types::Matrix2d;
-use graphics::DrawState;
 use graphics::Transformed;
+use graphics::{Context, DrawState};
 use include_assets::NamedArchive;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::RenderArgs;
 
-pub struct Renderer<'a> {
-    gl: GlGraphics,
-    assets: Assets<'a>,
+pub struct Piston2dGraphicsArguments<'a> {
+    pub gl: GlGraphics,
+    pub assets: Assets<'a>,
+    pub(super) transform: Matrix2d,
+    pub(super) draw_state: DrawState,
+    pub(super) elapsed_secs: f64,
 }
 
-impl<'a> Renderer<'a> {
+impl<'a> Piston2dGraphicsArguments<'a> {
     pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
         let assets = Assets::new(assets_archive);
 
         Self {
             gl: GlGraphics::new(gl_version),
             assets,
+            transform: Matrix2d::default(),
+            draw_state: DrawState::default(),
+            elapsed_secs: 0.0,
         }
+    }
+
+    fn update(&mut self, ctx: &Context, clock: f64) {
+        self.transform = ctx.transform;
+        self.draw_state = ctx.draw_state;
+        self.elapsed_secs = clock;
     }
 }
 
-pub(super) struct Piston2dGraphicsArguments<'short, 'long> {
-    pub(super) transform: Matrix2d,
-    pub(super) draw_state: DrawState,
-    pub(super) gl: &'short mut GlGraphics,
-    pub(super) assets: &'short mut Assets<'long>,
-    pub(super) elapsed_secs: f64,
-}
-
-impl<'short, 'long> Piston2dGraphicsArguments<'short, 'long> {
-    pub(in crate::app) fn new(
-        transform: Matrix2d,
-        draw_state: DrawState,
-        gl: &'short mut GlGraphics,
-        assets: &'short mut Assets<'long>,
-        elapsed_secs: f64,
-    ) -> Self {
-        Self {
-            transform,
-            draw_state,
-            gl,
-            assets,
-            elapsed_secs,
-        }
-    }
-}
-
-impl Renderer<'_> {
+impl Piston2dGraphicsArguments<'_> {
     pub fn render(&mut self, args: &RenderArgs, app: &App) {
-        self.gl.draw(args.viewport(), |ctx, gl| {
-            // Clear the screen.
-            graphics::clear(BG_COLOR, gl);
+        let ctx = self.gl.draw_begin(args.viewport());
 
-            let mut gl_ctx = Piston2dGraphicsArguments::new(
-                ctx.transform,
-                ctx.draw_state,
-                gl,
-                &mut self.assets,
-                app.clock,
-            );
+        self.update(&ctx, app.clock);
 
-            match &app.view_state {
-                ViewState::MainMenu => {
-                    render_text(&app.title_text, &mut gl_ctx);
-                    render_widget_manager(&app.widget_manager[0], &mut gl_ctx)
-                }
-                ViewState::Settings => {
-                    render_text(&app.title_text, &mut gl_ctx);
-                    for widget_manager in &app.widget_manager {
-                        render_widget_manager(widget_manager, &mut gl_ctx);
-                    }
-                }
-                ViewState::CreateRoom => {
-                    render_text(&app.title_text, &mut gl_ctx);
-                    render_widget_manager(&app.widget_manager[0], &mut gl_ctx)
-                }
-                ViewState::JoinRoom => {
-                    render_text(&app.title_text, &mut gl_ctx);
-                    render_widget_manager(&app.widget_manager[0], &mut gl_ctx)
-                }
-                a if a.is_game() => {
-                    render_widget_manager(&app.widget_manager[0], &mut gl_ctx);
-                    if app.running == RunningState::Running {
-                        render_text(&app.title_text, &mut gl_ctx);
-                    } else if app.running == RunningState::NotRunning {
-                        render_text(&app.restart_text, &mut gl_ctx);
-                    } else if app.running == RunningState::Paused {
-                        render_text(&app.pause_text, &mut gl_ctx);
-                    } else if app.running == RunningState::Starting {
-                        render_text(&app.title_text, &mut gl_ctx);
-                    }
+        // Clear the screen.
+        graphics::clear(BG_COLOR, &mut self.gl);
 
-                    render_text(&app.timer_text, &mut gl_ctx);
-
-                    for player in &app.local_players {
-                        render_local_player(player, &mut gl_ctx);
-                        gl_ctx.transform = gl_ctx.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
-                    }
-                    for player in &app.remote_player {
-                        render_remote_player(player, &mut gl_ctx);
-                        gl_ctx.transform = gl_ctx.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
-                    }
-                }
-                _ => unreachable!(),
+        match &app.view_state {
+            ViewState::MainMenu => {
+                render_text(&app.title_text, self);
+                render_widget_manager(&app.widget_manager[0], self)
             }
-        });
+            ViewState::Settings => {
+                render_text(&app.title_text, self);
+                for widget_manager in &app.widget_manager {
+                    render_widget_manager(widget_manager, self);
+                }
+            }
+            ViewState::CreateRoom => {
+                render_text(&app.title_text, self);
+                render_widget_manager(&app.widget_manager[0], self)
+            }
+            ViewState::JoinRoom => {
+                render_text(&app.title_text, self);
+                render_widget_manager(&app.widget_manager[0], self)
+            }
+            a if a.is_game() => {
+                render_widget_manager(&app.widget_manager[0], self);
+                if app.running == RunningState::Running {
+                    render_text(&app.title_text, self);
+                } else if app.running == RunningState::NotRunning {
+                    render_text(&app.restart_text, self);
+                } else if app.running == RunningState::Paused {
+                    render_text(&app.pause_text, self);
+                } else if app.running == RunningState::Starting {
+                    render_text(&app.title_text, self);
+                }
+
+                render_text(&app.timer_text, self);
+
+                for player in &app.local_players {
+                    render_local_player(player, self);
+                    self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
+                }
+                for player in &app.remote_player {
+                    render_remote_player(player, self);
+                    self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
+                }
+            }
+            _ => unreachable!(),
+        }
+
+        self.gl.draw_end();
     }
 }
