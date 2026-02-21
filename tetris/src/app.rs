@@ -103,8 +103,7 @@ pub struct Renderer<'a> {
     assets: Assets<'a>,
 }
 
-pub struct App<'a> {
-    pub renderer: Renderer<'a>,
+pub struct App {
     local_players: Vec<LocalPlayer>,
     remote_player: Vec<RemotePlayer>,
     pub player_config: PlayerConfig,
@@ -127,7 +126,7 @@ pub struct App<'a> {
 }
 
 impl<'a> Renderer<'a> {
-    fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
+    pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
         let assets = Assets::new(assets_archive);
 
         Self {
@@ -137,8 +136,8 @@ impl<'a> Renderer<'a> {
     }
 }
 
-impl<'a> App<'a> {
-    pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
+impl App {
+    pub fn new() -> Self {
         let mut rng = rand::rng();
         let seed: u64 = rng.random();
         let is_host = false;
@@ -151,7 +150,6 @@ impl<'a> App<'a> {
         let settings_manager = Settings::new(seed, &player_config);
 
         App {
-            renderer: Renderer::new(gl_version, assets_archive),
             local_players: players,
             remote_player: rem_players,
             player_config,

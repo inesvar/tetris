@@ -1,8 +1,8 @@
 //! Define the render function of [App].
 use super::{App, RunningState, ViewState};
+use crate::app::Renderer;
 use crate::assets::Assets;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
-use crate::utils::formattings::format_seconds;
 use graphics::types::Matrix2d;
 use graphics::DrawState;
 use graphics::Transformed;
@@ -41,9 +41,9 @@ pub(super) trait Render<GlCtx> {
     fn render(&self, graphics_args: &mut GlCtx);
 }
 
-impl App<'_> {
-    pub fn render(&mut self, args: &RenderArgs) {
-        self.renderer.gl.draw(args.viewport(), |ctx, gl| {
+impl Renderer<'_> {
+    pub fn render(&mut self, args: &RenderArgs, app: &App) {
+        self.gl.draw(args.viewport(), |ctx, gl| {
             // Clear the screen.
             graphics::clear(BG_COLOR, gl);
 
@@ -51,54 +51,48 @@ impl App<'_> {
                 ctx.transform,
                 ctx.draw_state,
                 gl,
-                &mut self.renderer.assets,
-                self.clock,
+                &mut self.assets,
+                app.clock,
             );
 
-            match &self.view_state {
+            match &app.view_state {
                 ViewState::MainMenu => {
-                    self.title_text.render(&mut gl_ctx);
-                    self.widget_manager[0].render(&mut gl_ctx)
+                    app.title_text.render(&mut gl_ctx);
+                    app.widget_manager[0].render(&mut gl_ctx)
                 }
                 ViewState::Settings => {
-                    self.title_text.render(&mut gl_ctx);
-                    for widget_manager in &mut self.widget_manager {
+                    app.title_text.render(&mut gl_ctx);
+                    for widget_manager in &app.widget_manager {
                         widget_manager.render(&mut gl_ctx);
                     }
                 }
                 ViewState::CreateRoom => {
-                    self.title_text.render(&mut gl_ctx);
-                    self.widget_manager[0].render(&mut gl_ctx)
+                    app.title_text.render(&mut gl_ctx);
+                    app.widget_manager[0].render(&mut gl_ctx)
                 }
                 ViewState::JoinRoom => {
-                    self.title_text.render(&mut gl_ctx);
-                    self.widget_manager[0].render(&mut gl_ctx)
+                    app.title_text.render(&mut gl_ctx);
+                    app.widget_manager[0].render(&mut gl_ctx)
                 }
                 a if a.is_game() => {
-                    self.widget_manager[0].render(&mut gl_ctx);
-                    if self.running == RunningState::Running {
-                        self.title_text.render(&mut gl_ctx);
-                        self.timer_text.set_text(format_seconds(self.clock));
-                    } else if self.running == RunningState::NotRunning {
-                        self.restart_text.render(&mut gl_ctx);
-                        self.timer_text
-                            .set_text(format!("Elapsed: {:.2}s", self.clock));
-                    } else if self.running == RunningState::Paused {
-                        self.pause_text.render(&mut gl_ctx);
-                        self.timer_text
-                            .set_text(format!("Elapsed: {:.2}s", self.clock));
-                    } else if self.running == RunningState::Starting {
-                        self.title_text.render(&mut gl_ctx);
-                        self.timer_text.set_text("Elapsed: 0.00s".to_string());
+                    app.widget_manager[0].render(&mut gl_ctx);
+                    if app.running == RunningState::Running {
+                        app.title_text.render(&mut gl_ctx);
+                    } else if app.running == RunningState::NotRunning {
+                        app.restart_text.render(&mut gl_ctx);
+                    } else if app.running == RunningState::Paused {
+                        app.pause_text.render(&mut gl_ctx);
+                    } else if app.running == RunningState::Starting {
+                        app.title_text.render(&mut gl_ctx);
                     }
 
-                    self.timer_text.render(&mut gl_ctx);
+                    app.timer_text.render(&mut gl_ctx);
 
-                    for player in &mut self.local_players {
+                    for player in &app.local_players {
                         player.render(&mut gl_ctx);
                         gl_ctx.transform = gl_ctx.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                     }
-                    for player in &mut self.remote_player {
+                    for player in &app.remote_player {
                         player.render(&mut gl_ctx);
                         gl_ctx.transform = gl_ctx.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                     }
