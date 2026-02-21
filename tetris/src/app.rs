@@ -20,7 +20,7 @@ use local_ip_address::local_ip;
 use piston::MouseButton;
 use piston_window::Key;
 use rand::RngExt;
-pub use render_app::Piston2dGraphicsArguments;
+pub use render_app::Piston2dOpenGlRenderer;
 use serde::{Deserialize, Serialize};
 use std::net::TcpStream;
 pub use ui::TetrisCommand;

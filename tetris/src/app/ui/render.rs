@@ -1,5 +1,5 @@
 //! Implement [Render] for [Text] and [InteractiveWidgetManager] (composed of [TextInput], [KeyInput] and [Button]).
-use super::super::Piston2dGraphicsArguments;
+use super::super::Piston2dOpenGlRenderer;
 use super::button::Button;
 use super::interactive_widget_manager::InteractiveWidgetManager;
 use super::key_input::KeyInput;
@@ -8,7 +8,7 @@ use super::text_input::TextInput;
 use crate::settings::{CURSOR_BLINK_PERIOD, DEFAULT_BUTTON_Y_SPACING, TEXT_COLOR};
 use graphics::{color, rectangle, Transformed};
 
-pub fn render_text(text: &Text, gl_ctx: &mut Piston2dGraphicsArguments) {
+pub fn render_text(text: &Text, gl_ctx: &mut Piston2dOpenGlRenderer) {
     let old_transform = gl_ctx.transform;
     gl_ctx.transform = gl_ctx.transform.trans(
         text.x - text.content.len() as f64 * text.font_size as f64 * 0.315,
@@ -33,7 +33,7 @@ pub fn render_text(text: &Text, gl_ctx: &mut Piston2dGraphicsArguments) {
     gl_ctx.transform = old_transform;
 }
 
-fn render_text_input(input: &TextInput, gl_ctx: &mut Piston2dGraphicsArguments) {
+fn render_text_input(input: &TextInput, gl_ctx: &mut Piston2dOpenGlRenderer) {
     let dims = rectangle::rectangle_by_corners(
         -input.width / 2.0,
         -input.height / 2.0,
@@ -66,7 +66,7 @@ fn render_text_input(input: &TextInput, gl_ctx: &mut Piston2dGraphicsArguments) 
     gl_ctx.transform = old_transform;
 }
 
-fn render_key_input(key_input: &KeyInput, gl_ctx: &mut Piston2dGraphicsArguments) {
+fn render_key_input(key_input: &KeyInput, gl_ctx: &mut Piston2dOpenGlRenderer) {
     let dims = rectangle::rectangle_by_corners(
         -key_input.width / 2.0,
         -key_input.height / 2.0,
@@ -102,7 +102,7 @@ fn render_key_input(key_input: &KeyInput, gl_ctx: &mut Piston2dGraphicsArguments
     gl_ctx.transform = old_transform;
 }
 
-fn render_button(button: &Button, gl_ctx: &mut Piston2dGraphicsArguments) {
+fn render_button(button: &Button, gl_ctx: &mut Piston2dOpenGlRenderer) {
     let dims = rectangle::rectangle_by_corners(
         -button.width / 2.0,
         -button.height / 2.0,
@@ -123,7 +123,7 @@ fn render_button(button: &Button, gl_ctx: &mut Piston2dGraphicsArguments) {
 
 pub fn render_widget_manager(
     manager: &InteractiveWidgetManager,
-    gl_ctx: &mut Piston2dGraphicsArguments,
+    gl_ctx: &mut Piston2dOpenGlRenderer,
 ) {
     for button in manager.buttons.values() {
         render_button(button, gl_ctx);

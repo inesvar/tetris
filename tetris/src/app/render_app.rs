@@ -11,7 +11,7 @@ use include_assets::NamedArchive;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::RenderArgs;
 
-pub struct Piston2dGraphicsArguments<'a> {
+pub struct Piston2dOpenGlRenderer<'a> {
     pub gl: GlGraphics,
     pub assets: Assets<'a>,
     pub(super) transform: Matrix2d,
@@ -19,7 +19,7 @@ pub struct Piston2dGraphicsArguments<'a> {
     pub(super) elapsed_secs: f64,
 }
 
-impl<'a> Piston2dGraphicsArguments<'a> {
+impl<'a> Piston2dOpenGlRenderer<'a> {
     pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
         let assets = Assets::new(assets_archive);
 
@@ -39,7 +39,7 @@ impl<'a> Piston2dGraphicsArguments<'a> {
     }
 }
 
-impl Piston2dGraphicsArguments<'_> {
+impl Piston2dOpenGlRenderer<'_> {
     pub fn render(&mut self, args: &RenderArgs, app: &App) {
         let ctx = self.gl.draw_begin(args.viewport());
 
