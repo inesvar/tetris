@@ -27,10 +27,6 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         let grid_transform = self.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
         self.transform = grid_transform;
 
-        if !player.is_in_play() {
-            self.render_tetromino(&player.tetromino_in_play);
-        }
-
         self.render_tetris_grid(&player.matrix);
 
         if player.is_in_play() {
@@ -40,6 +36,8 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
             self.draw_state = self.draw_state.blend(graphics::draw_state::Blend::Multiply);
             self.render_tetromino(&player.get_ghost_tetromino());
             self.draw_state = old_draw_state;
+        } else if (self.elapsed_secs * 2.0) % 2.0 < 1.0 {
+            self.render_tetromino(&player.tetromino_in_play);
         }
 
         // drawing a border for the hold piece

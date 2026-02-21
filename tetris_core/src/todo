@@ -2,6 +2,7 @@
 - but display the countdown anyway
 - erase `start`
 - separate `ui` crate (necessary for `render` crate)
+- the tetrominos should not change the first time the game is started
 
 - make tetris_core integration tests
 - code getters and make fields private (TetrisPlayer)
