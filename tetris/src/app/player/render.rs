@@ -1,4 +1,4 @@
-//! Define `trait` [Render] for [LocalPlayer], [TetrisPlayer], [Tetromino], [TetrisGrid].
+//! Define `trait` [RenderTetrisCore] for [TetrisPlayer], [Tetromino], [TetrisGrid].
 use crate::app::render_app::{Piston2dOpenGlRenderer, RenderTetrisCore, RenderTetrisUi};
 use crate::app::ui::text::Text;
 use crate::app::TetrisPlayer;

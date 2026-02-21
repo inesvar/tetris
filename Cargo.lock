@@ -2274,6 +2274,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ba39f3699c378cd8970968dcbff9c43159ea4cfbd88d43c00b22f2ef10a435d2"
 
 [[package]]
+name = "render_tetris"
+version = "0.1.0"
+dependencies = [
+ "piston2d-graphics",
+ "piston2d-opengl_graphics",
+ "tetris_core",
+]
+
+[[package]]
 name = "rgb"
 version = "0.8.50"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2629,6 +2638,7 @@ dependencies = [
  "pistoncore-glfw_window",
  "rand 0.10.0",
  "rand_pcg",
+ "render_tetris",
  "rstest",
  "serde",
  "serde_cbor",
