@@ -1,6 +1,6 @@
 use super::MessageType;
 use crate::{
-    app::{render_app::Render, GameFlowChange, Piston2dGraphicsArguments, TetrisPlayer},
+    app::{GameFlowChange, TetrisPlayer},
     once,
     settings::BAG_TYPE,
 };
@@ -8,7 +8,7 @@ use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::{
     net::{TcpListener, TcpStream},
-    sync::{Arc, Mutex},
+    sync::{Arc, Mutex, MutexGuard},
     thread,
 };
 
@@ -133,17 +133,12 @@ impl RemotePlayer {
         }
         last_game_flow
     }
-}
 
-impl Render<Piston2dGraphicsArguments<'_, '_>> for RemotePlayer {
-    fn render(&self, gl_ctx: &mut Piston2dGraphicsArguments) {
-        if !*self.first_screen_received.lock().unwrap() {
-            return;
-        }
-        {
-            let screen = self.screen.lock().unwrap();
-            screen.render(gl_ctx);
-        }
-        once!("render was done");
+    pub(in crate::app) fn received_first_screen(&self) -> bool {
+        *self.first_screen_received.lock().unwrap()
+    }
+
+    pub(in crate::app) fn get_player(&self) -> MutexGuard<'_, TetrisPlayer> {
+        self.screen.lock().unwrap()
     }
 }

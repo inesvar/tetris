@@ -1,5 +1,6 @@
 //! Define the render function of [App].
 use super::{App, RunningState, ViewState};
+use crate::app::player::{render_local_player, render_remote_player};
 use crate::assets::Assets;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
 use graphics::types::Matrix2d;
@@ -105,11 +106,11 @@ impl Renderer<'_> {
                     app.timer_text.render(&mut gl_ctx);
 
                     for player in &app.local_players {
-                        player.render(&mut gl_ctx);
+                        render_local_player(player, &mut gl_ctx);
                         gl_ctx.transform = gl_ctx.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                     }
                     for player in &app.remote_player {
-                        player.render(&mut gl_ctx);
+                        render_remote_player(player, &mut gl_ctx);
                         gl_ctx.transform = gl_ctx.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                     }
                 }
