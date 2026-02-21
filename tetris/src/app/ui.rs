@@ -7,3 +7,4 @@ pub mod text;
 pub mod text_input;
 
 pub use interactive_widget_manager::TetrisCommand;
+pub use render::{render_text, render_widget_manager};

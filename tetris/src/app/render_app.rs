@@ -1,6 +1,7 @@
 //! Define the render function of [App].
 use super::{App, RunningState, ViewState};
 use crate::app::player::{render_local_player, render_remote_player};
+use crate::app::ui::{render_text, render_widget_manager};
 use crate::assets::Assets;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
 use graphics::types::Matrix2d;
@@ -52,12 +53,6 @@ impl<'short, 'long> Piston2dGraphicsArguments<'short, 'long> {
     }
 }
 
-#[allow(dead_code)]
-/// Draw tetris objects.
-pub(super) trait Render<GlCtx> {
-    fn render(&self, graphics_args: &mut GlCtx);
-}
-
 impl Renderer<'_> {
     pub fn render(&mut self, args: &RenderArgs, app: &App) {
         self.gl.draw(args.viewport(), |ctx, gl| {
@@ -74,36 +69,36 @@ impl Renderer<'_> {
 
             match &app.view_state {
                 ViewState::MainMenu => {
-                    app.title_text.render(&mut gl_ctx);
-                    app.widget_manager[0].render(&mut gl_ctx)
+                    render_text(&app.title_text, &mut gl_ctx);
+                    render_widget_manager(&app.widget_manager[0], &mut gl_ctx)
                 }
                 ViewState::Settings => {
-                    app.title_text.render(&mut gl_ctx);
+                    render_text(&app.title_text, &mut gl_ctx);
                     for widget_manager in &app.widget_manager {
-                        widget_manager.render(&mut gl_ctx);
+                        render_widget_manager(widget_manager, &mut gl_ctx);
                     }
                 }
                 ViewState::CreateRoom => {
-                    app.title_text.render(&mut gl_ctx);
-                    app.widget_manager[0].render(&mut gl_ctx)
+                    render_text(&app.title_text, &mut gl_ctx);
+                    render_widget_manager(&app.widget_manager[0], &mut gl_ctx)
                 }
                 ViewState::JoinRoom => {
-                    app.title_text.render(&mut gl_ctx);
-                    app.widget_manager[0].render(&mut gl_ctx)
+                    render_text(&app.title_text, &mut gl_ctx);
+                    render_widget_manager(&app.widget_manager[0], &mut gl_ctx)
                 }
                 a if a.is_game() => {
-                    app.widget_manager[0].render(&mut gl_ctx);
+                    render_widget_manager(&app.widget_manager[0], &mut gl_ctx);
                     if app.running == RunningState::Running {
-                        app.title_text.render(&mut gl_ctx);
+                        render_text(&app.title_text, &mut gl_ctx);
                     } else if app.running == RunningState::NotRunning {
-                        app.restart_text.render(&mut gl_ctx);
+                        render_text(&app.restart_text, &mut gl_ctx);
                     } else if app.running == RunningState::Paused {
-                        app.pause_text.render(&mut gl_ctx);
+                        render_text(&app.pause_text, &mut gl_ctx);
                     } else if app.running == RunningState::Starting {
-                        app.title_text.render(&mut gl_ctx);
+                        render_text(&app.title_text, &mut gl_ctx);
                     }
 
-                    app.timer_text.render(&mut gl_ctx);
+                    render_text(&app.timer_text, &mut gl_ctx);
 
                     for player in &app.local_players {
                         render_local_player(player, &mut gl_ctx);

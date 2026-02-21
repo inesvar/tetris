@@ -1,7 +1,8 @@
 //! Define `trait` [Render] for [LocalPlayer], [TetrisPlayer], [Tetromino], [TetrisGrid].
 use crate::app::player::LocalPlayer;
 use crate::app::remote::RemotePlayer;
-use crate::app::render_app::{Piston2dGraphicsArguments, Render};
+use crate::app::render_app::Piston2dGraphicsArguments;
+use crate::app::ui::render_text;
 use crate::app::ui::text::Text;
 use crate::app::TetrisPlayer;
 use crate::once;
@@ -38,7 +39,7 @@ fn render_player(player: &TetrisPlayer, gl_ctx: &mut Piston2dGraphicsArguments) 
         DEFAULT_SCORE_TEXT_Y,
         TEXT_COLOR,
     );
-    score_text.render(gl_ctx);
+    render_text(&score_text, gl_ctx);
 
     let old_transform = gl_ctx.transform;
     let grid_transform = gl_ctx.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
