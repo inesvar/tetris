@@ -151,7 +151,7 @@ impl App {
                 TEXT_COLOR,
             ),
             timer_text: Text::new(
-                "Elapsed: 0.0s",
+                "",
                 DEFAULT_FONT_SIZE,
                 DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
                 DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,

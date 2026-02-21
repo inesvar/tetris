@@ -28,8 +28,7 @@ impl App {
             self.widget_manager[0].update_clipboard();
             self.widget_manager[0].update_from_text();
         } else if self.view_state.is_game() && self.running == RunningState::Starting {
-            self.timer_text
-                .set_text(format!("Elapsed: {}", format_seconds(0.0)));
+            self.timer_text.set_text(format_seconds(0.0));
             if self.clock > 3.0 {
                 self.start();
             }
@@ -37,8 +36,7 @@ impl App {
                 player.send_serialized();
             }
         } else if self.view_state.is_game() && self.running == RunningState::Running {
-            self.timer_text
-                .set_text(format!("Elapsed: {}", format_seconds(self.clock)));
+            self.timer_text.set_text(format_seconds(self.clock));
             self.frame_counter = self.frame_counter.wrapping_add(1);
             if let PlayerConfig::TwoRemote {
                 local_ip: _,
