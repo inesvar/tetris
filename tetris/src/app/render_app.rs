@@ -21,8 +21,8 @@ use piston::RenderArgs;
 pub trait RenderTetrisGame: RenderTetrisCore + RenderTetrisUi {
     type RenderArgs;
     fn render_app(&mut self, render_args: &RenderArgs, app: &App);
-    fn render_local_player(&mut self, local_player: &LocalPlayer);
-    fn render_remote_player(&mut self, remote_player: &RemotePlayer);
+    fn render_local_player(&mut self, local_player: &LocalPlayer, state: RunningState);
+    fn render_remote_player(&mut self, remote_player: &RemotePlayer, state: RunningState);
 }
 
 pub trait RenderTetrisUi {
@@ -34,7 +34,7 @@ pub trait RenderTetrisUi {
 }
 
 pub trait RenderTetrisCore: RenderTetrisUi {
-    fn render_player(&mut self, player: &TetrisPlayer);
+    fn render_player(&mut self, player: &TetrisPlayer, state: RunningState);
     fn render_tetris_grid(&mut self, grid: &TetrisGrid);
     fn render_tetromino(&mut self, tetromino: &Tetromino);
     fn render_tetris_block(&mut self, ppsition: &Position, tetris_color: TetrisColor);
@@ -102,11 +102,11 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
                 self.render_text(&app.timer_text);
 
                 for player in &app.local_players {
-                    self.render_local_player(player);
+                    self.render_local_player(player, app.running);
                     self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                 }
                 for player in &app.remote_player {
-                    self.render_remote_player(player);
+                    self.render_remote_player(player, app.running);
                     self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                 }
             }
@@ -116,18 +116,18 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
         self.gl.draw_end();
     }
 
-    fn render_remote_player(&mut self, remote_player: &RemotePlayer) {
+    fn render_remote_player(&mut self, remote_player: &RemotePlayer, state: RunningState) {
         if !remote_player.received_first_screen() {
             return;
         }
         {
             let screen = remote_player.get_player();
-            self.render_player(&screen);
+            self.render_player(&screen, state);
         }
         once!("render was done");
     }
 
-    fn render_local_player(&mut self, local_player: &LocalPlayer) {
-        self.render_player(local_player.get_player());
+    fn render_local_player(&mut self, local_player: &LocalPlayer, state: RunningState) {
+        self.render_player(local_player.get_player(), state);
     }
 }

@@ -7,12 +7,14 @@ use crate::settings::{
     GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO, TETROMINO_MAX_HEIGHT,
     TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
-use core_tetris::{Position, TetrisColor, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS};
+use core_tetris::{
+    Position, RunningState, TetrisColor, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS,
+};
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
 
 impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
-    fn render_player(&mut self, player: &TetrisPlayer) {
+    fn render_player(&mut self, player: &TetrisPlayer, state: RunningState) {
         let score_text = Text::new(
             format!("Score: {}", player.score).as_str(),
             DEFAULT_FONT_SIZE,
@@ -29,7 +31,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
 
         self.render_tetris_grid(&player.matrix);
 
-        if player.is_in_play() {
+        if state == RunningState::Running {
             self.render_tetromino(&player.tetromino_in_play);
 
             let old_draw_state = self.draw_state;

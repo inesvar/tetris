@@ -45,8 +45,6 @@ pub struct TetrisPlayer {
     pub new_completed_lines: u64,
     /// garbage_to_be_added is set before the update and reset during the update.
     garbage_to_be_added: u64,
-    /// Whether the game is running or not
-    in_play: bool,
     /// Flag not to be modified except in Serialize. Set to true.
     serialize_as_msg: RefCell<bool>,
 }
@@ -139,17 +137,12 @@ impl TetrisPlayer {
             next_queue,
             tetromino_bag,
             garbage_to_be_added: 0,
-            in_play: false,
             serialize_as_msg: true.into(),
         }
     }
 
     pub fn bag_type(&self) -> BagType {
         self.tetromino_bag.bag_type()
-    }
-
-    pub fn is_in_play(&self) -> bool {
-        self.in_play
     }
 
     fn swap_tetromino_in_play_with(&mut self, new: &mut Tetromino) {
@@ -220,7 +213,6 @@ impl TetrisPlayer {
     /// Empties the **Matrix** and puts a tetromino in its starting position.
     pub fn reset(&mut self) {
         self.matrix.reset();
-        self.in_play = true;
     }
 
     /// Tries to apply [TetrisCommand], returns [GameOverError] if the situation is a losing one,
@@ -232,7 +224,7 @@ impl TetrisPlayer {
         order: TetrisCommand,
         rng: &mut R,
     ) -> Result<bool, GameOverError> {
-        let moved = match order {
+        match order {
             TetrisCommand::Move(TetrominoMove::HardDrop) => {
                 self.tetromino_in_play
                     .try_apply(TetrominoMove::HardDrop, &self.matrix);
@@ -246,11 +238,7 @@ impl TetrisPlayer {
                 .try_apply(TetrominoMove::Fall, &self.matrix)),
             TetrisCommand::Hold => self.hold_tetromino(rng).map(|_| true),
             TetrisCommand::LockDown => self.lock_down(rng).map(|_| true),
-        };
-        if moved.is_err() {
-            self.in_play = false;
         }
-        moved
     }
 
     /// Returns a hard-dropped copy of the [TetrisPlayer::tetromino_in_play].
