@@ -416,7 +416,7 @@ mod tests {
 
     // # Examples
     // ```
-    // # use tetris_core::{Tetromino, TetrisGrid, GameOverError, TetrominoMove};
+    // # use core_tetris::{Tetromino, TetrisGrid, GameOverError, TetrominoMove};
     // # let mut empty_grid = TetrisGrid::default();
     // #
     // let mut o_tetromino = Tetromino::default();
@@ -433,7 +433,7 @@ mod tests {
     //
     // # Examples
     // ```
-    // # use tetris_core::{Tetromino, TetrisGrid, TetrominoMove};
+    // # use core_tetris::{Tetromino, TetrisGrid, TetrominoMove};
     // # let mut empty_grid = TetrisGrid::default();
     // # let mut o_tetromino = Tetromino::default();
     // # assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());

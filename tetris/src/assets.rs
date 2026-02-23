@@ -1,9 +1,9 @@
 //! Assets include tetromino block textures and fonts.
+use core_tetris::TetrisColor;
 use graphics::glyph_cache::rusttype::GlyphCache;
 use include_assets::NamedArchive;
 use opengl_graphics::*;
 use std::path::PathBuf;
-use tetris_core::TetrisColor;
 
 pub struct Assets<'a> {
     pub cyan_texture: Texture,

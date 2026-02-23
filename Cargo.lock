@@ -420,6 +420,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "core_tetris"
+version = "0.1.0"
+dependencies = [
+ "rand 0.10.0",
+ "rstest",
+ "serde",
+ "simple-mermaid",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2277,9 +2287,9 @@ checksum = "ba39f3699c378cd8970968dcbff9c43159ea4cfbd88d43c00b22f2ef10a435d2"
 name = "render_tetris"
 version = "0.1.0"
 dependencies = [
+ "core_tetris",
  "piston2d-graphics",
  "piston2d-opengl_graphics",
- "tetris_core",
 ]
 
 [[package]]
@@ -2629,6 +2639,7 @@ name = "tetris"
 version = "0.1.0"
 dependencies = [
  "arboard",
+ "core_tetris",
  "include_assets",
  "local-ip-address",
  "piston",
@@ -2642,17 +2653,6 @@ dependencies = [
  "rstest",
  "serde",
  "serde_cbor",
- "simple-mermaid",
- "tetris_core",
-]
-
-[[package]]
-name = "tetris_core"
-version = "0.1.0"
-dependencies = [
- "rand 0.10.0",
- "rstest",
- "serde",
  "simple-mermaid",
 ]
 

@@ -8,8 +8,8 @@ use crate::{
     keybindings::Keybindings,
     settings::{PAUSE_KEYS, RESTART_KEYS},
 };
+use core_tetris::TetrisResult;
 use piston::Key;
-use tetris_core::TetrisResult;
 
 impl LocalPlayer {
     /// handle_key_press is called when a key is pressed.

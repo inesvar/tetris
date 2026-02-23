@@ -3,10 +3,10 @@
 use std::{cell::RefCell, net::TcpStream};
 
 use crate::{app::PlayerConfig, once};
+use core_tetris::BagType;
 use opengl_graphics::OpenGL;
 use piston::Key;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
-use tetris_core::BagType;
 
 const SCALE_FACTOR: f64 = 1.0;
 pub const HOST_PORT: &str = ":26000";

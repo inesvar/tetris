@@ -4,7 +4,7 @@
 - separate `ui` crate (necessary for `render` crate to use `RenderTetrisUi` and `RenderTetrisGame` ?)
 - the tetrominos should not change the first time the game is started... start the game automatically when clicking on the button
 
-- make tetris_core integration tests
+- make core_tetris integration tests
 - code getters and make fields private (TetrisPlayer)
 - add_garbage could rely on rng provided by outside of the crate -> great for integration tests (or add_garbage could have a very precise number from outside ?)
 - BUG fix : TetrisPlayer should receive the number of garbage lines to add, not the number of completed lines !!

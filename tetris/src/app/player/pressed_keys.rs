@@ -1,10 +1,10 @@
 //! Define [PressedKeys] that stores the pressed keys and the last pressed key.
 use crate::keybindings::Keybindings;
 use crate::settings::KEY_REPEAT_DELAY;
+use core_tetris::{TetrisCommand, TetrominoMove};
 use piston::Key;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use tetris_core::{TetrisCommand, TetrominoMove};
 
 // TODO :
 // it would be more natural to have a hashmap associating a `Key` to an `Option<Command>`.

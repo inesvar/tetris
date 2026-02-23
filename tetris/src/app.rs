@@ -16,13 +16,13 @@ use crate::app::remote::MessageType;
 use crate::keybindings::Keybindings;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
+use core_tetris::RunningState;
 use local_ip_address::local_ip;
 use piston::MouseButton;
 use piston_window::Key;
 use rand::RngExt;
 pub use render_app::{Piston2dOpenGlRenderer, RenderTetrisGame};
 use std::net::TcpStream;
-use tetris_core::RunningState;
 pub use ui::TetrisCommand;
 
 #[derive(PartialEq, Debug)]

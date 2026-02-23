@@ -20,7 +20,7 @@ pub struct CircularBuffer<T: Debug> {
 /// # Examples
 ///
 /// ```
-/// # use tetris_core::{MockRng, TetrominoKind};
+/// # use core_tetris::{MockRng, TetrominoKind};
 /// # use rand::seq::IndexedRandom;
 /// let values = vec![TetrominoKind::T, TetrominoKind::L, TetrominoKind::Z];
 /// let mut mock = MockRng::new(values.clone());

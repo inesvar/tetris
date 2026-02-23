@@ -1,5 +1,5 @@
 [package]
-name = "tetris_core"
+name = "core_tetris"
 version = "0.1.0"
 edition = "2021"
 

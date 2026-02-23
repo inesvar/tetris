@@ -10,13 +10,13 @@ use crate::app::ui::text_input::TextInput;
 use crate::assets::Assets;
 use crate::once;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
+use core_tetris::{Position, TetrisColor, TetrisGrid, TetrisPlayer, Tetromino};
 use graphics::types::Matrix2d;
 use graphics::Transformed;
 use graphics::{Context, DrawState};
 use include_assets::NamedArchive;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::RenderArgs;
-use tetris_core::{Position, TetrisColor, TetrisGrid, TetrisPlayer, Tetromino};
 
 pub trait RenderTetrisGame: RenderTetrisCore + RenderTetrisUi {
     type RenderArgs;

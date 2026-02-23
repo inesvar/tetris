@@ -7,9 +7,9 @@ use crate::settings::{
     GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO, TETROMINO_MAX_HEIGHT,
     TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
+use core_tetris::{Position, TetrisColor, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS};
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
-use tetris_core::{Position, TetrisColor, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS};
 
 impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
     fn render_player(&mut self, player: &TetrisPlayer) {

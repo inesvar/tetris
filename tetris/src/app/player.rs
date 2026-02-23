@@ -9,10 +9,10 @@ mod render;
 mod update_player;
 
 use self::pressed_keys::PressedKeys;
+pub use core_tetris::TetrisPlayer;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use serde::{Deserialize, Serialize};
-pub use tetris_core::TetrisPlayer;
 
 /// Local player contains all the informations relative to one player.
 ///

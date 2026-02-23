@@ -27,12 +27,12 @@
 //! [TetrisPlayer] is serializable and can be sent through the network
 //! to implement multi-player tetris games.
 //!
-#![doc = simple_mermaid::mermaid!("tetris_core.mmd")]
+#![doc = simple_mermaid::mermaid!("core_tetris.mmd")]
 //!
 //! # Examples
 //!
 //! ```
-//! # use tetris_core::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
+//! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! // New tetrominos will be alternating T's and O's. Not recommended ;)
 //! let mut rng = MockRng::new(vec![TetrominoKind::T, TetrominoKind::O]);
@@ -42,7 +42,7 @@
 //! ```
 //! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s.
 //! ```
-//! # use tetris_core::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
+//! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! # let mut rng = MockRng::new(vec![TetrominoKind::T, TetrominoKind::O]);
 //! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
@@ -60,7 +60,7 @@
 //! also stores the **Hold Queue**, the **Next Queue**, the score, etc.
 //!
 //! ```
-//! # use tetris_core::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
+//! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! # let mut rng = MockRng::new(vec![TetrominoKind::T, TetrominoKind::O]);
 //! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
@@ -132,7 +132,7 @@
 //! [Tetromino] hit the bottom). Likewise, this crate does't know when to call [TetrominoMove::Fall] to make
 //! the [Tetromino] fall towards the bottom, it's the job of the tetris engine to regularly call [TetrominoMove::Fall].
 //! ```
-//! # use tetris_core::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
+//! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! # let mut rng = MockRng::new(vec![TetrominoKind::T, TetrominoKind::O]);
 //! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
