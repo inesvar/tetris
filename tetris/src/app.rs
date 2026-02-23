@@ -21,8 +21,8 @@ use piston::MouseButton;
 use piston_window::Key;
 use rand::RngExt;
 pub use render_app::{Piston2dOpenGlRenderer, RenderTetrisGame};
-use serde::{Deserialize, Serialize};
 use std::net::TcpStream;
+use tetris_core::RunningState;
 pub use ui::TetrisCommand;
 
 #[derive(PartialEq, Debug)]
@@ -85,14 +85,6 @@ impl ViewState {
     fn is_game(&self) -> bool {
         matches!(self, Self::Local | Self::TwoLocal | Self::Remote)
     }
-}
-
-#[derive(PartialEq, Serialize, Deserialize, Clone, Copy)]
-pub enum RunningState {
-    Running,
-    Paused,
-    NotRunning,
-    Starting,
 }
 
 pub struct App {

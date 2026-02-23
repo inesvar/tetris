@@ -179,3 +179,12 @@ pub use tetromino::{Position, Tetromino, TetrominoKind};
 // currently unused, TODO: propose different constructors for TetrisPlayer
 pub use circular_buffer::MockRng;
 pub use tetromino_generator::BagType;
+
+/// State of the game.
+#[derive(PartialEq, Clone, Copy)]
+pub enum RunningState {
+    Running,
+    Paused,
+    NotRunning,
+    Starting,
+}
