@@ -81,11 +81,6 @@ impl<T: Debug> CircularBuffer<T> {
             None
         }
     }
-
-    /// Get the first element in the buffer.
-    pub fn peek(&self) -> &T {
-        &self.vec[self.begin]
-    }
 }
 
 impl MockRng {

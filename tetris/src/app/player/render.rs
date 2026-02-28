@@ -62,7 +62,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
             };
 
             for position in blocks {
-                self.render_tetris_block(position, player.next_queue.peek().color());
+                self.render_tetris_block(position, player.tetromino_in_play.color());
             }
         }
     }
