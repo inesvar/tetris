@@ -72,7 +72,7 @@ impl<T: Debug> CircularBuffer<T> {
         std::mem::swap(replacement, &mut self.vec[self.begin]);
     }
 
-    /// Get the i-th element in the buffer.
+    /// Get the `i`-th element in the buffer.
     pub fn get(&self, i: usize) -> Option<&T> {
         //println!("getting {i} from {}", self);
         if i < self.vec.len() {
@@ -80,6 +80,11 @@ impl<T: Debug> CircularBuffer<T> {
         } else {
             None
         }
+    }
+
+    /// Get the first element in the buffer.
+    pub fn peek(&self) -> &T {
+        &self.vec[self.begin]
     }
 }
 

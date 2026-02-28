@@ -14,7 +14,7 @@ use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
 
 impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
-    fn render_player(&mut self, player: &TetrisPlayer, state: RunningState) {
+    fn display_player(&mut self, player: &TetrisPlayer, state: RunningState) {
         let score_text = Text::new(
             format!("Score: {}", player.score).as_str(),
             DEFAULT_FONT_SIZE,
@@ -29,21 +29,63 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         let grid_transform = self.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
         self.transform = grid_transform;
 
-        self.render_tetris_grid(&player.matrix, state);
+        self.display_tetris_grid(player, state);
+
+        self.display_tetromino_in_play(player, state);
+
+        self.display_hold_queue(player, state);
+
+        self.display_next_queue(player, state);
+
+        self.transform = old_transform;
+    }
+
+    fn display_tetris_grid(&mut self, player: &TetrisPlayer, state: RunningState) {
+        let grid = &player.matrix;
+        let empty_dims: Rectangle = [
+            0.0,
+            hidden_height(grid),
+            total_width(grid),
+            visible_height(grid),
+        ];
+        rectangle(GRID_BG_COLOR, empty_dims, self.transform, &mut self.gl);
+        let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
+        outline_rect.draw(empty_dims, &self.draw_state, self.transform, &mut self.gl);
+
+        if state != RunningState::Starting {
+            self.render_tetris_grid(grid);
+        } else {
+            let blocks: &[Position] = match self.elapsed_secs {
+                0.0..1.0 => &one(grid),
+                1.0..2.0 => &two(grid),
+                _ => &three(grid),
+            };
+
+            for position in blocks {
+                self.render_tetris_block(position, player.next_queue.peek().color());
+            }
+        }
+    }
+
+    fn display_tetromino_in_play(&mut self, player: &TetrisPlayer, state: RunningState) {
+        let tetromino = &player.tetromino_in_play;
 
         if state == RunningState::Running {
-            self.render_tetromino(&player.tetromino_in_play, state);
+            self.render_tetromino(tetromino);
 
             let old_draw_state = self.draw_state;
             self.draw_state = self.draw_state.blend(graphics::draw_state::Blend::Multiply);
-            self.render_tetromino(&player.get_ghost_tetromino(), state);
+            self.render_tetromino(&player.get_ghost_tetromino());
             self.draw_state = old_draw_state;
         } else if (self.elapsed_secs * 2.0) % 2.0 < 1.0 {
-            self.render_tetromino(&player.tetromino_in_play, state);
+            self.render_tetromino(tetromino);
         }
+    }
 
+    fn display_hold_queue(&mut self, player: &TetrisPlayer, _: RunningState) {
         // drawing a border for the hold piece
-        self.transform = grid_transform.trans(
+        let old_transform = self.transform;
+        self.transform = self.transform.trans(
             -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
             hidden_height(&player.matrix),
         );
@@ -56,15 +98,21 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
 
         // drawing the hold piece
         if let Some(saved) = &player.hold_queue {
-            self.transform = grid_transform.trans(
+            self.transform = old_transform.trans(
                 -TETROMINO_MAX_WIDTH - 2.0 * BLOCK_SIZE,
                 TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
             );
-            self.render_tetromino(saved, state);
+            self.render_tetromino(saved);
         }
 
+        self.transform = old_transform;
+    }
+
+    fn display_next_queue(&mut self, player: &TetrisPlayer, _: RunningState) {
         // drawing a border for the fifo of next pieces
-        self.transform = grid_transform.trans(
+        let old_transform = self.transform;
+
+        self.transform = self.transform.trans(
             total_width(&player.matrix) + BLOCK_SIZE,
             hidden_height(&player.matrix),
         );
@@ -77,49 +125,27 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
 
         // drawing the next pieces
         for i in 0..NB_NEXT_TETROMINO {
-            self.transform = grid_transform.trans(
+            self.transform = old_transform.trans(
                 total_width(&player.matrix) + 2.0 * BLOCK_SIZE,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
             if let Some(tetromino) = player.next_queue.get(i) {
-                self.render_tetromino(tetromino, state);
+                self.render_tetromino(tetromino);
             }
         }
 
         self.transform = old_transform;
     }
 
-    fn render_tetris_grid(&mut self, grid: &TetrisGrid, state: RunningState) {
-        let empty_dims: Rectangle = [
-            0.0,
-            hidden_height(grid),
-            total_width(grid),
-            visible_height(grid),
-        ];
-        rectangle(GRID_BG_COLOR, empty_dims, self.transform, &mut self.gl);
-        let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
-        outline_rect.draw(empty_dims, &self.draw_state, self.transform, &mut self.gl);
-
-        if state != RunningState::Starting {
-            for position in grid.positions() {
-                if let Some(tetris_color) = grid[&position] {
-                    self.render_tetris_block(&position, tetris_color);
-                }
-            }
-        } else {
-            let blocks: &[Position] = match self.elapsed_secs {
-                0.0..1.0 => &one(grid),
-                1.0..2.0 => &two(grid),
-                _ => &three(grid),
-            };
-
-            for position in blocks {
-                self.render_tetris_block(position, TetrisColor::Blue);
+    fn render_tetris_grid(&mut self, grid: &TetrisGrid) {
+        for position in grid.positions() {
+            if let Some(tetris_color) = grid[&position] {
+                self.render_tetris_block(&position, tetris_color);
             }
         }
     }
 
-    fn render_tetromino(&mut self, tetromino: &Tetromino, _: RunningState) {
+    fn render_tetromino(&mut self, tetromino: &Tetromino) {
         for block in tetromino.blocks() {
             self.render_tetris_block(block, tetromino.color());
         }

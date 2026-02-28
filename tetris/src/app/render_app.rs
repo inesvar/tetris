@@ -34,9 +34,14 @@ pub trait RenderTetrisUi {
 }
 
 pub trait RenderTetrisCore: RenderTetrisUi {
-    fn render_player(&mut self, player: &TetrisPlayer, state: RunningState);
-    fn render_tetris_grid(&mut self, grid: &TetrisGrid, state: RunningState);
-    fn render_tetromino(&mut self, tetromino: &Tetromino, state: RunningState);
+    fn display_player(&mut self, player: &TetrisPlayer, state: RunningState);
+    fn display_tetris_grid(&mut self, player: &TetrisPlayer, state: RunningState);
+    fn display_hold_queue(&mut self, player: &TetrisPlayer, state: RunningState);
+    fn display_next_queue(&mut self, player: &TetrisPlayer, state: RunningState);
+    fn display_tetromino_in_play(&mut self, player: &TetrisPlayer, state: RunningState);
+
+    fn render_tetris_grid(&mut self, grid: &TetrisGrid);
+    fn render_tetromino(&mut self, tetromino: &Tetromino);
     fn render_tetris_block(&mut self, position: &Position, tetris_color: TetrisColor);
 }
 
@@ -122,12 +127,12 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
         }
         {
             let screen = remote_player.get_player();
-            self.render_player(&screen, state);
+            self.display_player(&screen, state);
         }
         once!("render was done");
     }
 
     fn render_local_player(&mut self, local_player: &LocalPlayer, state: RunningState) {
-        self.render_player(local_player.get_player(), state);
+        self.display_player(local_player.get_player(), state);
     }
 }
