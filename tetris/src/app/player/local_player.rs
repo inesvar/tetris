@@ -49,10 +49,6 @@ impl LocalPlayer {
     pub fn get_lines_completed(&mut self) -> u64 {
         self.player_screen.get_lines_completed()
     }
-
-    pub fn start(&mut self) {
-        self.player_screen.reset();
-    }
 }
 
 impl LocalPlayer {

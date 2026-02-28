@@ -210,11 +210,6 @@ impl TetrisPlayer {
         lines
     }
 
-    /// Empties the **Matrix** and puts a tetromino in its starting position.
-    pub fn reset(&mut self) {
-        self.matrix.reset();
-    }
-
     /// Tries to apply [TetrisCommand], returns [GameOverError] if the situation is a losing one,
     /// otherwise returns whether the [TetrisPlayer::tetromino_in_play] was moved or not.
     ///

@@ -481,9 +481,6 @@ impl App {
 
     /// Makes the game active.
     fn start(&mut self) {
-        for player in &mut self.local_players {
-            player.start();
-        }
         self.clock = 0.0;
         self.running = RunningState::Running;
     }

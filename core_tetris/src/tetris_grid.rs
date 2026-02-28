@@ -116,15 +116,6 @@ impl TetrisGrid {
         }
     }
 
-    /// Empty the grid.
-    pub(crate) fn reset(&mut self) {
-        *self = Self::new(
-            self.nb_columns as u32,
-            self.nb_matrix_rows as u32,
-            self.nb_buffer_rows as u32,
-        );
-    }
-
     /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
     pub(crate) fn apply_received_garbage(&mut self, completed_lines: u64) -> TetrisResult {
         let lines_to_add = match completed_lines {
@@ -529,28 +520,6 @@ mod tests {
         ))]
     fn from_str_is_successful_when_input_well_formed(#[case] grid: &str) {
         assert!(TetrisGrid::from_str(grid).is_ok());
-    }
-
-    #[rstest]
-    fn reset_is_empty(#[from(empty_compact_grid)] expected: String) {
-        let mut grid = TetrisGrid::from_str(concat!(
-            "---------\n",
-            "         \n",
-            "       XX\n",
-            "---------\n",
-            "      X X\n",
-            "      XXX\n",
-            "     XX X\n",
-            "    X XXX\n",
-            "      XXX\n",
-            "    XXXXX\n",
-            "---------\n",
-        ))
-        .unwrap();
-
-        grid.reset();
-
-        assert_eq!(grid.to_string(), expected, "Actual grid:\n{}", grid);
     }
 
     #[test]
