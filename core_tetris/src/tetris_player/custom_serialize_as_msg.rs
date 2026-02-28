@@ -16,14 +16,14 @@ impl Serialize for TetrisPlayer {
     {
         if !*self.serialize_as_msg.borrow() {
             let mut s = serializer.serialize_struct("TetrisPlayer", 9)?;
-            s.serialize_field("grid", &self.matrix)?;
+            s.serialize_field("grid", &self.grid)?;
             s.serialize_field("score", &self.score)?;
             s.serialize_field("new_completed_lines", &self.new_completed_lines)?;
             s.serialize_field("active_tetromino", &self.tetromino_in_play)?;
             s.serialize_field("saved_tetromino", &self.hold_queue)?;
             s.serialize_field("fifo_next_tetromino", &self.next_queue)?;
             s.serialize_field("tetromino_bag", &self.tetromino_bag)?;
-            s.serialize_field("garbage_to_be_added", &self.garbage_to_be_added)?;
+            s.serialize_field("received_garbage_lines", &self.received_garbage_lines)?;
             s.serialize_field("serialize_as_msg", &self.serialize_as_msg)?;
             s.end()
         } else {

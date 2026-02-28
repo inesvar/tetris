@@ -27,7 +27,7 @@ pub trait RenderTetrisCore {
     }
 
     fn display_tetris_grid(&mut self, player: &TetrisPlayer, _state: RunningState) {
-        self.render_tetris_grid(&player.matrix);
+        self.render_tetris_grid(&player.grid);
     }
 
     fn display_hold_queue(&mut self, _player: &TetrisPlayer, _state: RunningState) {}

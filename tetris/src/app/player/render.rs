@@ -41,7 +41,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
     }
 
     fn display_tetris_grid(&mut self, player: &TetrisPlayer, state: RunningState) {
-        let grid = &player.matrix;
+        let grid = &player.grid;
         let empty_dims: Rectangle = [
             0.0,
             hidden_height(grid),
@@ -87,7 +87,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         let old_transform = self.transform;
         self.transform = self.transform.trans(
             -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
-            hidden_height(&player.matrix),
+            hidden_height(&player.grid),
         );
         let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
@@ -113,8 +113,8 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         let old_transform = self.transform;
 
         self.transform = self.transform.trans(
-            total_width(&player.matrix) + BLOCK_SIZE,
-            hidden_height(&player.matrix),
+            total_width(&player.grid) + BLOCK_SIZE,
+            hidden_height(&player.grid),
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;
@@ -126,7 +126,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         // drawing the next pieces
         for i in 0..NB_NEXT_TETROMINO {
             self.transform = old_transform.trans(
-                total_width(&player.matrix) + 2.0 * BLOCK_SIZE,
+                total_width(&player.grid) + 2.0 * BLOCK_SIZE,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
             if let Some(tetromino) = player.next_queue.get(i) {

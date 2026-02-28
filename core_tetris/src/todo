@@ -1,6 +1,7 @@
 - the tetrominos should not change the first time the game is started... start the game automatically when clicking on the button
-
+=> tricky change at the moment
 - make core_tetris integration tests
+=> not a priority
 - code getters and make fields private (TetrisPlayer)
 - add_garbage could rely on rng provided by outside of the crate -> great for integration tests (or add_garbage could have a very precise number from outside ?)
 - BUG fix : TetrisPlayer should receive the number of garbage lines to add, not the number of completed lines !!
@@ -25,10 +26,11 @@
 - read tetris guidelines to update code and vocabulary
 - assets load bug when too low in filesystem
 
-# not  the priority
+# not the priority
 
 instantiate the grid render:
 group all the block textures in one
+use the same texture for all colors ?
 OR use `tri_list_uv_c`
 
 
