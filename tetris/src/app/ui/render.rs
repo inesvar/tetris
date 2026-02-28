@@ -55,13 +55,17 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
         outline_rect.draw(dims, &self.draw_state, button_transform, &mut self.gl);
 
-        if input.focused && self.elapsed_secs % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0 {
-            let mut text_with_cursor = input.text.clone();
-            text_with_cursor.content.push('|');
-            self.render_text(&text_with_cursor);
-        } else {
-            self.render_text(&input.text);
+        let mut content = input.text.clone();
+
+        if !input.focused && content.content.is_empty() {
+            content.set_text(input.placeholder.clone());
+        } else if input.focused
+            && self.elapsed_secs % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0
+        {
+            content.content.push('|');
         }
+
+        self.render_text(&content);
 
         let old_transform = self.transform;
         self.transform = self.transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
