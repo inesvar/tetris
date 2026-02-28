@@ -1,4 +1,4 @@
-//! Define `trait` [RenderTetrisCore] for [TetrisPlayer], [Tetromino], [TetrisGrid].
+//! Implement `trait` [RenderTetrisCore] for [Piston2dOpenGlRenderer].
 use crate::app::render_app::{Piston2dOpenGlRenderer, RenderTetrisCore, RenderTetrisUi};
 use crate::app::ui::text::Text;
 use crate::app::TetrisPlayer;
@@ -8,7 +8,7 @@ use crate::settings::{
     TETROMINO_MAX_WIDTH, TEXT_COLOR,
 };
 use core_tetris::{
-    Position, RunningState, TetrisColor, TetrisGrid, Tetromino, NB_VISIBLE_BUFFER_ROWS,
+    Position, RunningState, TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS,
 };
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
@@ -135,20 +135,6 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         }
 
         self.transform = old_transform;
-    }
-
-    fn render_tetris_grid(&mut self, grid: &TetrisGrid) {
-        for position in grid.positions() {
-            if let Some(tetris_color) = grid[&position] {
-                self.render_tetris_block(&position, tetris_color);
-            }
-        }
-    }
-
-    fn render_tetromino(&mut self, tetromino: &Tetromino) {
-        for block in tetromino.blocks() {
-            self.render_tetris_block(block, tetromino.color());
-        }
     }
 
     /// In [player::render](super::render), helper to render a tetris block at `position` with `tetris_color`.
