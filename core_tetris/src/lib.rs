@@ -2,7 +2,7 @@
 //! It aims to follow the [2009 Tetris Guideline](<https://ia800405.us.archive.org/12/items/2009-tetris-variant-concepts_202201/2009%20Tetris%20Design%20Guideline.pdf>)
 //! as closely as possible.
 //! This crate provides pure logic (no OS interaction), it's meant to be used by a tetris engine that will handle:
-//! - rendering
+//! - rendering (this crate provides the [RenderTetrisCore] trait)
 //! - player input management (this crate expects [TetrisCommand]s as input)
 //! - time management (this crate doesn't know the time)
 //! - random generation (this crates only uses [MockRng] for testing and doc purposes)
@@ -160,6 +160,7 @@
 //! ```
 
 mod circular_buffer;
+mod render_tetris_core;
 mod tetris_grid;
 mod tetris_player;
 mod tetromino;
@@ -173,18 +174,10 @@ pub use tetris_grid::{GameOverError, TetrisResult};
 pub use tetris_player::TetrisCommand;
 pub use tetromino::TetrominoMove;
 // used to render the TetrisPlayer
+pub use circular_buffer::MockRng;
+pub use render_tetris_core::{RenderTetrisCore, RunningState};
 pub use tetris_grid::{TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS};
 pub use tetris_player::TetrisPlayer;
 pub use tetromino::{Position, Tetromino, TetrominoKind};
 // currently unused, TODO: propose different constructors for TetrisPlayer
-pub use circular_buffer::MockRng;
 pub use tetromino_generator::BagType;
-
-/// State of the game.
-#[derive(PartialEq, Clone, Copy)]
-pub enum RunningState {
-    Running,
-    Paused,
-    NotRunning,
-    Starting,
-}
