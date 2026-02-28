@@ -1,7 +1,3 @@
-- stop modifying the grid to display the countdown :OK
-- but display the countdown anyway :OK
-- erase `start`
-- separate `ui` crate (necessary for `render` crate to use `RenderTetrisUi` and `RenderTetrisGame` ?)
 - the tetrominos should not change the first time the game is started... start the game automatically when clicking on the button
 
 - make core_tetris integration tests
