@@ -35,9 +35,9 @@ pub trait RenderTetrisUi {
 
 pub trait RenderTetrisCore: RenderTetrisUi {
     fn render_player(&mut self, player: &TetrisPlayer, state: RunningState);
-    fn render_tetris_grid(&mut self, grid: &TetrisGrid);
-    fn render_tetromino(&mut self, tetromino: &Tetromino);
-    fn render_tetris_block(&mut self, ppsition: &Position, tetris_color: TetrisColor);
+    fn render_tetris_grid(&mut self, grid: &TetrisGrid, state: RunningState);
+    fn render_tetromino(&mut self, tetromino: &Tetromino, state: RunningState);
+    fn render_tetris_block(&mut self, position: &Position, tetris_color: TetrisColor);
 }
 
 pub struct Piston2dOpenGlRenderer<'a> {

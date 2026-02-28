@@ -1,5 +1,5 @@
 - stop modifying the grid to display the countdown :OK
-- but display the countdown anyway :
+- but display the countdown anyway :OK
 - erase `start`
 - separate `ui` crate (necessary for `render` crate to use `RenderTetrisUi` and `RenderTetrisGame` ?)
 - the tetrominos should not change the first time the game is started... start the game automatically when clicking on the button
@@ -15,6 +15,7 @@
 - the clock should pause during a game pause :
     the renderer and the app should have a separate clock
     the app should pause its clock during tetris pause, while the renderer should not
+    but both should start when a new game is launched (countdown)
 - serialize a PlayerScreen(PlayerScreen) instead of doing black magic
 - use tokio to outsource tcp comms
 - today key inputs are sent to the tetris game and mouse inputs to the app... something more flexible would be great

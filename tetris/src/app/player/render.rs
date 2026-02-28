@@ -29,17 +29,17 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         let grid_transform = self.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
         self.transform = grid_transform;
 
-        self.render_tetris_grid(&player.matrix);
+        self.render_tetris_grid(&player.matrix, state);
 
         if state == RunningState::Running {
-            self.render_tetromino(&player.tetromino_in_play);
+            self.render_tetromino(&player.tetromino_in_play, state);
 
             let old_draw_state = self.draw_state;
             self.draw_state = self.draw_state.blend(graphics::draw_state::Blend::Multiply);
-            self.render_tetromino(&player.get_ghost_tetromino());
+            self.render_tetromino(&player.get_ghost_tetromino(), state);
             self.draw_state = old_draw_state;
         } else if (self.elapsed_secs * 2.0) % 2.0 < 1.0 {
-            self.render_tetromino(&player.tetromino_in_play);
+            self.render_tetromino(&player.tetromino_in_play, state);
         }
 
         // drawing a border for the hold piece
@@ -60,7 +60,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
                 -TETROMINO_MAX_WIDTH - 2.0 * BLOCK_SIZE,
                 TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
             );
-            self.render_tetromino(saved);
+            self.render_tetromino(saved, state);
         }
 
         // drawing a border for the fifo of next pieces
@@ -82,14 +82,14 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
             if let Some(tetromino) = player.next_queue.get(i) {
-                self.render_tetromino(tetromino);
+                self.render_tetromino(tetromino, state);
             }
         }
 
         self.transform = old_transform;
     }
 
-    fn render_tetris_grid(&mut self, grid: &TetrisGrid) {
+    fn render_tetris_grid(&mut self, grid: &TetrisGrid, state: RunningState) {
         let empty_dims: Rectangle = [
             0.0,
             hidden_height(grid),
@@ -100,14 +100,26 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
         outline_rect.draw(empty_dims, &self.draw_state, self.transform, &mut self.gl);
 
-        for position in grid.positions() {
-            if let Some(tetris_color) = grid[&position] {
-                self.render_tetris_block(&position, tetris_color);
+        if state != RunningState::Starting {
+            for position in grid.positions() {
+                if let Some(tetris_color) = grid[&position] {
+                    self.render_tetris_block(&position, tetris_color);
+                }
+            }
+        } else {
+            let blocks: &[Position] = match self.elapsed_secs {
+                0.0..1.0 => &one(grid),
+                1.0..2.0 => &two(grid),
+                _ => &three(grid),
+            };
+
+            for position in blocks {
+                self.render_tetris_block(position, TetrisColor::Blue);
             }
         }
     }
 
-    fn render_tetromino(&mut self, tetromino: &Tetromino) {
+    fn render_tetromino(&mut self, tetromino: &Tetromino, _: RunningState) {
         for block in tetromino.blocks() {
             self.render_tetris_block(block, tetromino.color());
         }
@@ -127,6 +139,61 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
             self.transform,
             &mut self.gl,
         );
+    }
+}
+
+fn one(grid: &TetrisGrid) -> [Position; 9] {
+    [
+        center_in_grid(grid, 0, -2),
+        center_in_grid(grid, -1, -1),
+        center_in_grid(grid, 0, -1),
+        center_in_grid(grid, 0, 0),
+        center_in_grid(grid, 0, 1),
+        center_in_grid(grid, -2, 2),
+        center_in_grid(grid, -1, 2),
+        center_in_grid(grid, 0, 2),
+        center_in_grid(grid, 1, 2),
+    ]
+}
+
+fn two(grid: &TetrisGrid) -> [Position; 10] {
+    [
+        center_in_grid(grid, -1, -2),
+        center_in_grid(grid, 0, -2),
+        center_in_grid(grid, -2, -1),
+        center_in_grid(grid, 1, -1),
+        center_in_grid(grid, 0, 0),
+        center_in_grid(grid, -1, 1),
+        center_in_grid(grid, -2, 2),
+        center_in_grid(grid, -1, 2),
+        center_in_grid(grid, 0, 2),
+        center_in_grid(grid, 1, 2),
+    ]
+}
+
+fn three(grid: &TetrisGrid) -> [Position; 9] {
+    [
+        center_in_grid(grid, -1, -2),
+        center_in_grid(grid, 0, -2),
+        center_in_grid(grid, -2, -1),
+        center_in_grid(grid, 1, -1),
+        center_in_grid(grid, 0, 0),
+        center_in_grid(grid, -2, 1),
+        center_in_grid(grid, 1, 1),
+        center_in_grid(grid, -1, 2),
+        center_in_grid(grid, 0, 2),
+    ]
+}
+
+fn center_in_grid(grid: &TetrisGrid, x: i32, y: i32) -> Position {
+    match (x, y) {
+        (x @ -2..2, y @ -2..3) => Position::new(
+            grid.nb_columns_i32() / 2 + x,
+            grid.nb_matrix_rows_i32() / 2 + y + NB_VISIBLE_BUFFER_ROWS as i32,
+        ),
+        _ => {
+            panic!("x (resp. y) should be between -2 and 2 excluded (resp. -2 and 3 excluded)")
+        }
     }
 }
 
