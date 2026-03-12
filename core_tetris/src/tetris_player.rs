@@ -68,8 +68,8 @@ pub enum TetrisCommand {
     /// - a short time after [TetrisCommand::Fall] failed to move [TetrisPlayer::tetromino_in_play].
     ///
     /// This command consists in 3 steps :
-    /// - add the [TetrisPlayer::tetromino_in_play] to the [TetrisPlayer::matrix] (this can fail with [GameOverError::LockOut]);
-    /// - add the accumulated garbage to the [TetrisPlayer::matrix] (this can fail with [GameOverError::TopOut]);
+    /// - add the [TetrisPlayer::tetromino_in_play] to the [TetrisPlayer::grid] (this can fail with [GameOverError::LockOut]);
+    /// - add the accumulated garbage to the [TetrisPlayer::grid] (this can fail with [GameOverError::TopOut]);
     /// - move the new [TetrisPlayer::tetromino_in_play] to its starting position (this can fail with [GameOverError::BlockOut]).
     LockDown,
 }
@@ -232,7 +232,7 @@ impl TetrisPlayer {
         self.score += new_completed_lines;
     }
 
-    /// Increase the count of received garbage lines ([TetrisPlayer::received_garbage_lines]).
+    /// Increase the count of received garbage lines.
     ///
     /// Garbage lines will be pushed to the grid later (during **Lock Down**).
     pub fn push_garbage(&mut self, nb_completed_lines: u64) {
