@@ -4,6 +4,6 @@ path=~/"$folderName"
 
 cargo build --release
 
-mkdir "$path"
+mkdir -p "$path"
 cp ./target/release/tetris "$path"
 cp -r ./assets "$path"

@@ -4,6 +4,6 @@ path=~/"$folderName"
 
 cargo build --release --target x86_64-pc-windows-gnu
 
-mkdir "$path"
+mkdir -p "$path"
 cp ./target/x86_64-pc-windows-gnu/release/tetris.exe "$path"
 cp -r ./assets "$path"
