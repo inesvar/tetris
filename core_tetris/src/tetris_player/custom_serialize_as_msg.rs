@@ -19,9 +19,9 @@ impl Serialize for TetrisPlayer {
             s.serialize_field("grid", &self.grid)?;
             s.serialize_field("score", &self.score)?;
             s.serialize_field("new_completed_lines", &self.new_completed_lines)?;
-            s.serialize_field("active_tetromino", &self.tetromino_in_play)?;
-            s.serialize_field("saved_tetromino", &self.hold_queue)?;
-            s.serialize_field("fifo_next_tetromino", &self.next_queue)?;
+            s.serialize_field("tetromino_in_play", &self.tetromino_in_play)?;
+            s.serialize_field("hold_queue", &self.hold_queue)?;
+            s.serialize_field("next_queue", &self.next_queue)?;
             s.serialize_field("tetromino_bag", &self.tetromino_bag)?;
             s.serialize_field("received_garbage_lines", &self.received_garbage_lines)?;
             s.serialize_field("serialize_as_msg", &self.serialize_as_msg)?;
