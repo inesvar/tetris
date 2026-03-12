@@ -10,3 +10,6 @@ rand = { workspace = true }
 serde = { workspace = true }
 simple-mermaid = { workspace = true }
 rstest = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
