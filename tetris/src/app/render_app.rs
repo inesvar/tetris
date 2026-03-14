@@ -7,16 +7,12 @@ use crate::app::ui::interactive_widget_manager::InteractiveWidgetManager;
 use crate::app::ui::key_input::KeyInput;
 use crate::app::ui::text::Text;
 use crate::app::ui::text_input::TextInput;
-use crate::assets::Assets;
 use crate::once;
 use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
 use core_tetris::RenderTetrisCore;
-use graphics::types::Matrix2d;
 use graphics::Transformed;
-use graphics::{Context, DrawState};
-use include_assets::NamedArchive;
-use opengl_graphics::{GlGraphics, OpenGL};
 use piston::RenderArgs;
+use render_tetris::Piston2dOpenGlRenderer;
 
 pub trait RenderTetrisGame: RenderTetrisCore + RenderTetrisUi {
     type RenderArgs;
@@ -32,34 +28,6 @@ pub trait RenderTetrisUi {
     fn render_text_input(&mut self, input: &TextInput);
     fn render_key_input(&mut self, input: &KeyInput);
     fn render_button(&mut self, button: &Button);
-}
-
-pub struct Piston2dOpenGlRenderer<'a> {
-    pub gl: GlGraphics,
-    pub assets: Assets<'a>,
-    pub(super) transform: Matrix2d,
-    pub(super) draw_state: DrawState,
-    pub(super) elapsed_secs: f64,
-}
-
-impl<'a> Piston2dOpenGlRenderer<'a> {
-    pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
-        let assets = Assets::new(assets_archive);
-
-        Self {
-            gl: GlGraphics::new(gl_version),
-            assets,
-            transform: Matrix2d::default(),
-            draw_state: DrawState::default(),
-            elapsed_secs: 0.0,
-        }
-    }
-
-    fn update(&mut self, ctx: &Context, clock: f64) {
-        self.transform = ctx.transform;
-        self.draw_state = ctx.draw_state;
-        self.elapsed_secs = clock;
-    }
 }
 
 impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {

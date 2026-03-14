@@ -1,5 +1,4 @@
 //! Implement [Render] for [Text] and [InteractiveWidgetManager] (composed of [TextInput], [KeyInput] and [Button]).
-use super::super::Piston2dOpenGlRenderer;
 use super::button::Button;
 use super::interactive_widget_manager::InteractiveWidgetManager;
 use super::key_input::KeyInput;
@@ -10,6 +9,7 @@ use crate::{
     settings::{CURSOR_BLINK_PERIOD, DEFAULT_BUTTON_Y_SPACING, TEXT_COLOR},
 };
 use graphics::{color, rectangle, Transformed};
+use render_tetris::Piston2dOpenGlRenderer;
 
 impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
     fn render_text(&mut self, text: &Text) {

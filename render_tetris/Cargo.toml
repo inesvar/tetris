@@ -9,3 +9,4 @@ edition = "2021"
 core_tetris = { path = "../core_tetris" }
 piston2d-graphics = { workspace = true }
 piston2d-opengl_graphics = { workspace = true }
+include_assets = { workspace = true }

@@ -1,4 +1,5 @@
 //! Implement `trait` [RenderTetrisCore] for [Piston2dOpenGlRenderer].
+use super::Piston2dOpenGlRenderer;
 use super::{
     BLOCK_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS,
     TETROMINO_MAX_HEIGHT, TETROMINO_MAX_WIDTH,
@@ -135,7 +136,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         self.transform = old_transform;
     }
 
-    /// In [player::render](super::render), helper to render a tetris block at `position` with `tetris_color`.
+    /// Helper to render a tetris block at `position` with `tetris_color`.
     fn render_tetris_block(&mut self, position: &Position, tetris_color: TetrisColor) {
         let dims = rectangle::square(
             position.x() as Scalar * BLOCK_SIZE,

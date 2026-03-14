@@ -2293,6 +2293,7 @@ name = "render_tetris"
 version = "0.1.0"
 dependencies = [
  "core_tetris",
+ "include_assets",
  "piston2d-graphics",
  "piston2d-opengl_graphics",
 ]

@@ -6,8 +6,8 @@ use crate::{app::PlayerConfig, once};
 use core_tetris::BagType;
 use opengl_graphics::OpenGL;
 use piston::Key;
+use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_Y, SCALE_FACTOR};
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
-use render_tetris::{SCALE_FACTOR, DEFAULT_GRID_Y, BLOCK_SIZE};
 
 pub const HOST_PORT: &str = ":26000";
 pub const GUEST_PORT: &str = ":26005";
@@ -21,7 +21,6 @@ pub const OPENGL_VERSION: OpenGL = OpenGL::V4_5;
 
 pub const DEFAULT_WINDOW_WIDTH: u32 = (650.0 * SCALE_FACTOR) as u32;
 pub const DEFAULT_WINDOW_HEIGHT: u32 = (800.0 * SCALE_FACTOR) as u32;
-
 
 // height of the title "Tetris" and "Press R to (re)start"
 pub const DEFAULT_TITLE_Y: f64 = 100.0 * SCALE_FACTOR;
