@@ -15,7 +15,6 @@ use std::collections::HashMap;
 /// Pressed keys struct.
 #[derive(Serialize, Deserialize)]
 pub(super) struct PressedKeys {
-    last_pressed_key: Key,
     /// the countdown is initialized on a key press, then is decremented until it reaches 0 and long press is triggered.
     timer_countdown: HashMap<Key, u64>,
 }
@@ -43,22 +42,16 @@ pub fn get_order_from_key(keybindings: &Keybindings, key: Key) -> Option<TetrisC
 impl PressedKeys {
     pub(super) fn new() -> PressedKeys {
         PressedKeys {
-            last_pressed_key: Key::A,
             timer_countdown: HashMap::new(),
         }
     }
 
     pub(super) fn set_pressed(&mut self, key: Key) {
-        self.last_pressed_key = key;
         self.timer_countdown.insert(key, KEY_REPEAT_DELAY);
     }
 
     pub(super) fn set_released(&mut self, key: Key) {
         self.timer_countdown.remove(&key);
-    }
-
-    pub(super) fn was_just_pressed(&self, keys: &[Key]) -> bool {
-        keys.contains(&self.last_pressed_key)
     }
 
     pub(super) fn is_long_pressed(&self, keys: &[Key]) -> bool {
@@ -70,10 +63,6 @@ impl PressedKeys {
         for countdown in self.timer_countdown.values_mut() {
             *countdown = countdown.saturating_sub(1);
         }
-    }
-
-    pub(super) fn last_pressed_key(&self) -> Key {
-        self.last_pressed_key
     }
 
     fn is_delay_pressed(&self, key: Key) -> bool {

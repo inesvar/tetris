@@ -252,8 +252,36 @@ impl App {
         }
     }
 
+    fn handle_key_press_in_game(&mut self, key: Key) {
+        let mut game_flow_change = GameFlowChange::NoChange;
+
+        if self.running == RunningState::NotRunning && RESTART_KEYS.contains(&key) {
+            game_flow_change = GameFlowChange::Restart;
+        } else if self.running == RunningState::Paused && PAUSE_KEYS.contains(&key) {
+            game_flow_change = GameFlowChange::Resume;
+        } else if self.running == RunningState::Running && PAUSE_KEYS.contains(&key) {
+            game_flow_change = GameFlowChange::Pause;
+        } else if self.running == RunningState::Running {
+            for (id, player) in self.local_players.iter_mut().enumerate() {
+                if player
+                    .handle_key_press(&self.keybindings_manager[id], key)
+                    .is_err()
+                {
+                    game_flow_change = GameFlowChange::GameOver;
+                }
+            }
+        }
+
+        match game_flow_change {
+            GameFlowChange::Restart => self.restart(),
+            GameFlowChange::Resume => self.pause(),
+            GameFlowChange::Pause => self.pause(),
+            GameFlowChange::GameOver => self.game_over(),
+            _ => {}
+        }
+    }
+
     pub fn handle_key_press(&mut self, key: Key) {
-        let mut game_key_press = GameFlowChange::NoChange;
         match &self.view_state {
             ViewState::MainMenu => self.widget_manager[0].handle_key_press(key),
             ViewState::Settings => {
@@ -263,20 +291,8 @@ impl App {
             }
             ViewState::JoinRoom => self.widget_manager[0].handle_key_press(key),
             a if a.is_game() => {
-                // TODO: this is wrong for multiple players...
-                // the GameFlow should be handled only once, not per player.
-                for (id, player) in self.local_players.iter_mut().enumerate() {
-                    game_key_press =
-                        player.handle_key_press(&self.keybindings_manager[id], key, self.running)
-                }
+                self.handle_key_press_in_game(key);
             }
-            _ => {}
-        }
-        match game_key_press {
-            GameFlowChange::Restart => self.restart(),
-            GameFlowChange::Resume => self.pause(),
-            GameFlowChange::Pause => self.pause(),
-            GameFlowChange::GameOver => self.game_over(),
             _ => {}
         }
     }
