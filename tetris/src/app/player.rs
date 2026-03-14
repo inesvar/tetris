@@ -5,7 +5,6 @@
 mod handle_key_player;
 mod local_player;
 mod pressed_keys;
-mod render;
 mod update_player;
 
 use self::pressed_keys::PressedKeys;

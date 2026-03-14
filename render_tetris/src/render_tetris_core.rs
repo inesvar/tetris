@@ -1,21 +1,18 @@
 //! Implement `trait` [RenderTetrisCore] for [Piston2dOpenGlRenderer].
-use crate::app::render_app::{Piston2dOpenGlRenderer, RenderTetrisUi};
-use crate::app::ui::text::Text;
-use crate::app::TetrisPlayer;
-use crate::settings::{
-    BLOCK_SIZE, DEFAULT_FONT_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, DEFAULT_SCORE_TEXT_Y,
-    GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS, NB_NEXT_TETROMINO, TETROMINO_MAX_HEIGHT,
-    TETROMINO_MAX_WIDTH, TEXT_COLOR,
+use super::{
+    BLOCK_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS,
+    TETROMINO_MAX_HEIGHT, TETROMINO_MAX_WIDTH,
 };
 use core_tetris::{
-    Position, RenderTetrisCore, RunningState, TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS,
+    Position, RenderTetrisCore, RunningState, TetrisColor, TetrisGrid, TetrisPlayer,
+    NB_VISIBLE_BUFFER_ROWS,
 };
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
 
 impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
     fn display_player(&mut self, player: &TetrisPlayer, state: RunningState) {
-        let score_text = Text::new(
+        /* let score_text = Text::new(
             format!("Score: {}", player.score).as_str(),
             DEFAULT_FONT_SIZE,
             // the score is centered under the hold piece rectangle
@@ -23,7 +20,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
             DEFAULT_SCORE_TEXT_Y,
             TEXT_COLOR,
         );
-        self.render_text(&score_text);
+        self.render_text(&score_text); */
 
         let old_transform = self.transform;
         let grid_transform = self.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
@@ -117,14 +114,15 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
             hidden_height(&player.grid),
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
-        let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * NB_NEXT_TETROMINO as f64;
+        let height =
+            BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * player.next_queue.size() as f64;
         let dims: Rectangle = [0.0, 0.0, width, height];
         rectangle(GRID_BG_COLOR, dims, self.transform, &mut self.gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
         outline_rect.draw(dims, &self.draw_state, self.transform, &mut self.gl);
 
         // drawing the next pieces
-        for i in 0..NB_NEXT_TETROMINO {
+        for i in 0..player.next_queue.size() {
             self.transform = old_transform.trans(
                 total_width(&player.grid) + 2.0 * BLOCK_SIZE,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),

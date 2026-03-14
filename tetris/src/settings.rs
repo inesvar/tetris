@@ -7,8 +7,8 @@ use core_tetris::BagType;
 use opengl_graphics::OpenGL;
 use piston::Key;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
+use render_tetris::{SCALE_FACTOR, DEFAULT_GRID_Y, BLOCK_SIZE};
 
-const SCALE_FACTOR: f64 = 1.0;
 pub const HOST_PORT: &str = ":26000";
 pub const GUEST_PORT: &str = ":26005";
 
@@ -22,20 +22,11 @@ pub const OPENGL_VERSION: OpenGL = OpenGL::V4_5;
 pub const DEFAULT_WINDOW_WIDTH: u32 = (650.0 * SCALE_FACTOR) as u32;
 pub const DEFAULT_WINDOW_HEIGHT: u32 = (800.0 * SCALE_FACTOR) as u32;
 
-// coordinates of the top left corner of the grid
-// changing this moves everything in the single-player view except the title
-pub const DEFAULT_GRID_X: f64 = 200.0 * SCALE_FACTOR;
-pub const DEFAULT_GRID_Y: f64 = 160.0 * SCALE_FACTOR;
 
 // height of the title "Tetris" and "Press R to (re)start"
 pub const DEFAULT_TITLE_Y: f64 = 100.0 * SCALE_FACTOR;
 // height of the text on the left side indicating the score
 pub const DEFAULT_SCORE_TEXT_Y: f64 = DEFAULT_GRID_Y + 8.0 * BLOCK_SIZE;
-
-pub const BLOCK_SIZE: f64 = 25.0 * SCALE_FACTOR;
-pub const TETROMINO_MAX_WIDTH: f64 = 4.0 * BLOCK_SIZE;
-pub const TETROMINO_MAX_HEIGHT: f64 = 2.0 * BLOCK_SIZE;
-pub const GRID_THICKNESS: f64 = 0.5;
 
 /****************************************/
 /*      POSITIONS IN MAIN MENU VIEW     */
@@ -61,8 +52,6 @@ pub const DEFAULT_KEY_INPUT_HEIGHT: f64 = 50.0 * SCALE_FACTOR;
 /****************************************/
 
 pub const BG_COLOR: graphics::types::Color = [0.1, 0.1, 0.1, 1.0];
-pub const GRID_BG_COLOR: graphics::types::Color = [0.3, 0.3, 0.3, 1.0];
-pub const GRID_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
 pub const TEXT_COLOR: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
 
 /****************************************/

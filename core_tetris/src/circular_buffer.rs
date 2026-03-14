@@ -81,6 +81,10 @@ impl<T: Debug> CircularBuffer<T> {
             None
         }
     }
+
+    pub fn size(&self) -> usize {
+        self.vec.len()
+    }
 }
 
 impl MockRng {
