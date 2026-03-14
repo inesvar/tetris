@@ -9,7 +9,7 @@ pub struct Piston2dOpenGlRenderer<'a> {
     pub assets: Assets<'a>,
     pub transform: Matrix2d,
     pub draw_state: DrawState,
-    pub elapsed_secs: f64,
+    pub(super) elapsed_secs: f64,
 }
 
 impl<'a> Piston2dOpenGlRenderer<'a> {
@@ -29,5 +29,13 @@ impl<'a> Piston2dOpenGlRenderer<'a> {
         self.transform = ctx.transform;
         self.draw_state = ctx.draw_state;
         self.elapsed_secs = clock;
+    }
+
+    pub fn draw_state(&self) -> &DrawState {
+        &self.draw_state
+    }
+
+    pub fn elapsed_secs(&self) -> f64 {
+        self.elapsed_secs
     }
 }

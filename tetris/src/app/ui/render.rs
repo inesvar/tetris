@@ -60,7 +60,7 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         if !input.focused && content.content.is_empty() {
             content.set_text(input.placeholder.clone());
         } else if input.focused
-            && self.elapsed_secs % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0
+            && self.elapsed_secs() % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0
         {
             content.content.push('|');
         }
@@ -92,7 +92,8 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
         outline_rect.draw(dims, &self.draw_state, button_transform, &mut self.gl);
 
-        if key_input.focused && self.elapsed_secs % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0
+        if key_input.focused
+            && self.elapsed_secs() % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0
         {
             let mut text_with_cursor = key_input.custom_text.clone();
             text_with_cursor.content.push('|');
