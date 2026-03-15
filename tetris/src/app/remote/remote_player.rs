@@ -141,4 +141,11 @@ impl RemotePlayer {
     pub(in crate::app) fn get_player(&self) -> MutexGuard<'_, TetrisPlayer> {
         self.screen.lock().unwrap()
     }
+
+    pub(in crate::app) fn score(&self) -> u64 {
+        {
+            let player = self.get_player();
+            player.score
+        }
+    }
 }

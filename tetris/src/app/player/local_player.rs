@@ -49,6 +49,10 @@ impl LocalPlayer {
     pub fn get_lines_completed(&mut self) -> u64 {
         self.player_screen.get_lines_completed()
     }
+
+    pub(in crate::app) fn score(&self) -> u64 {
+        self.player_screen.score
+    }
 }
 
 impl LocalPlayer {

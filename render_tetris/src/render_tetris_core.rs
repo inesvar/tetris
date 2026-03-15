@@ -13,16 +13,6 @@ use graphics::{rectangle, Image, Transformed};
 
 impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
     fn display_player(&mut self, player: &TetrisPlayer, state: RunningState) {
-        /* let score_text = Text::new(
-            format!("Score: {}", player.score).as_str(),
-            DEFAULT_FONT_SIZE,
-            // the score is centered under the hold piece rectangle
-            DEFAULT_GRID_X - 4.0 * BLOCK_SIZE, // 4.0 = 1.0 (margin between borders) + 1.0 (margin inside) + 2.0 (half TETROMINO_MAX_WIDTH)
-            DEFAULT_SCORE_TEXT_Y,
-            TEXT_COLOR,
-        );
-        self.render_text(&score_text); */
-
         let old_transform = self.transform;
         let grid_transform = self.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
         self.transform = grid_transform;

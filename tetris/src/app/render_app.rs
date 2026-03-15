@@ -8,11 +8,14 @@ use crate::app::ui::key_input::KeyInput;
 use crate::app::ui::text::Text;
 use crate::app::ui::text_input::TextInput;
 use crate::once;
-use crate::settings::{BG_COLOR, DEFAULT_WINDOW_WIDTH};
+use crate::settings::{
+    BG_COLOR, DEFAULT_FONT_SIZE, DEFAULT_SCORE_TEXT_Y, DEFAULT_WINDOW_WIDTH, TEXT_COLOR,
+};
 use core_tetris::RenderTetrisCore;
 use graphics::Transformed;
 use piston::RenderArgs;
 use render_tetris::Piston2dOpenGlRenderer;
+use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
 
 pub trait RenderTetrisGame: RenderTetrisCore + RenderTetrisUi {
     type RenderArgs;
@@ -64,10 +67,31 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
                 self.render_text(&app.timer_text);
 
                 for player in &app.local_players {
+                    // TODO: score rendering should eventually be in render_tetris
+                    let score_text = Text::new(
+                        format!("Score: {}", player.score()).as_str(),
+                        DEFAULT_FONT_SIZE,
+                        // the score is centered under the hold piece rectangle
+                        DEFAULT_GRID_X - 4.0 * BLOCK_SIZE, // 4.0 = 1.0 (margin between borders) + 1.0 (margin inside) + 2.0 (half TETROMINO_MAX_WIDTH)
+                        DEFAULT_SCORE_TEXT_Y,
+                        TEXT_COLOR,
+                    );
+                    self.render_text(&score_text);
+
                     self.render_local_player(player, app.running);
                     self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                 }
                 for player in &app.remote_player {
+                    let score_text = Text::new(
+                        format!("Score: {}", player.score()).as_str(),
+                        DEFAULT_FONT_SIZE,
+                        // the score is centered under the hold piece rectangle
+                        DEFAULT_GRID_X - 4.0 * BLOCK_SIZE, // 4.0 = 1.0 (margin between borders) + 1.0 (margin inside) + 2.0 (half TETROMINO_MAX_WIDTH)
+                        DEFAULT_SCORE_TEXT_Y,
+                        TEXT_COLOR,
+                    );
+                    self.render_text(&score_text);
+
                     self.render_remote_player(player, app.running);
                     self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
                 }
