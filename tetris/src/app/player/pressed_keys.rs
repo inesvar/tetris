@@ -1,22 +1,17 @@
 //! Define [PressedKeys] that stores the pressed keys and the last pressed key.
-use crate::keybindings::Keybindings;
 use crate::settings::AUTO_REPEAT_DELAY;
+use crate::{keybindings::Keybindings, settings::AUTO_REPEAT_SPEED};
 use core_tetris::{TetrisCommand, TetrominoMove};
 use piston::Key;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-
-// TODO :
-// it would be more natural to have a hashmap associating a `Key` to an `Option<Command>`.
-// The command could be moving the active tetromino, or a game command.
-
-// And the long press should be handled by a lib obviously
 
 /// Pressed keys struct.
 #[derive(Serialize, Deserialize)]
 pub(super) struct PressedKeys {
     /// the countdown is initialized on a key press, then is decremented until it reaches 0 and long press is triggered.
     timer_countdown: HashMap<Key, u64>,
+    update: u64,
 }
 
 pub fn get_order_from_key(keybindings: &Keybindings, key: Key) -> Option<TetrisCommand> {
@@ -43,31 +38,33 @@ impl PressedKeys {
     pub(super) fn new() -> PressedKeys {
         PressedKeys {
             timer_countdown: HashMap::new(),
+            update: 0,
         }
     }
 
     pub(super) fn set_pressed(&mut self, key: Key) {
-        self.timer_countdown.insert(key, AUTO_REPEAT_DELAY);
+        self.timer_countdown.insert(key, self.update);
     }
 
     pub(super) fn set_released(&mut self, key: Key) {
         self.timer_countdown.remove(&key);
     }
 
-    pub(super) fn is_long_pressed(&self, keys: &[Key]) -> bool {
+    pub(super) fn is_auto_repeated(&self, keys: &[Key]) -> bool {
         keys.iter().any(|k| self.is_delay_pressed(*k))
     }
 
     /// Decrements the press delay countdown for all pressed keys.
     pub(super) fn update(&mut self) {
-        for countdown in self.timer_countdown.values_mut() {
-            *countdown = countdown.saturating_sub(1);
-        }
+        self.update = self.update.wrapping_add(1);
     }
 
     fn is_delay_pressed(&self, key: Key) -> bool {
-        self.timer_countdown
-            .get(&key)
-            .is_some_and(|countdown| *countdown == 0)
+        self.timer_countdown.get(&key).is_some_and(|pressed| {
+            let duration = self.update.wrapping_sub(*pressed);
+            duration
+                .checked_sub(AUTO_REPEAT_DELAY)
+                .is_some_and(|x| x % AUTO_REPEAT_SPEED == 0)
+        })
     }
 }

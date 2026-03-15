@@ -3,7 +3,6 @@
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
 use super::LocalPlayer;
 use crate::keybindings::Keybindings;
-use crate::settings::AUTO_REPEAT_SPEED;
 use core_tetris::{TetrisCommand, TetrisResult, TetrominoMove};
 
 impl LocalPlayer {
@@ -40,29 +39,23 @@ impl LocalPlayer {
          **********************************/
 
         // Translate the tetromino down on a key press
-        if frame_counter % AUTO_REPEAT_SPEED == 0 {
-            if self.keyboard.is_long_pressed(&keybindings.fall_keys)
-                && !self
-                    .player_screen
-                    .try_apply(TetrominoMove::Fall.into(), &mut self.rng)?
-                && self.freeze_frame < frame_counter
-            {
-                // if the tetromino reaches the bottom, set the freeze_frame
-                self.freeze_frame = frame_counter + freeze;
-            }
-            // Translate the tetromino right or left on a long key press
-            if self.keyboard.is_long_pressed(&keybindings.left_keys)
-                && !self.keyboard.is_long_pressed(&keybindings.right_keys)
-            {
-                self.player_screen
-                    .try_apply(TetrominoMove::Left.into(), &mut self.rng)?;
-            }
-            if self.keyboard.is_long_pressed(&keybindings.right_keys)
-                && !self.keyboard.is_long_pressed(&keybindings.left_keys)
-            {
-                self.player_screen
-                    .try_apply(TetrominoMove::Right.into(), &mut self.rng)?;
-            }
+        if self.keyboard.is_auto_repeated(&keybindings.fall_keys)
+            && !self
+                .player_screen
+                .try_apply(TetrominoMove::Fall.into(), &mut self.rng)?
+            && self.freeze_frame < frame_counter
+        {
+            // if the tetromino reaches the bottom, set the freeze_frame
+            self.freeze_frame = frame_counter + freeze;
+        }
+        // Translate the tetromino right or left on a long key press
+        if self.keyboard.is_auto_repeated(&keybindings.left_keys) {
+            self.player_screen
+                .try_apply(TetrominoMove::Left.into(), &mut self.rng)?;
+        }
+        if self.keyboard.is_auto_repeated(&keybindings.right_keys) {
+            self.player_screen
+                .try_apply(TetrominoMove::Right.into(), &mut self.rng)?;
         }
 
         /**********************************
