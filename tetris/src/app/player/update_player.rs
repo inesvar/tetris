@@ -3,6 +3,7 @@
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
 use super::LocalPlayer;
 use crate::keybindings::Keybindings;
+use crate::settings::AUTO_REPEAT_SPEED;
 use core_tetris::{TetrisCommand, TetrisResult, TetrominoMove};
 
 impl LocalPlayer {
@@ -39,7 +40,7 @@ impl LocalPlayer {
          **********************************/
 
         // Translate the tetromino down on a key press
-        if frame_counter % 5 == 0 {
+        if frame_counter % AUTO_REPEAT_SPEED == 0 {
             if self.keyboard.is_long_pressed(&keybindings.fall_keys)
                 && !self
                     .player_screen

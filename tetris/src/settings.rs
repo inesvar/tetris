@@ -68,7 +68,8 @@ pub const FREEZE: u64 = 50;
 // not setable in the UI
 pub const RESTART_KEYS: [Key; 1] = [Key::R];
 pub const PAUSE_KEYS: [Key; 1] = [Key::P];
-pub const KEY_REPEAT_DELAY: u64 = 20;
+pub const AUTO_REPEAT_DELAY: u64 = 20; // should be around 0.3s (36) according to the Guideline 5.2 Auto-repeat
+pub const AUTO_REPEAT_SPEED: u64 = 3; // should be around 25ms (3) according to the Guideline 5.2 Auto-repeat
 
 /// Settings represents parameters that need to be common between players in multiplayer mode.
 ///

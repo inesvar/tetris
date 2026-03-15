@@ -1,6 +1,6 @@
 //! Define [PressedKeys] that stores the pressed keys and the last pressed key.
 use crate::keybindings::Keybindings;
-use crate::settings::KEY_REPEAT_DELAY;
+use crate::settings::AUTO_REPEAT_DELAY;
 use core_tetris::{TetrisCommand, TetrominoMove};
 use piston::Key;
 use serde::{Deserialize, Serialize};
@@ -47,7 +47,7 @@ impl PressedKeys {
     }
 
     pub(super) fn set_pressed(&mut self, key: Key) {
-        self.timer_countdown.insert(key, KEY_REPEAT_DELAY);
+        self.timer_countdown.insert(key, AUTO_REPEAT_DELAY);
     }
 
     pub(super) fn set_released(&mut self, key: Key) {
