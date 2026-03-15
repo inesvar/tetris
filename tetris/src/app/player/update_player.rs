@@ -16,7 +16,6 @@ impl LocalPlayer {
     /// It's also responsible for :
     /// - updating the keyboard clock
     /// - updating the ghost tetromino
-    /// - adding garbage
     /// - sending the serialized data to the remote
     ///
     /// When the game is paused or inactive, update should not be called.
@@ -27,11 +26,7 @@ impl LocalPlayer {
         fall_speed_divide: u64,
         freeze: u64,
     ) -> TetrisResult {
-        /* Actions in this function have to be carefully ordered so that there are no uncoherences.
-         *
-         * For instance, garbage has to be added AFTER the tetromino is moved because it hasn't been rendered yet
-         * so the player couldn't adapt.
-         */
+        // Actions in this function have to be carefully ordered so that there are no uncoherences.
 
         /**********************************
          *   MOVING the ACTIVE_TETROMINO  *
