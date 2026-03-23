@@ -50,6 +50,7 @@ pub struct TetrisPlayer {
 }
 
 /// All possible commands received by [TetrisPlayer].
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub enum TetrisCommand {
     /// A user command to move the [TetrisPlayer::tetromino_in_play]
     /// (there are 7 possible moves described by [TetrominoMove]).

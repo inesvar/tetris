@@ -20,7 +20,7 @@ impl App {
         self.clock += args.dt;
         if self.view_state == ViewState::Settings {
             for (id, widget_manager) in self.widget_manager.iter_mut().enumerate() {
-                widget_manager.update_settings(&mut self.keybindings_manager[id]);
+                widget_manager.update_settings(self.local_players[id].get_mut_keybindings());
             }
         } else if self.view_state == ViewState::CreateRoom {
             self.widget_manager[0].update_clipboard();
@@ -63,18 +63,9 @@ impl App {
                 }
             }
             // update
-            let update_res =
-                self.local_players
-                    .iter_mut()
-                    .enumerate()
-                    .try_for_each(|(id, player)| {
-                        player.update(
-                            &self.keybindings_manager[id],
-                            self.frame_counter,
-                            self.fall_speed_divide,
-                            self.freeze,
-                        )
-                    });
+            let update_res = self.local_players.iter_mut().try_for_each(|player| {
+                player.update(self.frame_counter, self.fall_speed_divide, self.freeze)
+            });
             // taking into account the player states after a new piece was added
             // two options :
             // either the player didn't lose => nothing to do

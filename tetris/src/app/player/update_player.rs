@@ -2,7 +2,6 @@
 //!
 //! [update()](LocalPlayer::update()) is called before each render when the game is active.
 use super::LocalPlayer;
-use crate::keybindings::Keybindings;
 use core_tetris::{TetrisCommand, TetrisResult, TetrominoMove};
 
 impl LocalPlayer {
@@ -21,7 +20,6 @@ impl LocalPlayer {
     /// When the game is paused or inactive, update should not be called.
     pub fn update(
         &mut self,
-        keybindings: &Keybindings,
         frame_counter: u64,
         fall_speed_divide: u64,
         freeze: u64,
@@ -39,7 +37,7 @@ impl LocalPlayer {
          **********************************/
 
         // Translate the tetromino down on a key press
-        if self.keyboard.is_auto_repeated(&keybindings.fall_keys)
+        if self.keyboard.is_auto_repeated(TetrisCommand::Fall)
             && !self
                 .player_screen
                 .try_apply(TetrominoMove::Fall.into(), &mut self.rng)?
@@ -49,11 +47,11 @@ impl LocalPlayer {
             self.freeze_frame = frame_counter + freeze;
         }
         // Translate the tetromino right or left on a long key press
-        if self.keyboard.is_auto_repeated(&keybindings.left_keys) {
+        if self.keyboard.is_auto_repeated(TetrominoMove::Left.into()) {
             self.player_screen
                 .try_apply(TetrominoMove::Left.into(), &mut self.rng)?;
         }
-        if self.keyboard.is_auto_repeated(&keybindings.right_keys) {
+        if self.keyboard.is_auto_repeated(TetrominoMove::Right.into()) {
             self.player_screen
                 .try_apply(TetrominoMove::Right.into(), &mut self.rng)?;
         }

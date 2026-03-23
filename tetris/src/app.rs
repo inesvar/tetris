@@ -102,7 +102,6 @@ pub struct App {
     timer_text: Text,
     pub cursor_position: [f64; 2],
     widget_manager: Vec<InteractiveWidgetManager>,
-    keybindings_manager: Vec<Keybindings>,
     settings_manager: Settings,
     is_synchronized: bool,
     is_host: bool,
@@ -117,7 +116,7 @@ impl App {
         let is_host = false;
         let player_config = PlayerConfig::Local;
 
-        let local_player: LocalPlayer = LocalPlayer::new(&player_config);
+        let local_player: LocalPlayer = LocalPlayer::new(&player_config, Keybindings::new());
         let players: Vec<LocalPlayer> = vec![local_player];
         let rem_players: Vec<RemotePlayer> = vec![];
 
@@ -161,7 +160,6 @@ impl App {
             running: RunningState::NotRunning,
             cursor_position: [0.0, 0.0],
             widget_manager: vec![InteractiveWidgetManager::new_main_menu()],
-            keybindings_manager: vec![Keybindings::new()],
             settings_manager,
             is_synchronized: false,
             is_host,
@@ -197,12 +195,9 @@ impl App {
 
         match &player_config {
             PlayerConfig::Local => {
-                local_player = LocalPlayer::new(&player_config);
+                local_player = LocalPlayer::new(&player_config, Keybindings::new());
                 self.local_players = vec![local_player];
                 self.remote_player = vec![];
-                if self.keybindings_manager.len() > 1 {
-                    self.keybindings_manager = vec![Keybindings::new()];
-                }
             }
             PlayerConfig::Viewer(local_ip) => {
                 self.local_players = vec![];
@@ -211,15 +206,12 @@ impl App {
                     self.remote_player = vec![remote_player];
                     self.remote_player[0].listen(local_ip);
                 }
-                if self.keybindings_manager.len() > 1 {
-                    self.keybindings_manager = vec![Keybindings::new()];
-                }
             }
             PlayerConfig::TwoRemote {
                 local_ip,
                 remote_ip: _,
             } => {
-                local_player = LocalPlayer::new(&player_config);
+                local_player = LocalPlayer::new(&player_config, Keybindings::new());
                 self.local_players = vec![local_player];
                 if self.remote_player.is_empty() {
                     remote_player = RemotePlayer::new();
@@ -227,17 +219,12 @@ impl App {
                     self.remote_player[0].listen(local_ip);
                 }
                 self.is_host = local_ip.ends_with('0');
-                if self.keybindings_manager.len() > 1 {
-                    self.keybindings_manager = vec![Keybindings::new()];
-                }
             }
             PlayerConfig::TwoLocal => {
-                local_player = LocalPlayer::new(&player_config);
-                let second_local = LocalPlayer::new(&player_config);
+                local_player = LocalPlayer::new(&player_config, Keybindings::new_two_local(0));
+                let second_local = LocalPlayer::new(&player_config, Keybindings::new_two_local(1));
                 self.local_players = vec![local_player, second_local];
                 self.remote_player = vec![];
-                self.keybindings_manager =
-                    vec![Keybindings::new_two_local(0), Keybindings::new_two_local(1)];
             }
         }
 
@@ -263,11 +250,8 @@ impl App {
         } else if self.running == RunningState::Running && PAUSE_KEYS.contains(&key) {
             game_flow_change = GameFlowChange::Pause;
         } else if self.running == RunningState::Running {
-            for (id, player) in self.local_players.iter_mut().enumerate() {
-                if player
-                    .handle_key_press(&self.keybindings_manager[id], key)
-                    .is_err()
-                {
+            for player in self.local_players.iter_mut() {
+                if player.handle_key_press(key).is_err() {
                     game_flow_change = GameFlowChange::GameOver;
                 }
             }
@@ -392,14 +376,14 @@ impl App {
                 match &self.player_config {
                     PlayerConfig::Local => {
                         self.widget_manager = vec![InteractiveWidgetManager::new_settings(
-                            &self.keybindings_manager[0],
+                            self.local_players[0].get_keybindings(),
                             SettingsType::OnePlayer,
                             from_game,
                         )]
                     }
                     _ => {
                         self.widget_manager = vec![InteractiveWidgetManager::new_settings(
-                            &self.keybindings_manager[0],
+                            self.local_players[0].get_keybindings(),
                             SettingsType::LeftPlayer,
                             from_game,
                         )]
@@ -408,7 +392,7 @@ impl App {
                 if self.player_config == PlayerConfig::TwoLocal {
                     self.widget_manager
                         .push(InteractiveWidgetManager::new_settings(
-                            &self.keybindings_manager[1],
+                            self.local_players[1].get_keybindings(),
                             SettingsType::RightPlayer,
                             from_game,
                         ));

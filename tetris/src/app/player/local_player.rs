@@ -1,12 +1,12 @@
 //! Define the general implementation of [LocalPlayer].
 use super::{pressed_keys::PressedKeys, LocalPlayer, TetrisPlayer};
-use crate::{app::PlayerConfig, once, settings::BAG_TYPE};
+use crate::{app::PlayerConfig, keybindings::Keybindings, once, settings::BAG_TYPE};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
 
 impl LocalPlayer {
-    pub fn new(player_config: &PlayerConfig) -> Self {
+    pub fn new(player_config: &PlayerConfig, keybindings: Keybindings) -> Self {
         let mut rng = Pcg32::seed_from_u64(0);
 
         let mut remote_ip = String::from("");
@@ -24,7 +24,7 @@ impl LocalPlayer {
 
         LocalPlayer {
             player_screen,
-            keyboard: PressedKeys::new(),
+            keyboard: PressedKeys::new(keybindings),
             freeze_frame: 0, // that's about 10 billion years at 60fps
             sender,
             remote_ip,
@@ -34,6 +34,14 @@ impl LocalPlayer {
 
     pub fn get_player(&self) -> &TetrisPlayer {
         &self.player_screen
+    }
+
+    pub fn get_keybindings(&self) -> &Keybindings {
+        self.keyboard.get_keybindings()
+    }
+
+    pub fn get_mut_keybindings(&mut self) -> &mut Keybindings {
+        self.keyboard.get_mut_keybindings()
     }
 
     pub fn reset(&mut self, seed: u64) {
