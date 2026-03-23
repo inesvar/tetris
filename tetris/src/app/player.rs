@@ -9,16 +9,13 @@ mod update_player;
 
 use self::pressed_keys::PressedKeys;
 pub use core_tetris::TetrisPlayer;
-use rand::SeedableRng;
 use rand_pcg::Pcg32;
-use serde::{Deserialize, Serialize};
 
 /// Local player contains all the informations relative to one player.
 ///
 /// - the elements to show on screen
 /// - the pressed keys
 /// - the next tetromino in the queue as well as a random generator
-#[derive(Serialize, Deserialize)]
 pub struct LocalPlayer {
     /// player_screen contains all attributes visible on the screen
     ///
@@ -35,11 +32,5 @@ pub struct LocalPlayer {
     sender: bool,
     remote_ip: String,
     /// Random generator for the next pieces of tetromino.
-    #[serde(skip, default = "new_pcg")]
     rng: Pcg32,
-}
-
-/// Constructor for the random generator.
-fn new_pcg() -> Pcg32 {
-    Pcg32::seed_from_u64(0)
 }

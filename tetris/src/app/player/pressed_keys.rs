@@ -3,11 +3,9 @@ use crate::settings::AUTO_REPEAT_DELAY;
 use crate::{keybindings::Keybindings, settings::AUTO_REPEAT_SPEED};
 use core_tetris::{TetrisCommand, TetrominoMove};
 use piston::Key;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Pressed keys struct.
-#[derive(Serialize, Deserialize)]
 pub(super) struct PressedKeys {
     /// the countdown is initialized on a key press, then is decremented until it reaches 0 and long press is triggered.
     timer_countdown: HashMap<Key, u64>,
