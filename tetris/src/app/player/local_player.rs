@@ -1,5 +1,5 @@
 //! Define the general implementation of [LocalPlayer].
-use super::{pressed_keys::PressedKeys, LocalPlayer, TetrisPlayer};
+use super::{keyboard_input::KeyboardInput, LocalPlayer, TetrisPlayer};
 use crate::{app::PlayerConfig, keybindings::Keybindings, once, settings::BAG_TYPE};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
@@ -24,7 +24,7 @@ impl LocalPlayer {
 
         LocalPlayer {
             player_screen,
-            keyboard: PressedKeys::new(keybindings),
+            keyboard: KeyboardInput::new(keybindings),
             freeze_frame: 0, // that's about 10 billion years at 60fps
             sender,
             remote_ip,

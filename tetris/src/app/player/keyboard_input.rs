@@ -1,19 +1,26 @@
 //! Define [PressedKeys] that stores the pressed keys and the last pressed key.
-use crate::settings::AUTO_REPEAT_DELAY;
-use crate::{keybindings::Keybindings, settings::AUTO_REPEAT_SPEED};
+use crate::keybindings::Keybindings;
+use crate::settings::{AUTO_REPEAT_DELAY, AUTO_REPEAT_SPEED};
 use core_tetris::{TetrisCommand, TetrominoMove};
 use piston::Key;
 use std::collections::HashMap;
 
 /// Pressed keys struct.
-pub(super) struct PressedKeys {
-    /// the countdown is initialized on a key press, then is decremented until it reaches 0 and long press is triggered.
-    timer_countdown: HashMap<TetrisCommand, u64>,
-    update: u64,
+pub(super) struct KeyboardInput {
+    started_at: HashMap<TetrisCommand, u64>,
+    now: u64,
     keybindings: Keybindings,
 }
 
-impl PressedKeys {
+impl KeyboardInput {
+    pub(super) fn new(keybindings: Keybindings) -> KeyboardInput {
+        KeyboardInput {
+            started_at: HashMap::new(),
+            now: 0,
+            keybindings,
+        }
+    }
+
     pub(super) fn get_order_from_key(&self, key: Key) -> Option<TetrisCommand> {
         match key {
             key if self.keybindings.hold_tetromino_keys.contains(&key) => Some(TetrisCommand::Hold),
@@ -35,16 +42,6 @@ impl PressedKeys {
             _ => None,
         }
     }
-}
-
-impl PressedKeys {
-    pub(super) fn new(keybindings: Keybindings) -> PressedKeys {
-        PressedKeys {
-            timer_countdown: HashMap::new(),
-            update: 0,
-            keybindings,
-        }
-    }
 
     pub(super) fn get_keybindings(&self) -> &Keybindings {
         &self.keybindings
@@ -56,13 +53,13 @@ impl PressedKeys {
 
     pub(super) fn set_pressed(&mut self, key: Key) -> Option<TetrisCommand> {
         let command = self.get_order_from_key(key)?;
-        self.timer_countdown.insert(command.clone(), self.update);
+        self.started_at.insert(command.clone(), self.now);
         Some(command)
     }
 
     pub(super) fn set_released(&mut self, key: Key) {
         if let Some(command) = self.get_order_from_key(key) {
-            self.timer_countdown.remove(&command);
+            self.started_at.remove(&command);
         }
     }
 
@@ -73,13 +70,13 @@ impl PressedKeys {
 
     /// Increments the timer count.
     pub(super) fn update(&mut self) {
-        self.update = self.update.wrapping_add(1);
+        self.now = self.now.wrapping_add(1);
     }
 
     fn key_is_pressed_since(&self, command: TetrisCommand) -> Option<u64> {
-        self.timer_countdown
+        self.started_at
             .get(&command)
-            .map(|pressed_at| self.update.wrapping_sub(*pressed_at))
+            .map(|pressed_at| self.now.wrapping_sub(*pressed_at))
     }
 
     fn auto_repeat_delay_is_up_since(&self, command: TetrisCommand) -> Option<u64> {
