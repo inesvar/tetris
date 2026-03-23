@@ -51,20 +51,39 @@ impl PressedKeys {
     }
 
     pub(super) fn is_auto_repeated(&self, keys: &[Key]) -> bool {
-        keys.iter().any(|k| self.is_delay_pressed(*k))
+        self.auto_repeat_delay_is_up_since(keys)
+            .is_some_and(|x| x % AUTO_REPEAT_SPEED == 0)
     }
 
-    /// Decrements the press delay countdown for all pressed keys.
+    /// Increments the timer count.
     pub(super) fn update(&mut self) {
         self.update = self.update.wrapping_add(1);
     }
 
-    fn is_delay_pressed(&self, key: Key) -> bool {
-        self.timer_countdown.get(&key).is_some_and(|pressed| {
-            let duration = self.update.wrapping_sub(*pressed);
-            duration
-                .checked_sub(AUTO_REPEAT_DELAY)
-                .is_some_and(|x| x % AUTO_REPEAT_SPEED == 0)
+    fn key_is_pressed_since(&self, key: &Key) -> Option<u64> {
+        self.timer_countdown
+            .get(key)
+            .map(|pressed_at| self.update.wrapping_sub(*pressed_at))
+    }
+
+    fn is_pressed_since(&self, keys: &[Key]) -> Option<u64> {
+        keys.iter().fold(None, |acc, key| {
+            let key_pressed_since = self.key_is_pressed_since(key);
+            let Some(maximum) = acc else {
+                return key_pressed_since;
+            };
+            if key_pressed_since.is_some_and(|pressed_since| pressed_since > maximum) {
+                key_pressed_since
+            } else {
+                acc
+            }
         })
+    }
+
+    fn auto_repeat_delay_is_up_since(&self, keys: &[Key]) -> Option<u64> {
+        match self.is_pressed_since(keys) {
+            None => None,
+            Some(duration) => duration.checked_sub(AUTO_REPEAT_DELAY),
+        }
     }
 }
