@@ -1,6 +1,3 @@
-- TetrominoMove::Fall is sufficient, TetrisCommand::Fall shouldn't exist
-
-
 - the tetrominos should not change the first time the game is started... start the game automatically when clicking on the button
 => tricky change at the moment
 - make core_tetris integration tests

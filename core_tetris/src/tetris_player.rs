@@ -60,13 +60,9 @@ pub enum TetrisCommand {
     /// A user command to put the [TetrisPlayer::tetromino_in_play] in the **Hold Queue**
     /// (a new [TetrisPlayer::tetromino_in_play] will automatically be moved to its starting position).
     Hold,
-    /// An in-game command to move the [TetrisPlayer::tetromino_in_play] down one block.
-    Fall,
     /// An in-game command to **Lock Down** the tetromino.
     ///
-    /// This command happens automatically:
-    /// - immediately after [TetrominoMove::HardDrop];
-    /// - a short time after [TetrisCommand::Fall] failed to move [TetrisPlayer::tetromino_in_play].
+    /// This command happens automatically after [TetrominoMove::HardDrop].
     ///
     /// This command consists in 3 steps :
     /// - add the [TetrisPlayer::tetromino_in_play] to the [TetrisPlayer::grid] (this can fail with [GameOverError::LockOut]);
@@ -164,9 +160,6 @@ impl TetrisPlayer {
             TetrisCommand::Move(tetromino_move) => {
                 Ok(self.tetromino_in_play.try_apply(tetromino_move, &self.grid))
             }
-            TetrisCommand::Fall => Ok(self
-                .tetromino_in_play
-                .try_apply(TetrominoMove::Fall, &self.grid)),
             TetrisCommand::Hold => self.hold_tetromino(rng).map(|_| true),
             TetrisCommand::LockDown => self.lock_down(rng).map(|_| true),
         }
