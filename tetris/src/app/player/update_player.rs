@@ -37,7 +37,7 @@ impl LocalPlayer {
          **********************************/
 
         // Translate the tetromino down on a key press
-        if self.keyboard.is_auto_repeated(TetrisCommand::Fall)
+        if self.keyboard.is_auto_repeated(TetrominoMove::Fall.into())
             && !self
                 .player_screen
                 .try_apply(TetrominoMove::Fall.into(), &mut self.rng)?
