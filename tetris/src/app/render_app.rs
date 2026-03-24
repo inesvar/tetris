@@ -9,7 +9,7 @@ use graphics::Transformed;
 use piston::RenderArgs;
 use render_tetris::Piston2dOpenGlRenderer;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
-use ui_tetris::text::Text;
+use ui_tetris::Text;
 use ui_tetris::{RenderTetrisUi, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, TEXT_COLOR};
 
 pub trait RenderTetrisGame: RenderTetrisCore + RenderTetrisUi {

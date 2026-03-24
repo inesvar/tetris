@@ -21,8 +21,7 @@ use std::net::TcpStream;
 use ui_tetris::Keybindings;
 use ui_tetris::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
-    text::Text,
-    DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT, TEXT_COLOR,
+    Text, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT, TEXT_COLOR,
 };
 
 #[derive(PartialEq, Debug)]
