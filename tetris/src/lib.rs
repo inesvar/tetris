@@ -9,7 +9,7 @@ extern crate piston;
 
 use crate::{
     app::{App, RenderTetrisGame},
-    settings::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OPENGL_VERSION},
+    settings::OPENGL_VERSION,
 };
 use glfw_window::GlfwWindow;
 use include_assets::{include_dir, NamedArchive};
@@ -22,9 +22,9 @@ use piston::{
 use piston_window::PistonWindow;
 use render_tetris::Piston2dOpenGlRenderer;
 use std::time::SystemTime;
+use ui_tetris::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 
 mod app;
-mod keybindings;
 mod settings;
 mod utils;
 

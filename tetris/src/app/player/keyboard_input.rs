@@ -1,9 +1,9 @@
 //! Define [PressedKeys] that stores the pressed keys and the last pressed key.
-use crate::keybindings::Keybindings;
 use crate::settings::{AUTO_REPEAT_DELAY, AUTO_REPEAT_SPEED};
 use core_tetris::{TetrisCommand, TetrominoMove};
 use piston::Key;
 use std::collections::HashMap;
+use ui_tetris::Keybindings;
 
 /// Maps keyboard inputs to [TetrisCommand]s and remembers durations so that auto-repeat can be applied.
 pub(super) struct KeyboardInput {

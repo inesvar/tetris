@@ -1,5 +1,5 @@
 use super::text::Text;
-use crate::settings::{DEFAULT_FONT_SIZE, TEXT_COLOR};
+use super::{DEFAULT_FONT_SIZE, TEXT_COLOR};
 use piston::{Key, MouseButton};
 
 pub struct KeyInput {

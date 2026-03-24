@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 core_tetris = { path = "../core_tetris" }
 render_tetris = { path = "../render_tetris" }
+ui_tetris = { path = "../ui_tetris" }
 piston_window = { workspace = true }
 piston = { workspace = true }
 piston2d-graphics = { workspace = true }

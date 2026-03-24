@@ -2,18 +2,12 @@
 mod player;
 mod remote;
 mod render_app;
-mod ui;
 mod update_app;
 
 use self::player::LocalPlayer;
 pub use self::player::TetrisPlayer;
 use self::remote::RemotePlayer;
-use self::ui::{
-    interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
-    text::Text,
-};
 use crate::app::remote::MessageType;
-use crate::keybindings::Keybindings;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
 use core_tetris::RunningState;
@@ -24,7 +18,12 @@ use rand::RngExt;
 pub use render_app::RenderTetrisGame;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
 use std::net::TcpStream;
-pub use ui::TetrisCommand;
+use ui_tetris::Keybindings;
+use ui_tetris::{
+    interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
+    text::Text,
+    DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT, TEXT_COLOR,
+};
 
 #[derive(PartialEq, Debug)]
 pub enum PlayerConfig {

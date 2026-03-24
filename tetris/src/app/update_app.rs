@@ -1,10 +1,10 @@
 //! Define the update function of [App].
 //!
 //! [update()](App::update()) is called before each render when the game is active.
-use super::ui::interactive_widget_manager::ButtonType;
 use super::{remote::MessageType, App, PlayerConfig, RunningState, ViewState};
 use crate::utils::formattings::format_seconds;
 use piston::UpdateArgs;
+use ui_tetris::interactive_widget_manager::ButtonType;
 
 impl App {
     /// update is called before each render so that the informations on the screen are as recent as possible.

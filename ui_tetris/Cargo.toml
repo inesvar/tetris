@@ -1,6 +1,11 @@
 [package]
 name = "ui_tetris"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
+render_tetris = { path = "../render_tetris" }
+piston = { workspace = true }
+piston2d-graphics = { workspace = true }
+local-ip-address = { workspace = true }
+arboard = { workspace = true }

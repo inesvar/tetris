@@ -2,35 +2,21 @@
 use super::{App, RunningState, ViewState};
 use crate::app::player::LocalPlayer;
 use crate::app::remote::RemotePlayer;
-use crate::app::ui::button::Button;
-use crate::app::ui::interactive_widget_manager::InteractiveWidgetManager;
-use crate::app::ui::key_input::KeyInput;
-use crate::app::ui::text::Text;
-use crate::app::ui::text_input::TextInput;
 use crate::once;
-use crate::settings::{
-    BG_COLOR, DEFAULT_FONT_SIZE, DEFAULT_SCORE_TEXT_Y, DEFAULT_WINDOW_WIDTH, TEXT_COLOR,
-};
+use crate::settings::{BG_COLOR, DEFAULT_SCORE_TEXT_Y};
 use core_tetris::RenderTetrisCore;
 use graphics::Transformed;
 use piston::RenderArgs;
 use render_tetris::Piston2dOpenGlRenderer;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
+use ui_tetris::text::Text;
+use ui_tetris::{RenderTetrisUi, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, TEXT_COLOR};
 
 pub trait RenderTetrisGame: RenderTetrisCore + RenderTetrisUi {
     type RenderArgs;
     fn render_app(&mut self, render_args: &RenderArgs, app: &App);
     fn render_local_player(&mut self, local_player: &LocalPlayer, state: RunningState);
     fn render_remote_player(&mut self, remote_player: &RemotePlayer, state: RunningState);
-}
-
-/// Rendering an [InteractiveWidgetManager].
-pub trait RenderTetrisUi {
-    fn render_widget_manager(&mut self, manager: &InteractiveWidgetManager);
-    fn render_text(&mut self, text: &Text);
-    fn render_text_input(&mut self, input: &TextInput);
-    fn render_key_input(&mut self, input: &KeyInput);
-    fn render_button(&mut self, button: &Button);
 }
 
 impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {

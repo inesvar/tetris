@@ -1,9 +1,10 @@
 //! Define the general implementation of [LocalPlayer].
 use super::{keyboard_input::KeyboardInput, LocalPlayer, TetrisPlayer};
-use crate::{app::PlayerConfig, keybindings::Keybindings, once, settings::BAG_TYPE};
+use crate::{app::PlayerConfig, once, settings::BAG_TYPE};
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
+use ui_tetris::Keybindings;
 
 impl LocalPlayer {
     pub fn new(player_config: &PlayerConfig, keybindings: Keybindings) -> Self {

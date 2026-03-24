@@ -1,5 +1,5 @@
 use super::text::Text;
-use crate::settings::DEFAULT_FONT_SIZE;
+use super::DEFAULT_FONT_SIZE;
 use graphics::color;
 use piston::MouseButton;
 
@@ -44,20 +44,6 @@ impl Button {
         }
     }
 
-    #[allow(unused)]
-    pub fn default() -> Button {
-        Button {
-            x: 0.0,
-            y: 0.0,
-            width: 0.0,
-            height: 0.0,
-            text: Text::default(),
-            background_color: [0.0, 0.0, 0.0, 0.0],
-            commit: false,
-            is_pressed: false,
-        }
-    }
-
     pub fn are_coords_inside_button(&self, x: f64, y: f64) -> bool {
         x >= self.x - self.width / 2.0
             && x <= self.x + self.width / 2.0
@@ -91,6 +77,21 @@ impl Button {
         if button == MouseButton::Left {
             self.background_color = [0.8, 0.8, 0.8, 1.0];
             self.is_pressed = false;
+        }
+    }
+}
+
+impl Default for Button {
+    fn default() -> Self {
+        Button {
+            x: 0.0,
+            y: 0.0,
+            width: 0.0,
+            height: 0.0,
+            text: Text::default(),
+            background_color: [0.0, 0.0, 0.0, 0.0],
+            commit: false,
+            is_pressed: false,
         }
     }
 }

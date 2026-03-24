@@ -1,5 +1,5 @@
 #[allow(unused)]
-use crate::settings::DEFAULT_FONT_SIZE;
+use super::DEFAULT_FONT_SIZE;
 use graphics::types::Color;
 
 #[derive(Clone)]
@@ -35,8 +35,13 @@ impl Text {
         }
     }
 
-    #[allow(unused)]
-    pub fn default() -> Text {
+    pub fn set_text(&mut self, text: String) {
+        self.content = text;
+    }
+}
+
+impl Default for Text {
+    fn default() -> Self {
         Text {
             x: 0.0,
             y: 0.0,
@@ -45,9 +50,5 @@ impl Text {
             use_tetris_font: false,
             view: graphics::text::Text::new_color([0.0, 0.0, 0.0, 0.0], DEFAULT_FONT_SIZE),
         }
-    }
-
-    pub fn set_text(&mut self, text: String) {
-        self.content = text;
     }
 }

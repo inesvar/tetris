@@ -1,4 +1,4 @@
-use crate::app::TetrisCommand;
+use crate::interactive_widget_manager::TetrisCommand;
 use piston::Key;
 
 const FALL_KEYS_1P: [Key; 2] = [Key::Down, Key::NumPad2];
@@ -29,6 +29,12 @@ pub struct Keybindings {
     pub rotate_counterclockwise_keys: Vec<Key>,
     pub rotate_half_turn_keys: Vec<Key>,
     pub hold_tetromino_keys: Vec<Key>,
+}
+
+impl Default for Keybindings {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // TODO: keybindings should be in its own file
