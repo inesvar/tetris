@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["tetris", "core_tetris", "render_tetris", "input_manager"]
+members = ["tetris", "core_tetris", "render_tetris", "input_manager", "ui_tetris"]
 
 [workspace.dependencies]
 piston_window = "0.132.0"
