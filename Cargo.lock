@@ -2827,6 +2827,7 @@ name = "ui_tetris"
 version = "0.1.0"
 dependencies = [
  "arboard",
+ "core_tetris",
  "local-ip-address",
  "piston",
  "piston2d-graphics",

@@ -6,8 +6,9 @@ use super::{
 };
 use crate::keybindings::Keybindings;
 use arboard::Clipboard;
+use core_tetris::{TetrisCommand, TetrominoMove};
 use local_ip_address::local_ip;
-use piston::{Key, MouseButton};
+use piston::MouseButton;
 use std::collections::HashMap;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
@@ -40,18 +41,6 @@ pub enum TextInputType {
     #[allow(unused)]
     DebugTextInput,
     IpAddressInput,
-}
-
-#[derive(Hash, PartialEq, Eq)]
-pub enum TetrisCommand {
-    Fall(Vec<Key>),
-    HardDrop(Vec<Key>),
-    Right(Vec<Key>),
-    Left(Vec<Key>),
-    RotateClockwise(Vec<Key>),
-    RotateCounterclockwise(Vec<Key>),
-    RotateHalfTurn(Vec<Key>),
-    HoldTetromino(Vec<Key>),
 }
 
 #[allow(clippy::enum_variant_names)]
@@ -268,38 +257,26 @@ impl InteractiveWidgetManager {
         let text_inputs = HashMap::new();
 
         let mut key_inputs = HashMap::new();
+        key_inputs.insert(TetrisCommand::Move(TetrominoMove::Fall), fall_keys_input);
         key_inputs.insert(
-            TetrisCommand::Fall(fall_keys_input.keys.clone()),
-            fall_keys_input,
-        );
-        key_inputs.insert(
-            TetrisCommand::HardDrop(hard_drop_keys_input.keys.clone()),
+            TetrisCommand::Move(TetrominoMove::HardDrop),
             hard_drop_keys_input,
         );
+        key_inputs.insert(TetrisCommand::Move(TetrominoMove::Right), right_keys_input);
+        key_inputs.insert(TetrisCommand::Move(TetrominoMove::Left), left_keys_input);
         key_inputs.insert(
-            TetrisCommand::Right(right_keys_input.keys.clone()),
-            right_keys_input,
-        );
-        key_inputs.insert(
-            TetrisCommand::Left(left_keys_input.keys.clone()),
-            left_keys_input,
-        );
-        key_inputs.insert(
-            TetrisCommand::RotateClockwise(rotate_clockwise_keys_input.keys.clone()),
+            TetrisCommand::Move(TetrominoMove::Clockwise),
             rotate_clockwise_keys_input,
         );
         key_inputs.insert(
-            TetrisCommand::RotateCounterclockwise(rotate_counterclockwise_keys_input.keys.clone()),
+            TetrisCommand::Move(TetrominoMove::Counterclockwise),
             rotate_counterclockwise_keys_input,
         );
         key_inputs.insert(
-            TetrisCommand::RotateHalfTurn(rotate_half_turn_keys_input.keys.clone()),
+            TetrisCommand::Move(TetrominoMove::HalfTurn),
             rotate_half_turn_keys_input,
         );
-        key_inputs.insert(
-            TetrisCommand::HoldTetromino(hold_tetromino_keys_input.keys.clone()),
-            hold_tetromino_keys_input,
-        );
+        key_inputs.insert(TetrisCommand::Hold, hold_tetromino_keys_input);
 
         InteractiveWidgetManager {
             buttons,

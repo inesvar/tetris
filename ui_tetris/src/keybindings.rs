@@ -1,4 +1,4 @@
-use crate::interactive_widget_manager::TetrisCommand;
+use core_tetris::{TetrisCommand, TetrominoMove};
 use piston::Key;
 
 const FALL_KEYS_1P: [Key; 2] = [Key::Down, Key::NumPad2];
@@ -37,7 +37,6 @@ impl Default for Keybindings {
     }
 }
 
-// TODO: keybindings should be in its own file
 impl Keybindings {
     pub fn new() -> Keybindings {
         let fall_keys = FALL_KEYS_1P.to_vec();
@@ -107,16 +106,17 @@ impl Keybindings {
 
     pub fn set_keys(&mut self, key_type: &TetrisCommand, new_keys: Vec<Key>) {
         match key_type {
-            TetrisCommand::Fall(_) => self.fall_keys = new_keys,
-            TetrisCommand::HardDrop(_) => self.hard_drop_keys = new_keys,
-            TetrisCommand::Right(_) => self.right_keys = new_keys,
-            TetrisCommand::Left(_) => self.left_keys = new_keys,
-            TetrisCommand::RotateClockwise(_) => self.rotate_clockwise_keys = new_keys,
-            TetrisCommand::RotateCounterclockwise(_) => {
+            TetrisCommand::Move(TetrominoMove::Fall) => self.fall_keys = new_keys,
+            TetrisCommand::Move(TetrominoMove::HardDrop) => self.hard_drop_keys = new_keys,
+            TetrisCommand::Move(TetrominoMove::Right) => self.right_keys = new_keys,
+            TetrisCommand::Move(TetrominoMove::Left) => self.left_keys = new_keys,
+            TetrisCommand::Move(TetrominoMove::Clockwise) => self.rotate_clockwise_keys = new_keys,
+            TetrisCommand::Move(TetrominoMove::Counterclockwise) => {
                 self.rotate_counterclockwise_keys = new_keys
             }
-            TetrisCommand::RotateHalfTurn(_) => self.rotate_half_turn_keys = new_keys,
-            TetrisCommand::HoldTetromino(_) => self.hold_tetromino_keys = new_keys,
+            TetrisCommand::Move(TetrominoMove::HalfTurn) => self.rotate_half_turn_keys = new_keys,
+            TetrisCommand::Hold => self.hold_tetromino_keys = new_keys,
+            _ => unreachable!(),
         }
     }
 
