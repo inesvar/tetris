@@ -92,10 +92,23 @@ impl Keybindings {
     }
 
     pub fn get_keys(&self, key_type: &TetrisCommand) -> &[Key] {
-        &self.keys_for_command[key_type]
+        self.keys_for_command.get(key_type).map(Vec::as_slice).unwrap_or_default()
     }
 
     pub fn get_commands(&self) -> impl Iterator<Item = &TetrisCommand> {
         self.keys_for_command.keys()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use core_tetris::TetrisCommand;
+
+    use crate::Keybindings;
+
+    #[test]
+    fn get_keys_doesnt_panic_for_absent_command() {
+        let keybindings = Keybindings::new([]);
+        keybindings.get_keys(&TetrisCommand::Hold);
     }
 }
