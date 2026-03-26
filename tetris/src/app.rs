@@ -114,7 +114,7 @@ impl App {
         let is_host = false;
         let player_config = PlayerConfig::Local;
 
-        let local_player: LocalPlayer = LocalPlayer::new(&player_config, Keybindings::new());
+        let local_player: LocalPlayer = LocalPlayer::new(&player_config, Keybindings::new_local());
         let players: Vec<LocalPlayer> = vec![local_player];
         let rem_players: Vec<RemotePlayer> = vec![];
 
@@ -193,7 +193,7 @@ impl App {
 
         match &player_config {
             PlayerConfig::Local => {
-                local_player = LocalPlayer::new(&player_config, Keybindings::new());
+                local_player = LocalPlayer::new(&player_config, Keybindings::new_local());
                 self.local_players = vec![local_player];
                 self.remote_player = vec![];
             }
@@ -209,7 +209,7 @@ impl App {
                 local_ip,
                 remote_ip: _,
             } => {
-                local_player = LocalPlayer::new(&player_config, Keybindings::new());
+                local_player = LocalPlayer::new(&player_config, Keybindings::new_local());
                 self.local_players = vec![local_player];
                 if self.remote_player.is_empty() {
                     remote_player = RemotePlayer::new();

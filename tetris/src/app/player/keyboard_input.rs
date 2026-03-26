@@ -94,25 +94,12 @@ impl KeyboardInput {
     }
 
     fn get_order_from_key(&self, key: Key) -> Option<TetrisCommand> {
-        match key {
-            key if self.keybindings.hold_tetromino_keys.contains(&key) => Some(TetrisCommand::Hold),
-            key if self.keybindings.fall_keys.contains(&key) => Some(TetrominoMove::Fall.into()),
-            key if self.keybindings.hard_drop_keys.contains(&key) => {
-                Some(TetrominoMove::HardDrop.into())
+        for command in self.keybindings.get_commands() {
+            if self.keybindings.get_keys(command).contains(&key) {
+                return Some(command.clone());
             }
-            key if self.keybindings.left_keys.contains(&key) => Some(TetrominoMove::Left.into()),
-            key if self.keybindings.right_keys.contains(&key) => Some(TetrominoMove::Right.into()),
-            key if self.keybindings.rotate_clockwise_keys.contains(&key) => {
-                Some(TetrominoMove::Clockwise.into())
-            }
-            key if self.keybindings.rotate_counterclockwise_keys.contains(&key) => {
-                Some(TetrominoMove::Counterclockwise.into())
-            }
-            key if self.keybindings.rotate_half_turn_keys.contains(&key) => {
-                Some(TetrominoMove::HalfTurn.into())
-            }
-            _ => None,
         }
+        None
     }
 }
 

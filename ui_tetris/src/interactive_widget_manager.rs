@@ -135,7 +135,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &settings.fall_keys,
+            settings.get_keys(&TetrominoMove::Fall.into()),
             "Fall Keys :",
         );
 
@@ -144,7 +144,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &settings.hard_drop_keys,
+            settings.get_keys(&TetrominoMove::HardDrop.into()),
             "Hard Drop Keys :",
         );
 
@@ -153,7 +153,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &settings.right_keys,
+            settings.get_keys(&TetrominoMove::Right.into()),
             "Right Keys :",
         );
 
@@ -162,7 +162,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &settings.left_keys,
+            settings.get_keys(&TetrominoMove::Left.into()),
             "Left Keys :",
         );
 
@@ -171,7 +171,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &settings.rotate_clockwise_keys,
+            settings.get_keys(&TetrominoMove::Clockwise.into()),
             "Rotate Clockwise Keys :",
         );
 
@@ -180,7 +180,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &settings.rotate_counterclockwise_keys,
+            settings.get_keys(&TetrominoMove::Counterclockwise.into()),
             "Rotate Counterclockwise Keys :",
         );
 
@@ -189,7 +189,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &settings.rotate_half_turn_keys,
+            settings.get_keys(&TetrominoMove::HalfTurn.into()),
             "Rotate Half Turn Keys :",
         );
 
@@ -198,7 +198,7 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            &settings.hold_tetromino_keys,
+            settings.get_keys(&TetrisCommand::Hold),
             "Hold Tetromino Keys :",
         );
 
@@ -493,7 +493,7 @@ impl InteractiveWidgetManager {
         for (key_type, key_input) in self.key_inputs.iter_mut() {
             if key_input.commit() {
                 keybindings_manager.set_keys(key_type, key_input.keys.clone());
-                keybindings_manager.print();
+                println!("Keybindings: {keybindings_manager:?}");
             }
         }
     }
