@@ -26,6 +26,10 @@ pub struct Keybindings {
     keys_for_command: HashMap<TetrisCommand, Vec<Key>>,
 }
 
+pub struct KeyLookup {
+    lookup: HashMap<Key, TetrisCommand>,
+}
+
 impl Keybindings {
     fn new<const N: usize>(array: [(TetrisCommand, Vec<Key>); N]) -> Self {
         Self {
@@ -87,16 +91,32 @@ impl Keybindings {
         Self::new(keys)
     }
 
-    pub fn set_keys(&mut self, key_type: &TetrisCommand, new_keys: Vec<Key>) {
-        self.keys_for_command.insert(key_type.clone(), new_keys);
+    pub fn set_keys(&mut self, key_type: TetrisCommand, new_keys: Vec<Key>) {
+        self.keys_for_command.insert(key_type, new_keys);
     }
 
-    pub fn get_keys(&self, key_type: &TetrisCommand) -> &[Key] {
-        self.keys_for_command.get(key_type).map(Vec::as_slice).unwrap_or_default()
+    pub fn get_keys(&self, key_type: TetrisCommand) -> &[Key] {
+        self.keys_for_command
+            .get(&key_type)
+            .map(Vec::as_slice)
+            .unwrap_or_default()
     }
 
-    pub fn get_commands(&self) -> impl Iterator<Item = &TetrisCommand> {
-        self.keys_for_command.keys()
+    pub fn build_key_lookup(&self) -> KeyLookup {
+        let mut lookup = HashMap::new();
+        for (command, keys) in &self.keys_for_command {
+            for key in keys {
+                lookup.insert(*key, *command);
+            }
+        }
+
+        KeyLookup { lookup }
+    }
+}
+
+impl KeyLookup {
+    pub fn get_command(&self, key: &Key) -> Option<TetrisCommand> {
+        self.lookup.get(key).copied()
     }
 }
 
@@ -109,6 +129,6 @@ mod tests {
     #[test]
     fn get_keys_doesnt_panic_for_absent_command() {
         let keybindings = Keybindings::new([]);
-        keybindings.get_keys(&TetrisCommand::Hold);
+        keybindings.get_keys(TetrisCommand::Hold);
     }
 }

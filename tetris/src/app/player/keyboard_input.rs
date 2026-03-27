@@ -3,7 +3,7 @@ use crate::settings::{AUTO_REPEAT_DELAY, AUTO_REPEAT_SPEED};
 use core_tetris::{TetrisCommand, TetrominoMove};
 use piston::Key;
 use std::collections::HashMap;
-use ui_tetris::Keybindings;
+use ui_tetris::{KeyLookup, Keybindings};
 
 /// Maps keyboard inputs to [TetrisCommand]s and remembers durations so that auto-repeat can be applied.
 pub(super) struct KeyboardInput {
@@ -13,32 +13,35 @@ pub(super) struct KeyboardInput {
     temporarily_ignored: HashMap<TetrisCommand, u64>,
     now: u64,
     keybindings: Keybindings,
+    key_lookup: KeyLookup,
 }
 
 impl KeyboardInput {
     pub(super) fn new(keybindings: Keybindings) -> KeyboardInput {
+        let key_lookup = keybindings.build_key_lookup();
         KeyboardInput {
             started_at: HashMap::new(),
             temporarily_ignored: HashMap::new(),
             now: 0,
             keybindings,
+            key_lookup,
         }
     }
 
     pub(super) fn set_pressed(&mut self, key: Key) -> Option<TetrisCommand> {
-        let command = self.get_order_from_key(key)?;
-        self.started_at.insert(command.clone(), self.now);
+        let command = self.key_lookup.get_command(&key)?;
+        self.started_at.insert(command, self.now);
 
-        self.ignore_opposite_command(&command);
+        self.ignore_opposite_command(command);
 
         Some(command)
     }
 
     pub(super) fn set_released(&mut self, key: Key) {
-        if let Some(command) = self.get_order_from_key(key) {
+        if let Some(command) = self.key_lookup.get_command(&key) {
             self.started_at.remove(&command);
 
-            self.unignore_opposite_command(&command);
+            self.unignore_opposite_command(command);
         }
     }
 
@@ -73,7 +76,7 @@ impl KeyboardInput {
         }
     }
 
-    fn ignore_opposite_command(&mut self, command: &TetrisCommand) {
+    fn ignore_opposite_command(&mut self, command: TetrisCommand) {
         if let Some(opposite_command) = has_opposite_command(command) {
             let opposite_started = self.started_at.remove(&opposite_command);
             if let Some(opposite_started_at) = opposite_started {
@@ -83,7 +86,7 @@ impl KeyboardInput {
         }
     }
 
-    fn unignore_opposite_command(&mut self, command: &TetrisCommand) {
+    fn unignore_opposite_command(&mut self, command: TetrisCommand) {
         if let Some(opposite_command) = has_opposite_command(command) {
             let opposite_started = self.temporarily_ignored.remove(&opposite_command);
             if let Some(opposite_started_at) = opposite_started {
@@ -92,18 +95,9 @@ impl KeyboardInput {
             }
         }
     }
-
-    fn get_order_from_key(&self, key: Key) -> Option<TetrisCommand> {
-        for command in self.keybindings.get_commands() {
-            if self.keybindings.get_keys(command).contains(&key) {
-                return Some(command.clone());
-            }
-        }
-        None
-    }
 }
 
-fn has_opposite_command(command: &TetrisCommand) -> Option<TetrisCommand> {
+fn has_opposite_command(command: TetrisCommand) -> Option<TetrisCommand> {
     match command {
         TetrisCommand::Move(TetrominoMove::Left) => Some(TetrominoMove::Right.into()),
         TetrisCommand::Move(TetrominoMove::Right) => Some(TetrominoMove::Left.into()),
