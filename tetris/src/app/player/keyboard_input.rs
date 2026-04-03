@@ -3,7 +3,7 @@ use crate::settings::{AUTO_REPEAT_DELAY, AUTO_REPEAT_SPEED};
 use core_tetris::{TetrisCommand, TetrominoMove};
 use piston::Key;
 use std::collections::HashMap;
-use ui_tetris::{KeyLookup, Keybindings};
+use ui_tetris::Keybindings;
 
 /// Maps keyboard inputs to [TetrisCommand]s and remembers durations so that auto-repeat can be applied.
 pub(super) struct KeyboardInput {
@@ -16,9 +16,13 @@ pub(super) struct KeyboardInput {
     key_lookup: KeyLookup,
 }
 
+struct KeyLookup {
+    lookup: HashMap<Key, TetrisCommand>,
+}
+
 impl KeyboardInput {
     pub(super) fn new(keybindings: Keybindings) -> KeyboardInput {
-        let key_lookup = keybindings.build_key_lookup();
+        let key_lookup = KeyLookup::from(&keybindings);
         KeyboardInput {
             started_at: HashMap::new(),
             temporarily_ignored: HashMap::new(),
@@ -94,6 +98,25 @@ impl KeyboardInput {
                     .insert(opposite_command, opposite_started_at);
             }
         }
+    }
+}
+
+impl From<&Keybindings> for KeyLookup {
+    fn from(keybindings: &Keybindings) -> KeyLookup {
+        let mut lookup = HashMap::new();
+        for (command, keys) in keybindings.iter() {
+            for key in keys {
+                lookup.insert(*key, *command);
+            }
+        }
+
+        KeyLookup { lookup }
+    }
+}
+
+impl KeyLookup {
+    pub fn get_command(&self, key: &Key) -> Option<TetrisCommand> {
+        self.lookup.get(key).copied()
     }
 }
 

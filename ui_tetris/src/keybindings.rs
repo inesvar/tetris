@@ -26,12 +26,8 @@ pub struct Keybindings {
     keys_for_command: HashMap<TetrisCommand, Vec<Key>>,
 }
 
-pub struct KeyLookup {
-    lookup: HashMap<Key, TetrisCommand>,
-}
-
 impl Keybindings {
-    fn new<const N: usize>(array: [(TetrisCommand, Vec<Key>); N]) -> Self {
+    pub fn new<const N: usize>(array: [(TetrisCommand, Vec<Key>); N]) -> Self {
         Self {
             keys_for_command: HashMap::from(array),
         }
@@ -102,21 +98,8 @@ impl Keybindings {
             .unwrap_or_default()
     }
 
-    pub fn build_key_lookup(&self) -> KeyLookup {
-        let mut lookup = HashMap::new();
-        for (command, keys) in &self.keys_for_command {
-            for key in keys {
-                lookup.insert(*key, *command);
-            }
-        }
-
-        KeyLookup { lookup }
-    }
-}
-
-impl KeyLookup {
-    pub fn get_command(&self, key: &Key) -> Option<TetrisCommand> {
-        self.lookup.get(key).copied()
+    pub fn iter(&self) -> impl Iterator<Item = (&TetrisCommand, &Vec<Key>)> {
+        self.keys_for_command.iter()
     }
 }
 
