@@ -7,7 +7,6 @@ pub struct Text {
     pub x: f64,
     pub y: f64,
     pub(super) content: String,
-    pub font_size: u32,
     pub use_tetris_font: bool,
     pub(crate) view: graphics::Text,
 }
@@ -18,7 +17,6 @@ impl Text {
             x,
             y,
             content: String::from(text),
-            font_size,
             use_tetris_font: false,
             view: graphics::text::Text::new_color(color, font_size),
         }
@@ -29,7 +27,6 @@ impl Text {
             x,
             y,
             content: String::from(text),
-            font_size,
             use_tetris_font: true,
             view: graphics::text::Text::new_color(color, font_size),
         }
@@ -46,7 +43,6 @@ impl Default for Text {
             x: 0.0,
             y: 0.0,
             content: String::from(""),
-            font_size: DEFAULT_FONT_SIZE,
             use_tetris_font: false,
             view: graphics::text::Text::new_color([0.0, 0.0, 0.0, 0.0], DEFAULT_FONT_SIZE),
         }

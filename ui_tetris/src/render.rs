@@ -27,10 +27,10 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
             &mut self.assets.main_font
         };
 
-        let char = font.character(text.font_size, 'A').unwrap();
+        let char = font.character(text.view.font_size, 'A').unwrap();
         let top = char.top();
 
-        let text_width = font.width(text.font_size, &text.content).unwrap();
+        let text_width = font.width(text.view.font_size, &text.content).unwrap();
         self.transform = self
             .transform
             .trans(text.x - text_width / 2.0, text.y + top / 2.0);
