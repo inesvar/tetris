@@ -5,7 +5,7 @@ use super::key_input::KeyInput;
 use super::text::Text;
 use super::text_input::TextInput;
 use super::{CURSOR_BLINK_PERIOD, DEFAULT_BUTTON_Y_SPACING, TEXT_COLOR};
-use graphics::{color, rectangle, Transformed};
+use graphics::{color, rectangle, CharacterCache, Transformed};
 use render_tetris::Piston2dOpenGlRenderer;
 
 /// Rendering an [InteractiveWidgetManager].
@@ -20,16 +20,21 @@ pub trait RenderTetrisUi {
 impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
     fn render_text(&mut self, text: &Text) {
         let old_transform = self.transform;
-        self.transform = self.transform.trans(
-            text.x - text.content.len() as f64 * text.font_size as f64 * 0.315,
-            text.y + text.font_size as f64 * 0.41,
-        );
 
         let font = if text.use_tetris_font {
             &mut self.assets.tetris_font
         } else {
             &mut self.assets.main_font
         };
+
+        let char = font.character(text.font_size, 'A').unwrap();
+        let top = char.top();
+
+        let text_width = font.width(text.font_size, &text.content).unwrap();
+        self.transform = self
+            .transform
+            .trans(text.x - text_width / 2.0, text.y + top / 2.0);
+
         text.view
             .draw(
                 text.content.as_str(),

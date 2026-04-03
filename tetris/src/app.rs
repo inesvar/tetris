@@ -128,7 +128,7 @@ impl App {
             title_text: Text::new_with_tetris_font(
                 "T",
                 DEFAULT_FONT_SIZE,
-                DEFAULT_WINDOW_WIDTH as f64 * 27.0 / 65.0,
+                DEFAULT_WINDOW_WIDTH as f64 / 2.0,
                 DEFAULT_TITLE_Y,
                 TEXT_COLOR,
             ),
