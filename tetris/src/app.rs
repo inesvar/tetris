@@ -351,14 +351,20 @@ impl App {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
+        if button != MouseButton::Left {
+            return;
+        }
         for widget_manager in &mut self.widget_manager {
-            widget_manager.handle_mouse_press(button, &self.cursor_position);
+            widget_manager.handle_left_click(&self.cursor_position);
         }
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
+        if button != MouseButton::Left {
+            return;
+        }
         for widget_manager in &mut self.widget_manager {
-            widget_manager.handle_mouse_release(button);
+            widget_manager.handle_left_click_release();
         }
     }
 

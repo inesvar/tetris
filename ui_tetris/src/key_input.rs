@@ -1,6 +1,6 @@
 use super::text::Text;
 use super::{DEFAULT_FONT_SIZE, TEXT_COLOR};
-use piston::{Key, MouseButton};
+use piston::Key;
 
 pub struct KeyInput {
     pub(super) x: f64,
@@ -44,7 +44,7 @@ impl KeyInput {
         }
     }
 
-    pub fn are_coords_inside_input(&self, x: f64, y: f64) -> bool {
+    pub fn are_coords_inside_input(&self, &[x, y]: &[f64; 2]) -> bool {
         x >= self.x - self.width / 2.0
             && x <= self.x + self.width / 2.0
             && y >= self.y - self.height / 2.0
@@ -60,14 +60,12 @@ impl KeyInput {
         }
     }
 
-    pub fn handle_mouse_press(&mut self, button: MouseButton, cursor_position: &[f64; 2]) {
-        if button == MouseButton::Left {
-            if self.are_coords_inside_input(cursor_position[0], cursor_position[1]) {
-                self.focus();
-            } else if self.focused {
-                self.unfocus();
-            }
-        };
+    pub fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
+        if self.are_coords_inside_input(cursor_position) {
+            self.focus();
+        } else if self.focused {
+            self.unfocus();
+        }
     }
 
     pub fn handle_key_press(&mut self, key: Key) {

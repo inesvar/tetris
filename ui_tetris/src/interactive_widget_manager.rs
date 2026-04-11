@@ -8,7 +8,6 @@ use crate::keybindings::Keybindings;
 use arboard::Clipboard;
 use core_tetris::{TetrisCommand, TetrominoMove};
 use local_ip_address::local_ip;
-use piston::MouseButton;
 use std::collections::HashMap;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
@@ -443,22 +442,22 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub fn handle_mouse_press(&mut self, mouse_button: MouseButton, cursor_position: &[f64; 2]) {
+    pub fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
         for text_input in self.text_inputs.values_mut() {
-            text_input.handle_mouse_press(mouse_button, cursor_position);
+            text_input.handle_left_click(cursor_position);
         }
         for key_input in self.key_inputs.values_mut() {
-            key_input.handle_mouse_press(mouse_button, cursor_position);
+            key_input.handle_left_click(cursor_position);
         }
 
         for button in self.buttons.values_mut() {
-            button.handle_mouse_press(mouse_button, cursor_position);
+            button.handle_left_click(cursor_position);
         }
     }
 
-    pub fn handle_mouse_release(&mut self, mouse_button: MouseButton) {
+    pub fn handle_left_click_release(&mut self) {
         for button in self.buttons.values_mut() {
-            button.handle_mouse_release(mouse_button);
+            button.handle_left_click_release();
         }
     }
 
@@ -500,7 +499,7 @@ impl InteractiveWidgetManager {
 
     pub fn update_clipboard(&mut self) {
         if let Some(button) = self.buttons.get_mut(&ButtonType::CopyToClipboard) {
-            if button.commit() {
+            if button.has_been_pressed() {
                 let ip = local_ip().unwrap().to_string();
                 //let ip = "127.0.0.1".to_string();
                 let text = format!("{}{}", ip, HOST_PORT);
@@ -511,7 +510,7 @@ impl InteractiveWidgetManager {
             }
         };
         if let Some(button) = self.buttons.get_mut(&ButtonType::PasteFromClipboard) {
-            if button.commit() {
+            if button.has_been_pressed() {
                 let mut clipboard = Clipboard::new().expect("Clipboard is not supported");
                 let ip = clipboard.get_text().expect("Getting the clipboard failed");
                 let text_input = self.get_input(TextInputType::IpAddressInput);
@@ -522,7 +521,7 @@ impl InteractiveWidgetManager {
 
     pub fn update_from_text(&mut self) {
         let button = self.get_button(&ButtonType::ToTwoRemoteGame);
-        if button.commit() {
+        if button.has_been_pressed() {
             let text_input = self.get_input(TextInputType::IpAddressInput);
             let remote_ip = text_input.text.content.clone();
             println!("remote ip is {remote_ip}");
@@ -530,7 +529,7 @@ impl InteractiveWidgetManager {
             //let local_ip = "127.0.0.1".to_string();
             let local_ip = format!("{}{}", local_ip, GUEST_PORT);
 
-            let join_room = Button::new_committed(
+            let join_room = Button::new_pressed(
                 DEFAULT_WINDOW_WIDTH as f64 / 2.0,
                 DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
                 DEFAULT_BUTTON_WIDTH,
@@ -550,7 +549,7 @@ impl InteractiveWidgetManager {
 
     pub fn update_view(&mut self) -> ButtonType {
         for (button_type, button) in self.buttons.iter_mut() {
-            if button_type.view_changer() && button.commit() {
+            if button_type.view_changer() && button.has_been_pressed() {
                 println!("button type is {:?}", button_type);
                 return button_type.clone();
             }
