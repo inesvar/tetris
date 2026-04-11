@@ -18,11 +18,7 @@ impl App {
         // TODO: split in two functions
         // first apply the changes inside the views
         self.clock += args.dt;
-        if self.view_state == ViewState::Settings {
-            for (id, widget_manager) in self.widget_manager.iter_mut().enumerate() {
-                widget_manager.update_settings(self.local_players[id].get_mut_keybindings());
-            }
-        } else if self.view_state == ViewState::CreateRoom {
+        if self.view_state == ViewState::CreateRoom {
             self.widget_manager[0].update_clipboard();
         } else if self.view_state == ViewState::JoinRoom {
             self.widget_manager[0].update_clipboard();

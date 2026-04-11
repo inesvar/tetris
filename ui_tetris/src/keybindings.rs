@@ -21,16 +21,15 @@ const COUNTERCLOCKWISE_KEYS_2P: [Key; 2] = [Key::Q, Key::NumPad7];
 const HALF_TURN_2P: [Key; 2] = [Key::CapsLock, Key::NumPadPlus];
 const HOLD_KEYS_2P: [Key; 2] = [Key::Space, Key::NumPadEnter];
 
-#[derive(Debug)]
-pub struct Keybindings {
-    keys_for_command: HashMap<TetrisCommand, Vec<Key>>,
-}
+#[derive(Debug, Default)]
+pub struct Keybindings(HashMap<TetrisCommand, Vec<Key>>);
 
 impl Keybindings {
-    pub(super) fn new<const N: usize>(array: [(TetrisCommand, Vec<Key>); N]) -> Self {
-        Self {
-            keys_for_command: HashMap::from(array),
-        }
+    pub fn new<F>(values: F) -> Self
+    where
+        HashMap<TetrisCommand, Vec<Key>>: From<F>,
+    {
+        Self(HashMap::from(values))
     }
 
     pub fn new_local() -> Self {
@@ -87,19 +86,16 @@ impl Keybindings {
         Self::new(keys)
     }
 
-    pub(super) fn set_keys(&mut self, key_type: TetrisCommand, new_keys: Vec<Key>) {
-        self.keys_for_command.insert(key_type, new_keys);
+    pub fn set_keys(&mut self, key_type: TetrisCommand, new_keys: Vec<Key>) {
+        self.0.insert(key_type, new_keys);
     }
 
-    pub(super) fn get_keys(&self, key_type: TetrisCommand) -> &[Key] {
-        self.keys_for_command
-            .get(&key_type)
-            .map(Vec::as_slice)
-            .unwrap_or_default()
+    pub fn get_keys(&self, key_type: TetrisCommand) -> &[Key] {
+        self.0.get(&key_type).map(Vec::as_slice).unwrap_or_default()
     }
 
     pub fn iter(&self) -> impl Iterator<Item = (&TetrisCommand, &Vec<Key>)> {
-        self.keys_for_command.iter()
+        self.0.iter()
     }
 }
 

@@ -37,12 +37,12 @@ impl LocalPlayer {
         &self.player_screen
     }
 
-    pub fn get_keybindings(&self) -> &Keybindings {
+    pub fn get_keybindings(&mut self) -> Keybindings {
         self.keyboard.get_keybindings()
     }
 
-    pub fn get_mut_keybindings(&mut self) -> &mut Keybindings {
-        self.keyboard.get_mut_keybindings()
+    pub fn set_new_keybindings(&mut self, keybindings: &Keybindings) {
+        self.keyboard.set_new_keybindings(keybindings);
     }
 
     pub fn reset(&mut self, seed: u64) {

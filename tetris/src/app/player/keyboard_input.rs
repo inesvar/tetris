@@ -12,13 +12,11 @@ pub(super) struct KeyboardInput {
     /// keys are long pressed (cf Guideline 5.2 Auto-Repeat).
     temporarily_ignored: HashMap<TetrisCommand, u64>,
     now: u64,
-    keybindings: Keybindings,
     key_lookup: KeyLookup,
 }
 
-struct KeyLookup {
-    lookup: HashMap<Key, TetrisCommand>,
-}
+#[derive(Debug)]
+struct KeyLookup(HashMap<Key, TetrisCommand>);
 
 impl KeyboardInput {
     pub(super) fn new(keybindings: Keybindings) -> KeyboardInput {
@@ -27,7 +25,6 @@ impl KeyboardInput {
             started_at: HashMap::new(),
             temporarily_ignored: HashMap::new(),
             now: 0,
-            keybindings,
             key_lookup,
         }
     }
@@ -59,12 +56,13 @@ impl KeyboardInput {
         self.now = self.now.wrapping_add(1);
     }
 
-    pub(super) fn get_keybindings(&self) -> &Keybindings {
-        &self.keybindings
+    pub(super) fn get_keybindings(&self) -> Keybindings {
+        Keybindings::from(&self.key_lookup)
     }
 
-    pub(super) fn get_mut_keybindings(&mut self) -> &mut Keybindings {
-        &mut self.keybindings
+    pub(super) fn set_new_keybindings(&mut self, keybindings: &Keybindings) {
+        self.key_lookup = KeyLookup::from(keybindings);
+        println!("New key lookup: {:?}", self.key_lookup);
     }
 
     fn key_is_pressed_since(&self, command: TetrisCommand) -> Option<u64> {
@@ -110,13 +108,28 @@ impl From<&Keybindings> for KeyLookup {
             }
         }
 
-        KeyLookup { lookup }
+        KeyLookup(lookup)
+    }
+}
+
+impl From<&KeyLookup> for Keybindings {
+    fn from(key_lookup: &KeyLookup) -> Keybindings {
+        let mut keybindings: HashMap<TetrisCommand, Vec<Key>> = HashMap::new();
+        for (key, command) in key_lookup.iter() {
+            keybindings.entry(*command).or_default().push(*key)
+        }
+
+        Keybindings::new(keybindings)
     }
 }
 
 impl KeyLookup {
     pub fn get_command(&self, key: &Key) -> Option<TetrisCommand> {
-        self.lookup.get(key).copied()
+        self.0.get(key).copied()
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = (&Key, &TetrisCommand)> {
+        self.0.iter()
     }
 }
 

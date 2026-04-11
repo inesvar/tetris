@@ -13,7 +13,6 @@ pub struct KeyInput {
     pub(super) keys: Vec<Key>,
     init_keys: Vec<Key>,            // initial values from settings.rs
     pub(super) placeholder: String, // initial text
-    pub(super) commit: bool,        // true : update app's settings
     pub(super) info_text: Text,
 }
 
@@ -36,7 +35,6 @@ impl KeyInput {
             keys: vec![],
             init_keys: vec_keys,
             placeholder,
-            commit: false,
             info_text: Text::new(
                 info_text,
                 DEFAULT_FONT_SIZE,
@@ -44,15 +42,6 @@ impl KeyInput {
                 -DEFAULT_BUTTON_Y_SPACING / 2.0,
                 SILVER,
             ),
-        }
-    }
-
-    pub(super) fn commit(&mut self) -> bool {
-        if self.commit {
-            self.commit = false;
-            true
-        } else {
-            false
         }
     }
 
@@ -100,7 +89,6 @@ impl KeyInput {
         } else {
             self.custom = true;
         }
-        self.commit = true;
     }
 
     fn focus(&mut self) {

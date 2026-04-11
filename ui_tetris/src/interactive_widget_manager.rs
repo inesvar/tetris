@@ -489,13 +489,13 @@ impl InteractiveWidgetManager {
             .unwrap_or_else(|| panic!("Input {:?} not found", input_type))
     }
 
-    pub fn update_settings(&mut self, keybindings_manager: &mut Keybindings) {
+    pub fn get_new_keybindings(&mut self) -> Keybindings {
+        let mut keybindings_manager = Keybindings::default();
         for (key_type, key_input) in self.key_inputs.iter_mut() {
-            if key_input.commit() {
-                keybindings_manager.set_keys(*key_type, key_input.keys.clone());
-                println!("Keybindings: {keybindings_manager:?}");
-            }
+            keybindings_manager.set_keys(*key_type, key_input.keys.clone());
         }
+        println!("New keybindings: {keybindings_manager:?}");
+        keybindings_manager
     }
 
     pub fn update_clipboard(&mut self) {

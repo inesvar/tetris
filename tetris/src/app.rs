@@ -370,6 +370,11 @@ impl App {
     fn set_view(&mut self, view_state: ViewState) {
         println!("setting view to {:?}", view_state);
         let from_game = self.view_state.is_game();
+        if self.view_state == ViewState::Settings {
+            for (id, widget_manager) in self.widget_manager.iter_mut().enumerate() {
+                self.local_players[id].set_new_keybindings(&widget_manager.get_new_keybindings());
+            }
+        }
         self.view_state = view_state;
         match self.view_state {
             ViewState::MainMenu => {
@@ -379,14 +384,14 @@ impl App {
                 match &self.player_config {
                     PlayerConfig::Local => {
                         self.widget_manager = vec![InteractiveWidgetManager::new_settings(
-                            self.local_players[0].get_keybindings(),
+                            &self.local_players[0].get_keybindings(),
                             SettingsType::OnePlayer,
                             from_game,
                         )]
                     }
                     _ => {
                         self.widget_manager = vec![InteractiveWidgetManager::new_settings(
-                            self.local_players[0].get_keybindings(),
+                            &self.local_players[0].get_keybindings(),
                             SettingsType::LeftPlayer,
                             from_game,
                         )]
@@ -395,7 +400,7 @@ impl App {
                 if self.player_config == PlayerConfig::TwoLocal {
                     self.widget_manager
                         .push(InteractiveWidgetManager::new_settings(
-                            self.local_players[1].get_keybindings(),
+                            &self.local_players[1].get_keybindings(),
                             SettingsType::RightPlayer,
                             from_game,
                         ));
