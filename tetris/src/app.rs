@@ -18,10 +18,9 @@ use rand::RngExt;
 pub use render_app::RenderTetrisGame;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
 use std::net::TcpStream;
-use ui_tetris::Keybindings;
 use ui_tetris::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
-    Text, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT, LIGHT_GREY,
+    Keybindings, Text, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT, SILVER,
 };
 
 #[derive(PartialEq, Debug)]
@@ -130,28 +129,28 @@ impl App {
                 DEFAULT_FONT_SIZE,
                 DEFAULT_WINDOW_WIDTH / 2.0,
                 DEFAULT_TITLE_Y,
-                LIGHT_GREY,
+                SILVER,
             ),
             restart_text: Text::new(
                 "Press R to (re)start",
                 (DEFAULT_FONT_SIZE * 22) / 16,
                 DEFAULT_WINDOW_WIDTH / 2.0,
                 DEFAULT_TITLE_Y,
-                LIGHT_GREY,
+                SILVER,
             ),
             timer_text: Text::new(
                 "",
                 DEFAULT_FONT_SIZE,
                 DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
                 DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,
-                LIGHT_GREY,
+                SILVER,
             ),
             pause_text: Text::new(
                 "Press P to resume",
                 (DEFAULT_FONT_SIZE * 22) / 16,
                 DEFAULT_WINDOW_WIDTH / 2.0,
                 DEFAULT_TITLE_Y,
-                LIGHT_GREY,
+                SILVER,
             ),
             clock: 0.0,
             frame_counter: 0,

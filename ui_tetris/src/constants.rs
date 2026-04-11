@@ -6,7 +6,6 @@ pub const DEFAULT_WINDOW_HEIGHT: f64 = 800.0 * SCALE_FACTOR;
 
 // text
 pub const DEFAULT_FONT_SIZE: u32 = (16.0 * SCALE_FACTOR) as u32;
-pub const LIGHT_GREY: graphics::types::Color = [0.8, 0.8, 0.8, 1.0];
 
 // buttons
 pub const DEFAULT_BUTTON_WIDTH: f64 = 300.0 * SCALE_FACTOR;

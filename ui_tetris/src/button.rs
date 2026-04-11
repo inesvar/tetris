@@ -1,7 +1,7 @@
 use super::text::Text;
 use super::Rectangle;
 use super::DEFAULT_FONT_SIZE;
-use graphics::color;
+use graphics::color::{BLACK, GRAY, SILVER};
 use graphics::types::{Color, Scalar};
 
 /// Button that changes color when pressed.
@@ -26,9 +26,9 @@ impl Button {
     ) -> Self {
         Button {
             rect: Rectangle::new(center_x, center_y, width, height),
-            text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, color::BLACK),
-            color: [0.8, 0.8, 0.8, 1.0],
-            color_when_pressed: [0.5, 0.5, 0.5, 1.0],
+            text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, BLACK),
+            color: SILVER,
+            color_when_pressed: GRAY,
             has_been_pressed: false,
             is_pressed: false,
         }
@@ -43,9 +43,9 @@ impl Button {
     ) -> Self {
         Button {
             rect: Rectangle::new(center_x, center_y, width, height),
-            text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, color::BLACK),
-            color: [0.8, 0.8, 0.8, 1.0],
-            color_when_pressed: [0.5, 0.5, 0.5, 1.0],
+            text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, BLACK),
+            color: SILVER,
+            color_when_pressed: GRAY,
             has_been_pressed: true,
             is_pressed: false,
         }

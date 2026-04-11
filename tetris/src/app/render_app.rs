@@ -9,8 +9,7 @@ use graphics::Transformed;
 use piston::RenderArgs;
 use render_tetris::Piston2dOpenGlRenderer;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
-use ui_tetris::Text;
-use ui_tetris::{RenderTetrisUi, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, LIGHT_GREY};
+use ui_tetris::{RenderTetrisUi, Text, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, SILVER};
 
 pub trait RenderTetrisGame: RenderTetrisCore + RenderTetrisUi {
     type RenderArgs;
@@ -60,7 +59,7 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
                         // the score is centered under the hold piece rectangle
                         DEFAULT_GRID_X - 4.0 * BLOCK_SIZE, // 4.0 = 1.0 (margin between borders) + 1.0 (margin inside) + 2.0 (half TETROMINO_MAX_WIDTH)
                         DEFAULT_SCORE_TEXT_Y,
-                        LIGHT_GREY,
+                        SILVER,
                     );
                     self.render_text(&score_text);
 
@@ -74,7 +73,7 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
                         // the score is centered under the hold piece rectangle
                         DEFAULT_GRID_X - 4.0 * BLOCK_SIZE, // 4.0 = 1.0 (margin between borders) + 1.0 (margin inside) + 2.0 (half TETROMINO_MAX_WIDTH)
                         DEFAULT_SCORE_TEXT_Y,
-                        LIGHT_GREY,
+                        SILVER,
                     );
                     self.render_text(&score_text);
 

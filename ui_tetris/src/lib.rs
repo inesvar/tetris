@@ -14,8 +14,8 @@ pub(crate) use rectangle::Rectangle;
 
 pub use constants::{
     DEFAULT_FONT_SIZE, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT,
-    LIGHT_GREY,
 };
+pub use graphics::color::SILVER;
 pub use keybindings::Keybindings;
 pub use render::RenderTetrisUi;
 pub use text::Text;
