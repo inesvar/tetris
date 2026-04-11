@@ -11,14 +11,17 @@ use render_tetris::Piston2dOpenGlRenderer;
 /// Rendering an [InteractiveWidgetManager].
 pub trait RenderTetrisUi {
     fn render_widget_manager(&mut self, manager: &InteractiveWidgetManager);
-    fn render_text(&mut self, text: &Text);
+    fn render_text_with_content(&mut self, text_style: &Text, content: &str);
+    fn render_text(&mut self, text: &Text) {
+        self.render_text_with_content(text, &text.content);
+    }
     fn render_text_input(&mut self, input: &TextInput);
     fn render_key_input(&mut self, input: &KeyInput);
     fn render_button(&mut self, button: &Button);
 }
 
 impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
-    fn render_text(&mut self, text: &Text) {
+    fn render_text_with_content(&mut self, text: &Text, content: &str) {
         let old_transform = self.transform;
 
         let font = if text.use_tetris_font {
@@ -30,14 +33,14 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         let char = font.character(text.view.font_size, 'A').unwrap();
         let top = char.top();
 
-        let text_width = font.width(text.view.font_size, &text.content).unwrap();
+        let text_width = font.width(text.view.font_size, content).unwrap();
         self.transform = self
             .transform
             .trans(text.center_x - text_width / 2.0, text.center_y + top / 2.0);
 
         text.view
             .draw(
-                text.content.as_str(),
+                content,
                 font,
                 &self.draw_state,
                 self.transform,
