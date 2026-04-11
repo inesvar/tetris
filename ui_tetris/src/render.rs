@@ -4,7 +4,7 @@ use super::interactive_widget_manager::InteractiveWidgetManager;
 use super::key_input::KeyInput;
 use super::text::Text;
 use super::text_input::TextInput;
-use super::{CURSOR_BLINK_PERIOD, TEXT_COLOR};
+use super::{CURSOR_BLINK_PERIOD, LIGHT_GREY};
 use graphics::{color, CharacterCache, Transformed};
 use render_tetris::Piston2dOpenGlRenderer;
 
@@ -56,7 +56,7 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         let color = if input.focused {
             color::RED
         } else {
-            TEXT_COLOR
+            LIGHT_GREY
         };
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
@@ -91,7 +91,7 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         let color = if key_input.focused {
             color::RED
         } else {
-            TEXT_COLOR
+            LIGHT_GREY
         };
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);

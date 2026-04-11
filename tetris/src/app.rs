@@ -21,7 +21,7 @@ use std::net::TcpStream;
 use ui_tetris::Keybindings;
 use ui_tetris::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
-    Text, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT, TEXT_COLOR,
+    Text, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT, LIGHT_GREY,
 };
 
 #[derive(PartialEq, Debug)]
@@ -130,28 +130,28 @@ impl App {
                 DEFAULT_FONT_SIZE,
                 DEFAULT_WINDOW_WIDTH as f64 / 2.0,
                 DEFAULT_TITLE_Y,
-                TEXT_COLOR,
+                LIGHT_GREY,
             ),
             restart_text: Text::new(
                 "Press R to (re)start",
                 (DEFAULT_FONT_SIZE * 22) / 16,
                 DEFAULT_WINDOW_WIDTH as f64 / 2.0,
                 DEFAULT_TITLE_Y,
-                TEXT_COLOR,
+                LIGHT_GREY,
             ),
             timer_text: Text::new(
                 "",
                 DEFAULT_FONT_SIZE,
                 DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
                 DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,
-                TEXT_COLOR,
+                LIGHT_GREY,
             ),
             pause_text: Text::new(
                 "Press P to resume",
                 (DEFAULT_FONT_SIZE * 22) / 16,
                 DEFAULT_WINDOW_WIDTH as f64 / 2.0,
                 DEFAULT_TITLE_Y,
-                TEXT_COLOR,
+                LIGHT_GREY,
             ),
             clock: 0.0,
             frame_counter: 0,

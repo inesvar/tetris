@@ -1,6 +1,6 @@
 use super::text::Text;
 use super::Rectangle;
-use super::{DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE, TEXT_COLOR};
+use super::{DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE, LIGHT_GREY};
 use piston::Key;
 
 pub struct KeyInput {
@@ -30,23 +30,17 @@ impl KeyInput {
             rect: Rectangle::new(center_x, center_y, width, height),
             focused: false,
             custom: false,
-            custom_text: Text::new("", DEFAULT_FONT_SIZE, 0.0, 0.0, TEXT_COLOR),
+            custom_text: Text::new("", DEFAULT_FONT_SIZE, 0.0, 0.0, LIGHT_GREY),
             keys: vec![],
             init_keys: vec_keys,
-            placeholder: Text::new(
-                placeholder,
-                DEFAULT_FONT_SIZE,
-                0.0,
-                0.0,
-                TEXT_COLOR,
-            ),
+            placeholder: Text::new(placeholder, DEFAULT_FONT_SIZE, 0.0, 0.0, LIGHT_GREY),
             commit: false,
             info_text: Text::new(
                 info_text,
                 DEFAULT_FONT_SIZE,
                 0.0,
                 -DEFAULT_BUTTON_Y_SPACING / 2.0,
-                TEXT_COLOR,
+                LIGHT_GREY,
             ),
         }
     }
