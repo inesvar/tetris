@@ -21,10 +21,21 @@ impl TextInput {
         height: Scalar,
         placeholder: &str,
     ) -> Self {
+        TextInput::new_with_text_info(center_x, center_y, width, height, placeholder, "")
+    }
+
+    pub(super) fn new_with_text_info(
+        center_x: Scalar,
+        center_y: Scalar,
+        width: Scalar,
+        height: Scalar,
+        placeholder: &str,
+        info_text: &str,
+    ) -> Self {
         TextInput {
             rect: Rectangle::new(center_x, center_y, width, height),
             info_text: Text::new(
-                "",
+                info_text,
                 DEFAULT_FONT_SIZE,
                 0.0,
                 -DEFAULT_BUTTON_Y_SPACING / 2.0,
@@ -36,8 +47,8 @@ impl TextInput {
         }
     }
 
-    pub(super) fn handle_left_click(&mut self, cursor: &[Scalar; 2]) {
-        self.focused = self.rect.contains(cursor);
+    pub(super) fn handle_left_click(&mut self, cursor_position: &[Scalar; 2]) {
+        self.focused = self.rect.contains(cursor_position);
     }
 
     pub(super) fn handle_key_press(&mut self, key: Key) {

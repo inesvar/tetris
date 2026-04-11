@@ -19,7 +19,9 @@ pub trait RenderTetrisUi {
         self.render_text_replace_content(text, text.get_editable_text(cursor));
     }
     fn render_text_input(&mut self, input: &TextInput);
-    fn render_key_input(&mut self, input: &KeyInput);
+    fn render_key_input(&mut self, key_input: &KeyInput) {
+        self.render_text_input(&key_input.text_input);
+    }
     fn render_button(&mut self, button: &Button);
 }
 
@@ -82,38 +84,6 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         }
 
         self.render_text(&input.info_text);
-
-        self.transform = old_transform;
-    }
-
-    fn render_key_input(&mut self, key_input: &KeyInput) {
-        let old_transform = self.transform;
-        let (center_x, center_y) = key_input.rect.get_center();
-        self.transform = self.transform.trans(center_x, center_y);
-
-        let color = if key_input.focused {
-            color::RED
-        } else {
-            color::SILVER
-        };
-
-        let outline_rect = graphics::Rectangle::new_border(color, 1.0);
-        outline_rect.draw(
-            key_input.rect.get_dimensions(),
-            &self.draw_state,
-            self.transform,
-            &mut self.gl,
-        );
-
-        if !key_input.focused && key_input.custom_text.is_empty() {
-            self.render_text_replace_content(&key_input.custom_text, &key_input.placeholder);
-        } else {
-            let cursor = key_input.focused
-                && self.elapsed_secs() % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0;
-            self.render_editable_text(&key_input.custom_text, cursor);
-        }
-
-        self.render_text(&key_input.info_text);
 
         self.transform = old_transform;
     }
