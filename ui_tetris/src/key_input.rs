@@ -82,28 +82,18 @@ impl KeyInput {
     }
 
     fn push_key(&mut self, key: Key) {
-        self.custom_text.content.push_str(&key_to_string(key));
+        self.custom_text.push_str(&key_to_string(key));
         self.keys.push(key);
     }
 
     fn pop_key(&mut self) {
-        self.custom_text.content.pop();
-        while self.custom_text.content.chars().count() > 0 {
-            if let Some(" ") = self
-                .custom_text
-                .content
-                .get((self.custom_text.content.len() - 1)..=(self.custom_text.content.len() - 1))
-            {
-                break;
-            }
-            self.custom_text.content.pop();
-        }
         self.keys.pop();
+        self.custom_text.set_text(keys_to_string(&self.keys));
     }
 
     fn unfocus(&mut self) {
         self.focused = false;
-        if self.custom_text.content.is_empty() {
+        if self.custom_text.is_empty() {
             self.custom = false;
             self.custom_text.set_text(keys_to_string(&self.init_keys));
             self.keys = self.init_keys.clone();

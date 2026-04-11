@@ -10,3 +10,4 @@ piston = { workspace = true }
 piston2d-graphics = { workspace = true }
 local-ip-address = { workspace = true }
 arboard = { workspace = true }
+rstest = { workspace = true }

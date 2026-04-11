@@ -11,9 +11,12 @@ use render_tetris::Piston2dOpenGlRenderer;
 /// Rendering an [InteractiveWidgetManager].
 pub trait RenderTetrisUi {
     fn render_widget_manager(&mut self, manager: &InteractiveWidgetManager);
-    fn render_text_with_content(&mut self, text_style: &Text, content: &str);
+    fn render_text_replace_content(&mut self, text_style: &Text, content: &str);
     fn render_text(&mut self, text: &Text) {
-        self.render_text_with_content(text, &text.content);
+        self.render_text_replace_content(text, text.get_text());
+    }
+    fn render_editable_text(&mut self, text: &Text, cursor: bool) {
+        self.render_text_replace_content(text, text.get_editable_text(cursor));
     }
     fn render_text_input(&mut self, input: &TextInput);
     fn render_key_input(&mut self, input: &KeyInput);
@@ -21,7 +24,7 @@ pub trait RenderTetrisUi {
 }
 
 impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
-    fn render_text_with_content(&mut self, text: &Text, content: &str) {
+    fn render_text_replace_content(&mut self, text: &Text, content: &str) {
         let old_transform = self.transform;
 
         let font = if text.use_tetris_font {
@@ -70,17 +73,14 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
             &mut self.gl,
         );
 
-        let mut content = input.text.clone();
-
-        if !input.focused && content.content.is_empty() {
-            content.set_text(input.placeholder.clone());
-        } else if input.focused
-            && self.elapsed_secs() % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0
-        {
-            content.content.push('|');
+        if !input.focused && input.text.is_empty() {
+            self.render_text_replace_content(&input.text, &input.placeholder);
+        } else {
+            let cursor = input.focused
+                && self.elapsed_secs() % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0;
+            self.render_editable_text(&input.text, cursor);
         }
 
-        self.render_text(&content);
         self.render_text(&input.info_text);
 
         self.transform = old_transform;
@@ -108,9 +108,7 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         if key_input.focused
             && self.elapsed_secs() % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0
         {
-            let mut text_with_cursor = key_input.custom_text.clone();
-            text_with_cursor.content.push('|');
-            self.render_text(&text_with_cursor);
+            self.render_editable_text(&key_input.custom_text, true);
         } else if key_input.focused || key_input.custom {
             self.render_text(&key_input.custom_text);
         } else {

@@ -2840,6 +2840,7 @@ dependencies = [
  "piston",
  "piston2d-graphics 0.45.0",
  "render_tetris",
+ "rstest",
 ]
 
 [[package]]

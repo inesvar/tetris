@@ -515,7 +515,7 @@ impl InteractiveWidgetManager {
                 let mut clipboard = Clipboard::new().expect("Clipboard is not supported");
                 let ip = clipboard.get_text().expect("Getting the clipboard failed");
                 let text_input = self.get_input(TextInputType::IpAddressInput);
-                text_input.text.content = ip;
+                text_input.text.set_text(ip);
             }
         };
     }
@@ -524,7 +524,7 @@ impl InteractiveWidgetManager {
         let button = self.get_button(&ButtonType::ToTwoRemoteGame);
         if button.has_been_pressed() {
             let text_input = self.get_input(TextInputType::IpAddressInput);
-            let remote_ip = text_input.text.content.clone();
+            let remote_ip = String::from(text_input.text.get_text());
             println!("remote ip is {remote_ip}");
             let local_ip = local_ip().unwrap().to_string();
             //let local_ip = "127.0.0.1".to_string();

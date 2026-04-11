@@ -44,7 +44,7 @@ impl TextInput {
         if self.focused {
             match key {
                 Key::Backspace => {
-                    self.text.content.pop();
+                    self.text.pop();
                 }
                 Key::Return => {
                     self.focused = false;
@@ -56,7 +56,7 @@ impl TextInput {
 
     pub(super) fn handle_text_input(&mut self, text: &str) {
         if self.focused {
-            self.text.content.push_str(text);
+            self.text.push_str(text);
         }
     }
 }
