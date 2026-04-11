@@ -1,0 +1,3 @@
+- fix nb garbage lines / nb completed lines confusion
+- decide whether a TetrisCommand should be applied immediately on KeyPress or on the next update
+- try tweaking TetrisPlayer serialization so that the tetris grid isn't sent
