@@ -105,14 +105,12 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
             &mut self.gl,
         );
 
-        if key_input.focused
-            && self.elapsed_secs() % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0
-        {
-            self.render_editable_text(&key_input.custom_text, true);
-        } else if key_input.focused || key_input.custom {
-            self.render_text(&key_input.custom_text);
-        } else {
+        if !key_input.focused && key_input.custom_text.is_empty() {
             self.render_text_replace_content(&key_input.custom_text, &key_input.placeholder);
+        } else {
+            let cursor = key_input.focused
+                && self.elapsed_secs() % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0;
+            self.render_editable_text(&key_input.custom_text, cursor);
         }
 
         self.render_text(&key_input.info_text);

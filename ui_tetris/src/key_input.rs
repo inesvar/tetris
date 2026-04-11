@@ -8,10 +8,8 @@ use piston::Key;
 pub struct KeyInput {
     pub(super) rect: Rectangle,
     pub(super) focused: bool, // true : display custom_text and cursor, false : depends on custom
-    pub(super) custom: bool, // when unfocused, true : display custom_text, false : display keys_to_string(init_keys)
     pub(super) custom_text: Text,
-    pub(super) keys: Vec<Key>,
-    init_keys: Vec<Key>,            // initial values from settings.rs
+    pub(super) keys: Vec<Key>,      // initial values from settings.rs
     pub(super) placeholder: String, // initial text
     pub(super) info_text: Text,
 }
@@ -26,14 +24,11 @@ impl KeyInput {
         info_text: &str,
     ) -> Self {
         let placeholder = keys_to_string(keys);
-        let vec_keys = keys.to_vec();
         KeyInput {
             rect: Rectangle::new(center_x, center_y, width, height),
             focused: false,
-            custom: false,
             custom_text: Text::new("", DEFAULT_FONT_SIZE, 0.0, 0.0, SILVER),
             keys: vec![],
-            init_keys: vec_keys,
             placeholder,
             info_text: Text::new(
                 info_text,
@@ -46,11 +41,7 @@ impl KeyInput {
     }
 
     pub(super) fn handle_left_click(&mut self, cursor_position: &[Scalar; 2]) {
-        if self.rect.contains(cursor_position) {
-            self.focus();
-        } else if self.focused {
-            self.unfocus();
-        }
+        self.focused = self.rect.contains(cursor_position);
     }
 
     pub(super) fn handle_key_press(&mut self, key: Key) {
@@ -62,7 +53,7 @@ impl KeyInput {
                 self.pop_key();
             }
             Key::Return => {
-                self.unfocus();
+                self.focused = false;
             }
             _ => {
                 self.push_key(key);
@@ -78,25 +69,6 @@ impl KeyInput {
     fn pop_key(&mut self) {
         self.keys.pop();
         self.custom_text.set_text(keys_to_string(&self.keys));
-    }
-
-    fn unfocus(&mut self) {
-        self.focused = false;
-        if self.custom_text.is_empty() {
-            self.custom = false;
-            self.custom_text.set_text(keys_to_string(&self.init_keys));
-            self.keys = self.init_keys.clone();
-        } else {
-            self.custom = true;
-        }
-    }
-
-    fn focus(&mut self) {
-        self.focused = true;
-        if !self.custom {
-            self.custom_text.set_text("".to_string());
-            self.keys = vec![];
-        }
     }
 }
 
