@@ -5,6 +5,7 @@ use piston::Key;
 pub struct KeyInput {
     pub(super) text_input: TextInput,
     pub(super) keys: Vec<Key>,
+    pub(super) initial_keys: Vec<Key>,
 }
 
 impl KeyInput {
@@ -27,7 +28,8 @@ impl KeyInput {
         );
         KeyInput {
             text_input,
-            keys: vec![],
+            keys: Vec::new(),
+            initial_keys: keys.to_vec(),
         }
     }
 

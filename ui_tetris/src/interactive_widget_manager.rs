@@ -492,9 +492,12 @@ impl InteractiveWidgetManager {
     pub fn get_new_keybindings(&mut self) -> Keybindings {
         let mut keybindings_manager = Keybindings::default();
         for (key_type, key_input) in self.key_inputs.iter_mut() {
-            keybindings_manager.set_keys(*key_type, key_input.keys.clone());
+            if key_input.keys.is_empty() {
+                keybindings_manager.set_keys(*key_type, key_input.initial_keys.clone());
+            } else {
+                keybindings_manager.set_keys(*key_type, key_input.keys.clone());
+            }
         }
-        println!("New keybindings: {keybindings_manager:?}");
         keybindings_manager
     }
 

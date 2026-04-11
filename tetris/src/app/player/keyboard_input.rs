@@ -62,7 +62,6 @@ impl KeyboardInput {
 
     pub(super) fn set_new_keybindings(&mut self, keybindings: &Keybindings) {
         self.key_lookup = KeyLookup::from(keybindings);
-        println!("New key lookup: {:?}", self.key_lookup);
     }
 
     fn key_is_pressed_since(&self, command: TetrisCommand) -> Option<u64> {
