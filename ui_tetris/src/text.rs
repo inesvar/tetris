@@ -2,10 +2,10 @@ use graphics::types::Color;
 
 #[derive(Clone)]
 pub struct Text {
-    pub x: f64,
-    pub y: f64,
+    pub(super) x: f64,
+    pub(super) y: f64,
     pub(super) content: String,
-    pub use_tetris_font: bool,
+    pub(super) use_tetris_font: bool,
     pub(crate) view: graphics::Text,
 }
 

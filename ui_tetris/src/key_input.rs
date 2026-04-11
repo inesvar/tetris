@@ -18,7 +18,7 @@ pub struct KeyInput {
 }
 
 impl KeyInput {
-    pub fn new_with_info(
+    pub(super) fn new_with_info(
         x: f64,
         y: f64,
         width: f64,
@@ -44,14 +44,14 @@ impl KeyInput {
         }
     }
 
-    pub fn are_coords_inside_input(&self, &[x, y]: &[f64; 2]) -> bool {
+    pub(super) fn are_coords_inside_input(&self, &[x, y]: &[f64; 2]) -> bool {
         x >= self.x - self.width / 2.0
             && x <= self.x + self.width / 2.0
             && y >= self.y - self.height / 2.0
             && y <= self.y + self.height / 2.0
     }
 
-    pub fn commit(&mut self) -> bool {
+    pub(super) fn commit(&mut self) -> bool {
         if self.commit {
             self.commit = false;
             true
@@ -60,7 +60,7 @@ impl KeyInput {
         }
     }
 
-    pub fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
+    pub(super) fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
         if self.are_coords_inside_input(cursor_position) {
             self.focus();
         } else if self.focused {
@@ -68,7 +68,7 @@ impl KeyInput {
         }
     }
 
-    pub fn handle_key_press(&mut self, key: Key) {
+    pub(super) fn handle_key_press(&mut self, key: Key) {
         if !self.focused {
             return;
         }

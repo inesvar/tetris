@@ -7,11 +7,11 @@ use graphics::types::Color;
 /// The widget manager will know the button was pressed when it makes its next query.
 #[derive(Clone)]
 pub struct Button {
-    pub center_x: f64,
-    pub center_y: f64,
-    pub width: f64,
-    pub height: f64,
-    pub text: Text,
+    pub(super) center_x: f64,
+    pub(super) center_y: f64,
+    pub(super) width: f64,
+    pub(super) height: f64,
+    pub(super) text: Text,
     color: Color,
     color_when_pressed: Color,
     has_been_pressed: bool,
@@ -19,7 +19,7 @@ pub struct Button {
 }
 
 impl Button {
-    pub fn new(center_x: f64, center_y: f64, width: f64, height: f64, text: &str) -> Self {
+    pub(super) fn new(center_x: f64, center_y: f64, width: f64, height: f64, text: &str) -> Self {
         Button {
             center_x,
             center_y,
@@ -33,7 +33,13 @@ impl Button {
         }
     }
 
-    pub fn new_pressed(center_x: f64, center_y: f64, width: f64, height: f64, text: &str) -> Self {
+    pub(super) fn new_pressed(
+        center_x: f64,
+        center_y: f64,
+        width: f64,
+        height: f64,
+        text: &str,
+    ) -> Self {
         Button {
             center_x,
             center_y,
@@ -47,20 +53,20 @@ impl Button {
         }
     }
 
-    pub fn are_coords_inside_button(&self, &[x, y]: &[f64; 2]) -> bool {
+    pub(super) fn are_coords_inside_button(&self, &[x, y]: &[f64; 2]) -> bool {
         x >= self.center_x - self.width / 2.0
             && x <= self.center_x + self.width / 2.0
             && y >= self.center_y - self.height / 2.0
             && y <= self.center_y + self.height / 2.0
     }
 
-    pub fn has_been_pressed(&mut self) -> bool {
+    pub(super) fn has_been_pressed(&mut self) -> bool {
         let has_been_pressed = self.has_been_pressed;
         self.has_been_pressed = false;
         has_been_pressed
     }
 
-    pub fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
+    pub(super) fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
         if self.are_coords_inside_button(cursor_position) {
             println!("button press");
             self.is_pressed = true;
@@ -68,11 +74,11 @@ impl Button {
         };
     }
 
-    pub fn handle_left_click_release(&mut self) {
+    pub(super) fn handle_left_click_release(&mut self) {
         self.is_pressed = false;
     }
 
-    pub fn color(&self) -> Color {
+    pub(super) fn color(&self) -> Color {
         if self.is_pressed {
             self.color_when_pressed
         } else {

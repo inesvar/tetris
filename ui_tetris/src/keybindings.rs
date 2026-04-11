@@ -27,7 +27,7 @@ pub struct Keybindings {
 }
 
 impl Keybindings {
-    pub fn new<const N: usize>(array: [(TetrisCommand, Vec<Key>); N]) -> Self {
+    pub(super) fn new<const N: usize>(array: [(TetrisCommand, Vec<Key>); N]) -> Self {
         Self {
             keys_for_command: HashMap::from(array),
         }
@@ -87,11 +87,11 @@ impl Keybindings {
         Self::new(keys)
     }
 
-    pub fn set_keys(&mut self, key_type: TetrisCommand, new_keys: Vec<Key>) {
+    pub(super) fn set_keys(&mut self, key_type: TetrisCommand, new_keys: Vec<Key>) {
         self.keys_for_command.insert(key_type, new_keys);
     }
 
-    pub fn get_keys(&self, key_type: TetrisCommand) -> &[Key] {
+    pub(super) fn get_keys(&self, key_type: TetrisCommand) -> &[Key] {
         self.keys_for_command
             .get(&key_type)
             .map(Vec::as_slice)

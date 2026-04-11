@@ -14,7 +14,7 @@ pub struct TextInput {
 }
 
 impl TextInput {
-    pub fn new(x: f64, y: f64, width: f64, height: f64, placeholder: &str) -> Self {
+    pub(super) fn new(x: f64, y: f64, width: f64, height: f64, placeholder: &str) -> Self {
         TextInput {
             x,
             y,
@@ -27,38 +27,18 @@ impl TextInput {
         }
     }
 
-    pub fn new_with_info(
-        x: f64,
-        y: f64,
-        width: f64,
-        height: f64,
-        placeholder: &str,
-        info_text: &str,
-    ) -> Self {
-        TextInput {
-            x,
-            y,
-            width,
-            height,
-            info_text: Text::new(info_text, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
-            text: Text::new("", DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
-            placeholder: String::from(placeholder),
-            focused: false,
-        }
-    }
-
-    pub fn are_coords_inside_input(&self, &[x, y]: &[f64; 2]) -> bool {
+    pub(super) fn are_coords_inside_input(&self, &[x, y]: &[f64; 2]) -> bool {
         x >= self.x - self.width / 2.0
             && x <= self.x + self.width / 2.0
             && y >= self.y - self.height / 2.0
             && y <= self.y + self.height / 2.0
     }
 
-    pub fn handle_left_click(&mut self, cursor: &[f64; 2]) {
+    pub(super) fn handle_left_click(&mut self, cursor: &[f64; 2]) {
         self.focused = self.are_coords_inside_input(cursor);
     }
 
-    pub fn handle_key_press(&mut self, key: Key) {
+    pub(super) fn handle_key_press(&mut self, key: Key) {
         if self.focused {
             match key {
                 Key::Backspace => {
@@ -72,7 +52,7 @@ impl TextInput {
         }
     }
 
-    pub fn handle_text_input(&mut self, text: &str) {
+    pub(super) fn handle_text_input(&mut self, text: &str) {
         if self.focused {
             self.text.content.push_str(text);
         }
