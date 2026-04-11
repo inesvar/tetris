@@ -65,7 +65,7 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
                     self.render_text(&score_text);
 
                     self.render_local_player(player, app.running);
-                    self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
+                    self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH, 0.0);
                 }
                 for player in &app.remote_player {
                     let score_text = Text::new(
@@ -79,7 +79,7 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
                     self.render_text(&score_text);
 
                     self.render_remote_player(player, app.running);
-                    self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH as f64, 0.0);
+                    self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH, 0.0);
                 }
             }
             _ => unreachable!(),

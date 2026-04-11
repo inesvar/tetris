@@ -1,6 +1,7 @@
 use super::text::Text;
 use super::Rectangle;
 use super::{DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE, LIGHT_GREY};
+use graphics::math::Scalar;
 use piston::Key;
 
 pub struct KeyInput {
@@ -17,10 +18,10 @@ pub struct KeyInput {
 
 impl KeyInput {
     pub(super) fn new_with_info(
-        center_x: f64,
-        center_y: f64,
-        width: f64,
-        height: f64,
+        center_x: Scalar,
+        center_y: Scalar,
+        width: Scalar,
+        height: Scalar,
         keys: &[Key],
         info_text: &str,
     ) -> Self {
@@ -54,7 +55,7 @@ impl KeyInput {
         }
     }
 
-    pub(super) fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
+    pub(super) fn handle_left_click(&mut self, cursor_position: &[Scalar; 2]) {
         if self.rect.contains(cursor_position) {
             self.focus();
         } else if self.focused {

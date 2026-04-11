@@ -78,7 +78,7 @@ pub fn event_loop() {
         // Update the size of the window if necessary.
         if app.player_config.is_multiplayer() {
             if !bigger_window_size {
-                window.set_size([DEFAULT_WINDOW_WIDTH * 2, DEFAULT_WINDOW_HEIGHT]);
+                window.set_size([DEFAULT_WINDOW_WIDTH * 2.0, DEFAULT_WINDOW_HEIGHT]);
                 bigger_window_size = true;
             }
         } else if bigger_window_size {

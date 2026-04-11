@@ -7,6 +7,7 @@ use super::{
 use crate::keybindings::Keybindings;
 use arboard::Clipboard;
 use core_tetris::{TetrisCommand, TetrominoMove};
+use graphics::math::Scalar;
 use local_ip_address::local_ip;
 use std::collections::HashMap;
 
@@ -59,40 +60,40 @@ pub struct InteractiveWidgetManager {
 impl InteractiveWidgetManager {
     pub fn new_main_menu() -> InteractiveWidgetManager {
         let create_single_player_game_button = Button::new(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 - DEFAULT_BUTTON_Y_SPACING,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0 - DEFAULT_BUTTON_Y_SPACING,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Single-player game",
         );
 
         let create_room_button = Button::new(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Create new room",
         );
 
         let join_room_button = Button::new(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Join room",
         );
 
         let settings_button = Button::new(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Settings",
         );
 
         let create_two_player_game_button = Button::new(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "two-player game",
@@ -125,13 +126,13 @@ impl InteractiveWidgetManager {
         from_game: bool,
     ) -> InteractiveWidgetManager {
         let player_x = if settings_type == SettingsType::RightPlayer {
-            DEFAULT_WINDOW_WIDTH as f64
+            DEFAULT_WINDOW_WIDTH
         } else {
             0.0
         };
         let fall_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 / 4.0 + player_x,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+            DEFAULT_WINDOW_WIDTH / 4.0 + player_x,
+            DEFAULT_WINDOW_HEIGHT / 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
             settings.get_keys(TetrominoMove::Fall.into()),
@@ -139,8 +140,8 @@ impl InteractiveWidgetManager {
         );
 
         let hard_drop_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 / 4.0 + player_x,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
+            DEFAULT_WINDOW_WIDTH / 4.0 + player_x,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
             settings.get_keys(TetrominoMove::HardDrop.into()),
@@ -148,8 +149,8 @@ impl InteractiveWidgetManager {
         );
 
         let right_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 / 4.0 + player_x,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
+            DEFAULT_WINDOW_WIDTH / 4.0 + player_x,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
             settings.get_keys(TetrominoMove::Right.into()),
@@ -157,8 +158,8 @@ impl InteractiveWidgetManager {
         );
 
         let left_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 / 4.0 + player_x,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
+            DEFAULT_WINDOW_WIDTH / 4.0 + player_x,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
             settings.get_keys(TetrominoMove::Left.into()),
@@ -166,8 +167,8 @@ impl InteractiveWidgetManager {
         );
 
         let rotate_clockwise_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0 + player_x,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+            DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + player_x,
+            DEFAULT_WINDOW_HEIGHT / 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
             settings.get_keys(TetrominoMove::Clockwise.into()),
@@ -175,8 +176,8 @@ impl InteractiveWidgetManager {
         );
 
         let rotate_counterclockwise_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0 + player_x,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
+            DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + player_x,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
             settings.get_keys(TetrominoMove::Counterclockwise.into()),
@@ -184,8 +185,8 @@ impl InteractiveWidgetManager {
         );
 
         let rotate_half_turn_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0 + player_x,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
+            DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + player_x,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
             settings.get_keys(TetrominoMove::HalfTurn.into()),
@@ -193,8 +194,8 @@ impl InteractiveWidgetManager {
         );
 
         let hold_tetromino_keys_input = KeyInput::new_with_info(
-            DEFAULT_WINDOW_WIDTH as f64 * 3.0 / 4.0 + player_x,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
+            DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + player_x,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
             settings.get_keys(TetrisCommand::Hold),
@@ -207,8 +208,8 @@ impl InteractiveWidgetManager {
             match settings_type {
                 SettingsType::OnePlayer => {
                     let back_to_main_menu_button = Button::new(
-                        (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-                        (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+                        (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+                        (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
                         DEFAULT_BUTTON_WIDTH / 6.0,
                         DEFAULT_BUTTON_HEIGHT / 2.0,
                         "Back",
@@ -218,8 +219,8 @@ impl InteractiveWidgetManager {
                 SettingsType::RightPlayer => {}
                 SettingsType::LeftPlayer => {
                     let back_to_main_menu_button = Button::new(
-                        (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-                        (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+                        (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+                        (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
                         DEFAULT_BUTTON_WIDTH / 6.0,
                         DEFAULT_BUTTON_HEIGHT / 2.0,
                         "Back",
@@ -231,8 +232,8 @@ impl InteractiveWidgetManager {
             match settings_type {
                 SettingsType::OnePlayer => {
                     let back_to_game_button = Button::new(
-                        (60.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-                        (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+                        (60.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+                        (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
                         DEFAULT_BUTTON_WIDTH / 6.0,
                         DEFAULT_BUTTON_HEIGHT / 2.0,
                         "Back",
@@ -242,8 +243,8 @@ impl InteractiveWidgetManager {
                 SettingsType::RightPlayer => {}
                 SettingsType::LeftPlayer => {
                     let back_to_game_button = Button::new(
-                        (125.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-                        (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+                        (125.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+                        (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
                         DEFAULT_BUTTON_WIDTH / 6.0,
                         DEFAULT_BUTTON_HEIGHT / 2.0,
                         "Back",
@@ -286,24 +287,24 @@ impl InteractiveWidgetManager {
 
     pub fn new_single_player_game() -> InteractiveWidgetManager {
         let back_to_main_menu_button = Button::new(
-            (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
             "Back",
         );
 
         let pause_button = Button::new(
-            (13.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 5.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
             "Pause",
         );
 
         let settings_button = Button::new(
-            (58.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            (58.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 3.5,
             DEFAULT_BUTTON_HEIGHT / 2.0,
             "Settings",
@@ -326,24 +327,24 @@ impl InteractiveWidgetManager {
 
     pub fn new_two_player_game() -> InteractiveWidgetManager {
         let back_to_main_menu_button = Button::new(
-            (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
             "Back",
         );
 
         let pause_button = Button::new(
-            (13.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 5.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
             "Pause",
         );
 
         let settings_button = Button::new(
-            (123.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            (123.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 3.5,
             DEFAULT_BUTTON_HEIGHT / 2.0,
             "Settings",
@@ -366,16 +367,16 @@ impl InteractiveWidgetManager {
 
     pub fn new_create_room() -> InteractiveWidgetManager {
         let back_to_main_menu_button = Button::new(
-            (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
             "Back",
         );
 
         let copy_ip = Button::new(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Copy room IP",
@@ -396,32 +397,32 @@ impl InteractiveWidgetManager {
 
     pub fn new_join_room() -> InteractiveWidgetManager {
         let back_to_main_menu_button = Button::new(
-            (5.0 * DEFAULT_WINDOW_WIDTH as f64) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT as f64) / 70.0,
+            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
             "Back",
         );
 
         let join_room = Button::new(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Join room",
         );
 
         let room_ip_input = TextInput::new(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 3.0,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 3.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Join room",
         );
 
         let paste_ip = Button::new(
-            DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-            DEFAULT_WINDOW_HEIGHT as f64 / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
             DEFAULT_BUTTON_WIDTH,
             DEFAULT_BUTTON_HEIGHT,
             "Paste",
@@ -442,7 +443,7 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
+    pub fn handle_left_click(&mut self, cursor_position: &[Scalar; 2]) {
         for text_input in self.text_inputs.values_mut() {
             text_input.handle_left_click(cursor_position);
         }
@@ -530,8 +531,8 @@ impl InteractiveWidgetManager {
             let local_ip = format!("{}{}", local_ip, GUEST_PORT);
 
             let join_room = Button::new_pressed(
-                DEFAULT_WINDOW_WIDTH as f64 / 2.0,
-                DEFAULT_WINDOW_HEIGHT as f64 / 2.0,
+                DEFAULT_WINDOW_WIDTH / 2.0,
+                DEFAULT_WINDOW_HEIGHT / 2.0,
                 DEFAULT_BUTTON_WIDTH,
                 DEFAULT_BUTTON_HEIGHT,
                 "Join this room",

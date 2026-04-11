@@ -128,14 +128,14 @@ impl App {
             title_text: Text::new_with_tetris_font(
                 "T",
                 DEFAULT_FONT_SIZE,
-                DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+                DEFAULT_WINDOW_WIDTH / 2.0,
                 DEFAULT_TITLE_Y,
                 LIGHT_GREY,
             ),
             restart_text: Text::new(
                 "Press R to (re)start",
                 (DEFAULT_FONT_SIZE * 22) / 16,
-                DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+                DEFAULT_WINDOW_WIDTH / 2.0,
                 DEFAULT_TITLE_Y,
                 LIGHT_GREY,
             ),
@@ -149,7 +149,7 @@ impl App {
             pause_text: Text::new(
                 "Press P to resume",
                 (DEFAULT_FONT_SIZE * 22) / 16,
-                DEFAULT_WINDOW_WIDTH as f64 / 2.0,
+                DEFAULT_WINDOW_WIDTH / 2.0,
                 DEFAULT_TITLE_Y,
                 LIGHT_GREY,
             ),

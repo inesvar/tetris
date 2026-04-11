@@ -2,7 +2,7 @@ use super::text::Text;
 use super::Rectangle;
 use super::DEFAULT_FONT_SIZE;
 use graphics::color;
-use graphics::types::Color;
+use graphics::types::{Color, Scalar};
 
 /// Button that changes color when pressed.
 /// The widget manager will know the button was pressed when it makes its next query.
@@ -17,7 +17,13 @@ pub struct Button {
 }
 
 impl Button {
-    pub(super) fn new(center_x: f64, center_y: f64, width: f64, height: f64, text: &str) -> Self {
+    pub(super) fn new(
+        center_x: Scalar,
+        center_y: Scalar,
+        width: Scalar,
+        height: Scalar,
+        text: &str,
+    ) -> Self {
         Button {
             rect: Rectangle::new(center_x, center_y, width, height),
             text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, color::BLACK),
@@ -29,10 +35,10 @@ impl Button {
     }
 
     pub(super) fn new_pressed(
-        center_x: f64,
-        center_y: f64,
-        width: f64,
-        height: f64,
+        center_x: Scalar,
+        center_y: Scalar,
+        width: Scalar,
+        height: Scalar,
         text: &str,
     ) -> Self {
         Button {
@@ -51,7 +57,7 @@ impl Button {
         has_been_pressed
     }
 
-    pub(super) fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
+    pub(super) fn handle_left_click(&mut self, cursor_position: &[Scalar; 2]) {
         if self.rect.contains(cursor_position) {
             println!("button press");
             self.is_pressed = true;
