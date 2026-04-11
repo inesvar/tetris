@@ -1,6 +1,6 @@
 use super::text::Text;
 use super::Rectangle;
-use super::{DEFAULT_FONT_SIZE, TEXT_COLOR};
+use super::{DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE, TEXT_COLOR};
 use piston::Key;
 
 pub struct TextInput {
@@ -21,8 +21,14 @@ impl TextInput {
     ) -> Self {
         TextInput {
             rect: Rectangle::new(center_x, center_y, width, height),
-            info_text: Text::new("", DEFAULT_FONT_SIZE, center_x, center_y, TEXT_COLOR),
-            text: Text::new("", DEFAULT_FONT_SIZE, center_x, center_y, TEXT_COLOR),
+            info_text: Text::new(
+                "",
+                DEFAULT_FONT_SIZE,
+                0.0,
+                -DEFAULT_BUTTON_Y_SPACING / 2.0,
+                TEXT_COLOR,
+            ),
+            text: Text::new("", DEFAULT_FONT_SIZE, 0.0, 0.0, TEXT_COLOR),
             placeholder: String::from(placeholder),
             focused: false,
         }

@@ -4,7 +4,7 @@ use super::interactive_widget_manager::InteractiveWidgetManager;
 use super::key_input::KeyInput;
 use super::text::Text;
 use super::text_input::TextInput;
-use super::{CURSOR_BLINK_PERIOD, DEFAULT_BUTTON_Y_SPACING, TEXT_COLOR};
+use super::{CURSOR_BLINK_PERIOD, TEXT_COLOR};
 use graphics::{color, CharacterCache, Transformed};
 use render_tetris::Piston2dOpenGlRenderer;
 
@@ -49,8 +49,9 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
     }
 
     fn render_text_input(&mut self, input: &TextInput) {
+        let old_transform = self.transform;
         let (center_x, center_y) = input.rect.get_center();
-        let button_transform = self.transform.trans(center_x, center_y);
+        self.transform = self.transform.trans(center_x, center_y);
 
         let color = if input.focused {
             color::RED
@@ -62,7 +63,7 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         outline_rect.draw(
             input.rect.get_dimensions(),
             &self.draw_state,
-            button_transform,
+            self.transform,
             &mut self.gl,
         );
 
@@ -77,17 +78,15 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         }
 
         self.render_text(&content);
-
-        let old_transform = self.transform;
-        self.transform = self.transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
         self.render_text(&input.info_text);
 
         self.transform = old_transform;
     }
 
     fn render_key_input(&mut self, key_input: &KeyInput) {
+        let old_transform = self.transform;
         let (center_x, center_y) = key_input.rect.get_center();
-        let button_transform = self.transform.trans(center_x, center_y);
+        self.transform = self.transform.trans(center_x, center_y);
 
         let color = if key_input.focused {
             color::RED
@@ -99,7 +98,7 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         outline_rect.draw(
             key_input.rect.get_dimensions(),
             &self.draw_state,
-            button_transform,
+            self.transform,
             &mut self.gl,
         );
 
@@ -115,9 +114,6 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
             self.render_text(&key_input.placeholder);
         }
 
-        // render the info_text
-        let old_transform = self.transform;
-        self.transform = self.transform.trans(0.0, -DEFAULT_BUTTON_Y_SPACING / 2.0);
         self.render_text(&key_input.info_text);
 
         self.transform = old_transform;
