@@ -1,12 +1,10 @@
 use super::text::Text;
+use super::Rectangle;
 use super::{DEFAULT_FONT_SIZE, TEXT_COLOR};
 use piston::Key;
 
 pub struct TextInput {
-    pub(super) x: f64,
-    pub(super) y: f64,
-    pub(super) width: f64,
-    pub(super) height: f64,
+    pub(super) rect: Rectangle,
     pub(super) text: Text,
     pub(super) info_text: Text,
     pub(super) placeholder: String,
@@ -14,28 +12,24 @@ pub struct TextInput {
 }
 
 impl TextInput {
-    pub(super) fn new(x: f64, y: f64, width: f64, height: f64, placeholder: &str) -> Self {
+    pub(super) fn new(
+        center_x: f64,
+        center_y: f64,
+        width: f64,
+        height: f64,
+        placeholder: &str,
+    ) -> Self {
         TextInput {
-            x,
-            y,
-            width,
-            height,
-            info_text: Text::new("", DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
-            text: Text::new("", DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
+            rect: Rectangle::new(center_x, center_y, width, height),
+            info_text: Text::new("", DEFAULT_FONT_SIZE, center_x, center_y, TEXT_COLOR),
+            text: Text::new("", DEFAULT_FONT_SIZE, center_x, center_y, TEXT_COLOR),
             placeholder: String::from(placeholder),
             focused: false,
         }
     }
 
-    pub(super) fn are_coords_inside_input(&self, &[x, y]: &[f64; 2]) -> bool {
-        x >= self.x - self.width / 2.0
-            && x <= self.x + self.width / 2.0
-            && y >= self.y - self.height / 2.0
-            && y <= self.y + self.height / 2.0
-    }
-
     pub(super) fn handle_left_click(&mut self, cursor: &[f64; 2]) {
-        self.focused = self.are_coords_inside_input(cursor);
+        self.focused = self.rect.contains(cursor);
     }
 
     pub(super) fn handle_key_press(&mut self, key: Key) {

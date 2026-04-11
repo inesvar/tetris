@@ -1,4 +1,5 @@
 use super::text::Text;
+use super::Rectangle;
 use super::DEFAULT_FONT_SIZE;
 use graphics::color;
 use graphics::types::Color;
@@ -7,10 +8,7 @@ use graphics::types::Color;
 /// The widget manager will know the button was pressed when it makes its next query.
 #[derive(Clone)]
 pub struct Button {
-    pub(super) center_x: f64,
-    pub(super) center_y: f64,
-    pub(super) width: f64,
-    pub(super) height: f64,
+    pub(super) rect: Rectangle,
     pub(super) text: Text,
     color: Color,
     color_when_pressed: Color,
@@ -21,10 +19,7 @@ pub struct Button {
 impl Button {
     pub(super) fn new(center_x: f64, center_y: f64, width: f64, height: f64, text: &str) -> Self {
         Button {
-            center_x,
-            center_y,
-            width,
-            height,
+            rect: Rectangle::new(center_x, center_y, width, height),
             text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, color::BLACK),
             color: [0.8, 0.8, 0.8, 1.0],
             color_when_pressed: [0.5, 0.5, 0.5, 1.0],
@@ -41,23 +36,13 @@ impl Button {
         text: &str,
     ) -> Self {
         Button {
-            center_x,
-            center_y,
-            width,
-            height,
+            rect: Rectangle::new(center_x, center_y, width, height),
             text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, color::BLACK),
             color: [0.8, 0.8, 0.8, 1.0],
             color_when_pressed: [0.5, 0.5, 0.5, 1.0],
             has_been_pressed: true,
             is_pressed: false,
         }
-    }
-
-    pub(super) fn are_coords_inside_button(&self, &[x, y]: &[f64; 2]) -> bool {
-        x >= self.center_x - self.width / 2.0
-            && x <= self.center_x + self.width / 2.0
-            && y >= self.center_y - self.height / 2.0
-            && y <= self.center_y + self.height / 2.0
     }
 
     pub(super) fn has_been_pressed(&mut self) -> bool {
@@ -67,7 +52,7 @@ impl Button {
     }
 
     pub(super) fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
-        if self.are_coords_inside_button(cursor_position) {
+        if self.rect.contains(cursor_position) {
             println!("button press");
             self.is_pressed = true;
             self.has_been_pressed = true;

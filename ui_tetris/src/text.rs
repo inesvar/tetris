@@ -2,8 +2,8 @@ use graphics::types::Color;
 
 #[derive(Clone)]
 pub struct Text {
-    pub(super) x: f64,
-    pub(super) y: f64,
+    pub(super) center_x: f64,
+    pub(super) center_y: f64,
     pub(super) content: String,
     pub(super) use_tetris_font: bool,
     pub(crate) view: graphics::Text,
@@ -14,13 +14,13 @@ impl Text {
         text: &str,
         use_tetris_font: bool,
         font_size: u32,
-        x: f64,
-        y: f64,
+        center_x: f64,
+        center_y: f64,
         color: Color,
     ) -> Text {
         Text {
-            x,
-            y,
+            center_x,
+            center_y,
             content: String::from(text),
             use_tetris_font,
             view: graphics::text::Text::new_color(color, font_size),

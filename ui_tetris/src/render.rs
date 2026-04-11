@@ -5,7 +5,7 @@ use super::key_input::KeyInput;
 use super::text::Text;
 use super::text_input::TextInput;
 use super::{CURSOR_BLINK_PERIOD, DEFAULT_BUTTON_Y_SPACING, TEXT_COLOR};
-use graphics::{color, rectangle, CharacterCache, Transformed};
+use graphics::{color, CharacterCache, Transformed};
 use render_tetris::Piston2dOpenGlRenderer;
 
 /// Rendering an [InteractiveWidgetManager].
@@ -33,7 +33,7 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         let text_width = font.width(text.view.font_size, &text.content).unwrap();
         self.transform = self
             .transform
-            .trans(text.x - text_width / 2.0, text.y + top / 2.0);
+            .trans(text.center_x - text_width / 2.0, text.center_y + top / 2.0);
 
         text.view
             .draw(
@@ -49,13 +49,8 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
     }
 
     fn render_text_input(&mut self, input: &TextInput) {
-        let dims = rectangle::rectangle_by_corners(
-            -input.width / 2.0,
-            -input.height / 2.0,
-            input.width / 2.0,
-            input.height / 2.0,
-        );
-        let button_transform = self.transform.trans(input.x, input.y);
+        let (center_x, center_y) = input.rect.get_center();
+        let button_transform = self.transform.trans(center_x, center_y);
 
         let color = if input.focused {
             color::RED
@@ -64,7 +59,12 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         };
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
-        outline_rect.draw(dims, &self.draw_state, button_transform, &mut self.gl);
+        outline_rect.draw(
+            input.rect.get_dimensions(),
+            &self.draw_state,
+            button_transform,
+            &mut self.gl,
+        );
 
         let mut content = input.text.clone();
 
@@ -86,13 +86,8 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
     }
 
     fn render_key_input(&mut self, key_input: &KeyInput) {
-        let dims = rectangle::rectangle_by_corners(
-            -key_input.width / 2.0,
-            -key_input.height / 2.0,
-            key_input.width / 2.0,
-            key_input.height / 2.0,
-        );
-        let button_transform = self.transform.trans(key_input.x, key_input.y);
+        let (center_x, center_y) = key_input.rect.get_center();
+        let button_transform = self.transform.trans(center_x, center_y);
 
         let color = if key_input.focused {
             color::RED
@@ -101,7 +96,12 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         };
 
         let outline_rect = graphics::Rectangle::new_border(color, 1.0);
-        outline_rect.draw(dims, &self.draw_state, button_transform, &mut self.gl);
+        outline_rect.draw(
+            key_input.rect.get_dimensions(),
+            &self.draw_state,
+            button_transform,
+            &mut self.gl,
+        );
 
         if key_input.focused
             && self.elapsed_secs() % CURSOR_BLINK_PERIOD < CURSOR_BLINK_PERIOD / 2.0
@@ -124,18 +124,18 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
     }
 
     fn render_button(&mut self, button: &Button) {
-        let dims = rectangle::rectangle_by_corners(
-            -button.width / 2.0,
-            -button.height / 2.0,
-            button.width / 2.0,
-            button.height / 2.0,
-        );
         let rectangle = graphics::Rectangle::new(button.color());
 
         let old_transform = self.transform;
-        self.transform = self.transform.trans(button.center_x, button.center_y);
+        let (center_x, center_y) = button.rect.get_center();
+        self.transform = self.transform.trans(center_x, center_y);
 
-        rectangle.draw(dims, &self.draw_state, self.transform, &mut self.gl);
+        rectangle.draw(
+            button.rect.get_dimensions(),
+            &self.draw_state,
+            self.transform,
+            &mut self.gl,
+        );
 
         self.render_text(&button.text);
 

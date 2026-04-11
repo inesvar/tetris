@@ -1,12 +1,10 @@
 use super::text::Text;
+use super::Rectangle;
 use super::{DEFAULT_FONT_SIZE, TEXT_COLOR};
 use piston::Key;
 
 pub struct KeyInput {
-    pub(super) x: f64,
-    pub(super) y: f64,
-    pub(super) width: f64,
-    pub(super) height: f64,
+    pub(super) rect: Rectangle,
     pub(super) focused: bool, // true : display custom_text and cursor, false : depends on custom
     pub(super) custom: bool, // when unfocused, true : display custom_text, false : display keys_to_string(init_keys)
     pub(super) custom_text: Text,
@@ -19,8 +17,8 @@ pub struct KeyInput {
 
 impl KeyInput {
     pub(super) fn new_with_info(
-        x: f64,
-        y: f64,
+        center_x: f64,
+        center_y: f64,
         width: f64,
         height: f64,
         keys: &[Key],
@@ -29,26 +27,22 @@ impl KeyInput {
         let placeholder: &str = &keys_to_string(keys);
         let vec_keys = keys.to_vec();
         KeyInput {
-            x,
-            y,
-            width,
-            height,
+            rect: Rectangle::new(center_x, center_y, width, height),
             focused: false,
             custom: false,
-            custom_text: Text::new("", DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
+            custom_text: Text::new("", DEFAULT_FONT_SIZE, center_x, center_y, TEXT_COLOR),
             keys: vec![],
             init_keys: vec_keys,
-            placeholder: Text::new(placeholder, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
+            placeholder: Text::new(
+                placeholder,
+                DEFAULT_FONT_SIZE,
+                center_x,
+                center_y,
+                TEXT_COLOR,
+            ),
             commit: false,
-            info_text: Text::new(info_text, DEFAULT_FONT_SIZE, x, y, TEXT_COLOR),
+            info_text: Text::new(info_text, DEFAULT_FONT_SIZE, center_x, center_y, TEXT_COLOR),
         }
-    }
-
-    pub(super) fn are_coords_inside_input(&self, &[x, y]: &[f64; 2]) -> bool {
-        x >= self.x - self.width / 2.0
-            && x <= self.x + self.width / 2.0
-            && y >= self.y - self.height / 2.0
-            && y <= self.y + self.height / 2.0
     }
 
     pub(super) fn commit(&mut self) -> bool {
@@ -61,7 +55,7 @@ impl KeyInput {
     }
 
     pub(super) fn handle_left_click(&mut self, cursor_position: &[f64; 2]) {
-        if self.are_coords_inside_input(cursor_position) {
+        if self.rect.contains(cursor_position) {
             self.focus();
         } else if self.focused {
             self.unfocus();
