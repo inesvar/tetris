@@ -112,7 +112,7 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         } else if key_input.focused || key_input.custom {
             self.render_text(&key_input.custom_text);
         } else {
-            self.render_text(&key_input.placeholder);
+            self.render_text_replace_content(&key_input.custom_text, &key_input.placeholder);
         }
 
         self.render_text(&key_input.info_text);

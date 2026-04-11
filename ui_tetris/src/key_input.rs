@@ -11,9 +11,9 @@ pub struct KeyInput {
     pub(super) custom: bool, // when unfocused, true : display custom_text, false : display keys_to_string(init_keys)
     pub(super) custom_text: Text,
     pub(super) keys: Vec<Key>,
-    init_keys: Vec<Key>,          // initial values from settings.rs
-    pub(super) placeholder: Text, // initial text
-    pub(super) commit: bool,      // true : update app's settings
+    init_keys: Vec<Key>,            // initial values from settings.rs
+    pub(super) placeholder: String, // initial text
+    pub(super) commit: bool,        // true : update app's settings
     pub(super) info_text: Text,
 }
 
@@ -26,7 +26,7 @@ impl KeyInput {
         keys: &[Key],
         info_text: &str,
     ) -> Self {
-        let placeholder: &str = &keys_to_string(keys);
+        let placeholder = keys_to_string(keys);
         let vec_keys = keys.to_vec();
         KeyInput {
             rect: Rectangle::new(center_x, center_y, width, height),
@@ -35,7 +35,7 @@ impl KeyInput {
             custom_text: Text::new("", DEFAULT_FONT_SIZE, 0.0, 0.0, SILVER),
             keys: vec![],
             init_keys: vec_keys,
-            placeholder: Text::new(placeholder, DEFAULT_FONT_SIZE, 0.0, 0.0, SILVER),
+            placeholder,
             commit: false,
             info_text: Text::new(
                 info_text,
