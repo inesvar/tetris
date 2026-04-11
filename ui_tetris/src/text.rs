@@ -36,15 +36,3 @@ impl Text {
         self.content = text;
     }
 }
-
-impl Default for Text {
-    fn default() -> Self {
-        Text {
-            x: 0.0,
-            y: 0.0,
-            content: String::from(""),
-            use_tetris_font: false,
-            view: graphics::text::Text::new_color([0.0, 0.0, 0.0, 0.0], DEFAULT_FONT_SIZE),
-        }
-    }
-}

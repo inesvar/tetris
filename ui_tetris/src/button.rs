@@ -80,18 +80,3 @@ impl Button {
         }
     }
 }
-
-impl Default for Button {
-    fn default() -> Self {
-        Button {
-            x: 0.0,
-            y: 0.0,
-            width: 0.0,
-            height: 0.0,
-            text: Text::default(),
-            background_color: [0.0, 0.0, 0.0, 0.0],
-            commit: false,
-            is_pressed: false,
-        }
-    }
-}
