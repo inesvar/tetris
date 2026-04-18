@@ -1,7 +1,6 @@
 //! Define the general implementation of [LocalPlayer].
 use super::{input_commands::InputCommands, LocalPlayer, TetrisPlayer};
 use crate::{app::PlayerConfig, once, settings::BAG_TYPE};
-use core_tetris::TetrisResult;
 use piston::Key;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
@@ -35,11 +34,8 @@ impl LocalPlayer {
         }
     }
 
-    pub fn handle_key_press(&mut self, key: Key) -> TetrisResult {
-        if let Some(tetris_order) = self.keyboard.set_pressed(key) {
-            self.player_screen.try_apply(tetris_order, &mut self.rng)?;
-        }
-        Ok(())
+    pub fn handle_key_press(&mut self, key: Key) {
+        self.keyboard.set_pressed(key);
     }
 
     pub fn handle_key_release(&mut self, key: Key) {

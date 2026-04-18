@@ -29,18 +29,31 @@ impl InputCommands {
         }
     }
 
-    pub(super) fn set_pressed(&mut self, key: Key) -> Option<TetrisCommand> {
-        let command = self.key_lookup.get_command(&key)?;
-        self.started_at.insert(command, self.now);
+    pub(super) fn should_apply_command(&self, command: TetrisCommand) -> bool {
+        match self.key_is_pressed_since(command) {
+            None => false,
+            Some(0) => true,
+            Some(duration) => {
+                command.has_auto_repeat()
+                    && duration
+                        .checked_sub(AUTO_REPEAT_DELAY)
+                        .is_some_and(|duration| duration % AUTO_REPEAT_SPEED == 0)
+            }
+        }
+    }
 
-        self.ignore_opposite_command(command);
+    pub(super) fn set_pressed(&mut self, key: Key) {
+        if let Some(command) = self.key_lookup.get_command(&key) {
+            self.started_at.insert(command, self.now);
 
-        Some(command)
+            self.ignore_opposite_command(command);
+        }
     }
 
     pub(super) fn set_released(&mut self, key: Key) {
         if let Some(command) = self.key_lookup.get_command(&key) {
             self.started_at.remove(&command);
+            self.temporarily_ignored.remove(&command);
 
             self.unignore_opposite_command(command);
         }
@@ -55,16 +68,6 @@ impl InputCommands {
         self.started_at
             .get(&command)
             .map(|pressed_at| self.now.wrapping_sub(*pressed_at))
-    }
-
-    fn auto_repeat_delay_is_up_since(&self, command: TetrisCommand) -> Option<u64> {
-        self.key_is_pressed_since(command)
-            .and_then(|duration| duration.checked_sub(AUTO_REPEAT_DELAY))
-    }
-
-    pub(super) fn is_auto_repeated(&self, command: TetrisCommand) -> bool {
-        self.auto_repeat_delay_is_up_since(command)
-            .is_some_and(|x| x % AUTO_REPEAT_SPEED == 0)
     }
 
     pub(super) fn get_keybindings(&self) -> Keybindings {

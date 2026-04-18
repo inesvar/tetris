@@ -248,9 +248,7 @@ impl App {
             game_flow_change = GameFlowChange::Pause;
         } else if self.running == RunningState::Running {
             for player in self.local_players.iter_mut() {
-                if player.handle_key_press(key).is_err() {
-                    game_flow_change = GameFlowChange::GameOver;
-                }
+                player.handle_key_press(key)
             }
         }
 
