@@ -1,7 +1,6 @@
 //! Implement [TetrisPlayer].
 use super::{
-    BagType, CircularBuffer, GameOverError, TetrisGrid, TetrisResult, Tetromino,
-    TetrominoGenerator, TetrominoMove,
+    BagType, CircularBuffer, TetrisGrid, TetrisResult, Tetromino, TetrominoGenerator, TetrominoMove,
 };
 use rand::Rng;
 use serde::Deserialize;
@@ -60,22 +59,12 @@ pub enum TetrisCommand {
     /// A user command to put the [TetrisPlayer::tetromino_in_play] in the **Hold Queue**
     /// (a new [TetrisPlayer::tetromino_in_play] will automatically be moved to its starting position).
     Hold,
-    /// An in-game command to **Lock Down** the tetromino.
-    ///
-    /// This command happens automatically after [TetrominoMove::HardDrop].
-    ///
-    /// This command consists in 3 steps :
-    /// - add the [TetrisPlayer::tetromino_in_play] to the [TetrisPlayer::grid] (this can fail with [GameOverError::LockOut]);
-    /// - add the accumulated garbage to the [TetrisPlayer::grid] (this can fail with [GameOverError::TopOut]);
-    /// - move the new [TetrisPlayer::tetromino_in_play] to its starting position (this can fail with [GameOverError::BlockOut]).
-    LockDown,
 }
 
 impl TetrisCommand {
-    pub const ALL: [TetrisCommand; 8] = [
+    pub const ALL_EXCEPT_FALL: [TetrisCommand; 7] = [
         TetrisCommand::Move(TetrominoMove::Right),
         TetrisCommand::Move(TetrominoMove::Left),
-        TetrisCommand::Move(TetrominoMove::Fall),
         TetrisCommand::Move(TetrominoMove::Clockwise),
         TetrisCommand::Move(TetrominoMove::Counterclockwise),
         TetrisCommand::Move(TetrominoMove::HalfTurn),
@@ -165,27 +154,27 @@ impl TetrisPlayer {
         self.tetromino_bag.bag_type()
     }
 
-    /// Tries to apply [TetrisCommand], returns [GameOverError] if the situation is a losing one,
-    /// otherwise returns whether the [TetrisPlayer::tetromino_in_play] was moved or not.
+    /// Tries to apply [TetrisCommand], returns [TetrisResult] if the situation is a losing one.
     ///
     /// Refer to [TetrisCommand] documentation for more detail.
-    pub fn try_apply<R: Rng>(
-        &mut self,
-        order: TetrisCommand,
-        rng: &mut R,
-    ) -> Result<bool, GameOverError> {
+    pub fn try_apply<R: Rng>(&mut self, order: TetrisCommand, rng: &mut R) -> TetrisResult {
         match order {
             TetrisCommand::Move(TetrominoMove::HardDrop) => {
                 self.tetromino_in_play
                     .try_apply(TetrominoMove::HardDrop, &self.grid);
-                self.lock_down(rng).map(|_| true)
+                self.lock_down(rng)
             }
             TetrisCommand::Move(tetromino_move) => {
-                Ok(self.tetromino_in_play.try_apply(tetromino_move, &self.grid))
+                self.tetromino_in_play.try_apply(tetromino_move, &self.grid);
+                Ok(())
             }
-            TetrisCommand::Hold => self.hold_tetromino(rng).map(|_| true),
-            TetrisCommand::LockDown => self.lock_down(rng).map(|_| true),
+            TetrisCommand::Hold => self.hold_tetromino(rng),
         }
+    }
+
+    pub fn try_fall(&mut self) -> bool {
+        self.tetromino_in_play
+            .try_apply(TetrominoMove::Fall, &self.grid)
     }
 
     /// Swap `tetromino_in_play` and `swap`.
@@ -229,6 +218,13 @@ impl TetrisPlayer {
     }
 
     /// Lock down `tetromino_in_play`, and return whether game over has occurred.
+    ///
+    /// This is triggered by [TetrominoMove::HardDrop].
+    ///
+    /// This command consists in 3 steps :
+    /// - add the [TetrisPlayer::tetromino_in_play] to the [TetrisPlayer::grid] (this can fail with [GameOverError::LockOut]);
+    /// - add the accumulated garbage to the [TetrisPlayer::grid] (this can fail with [GameOverError::TopOut]);
+    /// - move the new [TetrisPlayer::tetromino_in_play] to its starting position (this can fail with [GameOverError::BlockOut]).
     fn lock_down<R: Rng>(&mut self, rng: &mut R) -> TetrisResult {
         let previously_active = self.replace_tetromino_in_play(rng);
 

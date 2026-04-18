@@ -120,7 +120,7 @@ impl Tetromino {
         let translation = RotationTranslation::translation(tetromino_move.get_translation());
         let moved = self.try_move(grid, &translation);
 
-        if tetromino_move.is_repeated() {
+        if tetromino_move.is_repeated() && moved {
             while self.try_move(grid, &translation) {}
         }
 

@@ -9,45 +9,38 @@ impl LocalPlayer {
         fall_speed_divide: u64,
         freeze: u64,
     ) -> TetrisResult {
-        for command in TetrisCommand::ALL {
+        for command in TetrisCommand::ALL_EXCEPT_FALL {
             if self.keyboard.should_apply_command(command) {
-                let command_succeeded = self.player_screen.try_apply(command, &mut self.rng)?;
-                if !command_succeeded && self.freeze_frame < frame_counter {
-                    // if the tetromino reaches the bottom, set the freeze_frame
-                    self.freeze_frame = frame_counter + freeze;
-                }
+                self.player_screen.try_apply(command, &mut self.rng)?;
             }
         }
 
-        // move the tetromino down to emulate its fall
-        if frame_counter % fall_speed_divide == 0
-            && !self
-                .player_screen
-                .try_apply(TetrominoMove::Fall.into(), &mut self.rng)?
+        if self.should_apply_fall(frame_counter, fall_speed_divide)
+            && !self.player_screen.try_fall()
             && self.freeze_frame < frame_counter
         {
-            // if the tetromino reaches the bottom, set the freeze_frame
+            // if the tetromino just reached the bottom, update the freeze_frame
             self.freeze_frame = frame_counter + freeze;
         }
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
-        if frame_counter == self.freeze_frame
-            && !self
-                .player_screen
-                .try_apply(TetrominoMove::Fall.into(), &mut self.rng)?
-        {
+        if frame_counter == self.freeze_frame && !self.player_screen.try_fall() {
             self.player_screen
-                .try_apply(TetrisCommand::LockDown, &mut self.rng)?;
+                .try_apply(TetrominoMove::HardDrop.into(), &mut self.rng)?;
         }
 
-        // Updates the time for the keyboard
         self.keyboard.update();
 
-        // Send the player_screen data if necessary
         if self.sender {
             self.send_serialized();
         }
 
         Ok(())
+    }
+
+    fn should_apply_fall(&self, frame_counter: u64, fall_speed_divide: u64) -> bool {
+        self.keyboard
+            .should_apply_command(TetrominoMove::Fall.into())
+            || frame_counter % fall_speed_divide == 0
     }
 }

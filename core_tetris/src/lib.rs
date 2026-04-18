@@ -51,7 +51,6 @@
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng);
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng);
 //! player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng);
-//! player.try_apply(TetrisCommand::LockDown, &mut rng);
 //! player.try_apply(TetrisCommand::Hold, &mut rng);
 //! ```
 //!
@@ -122,15 +121,10 @@
 //!         "---------\n",
 //!     ));
 //! ```
-//! NB: [TetrominoMove::HardDrop] is automatically followed by [TetrisCommand::LockDown]
-//! (which is namely responsible for putting the next tetromino in the grid).
-//! However, [TetrisCommand::LockDown] has to be requested by the tetris engine in the case of a
-//! tetromino that fell to the bottom without the use of hard drop.
-//!
-//! This may be confusing at first, but the explanation is straightforward : this crate doesn't know the time,
-//! so it doesn't know when [TetrisCommand::LockDown] should be called (which doesn't happen instantaneously after the
-//! [Tetromino] hit the bottom). Likewise, this crate does't know when to call [TetrominoMove::Fall] to make
-//! the [Tetromino] fall towards the bottom, it's the job of the tetris engine to regularly call [TetrominoMove::Fall].
+//! NB: [TetrominoMove::HardDrop] has to be used some time after the tetromino in play reached the bottom.
+//! This crate doesn't know the time, so it doesn't know when it's the right time to do that.
+//! Likewise, this crate wouldn't know when to call [TetrominoMove::Fall] to make the active tetromino
+//! fall towards the bottom, it's the job of the tetris engine to regularly call [TetrominoMove::Fall].
 //! ```
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
