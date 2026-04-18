@@ -1,7 +1,4 @@
-//! Define the mecanism of the game relative to one player.
-//!
-//! This module uses [core] to make the tetromino move according to the player's commands.
-//! It also generates new tetromino pieces and handles the queue of next pieces.
+//! Define `struct` [LocalPlayer].
 mod input_commands;
 mod local_player;
 mod update_player;
@@ -10,22 +7,12 @@ use self::input_commands::InputCommands;
 pub use core_tetris::TetrisPlayer;
 use rand_pcg::Pcg32;
 
-/// Local player contains all the informations relative to one player.
-///
-/// - the elements to show on screen
-/// - the pressed keys
-/// - the next tetromino in the queue as well as a random generator
+/// [LocalPlayer] is a wrapper around [TetrisPlayer].
+/// [TetrisPlayer] handles deterministic logic, while [TetrisPlayer]
+/// additionally handles time and I/O.
 pub struct LocalPlayer {
-    /// player_screen contains all attributes visible on the screen
-    ///
-    /// TetrisPlayer, not LocalPlayer, is rendered.
-    /// TetrisPlayer, not LocalPlayer, will be sent to the remote.
     player_screen: TetrisPlayer,
-    /// keyboards keeps track of which keys are pressed and if they were pressed for a long time.
     keyboard: InputCommands,
-    /// freeze_frame indicates when to freeze the active_tetromino and get a new one.
-    ///
-    /// freeze_frame is updated when a tetromino reaches the bottom of the grid.
     freeze_frame: u64,
     /// Whether information has to be sent to the remote or not.
     sender: bool,
