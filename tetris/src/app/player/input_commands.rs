@@ -1,27 +1,27 @@
-//! Define [PressedKeys] that stores the pressed keys and the last pressed key.
+//! Define `struct` [InputCommands].
 use crate::settings::{AUTO_REPEAT_DELAY, AUTO_REPEAT_SPEED};
 use core_tetris::{TetrisCommand, TetrominoMove};
 use piston::Key;
 use std::collections::HashMap;
 use ui_tetris::Keybindings;
 
-/// Maps keyboard inputs to [TetrisCommand]s and remembers durations so that auto-repeat can be applied.
-pub(super) struct KeyboardInput {
+#[derive(Debug)]
+struct KeyLookup(HashMap<Key, TetrisCommand>);
+
+/// Stores relevant keyboard inputs in order to output the right [TetrisCommand]s at each `update`.
+pub(super) struct InputCommands {
     started_at: HashMap<TetrisCommand, u64>,
-    /// Some inputs have to be ignored. A typical example is when both right and left
-    /// keys are long pressed (cf Guideline 5.2 Auto-Repeat).
+    // Some inputs have to be ignored. A typical example is when both right and left
+    // keys are long pressed (cf Guideline 5.2 Auto-Repeat).
     temporarily_ignored: HashMap<TetrisCommand, u64>,
     now: u64,
     key_lookup: KeyLookup,
 }
 
-#[derive(Debug)]
-struct KeyLookup(HashMap<Key, TetrisCommand>);
-
-impl KeyboardInput {
-    pub(super) fn new(keybindings: Keybindings) -> KeyboardInput {
+impl InputCommands {
+    pub(super) fn new(keybindings: Keybindings) -> InputCommands {
         let key_lookup = KeyLookup::from(&keybindings);
-        KeyboardInput {
+        InputCommands {
             started_at: HashMap::new(),
             temporarily_ignored: HashMap::new(),
             now: 0,
@@ -46,22 +46,9 @@ impl KeyboardInput {
         }
     }
 
-    pub(super) fn is_auto_repeated(&self, command: TetrisCommand) -> bool {
-        self.auto_repeat_delay_is_up_since(command)
-            .is_some_and(|x| x % AUTO_REPEAT_SPEED == 0)
-    }
-
     /// Increments the timer count.
     pub(super) fn update(&mut self) {
         self.now = self.now.wrapping_add(1);
-    }
-
-    pub(super) fn get_keybindings(&self) -> Keybindings {
-        Keybindings::from(&self.key_lookup)
-    }
-
-    pub(super) fn set_new_keybindings(&mut self, keybindings: &Keybindings) {
-        self.key_lookup = KeyLookup::from(keybindings);
     }
 
     fn key_is_pressed_since(&self, command: TetrisCommand) -> Option<u64> {
@@ -71,10 +58,21 @@ impl KeyboardInput {
     }
 
     fn auto_repeat_delay_is_up_since(&self, command: TetrisCommand) -> Option<u64> {
-        match self.key_is_pressed_since(command) {
-            None => None,
-            Some(duration) => duration.checked_sub(AUTO_REPEAT_DELAY),
-        }
+        self.key_is_pressed_since(command)
+            .and_then(|duration| duration.checked_sub(AUTO_REPEAT_DELAY))
+    }
+
+    pub(super) fn is_auto_repeated(&self, command: TetrisCommand) -> bool {
+        self.auto_repeat_delay_is_up_since(command)
+            .is_some_and(|x| x % AUTO_REPEAT_SPEED == 0)
+    }
+
+    pub(super) fn get_keybindings(&self) -> Keybindings {
+        Keybindings::from(&self.key_lookup)
+    }
+
+    pub(super) fn set_new_keybindings(&mut self, keybindings: &Keybindings) {
+        self.key_lookup = KeyLookup::from(keybindings);
     }
 
     fn ignore_opposite_command(&mut self, command: TetrisCommand) {
@@ -139,3 +137,5 @@ fn has_opposite_command(command: TetrisCommand) -> Option<TetrisCommand> {
         _ => None,
     }
 }
+
+// TODO: write unit tests

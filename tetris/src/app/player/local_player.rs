@@ -1,6 +1,8 @@
 //! Define the general implementation of [LocalPlayer].
-use super::{keyboard_input::KeyboardInput, LocalPlayer, TetrisPlayer};
+use super::{input_commands::InputCommands, LocalPlayer, TetrisPlayer};
 use crate::{app::PlayerConfig, once, settings::BAG_TYPE};
+use core_tetris::TetrisResult;
+use piston::Key;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
 use std::net::TcpStream;
@@ -25,12 +27,23 @@ impl LocalPlayer {
 
         LocalPlayer {
             player_screen,
-            keyboard: KeyboardInput::new(keybindings),
+            keyboard: InputCommands::new(keybindings),
             freeze_frame: 0, // that's about 10 billion years at 60fps
             sender,
             remote_ip,
             rng,
         }
+    }
+
+    pub fn handle_key_press(&mut self, key: Key) -> TetrisResult {
+        if let Some(tetris_order) = self.keyboard.set_pressed(key) {
+            self.player_screen.try_apply(tetris_order, &mut self.rng)?;
+        }
+        Ok(())
+    }
+
+    pub fn handle_key_release(&mut self, key: Key) {
+        self.keyboard.set_released(key);
     }
 
     pub fn get_player(&self) -> &TetrisPlayer {
