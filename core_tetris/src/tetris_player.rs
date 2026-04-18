@@ -53,8 +53,6 @@ pub struct TetrisPlayer {
 pub enum TetrisCommand {
     /// A user command to move the [TetrisPlayer::tetromino_in_play]
     /// (there are 7 possible moves described by [TetrominoMove]).
-    ///
-    /// NB: [TetrominoMove::HardDrop] is automatically followed by [TetrisCommand::LockDown].
     Move(TetrominoMove),
     /// A user command to put the [TetrisPlayer::tetromino_in_play] in the **Hold Queue**
     /// (a new [TetrisPlayer::tetromino_in_play] will automatically be moved to its starting position).

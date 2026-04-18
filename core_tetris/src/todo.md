@@ -1,41 +1,13 @@
-- the tetrominos should not change the first time the game is started... start the game automatically when clicking on the button
+1- CLEAN add_garbage could rely on rng provided by outside of the crate -> great for integration tests (or add_garbage could have a very precise number from outside ?)
+2- PERF try tweaking TetrisPlayer serialization so that the tetris grid isn't sent
+
+- BUG the tetrominos should not change the first time the game is started... start the game automatically when clicking on the button
 => tricky change at the moment
-- make core_tetris integration tests
+- TESTS make core_tetris integration tests
 => not a priority
-- code getters and make fields private (TetrisPlayer)
-- add_garbage could rely on rng provided by outside of the crate -> great for integration tests (or add_garbage could have a very precise number from outside ?)
+- CLEAN code getters and make fields private (TetrisPlayer)
 - BUG fix : TetrisPlayer should receive the number of garbage lines to add, not the number of completed lines !!
-- improve doc
-- make more tetris_grid unit tests
-
-# problems
-- the clock should pause during a game pause :
-    the renderer and the app should have a separate clock
-    the app should pause its clock during tetris pause, while the renderer should not
-    but both should start when a new game is launched (countdown)
-- serialize a PlayerScreen(PlayerScreen) instead of doing black magic
-- use tokio to outsource tcp comms
-- today key inputs are sent to the tetris game and mouse inputs to the app... something more flexible would be great
-
-# new features
-- fix paths for Windows in assets.rs -> done, has to be checked
-- press key s open settings (requires some planning before, the code is messy)
-- output an error when playing remote doesn't work
-# other
-- correct srs using guidelines
-- read tetris guidelines to update code and vocabulary
-- assets load bug when too low in filesystem
-
-# not the priority
-
-instantiate the grid render:
-group all the block textures in one
-use the same texture for all colors ?
-OR use `tri_list_uv_c`
-
-
-add a bench for the grid render
-
-the grid should contain a [f; 4] color for all blocks
-outwardly the user interacts with a TetrisColor,
-but actually there would be a color
+- DOC improve doc
+- TESTS make more tetris_grid unit tests
+- TETRIS correct srs using guidelines
+- TETRIS read tetris guidelines to update code and vocabulary
