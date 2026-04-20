@@ -5,11 +5,12 @@ use super::{Tetromino, TetrominoKind};
 use rand::seq::{IndexedRandom, SliceRandom};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+use std::collections::VecDeque;
 
 /// Tetromino generator.
 #[derive(Serialize, Deserialize, Default)]
 pub struct TetrominoGenerator {
-    tetrominos: Vec<TetrominoKind>,
+    tetrominos: VecDeque<TetrominoKind>,
     bag_type: BagType,
 }
 
@@ -34,7 +35,7 @@ impl TetrominoGenerator {
     /// Creates a new [TetrominoGenerator] with [BagType] `bag_type`.
     pub(crate) fn new(bag_type: BagType) -> Self {
         Self {
-            tetrominos: Vec::new(),
+            tetrominos: VecDeque::new(),
             bag_type,
         }
     }
@@ -50,26 +51,32 @@ impl TetrominoGenerator {
 
     /// Returns one [Tetromino].
     pub(crate) fn get<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
-        Tetromino::new(self.tetrominos.pop().unwrap_or_else(|| {
+        if self.tetrominos.is_empty() {
             self.draw_new_bag(rng);
+        }
+
+        Tetromino::new(
             self.tetrominos
-                .pop()
-                .expect("`draw_new_bag` shouldn't have left `tetrominos` empty")
-        }))
+                .pop_front()
+                .expect("`draw_new_bag` shouldn't have left `tetrominos` empty"),
+        )
     }
 
     fn draw_new_bag<R: Rng>(&mut self, rng: &mut R) {
+        debug_assert!(self.tetrominos.is_empty());
         if let Some(nb_occurrences) = self.bag_type.occurrences_per_kind() {
-            self.tetrominos = TetrominoKind::ALL.repeat(nb_occurrences);
-            self.tetrominos.shuffle(rng);
+            self.tetrominos = TetrominoKind::ALL.repeat(nb_occurrences).into();
+            self.tetrominos.make_contiguous().shuffle(rng);
         } else {
-            let random_tetromino = || {
+            let mut random_tetromino = || {
                 *TetrominoKind::ALL
                     .choose(rng)
                     .expect("`ALL_TETROMINO_KINDS` shouldn't be empty")
             };
             // taking 7 tetrominos to avoid calling `draw_new_bag` too often
-            self.tetrominos = Vec::from_iter(std::iter::repeat_with(random_tetromino).take(7));
+            for _ in 0..7 {
+                self.tetrominos.push_back(random_tetromino());
+            }
         }
     }
 }
@@ -172,8 +179,12 @@ mod tests {
     ) {
         let mut bag = TetrominoGenerator::new(BagType::NoBag);
 
-        bag.draw_new_bag(rng);
+        let generated: Vec<_> = bag
+            .get_chunk(rng, expected.len())
+            .into_iter()
+            .map(|t| t.kind())
+            .collect();
 
-        assert_eq!(bag.tetrominos, expected);
+        assert_eq!(generated, expected);
     }
 }

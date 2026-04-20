@@ -2,31 +2,15 @@ use super::{CircularBuffer, TetrominoKind};
 use rand::TryRng;
 use std::convert::Infallible;
 
-/// Implements [TryRng], designed so that using
-/// [rand::seq::IndexedRandom::choose] on [TetrominoKind::ALL] will generate the values
-/// that [MockRng] was constructed with.
-///
-/// # Examples
-///
-/// ```
-/// # use core_tetris::{MockRng, TetrominoKind};
-/// # use rand::seq::IndexedRandom;
-/// let values = vec![TetrominoKind::T, TetrominoKind::L, TetrominoKind::Z];
-/// let mut mock = MockRng::cycle(&values);
-///
-/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[0]);
-/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[1]);
-/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[2]);
-/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[0]);
-/// // etc.
-/// ```
+/// [MockRng] implements [TryRng] and is designed to control the output of random generation.
+/// - for tetromino generation, [MockRng::cycle] and [MockRng::only] are designed to be used with [super::BagType::NoBag]
 pub struct MockRng(CircularBuffer<u32>);
 
 impl MockRng {
-    // Little retro-engineering of `rand::seq::IndexedRandom::choose` on `TetrominoKind::ALL`.
     pub fn cycle(array: &[TetrominoKind]) -> Self {
         let mut indices = Vec::new();
         for kind in array {
+            // Little retro-engineering of `rand::seq::IndexedRandom::choose` on `TetrominoKind::ALL`.
             let index = TetrominoKind::ALL
                 .iter()
                 .position(|k| k == kind)
