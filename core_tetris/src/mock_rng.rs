@@ -1,0 +1,106 @@
+use super::{CircularBuffer, TetrominoKind};
+use rand::TryRng;
+use std::convert::Infallible;
+
+/// Implements [TryRng], designed so that using
+/// [rand::seq::IndexedRandom::choose] on [TetrominoKind::ALL] will generate the values
+/// that [MockRng] was constructed with.
+///
+/// # Examples
+///
+/// ```
+/// # use core_tetris::{MockRng, TetrominoKind};
+/// # use rand::seq::IndexedRandom;
+/// let values = vec![TetrominoKind::T, TetrominoKind::L, TetrominoKind::Z];
+/// let mut mock = MockRng::cycle(values.clone());
+///
+/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[0]);
+/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[1]);
+/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[2]);
+/// assert_eq!(TetrominoKind::ALL.choose(&mut mock).unwrap(), &values[0]);
+/// // etc.
+/// ```
+pub struct MockRng(CircularBuffer<TetrominoKind>);
+
+impl MockRng {
+    pub fn cycle(array: Vec<TetrominoKind>) -> Self {
+        Self(CircularBuffer::new(array))
+    }
+
+    pub fn only(kind: TetrominoKind) -> Self {
+        Self(CircularBuffer::new(vec![kind]))
+    }
+
+    // Little retro-engineering of `rand::seq::IndexedRandom::choose` on `TetrominoKind::ALL`.
+    fn next(&mut self) -> u32 {
+        let mut next = *self.0.peek();
+        self.0.get_front_push_back(&mut next);
+
+        let next = TetrominoKind::ALL
+            .iter()
+            .position(|kind| *kind == next)
+            .expect("All TetrominoKind variants should be in TetrominoKind::ALL")
+            as u32;
+
+        (next + 1) << 29
+    }
+}
+
+impl TryRng for MockRng {
+    type Error = Infallible;
+
+    fn try_next_u32(&mut self) -> Result<u32, Self::Error> {
+        Ok(self.next())
+    }
+
+    fn try_next_u64(&mut self) -> Result<u64, Self::Error> {
+        let high = self.next() as u64;
+        let low = self.next() as u64;
+        Ok(high << 32 | low)
+    }
+
+    // This is a naive implementation : it's only for tests.
+    fn try_fill_bytes(&mut self, dst: &mut [u8]) -> Result<(), Self::Error> {
+        for i in dst {
+            *i = self.next() as u8;
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rand::seq::IndexedRandom;
+    use rstest::rstest;
+    #[rstest]
+    #[case::o(TetrominoKind::O, 0x20000000)]
+    #[case::i(TetrominoKind::I, 0x40000000)]
+    #[case::t(TetrominoKind::T, 0x60000000)]
+    #[case::l(TetrominoKind::L, 0x80000000)]
+    #[case::j(TetrominoKind::J, 0xa0000000)]
+    #[case::s(TetrominoKind::S, 0xc0000000)]
+    #[case::z(TetrominoKind::Z, 0xe0000000)]
+    fn mock_rng_next_is_correct_when_there_is_one_element(
+        #[case] kind: TetrominoKind,
+        #[case] expected: u32,
+    ) {
+        let mut mock = MockRng::only(kind);
+        assert_eq!(TetrominoKind::ALL.choose(&mut mock), Some(&kind));
+        assert_eq!(mock.next(), expected);
+    }
+
+    #[rstest]
+    #[case::tetromino_kind_all(Vec::from(TetrominoKind::ALL))]
+    #[case::tetromino_kind_t_l_j(TetrominoKind::ALL[2..5].to_vec())]
+    fn mock_rng_next_is_correct(#[case] values: Vec<TetrominoKind>) {
+        let mut mock = MockRng::cycle(values.clone());
+
+        let generated_values = Vec::from_iter(
+            std::iter::repeat_with(|| *TetrominoKind::ALL.choose(&mut mock).unwrap())
+                .take(values.len()),
+        );
+
+        assert_eq!(generated_values, values);
+    }
+}

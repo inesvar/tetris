@@ -35,7 +35,7 @@
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! // New tetrominos will be alternating T's and O's. Not recommended ;)
-//! let mut rng = MockRng::new(vec![TetrominoKind::T, TetrominoKind::O]);
+//! let mut rng = MockRng::cycle(vec![TetrominoKind::T, TetrominoKind::O]);
 //! // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing,
 //! // `default` creates a normal 10x(20+20) tetris grid and `new` lets you choose the size.
 //! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
@@ -44,7 +44,7 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! # let mut rng = MockRng::new(vec![TetrominoKind::T, TetrominoKind::O]);
+//! # let mut rng = MockRng::cycle(vec![TetrominoKind::T, TetrominoKind::O]);
 //! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
 //! # // `default` creates a normal 10x(20+20) tetris grid.
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
@@ -61,7 +61,7 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! # let mut rng = MockRng::new(vec![TetrominoKind::T, TetrominoKind::O]);
+//! # let mut rng = MockRng::cycle(vec![TetrominoKind::T, TetrominoKind::O]);
 //! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
 //! # // `default` creates a normal 10x(20+20) tetris grid.
 //! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
@@ -128,7 +128,7 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! # let mut rng = MockRng::new(vec![TetrominoKind::T, TetrominoKind::O]);
+//! # let mut rng = MockRng::cycle(vec![TetrominoKind::T, TetrominoKind::O]);
 //! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
 //! # // `default` creates a normal 10x(20+20) tetris grid.
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
@@ -154,6 +154,7 @@
 //! ```
 
 mod circular_buffer;
+mod mock_rng;
 mod render_tetris_core;
 mod tetris_grid;
 mod tetris_player;
@@ -168,7 +169,7 @@ pub use tetris_grid::{GameOverError, TetrisResult};
 pub use tetris_player::TetrisCommand;
 pub use tetromino::TetrominoMove;
 // used to render the TetrisPlayer
-pub use circular_buffer::MockRng;
+pub use mock_rng::MockRng;
 pub use render_tetris_core::{RenderTetrisCore, RunningState};
 pub use tetris_grid::{TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS};
 pub use tetris_player::TetrisPlayer;

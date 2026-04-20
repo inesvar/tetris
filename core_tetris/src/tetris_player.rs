@@ -279,11 +279,11 @@ impl Display for TetrisPlayer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::MockRng;
+    use crate::{MockRng, TetrominoKind};
     use rstest::rstest;
 
     #[rstest]
-    #[case(TetrisPlayer::compact(&mut MockRng::default(), BagType::NoBag), concat!(
+    #[case(TetrisPlayer::compact(&mut MockRng::only(TetrominoKind::O), BagType::NoBag), concat!(
             "---------\n",
             "    OO   \n",
             "    OO   \n",
@@ -296,7 +296,7 @@ mod tests {
             "         \n",
             "---------\n",
         ))]
-    #[case(TetrisPlayer::new(&mut MockRng::default(), BagType::NoBag, TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::COMPACT_NB_MATRIX_ROWS, TetrisGrid::COMPACT_NB_BUFFER_ROWS), concat!(
+    #[case(TetrisPlayer::new(&mut MockRng::only(TetrominoKind::O), BagType::NoBag, TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::COMPACT_NB_MATRIX_ROWS, TetrisGrid::COMPACT_NB_BUFFER_ROWS), concat!(
             "----------\n",
             "    OO    \n",
             "    OO    \n",
@@ -332,7 +332,7 @@ mod tests {
     )]
     #[case::minimal(4, 6, 2)]
     fn new_does_not_panic(
-        #[values(&mut MockRng::default())] rng: &mut MockRng,
+        #[values(&mut MockRng::only(TetrominoKind::O))] rng: &mut MockRng,
         #[values(BagType::NoBag, BagType::Bag7, BagType::Bag14)] bag_type: BagType,
         #[case] nb_columns: u32,
         #[case] nb_matrix_rows: u32,
