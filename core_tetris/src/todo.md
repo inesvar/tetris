@@ -2,7 +2,7 @@
 => the issue with this is that it makes everything generic (RenderTetrisCore) and muddies serialization
 
 0- Separate MockRng from CircularBuffer (make it a newtype ?) : *OK*
-Harmonize MockRng and MockGarbageRng (values inside should be precomputed, next function shared as well as
+Harmonize MockRng and MockGarbageRng (values inside should be precomputed : *OK*, next function shared as well as
 TryRng implementation). New functions should reference the precise usage.
 
 1- CLEAN add_garbage could rely on rng provided by outside of the crate -> great for integration tests (or add_garbage could have a very precise number from outside ?)

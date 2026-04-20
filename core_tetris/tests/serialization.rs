@@ -14,7 +14,7 @@ fn deserialization_works() -> Result<(), Box<dyn Error>> {
 
 #[test]
 fn serialization_works() -> Result<(), Box<dyn Error>> {
-    let mut rng = MockRng::cycle(Vec::from(TetrominoKind::ALL));
+    let mut rng = MockRng::cycle(&TetrominoKind::ALL);
     let player = TetrisPlayer::default(&mut rng, core_tetris::BagType::NoBag);
 
     let file = OpenOptions::new()
