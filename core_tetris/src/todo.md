@@ -1,6 +1,9 @@
 ~~API TetrisPlayer should have 2 rngs, changeable anytime~~
 => the issue with this is that it makes everything generic (RenderTetrisCore) and muddies serialization
 
+1- BUG fix : TetrisPlayer should receive the number of garbage lines to add, not the number of completed lines !!
+Don't forget to update the doc.
+
 2- PERF try tweaking TetrisPlayer serialization so that the tetris grid isn't sent
 
 - BUG the tetrominos should not change the first time the game is started... start the game automatically when clicking on the button
@@ -8,7 +11,6 @@
 - TESTS make core_tetris integration tests
 => not a priority
 - CLEAN code getters and make fields private (TetrisPlayer)
-- BUG fix : TetrisPlayer should receive the number of garbage lines to add, not the number of completed lines !!
 - DOC improve doc
 - TESTS make more tetris_grid unit tests
 - TETRIS correct srs using guidelines
