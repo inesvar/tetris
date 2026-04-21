@@ -19,4 +19,6 @@ pub struct LocalPlayer {
     remote_ip: String,
     /// Random generator for the next pieces of tetromino.
     rng: Pcg32,
+    /// Random generator for garbage gaps.
+    garbage_rng: Pcg32,
 }

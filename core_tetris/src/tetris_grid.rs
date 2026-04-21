@@ -4,7 +4,7 @@
 mod tetris_color;
 
 use super::Position;
-use rand::RngExt;
+use rand::{Rng, RngExt};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::ops::Index;
@@ -117,7 +117,11 @@ impl TetrisGrid {
     }
 
     /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
-    pub(crate) fn apply_received_garbage(&mut self, completed_lines: u64) -> TetrisResult {
+    pub(crate) fn apply_received_garbage<R: Rng>(
+        &mut self,
+        completed_lines: u64,
+        rng: &mut R,
+    ) -> TetrisResult {
         let lines_to_add = match completed_lines {
             x if x < 2 => return Ok(()),
             x if x < 4 => x - 1,
@@ -128,7 +132,6 @@ impl TetrisGrid {
             completed_lines, lines_to_add
         );
 
-        let mut rng = rand::rng();
         let empty = rng.random_range(0..self.nb_columns);
 
         for _ in 0..lines_to_add {

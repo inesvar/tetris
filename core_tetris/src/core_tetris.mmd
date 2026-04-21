@@ -21,10 +21,10 @@ graph LR
     TetrisPlayer --o Tetromino
     TetrisPlayer --o BagType
 
-    subgraph circular_buffer
+    subgraph mock_rng
         MockRng
     end
-    MockRng --o TetrominoKind
+    MockRng -.-> TetrominoKind
     Tetromino -.-> tetris_grid
     TetrisGrid -.-> Position
 

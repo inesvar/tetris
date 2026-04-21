@@ -155,12 +155,17 @@ impl TetrisPlayer {
     /// Tries to apply [TetrisCommand], returns [TetrisResult] if the situation is a losing one.
     ///
     /// Refer to [TetrisCommand] documentation for more detail.
-    pub fn try_apply<R: Rng>(&mut self, order: TetrisCommand, rng: &mut R) -> TetrisResult {
+    pub fn try_apply<R1: Rng, R2: Rng>(
+        &mut self,
+        order: TetrisCommand,
+        rng: &mut R1,
+        garbage_rng: &mut R2,
+    ) -> TetrisResult {
         match order {
             TetrisCommand::Move(TetrominoMove::HardDrop) => {
                 self.tetromino_in_play
                     .try_apply(TetrominoMove::HardDrop, &self.grid);
-                self.lock_down(rng)
+                self.lock_down(rng, garbage_rng)
             }
             TetrisCommand::Move(tetromino_move) => {
                 self.tetromino_in_play.try_apply(tetromino_move, &self.grid);
@@ -223,14 +228,14 @@ impl TetrisPlayer {
     /// - add the [TetrisPlayer::tetromino_in_play] to the [TetrisPlayer::grid] (this can fail with [GameOverError::LockOut]);
     /// - add the accumulated garbage to the [TetrisPlayer::grid] (this can fail with [GameOverError::TopOut]);
     /// - move the new [TetrisPlayer::tetromino_in_play] to its starting position (this can fail with [GameOverError::BlockOut]).
-    fn lock_down<R: Rng>(&mut self, rng: &mut R) -> TetrisResult {
+    fn lock_down<R1: Rng, R2: Rng>(&mut self, rng: &mut R1, garbage_rng: &mut R2) -> TetrisResult {
         let previously_active = self.replace_tetromino_in_play(rng);
 
         let new_completed_lines = previously_active.lock_down(&mut self.grid)?;
         self.update_new_completed_lines(new_completed_lines);
 
         self.grid
-            .apply_received_garbage(self.received_garbage_lines)?;
+            .apply_received_garbage(self.received_garbage_lines, garbage_rng)?;
         self.received_garbage_lines = 0;
 
         self.tetromino_in_play.is_valid_in_grid(&self.grid)
@@ -279,11 +284,11 @@ impl Display for TetrisPlayer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{MockRng, TetrominoKind};
+    use crate::MockRng;
     use rstest::rstest;
 
     #[rstest]
-    #[case(TetrisPlayer::compact(&mut MockRng::only(TetrominoKind::O), BagType::NoBag), concat!(
+    #[case(TetrisPlayer::compact(&mut MockRng::o_tetrominos(), BagType::NoBag), concat!(
             "---------\n",
             "    OO   \n",
             "    OO   \n",
@@ -296,7 +301,7 @@ mod tests {
             "         \n",
             "---------\n",
         ))]
-    #[case(TetrisPlayer::new(&mut MockRng::only(TetrominoKind::O), BagType::NoBag, TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::COMPACT_NB_MATRIX_ROWS, TetrisGrid::COMPACT_NB_BUFFER_ROWS), concat!(
+    #[case(TetrisPlayer::new(&mut MockRng::o_tetrominos(), BagType::NoBag, TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::COMPACT_NB_MATRIX_ROWS, TetrisGrid::COMPACT_NB_BUFFER_ROWS), concat!(
             "----------\n",
             "    OO    \n",
             "    OO    \n",
@@ -332,7 +337,7 @@ mod tests {
     )]
     #[case::minimal(4, 6, 2)]
     fn new_does_not_panic(
-        #[values(&mut MockRng::only(TetrominoKind::O))] rng: &mut MockRng,
+        #[values(&mut MockRng::o_tetrominos())] rng: &mut MockRng,
         #[values(BagType::NoBag, BagType::Bag7, BagType::Bag14)] bag_type: BagType,
         #[case] nb_columns: u32,
         #[case] nb_matrix_rows: u32,

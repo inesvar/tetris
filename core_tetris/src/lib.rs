@@ -34,24 +34,22 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! // New tetrominos will be alternating T's and O's. Not recommended ;)
-//! let mut rng = MockRng::cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing,
-//! // `default` creates a normal 10x(20+20) tetris grid and `new` lets you choose the size.
+//! let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! let mut garbage_rng = MockRng::right_aligned_garbage();
+//! // `compact` creates a smaller tetris grid which is nice for printing
 //! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! ```
-//! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s.
+//! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s (or [TetrominoMove]s).
 //! ```
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! # let mut rng = MockRng::cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
-//! # // `default` creates a normal 10x(20+20) tetris grid.
+//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! # let mut garbage_rng = MockRng::right_aligned_garbage();
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
-//! player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng);
-//! player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng);
-//! player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng);
-//! player.try_apply(TetrisCommand::Hold, &mut rng);
+//! player.try_apply(TetrominoMove::Left.into(), &mut rng, &mut garbage_rng);
+//! player.try_apply(TetrominoMove::Clockwise.into(), &mut rng, &mut garbage_rng);
+//! player.try_apply(TetrominoMove::HardDrop.into(), &mut rng, &mut garbage_rng);
+//! player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng);
 //! ```
 //!
 //! Let's look at the results of these commands by printing [TetrisPlayer] after each command.
@@ -61,9 +59,8 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! # let mut rng = MockRng::cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
-//! # // `default` creates a normal 10x(20+20) tetris grid.
+//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! # let mut garbage_rng = MockRng::right_aligned_garbage();
 //! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
@@ -78,7 +75,7 @@
 //!         "         \n",
 //!         "---------\n",
 //!     ));
-//! player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng);
+//! player.try_apply(TetrominoMove::Left.into(), &mut rng, &mut garbage_rng);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "   T     \n",
@@ -92,7 +89,7 @@
 //!         "         \n",
 //!         "---------\n",
 //!     ));
-//! player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng);
+//! player.try_apply(TetrominoMove::Clockwise.into(), &mut rng, &mut garbage_rng);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "   T     \n",
@@ -106,7 +103,7 @@
 //!         "         \n",
 //!         "---------\n",
 //!     ));
-//! player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng);
+//! player.try_apply(TetrominoMove::HardDrop.into(), &mut rng, &mut garbage_rng);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    OO   \n",
@@ -121,21 +118,20 @@
 //!         "---------\n",
 //!     ));
 //! ```
-//! NB: [TetrominoMove::HardDrop] has to be used some time after the tetromino in play reached the bottom.
+//! NB: [TetrominoMove::HardDrop] should be used to lock down the tetromino in play some time after it reaches the bottom.
 //! This crate doesn't know the time, so it doesn't know when it's the right time to do that.
 //! Likewise, this crate wouldn't know when to call [TetrominoMove::Fall] to make the active tetromino
 //! fall towards the bottom, it's the job of the tetris engine to regularly call [TetrominoMove::Fall].
 //! ```
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! # let mut rng = MockRng::cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # // `compact` creates a smaller 9x(6+2) tetris grid which is nice for printing.
-//! # // `default` creates a normal 10x(20+20) tetris grid.
+//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! # let mut garbage_rng = MockRng::right_aligned_garbage();
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
-//! # player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng);
-//! # player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng);
-//! # player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng);
-//! player.try_apply(TetrisCommand::Hold, &mut rng);
+//! # player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng, &mut garbage_rng);
+//! # player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng, &mut garbage_rng);
+//! # player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng, &mut garbage_rng);
+//! player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    T    \n",
@@ -149,8 +145,48 @@
 //!         "   T     \n",
 //!         "---------\n",
 //!     ));
-//! player.push_garbage(4);
-//! let lines_to_send = player.get_lines_completed();
+//! player.push_garbage(2);
+//! assert_eq!(player.to_string(), concat!(
+//!         "---------\n",
+//!         "    T    \n",
+//!         "   TTT   \n",
+//!         "---------\n",
+//!         "         \n",
+//!         "         \n",
+//!         "         \n",
+//!         "   T     \n",
+//!         "   TT    \n",
+//!         "   T     \n",
+//!         "---------\n",
+//!     ));
+//! ```
+//! [TetrisPlayer::push_garbage] doesn't have an immediate result, garbage can only be added to the grid
+//! during the lock down stage. Let's trigger one to see what happens.
+//! ```
+//! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
+//! #
+//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! # let mut garbage_rng = MockRng::right_aligned_garbage();
+//! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+//! # player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng, &mut garbage_rng);
+//! # player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng, &mut garbage_rng);
+//! # player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng, &mut garbage_rng);
+//! # player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng);
+//! # player.push_garbage(2);
+//! player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng, &mut garbage_rng);
+//! assert_eq!(player.to_string(), concat!(
+//!         "---------\n",
+//!         "    OO   \n",
+//!         "    OO   \n",
+//!         "---------\n",
+//!         "    T    \n",
+//!         "   TTT   \n",
+//!         "   T     \n",
+//!         "   TT    \n",
+//!         "   T     \n",
+//!         " XXXXXXXX\n", // garbage is right aligned as specified in `garbage_rng`
+//!         "---------\n",
+//!     ));
 //! ```
 
 mod circular_buffer;

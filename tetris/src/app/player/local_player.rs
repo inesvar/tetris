@@ -10,6 +10,7 @@ use ui_tetris::Keybindings;
 impl LocalPlayer {
     pub fn new(player_config: &PlayerConfig, keybindings: Keybindings) -> Self {
         let mut rng = Pcg32::seed_from_u64(0);
+        let garbage_rng = Pcg32::seed_from_u64(0);
 
         let mut remote_ip = String::from("");
         let mut sender = false;
@@ -31,6 +32,7 @@ impl LocalPlayer {
             sender,
             remote_ip,
             rng,
+            garbage_rng,
         }
     }
 

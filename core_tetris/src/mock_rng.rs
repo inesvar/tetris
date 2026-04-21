@@ -1,13 +1,18 @@
 use super::{CircularBuffer, TetrominoKind};
 use rand::TryRng;
-use std::convert::Infallible;
+use std::{convert::Infallible, ops::Range};
 
 /// [MockRng] implements [TryRng] and is designed to control the output of random generation.
-/// - for tetromino generation, [MockRng::cycle] and [MockRng::only] are designed to be used with [super::BagType::NoBag]
+///
+/// [MockRng::tetromino_cycle] and [MockRng::o_tetrominos] controls
+/// tetromino generation (this only works with [super::BagType::NoBag]).
+///
+/// [MockRng::garbage_cycle] and [MockRng::right_aligned_garbage] controls garbage generation
+/// (more precisely, the gap in the garbage lines).
 pub struct MockRng(CircularBuffer<u32>);
 
 impl MockRng {
-    pub fn cycle(array: &[TetrominoKind]) -> Self {
+    pub fn tetromino_cycle(array: &[TetrominoKind]) -> Self {
         let mut indices = Vec::new();
         for kind in array {
             // Little retro-engineering of `rand::seq::IndexedRandom::choose` on `TetrominoKind::ALL`.
@@ -21,8 +26,29 @@ impl MockRng {
         Self(CircularBuffer::new(indices))
     }
 
-    pub fn only(kind: TetrominoKind) -> Self {
-        Self::cycle(&[kind])
+    pub fn o_tetrominos() -> Self {
+        Self::tetromino_cycle(&[TetrominoKind::O])
+    }
+
+    pub fn garbage_cycle(values: &[u32], range: Range<u32>) -> Self {
+        let mut spaced_values = Vec::new();
+        let len = range
+            .end
+            .saturating_sub(1)
+            .saturating_sub(range.start)
+            .max(1);
+        for value in values {
+            if !range.contains(value) {
+                panic!("`values` should be contained in `range`")
+            }
+            let spaced_value = u32::MAX / len * *value;
+            spaced_values.push(spaced_value);
+        }
+        Self(CircularBuffer::new(spaced_values))
+    }
+    pub fn right_aligned_garbage() -> Self {
+        let values = vec![0];
+        Self(CircularBuffer::new(values))
     }
 
     fn next(&mut self) -> u32 {
@@ -58,8 +84,9 @@ impl TryRng for MockRng {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::seq::IndexedRandom;
+    use rand::{seq::IndexedRandom, RngExt};
     use rstest::rstest;
+
     #[rstest]
     #[case::o(TetrominoKind::O, 0x20000000)]
     #[case::i(TetrominoKind::I, 0x40000000)]
@@ -68,11 +95,11 @@ mod tests {
     #[case::j(TetrominoKind::J, 0xa0000000)]
     #[case::s(TetrominoKind::S, 0xc0000000)]
     #[case::z(TetrominoKind::Z, 0xe0000000)]
-    fn mock_rng_next_is_correct_when_there_is_one_element(
+    fn choose_tetromino_using_one_tetromino_is_correct(
         #[case] kind: TetrominoKind,
         #[case] expected: u32,
     ) {
-        let mut mock = MockRng::only(kind);
+        let mut mock = MockRng::tetromino_cycle(&[kind]);
         assert_eq!(TetrominoKind::ALL.choose(&mut mock), Some(&kind));
         assert_eq!(mock.next(), expected);
     }
@@ -80,8 +107,8 @@ mod tests {
     #[rstest]
     #[case::tetromino_kind_all(Vec::from(TetrominoKind::ALL))]
     #[case::tetromino_kind_t_l_j(TetrominoKind::ALL[2..5].to_vec())]
-    fn mock_rng_next_is_correct(#[case] values: Vec<TetrominoKind>) {
-        let mut mock = MockRng::cycle(&values);
+    fn choose_tetromino_using_tetromino_cycle_is_correct(#[case] values: Vec<TetrominoKind>) {
+        let mut mock = MockRng::tetromino_cycle(&values);
 
         let generated_values = Vec::from_iter(
             std::iter::repeat_with(|| *TetrominoKind::ALL.choose(&mut mock).unwrap())
@@ -89,5 +116,24 @@ mod tests {
         );
 
         assert_eq!(generated_values, values);
+    }
+
+    #[rstest]
+    #[case(vec![0], 0..10)]
+    #[case(vec![9], 0..10)]
+    #[case(vec![10], 0..11)]
+    #[case(Vec::from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), 0..10)]
+    #[case(Vec::from([0, 1, 1, 1, 1, 1, 1, 2, 3, 3]), 0..4)]
+    fn random_garbage_using_garbage_cycle_is_correct(
+        #[case] garbage_gaps: Vec<u32>,
+        #[case] range: Range<u32>,
+    ) {
+        let mut mock = MockRng::garbage_cycle(&garbage_gaps, range.clone());
+
+        let generated_gaps = Vec::from_iter(
+            std::iter::repeat_with(|| mock.random_range(range.clone())).take(garbage_gaps.len()),
+        );
+
+        assert_eq!(generated_gaps, garbage_gaps);
     }
 }
