@@ -86,7 +86,7 @@ impl Tetromino {
     }
 
     /// Returns [GameOverError::BlockOut] if `self` is not valid in `grid`.
-    pub(crate) fn is_valid_in_grid(&mut self, grid: &TetrisGrid) -> TetrisResult {
+    pub(crate) fn is_valid_in_grid(&self, grid: &TetrisGrid) -> TetrisResult {
         if self
             .blocks
             .iter()

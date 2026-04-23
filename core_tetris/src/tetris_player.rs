@@ -273,9 +273,9 @@ impl TetrisPlayer {
 impl Display for TetrisPlayer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut grid = self.grid.clone();
-        let tetromino = self.tetromino_in_play.clone();
-
-        let _ = tetromino.lock_down(&mut grid);
+        for block in self.tetromino_in_play.blocks() {
+            grid[block] = Some(self.tetromino_in_play.color());
+        }
 
         write!(f, "{}", grid)
     }

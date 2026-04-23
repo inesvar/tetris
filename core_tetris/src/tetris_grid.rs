@@ -7,7 +7,7 @@ use super::Position;
 use rand::{Rng, RngExt};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
-use std::ops::Index;
+use std::ops::{Index, IndexMut};
 use std::str::FromStr;
 pub use tetris_color::TetrisColor;
 
@@ -119,22 +119,11 @@ impl TetrisGrid {
     /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
     pub(crate) fn apply_received_garbage<R: Rng>(
         &mut self,
-        completed_lines: u64,
+        nb_garbage_lines: u64,
         rng: &mut R,
     ) -> TetrisResult {
-        let lines_to_add = match completed_lines {
-            x if x < 2 => return Ok(()),
-            x if x < 4 => x - 1,
-            _ => completed_lines,
-        };
-        println!(
-            "the garbage creating function was called for {} lines, will add {}",
-            completed_lines, lines_to_add
-        );
-
-        let empty = rng.random_range(0..self.nb_columns);
-
-        for _ in 0..lines_to_add {
+        for _ in 0..nb_garbage_lines {
+            let empty = rng.random_range(0..self.nb_columns);
             self.add_garbage_row(empty as usize)?;
         }
         Ok(())
@@ -302,6 +291,13 @@ impl Index<&Position> for TetrisGrid {
     fn index(&self, block: &Position) -> &<Self as Index<&Position>>::Output {
         let line = self.convert_position_y_to_grid_y(block.y()) as usize;
         &self.cells[line][block.x() as usize]
+    }
+}
+
+impl IndexMut<&Position> for TetrisGrid {
+    fn index_mut(&mut self, block: &Position) -> &mut <Self as Index<&Position>>::Output {
+        let line = self.convert_position_y_to_grid_y(block.y()) as usize;
+        &mut self.cells[line][block.x() as usize]
     }
 }
 

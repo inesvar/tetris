@@ -41,15 +41,16 @@
 //! ```
 //! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s (or [TetrominoMove]s).
 //! ```
-//! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
+//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
 //! # let mut garbage_rng = MockRng::right_aligned_garbage();
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
-//! player.try_apply(TetrominoMove::Left.into(), &mut rng, &mut garbage_rng);
-//! player.try_apply(TetrominoMove::Clockwise.into(), &mut rng, &mut garbage_rng);
-//! player.try_apply(TetrominoMove::HardDrop.into(), &mut rng, &mut garbage_rng);
-//! player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng);
+//! player.try_apply(TetrominoMove::Left.into(), &mut rng, &mut garbage_rng)?;
+//! player.try_apply(TetrominoMove::Clockwise.into(), &mut rng, &mut garbage_rng)?;
+//! player.try_apply(TetrominoMove::HardDrop.into(), &mut rng, &mut garbage_rng)?;
+//! player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng)?;
+//! # Ok::<(), GameOverError>(())
 //! ```
 //!
 //! Let's look at the results of these commands by printing [TetrisPlayer] after each command.
@@ -57,7 +58,7 @@
 //! also stores the **Hold Queue**, the **Next Queue**, the score, etc.
 //!
 //! ```
-//! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
+//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
 //! # let mut garbage_rng = MockRng::right_aligned_garbage();
@@ -75,7 +76,7 @@
 //!         "         \n",
 //!         "---------\n",
 //!     ));
-//! player.try_apply(TetrominoMove::Left.into(), &mut rng, &mut garbage_rng);
+//! player.try_apply(TetrominoMove::Left.into(), &mut rng, &mut garbage_rng)?;
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "   T     \n",
@@ -89,7 +90,7 @@
 //!         "         \n",
 //!         "---------\n",
 //!     ));
-//! player.try_apply(TetrominoMove::Clockwise.into(), &mut rng, &mut garbage_rng);
+//! player.try_apply(TetrominoMove::Clockwise.into(), &mut rng, &mut garbage_rng)?;
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "   T     \n",
@@ -103,7 +104,7 @@
 //!         "         \n",
 //!         "---------\n",
 //!     ));
-//! player.try_apply(TetrominoMove::HardDrop.into(), &mut rng, &mut garbage_rng);
+//! player.try_apply(TetrominoMove::HardDrop.into(), &mut rng, &mut garbage_rng)?;
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    OO   \n",
@@ -117,13 +118,14 @@
 //!         "   T     \n",
 //!         "---------\n",
 //!     ));
+//! # Ok::<(), GameOverError>(())
 //! ```
 //! NB: [TetrominoMove::HardDrop] should be used to lock down the tetromino in play some time after it reaches the bottom.
 //! This crate doesn't know the time, so it doesn't know when it's the right time to do that.
 //! Likewise, this crate wouldn't know when to call [TetrominoMove::Fall] to make the active tetromino
 //! fall towards the bottom, it's the job of the tetris engine to regularly call [TetrominoMove::Fall].
 //! ```
-//! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
+//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
 //! # let mut garbage_rng = MockRng::right_aligned_garbage();
@@ -131,7 +133,7 @@
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng, &mut garbage_rng);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng, &mut garbage_rng);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng, &mut garbage_rng);
-//! player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng);
+//! player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng)?;
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    T    \n",
@@ -145,7 +147,7 @@
 //!         "   T     \n",
 //!         "---------\n",
 //!     ));
-//! player.push_garbage(2);
+//! player.push_garbage(1);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    T    \n",
@@ -159,11 +161,12 @@
 //!         "   T     \n",
 //!         "---------\n",
 //!     ));
+//! # Ok::<(), GameOverError>(())
 //! ```
 //! [TetrisPlayer::push_garbage] doesn't have an immediate result, garbage can only be added to the grid
 //! during the lock down stage. Let's trigger one to see what happens.
 //! ```
-//! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
+//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
 //! # let mut garbage_rng = MockRng::right_aligned_garbage();
@@ -172,8 +175,8 @@
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng, &mut garbage_rng);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng, &mut garbage_rng);
 //! # player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng);
-//! # player.push_garbage(2);
-//! player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng, &mut garbage_rng);
+//! # player.push_garbage(1);
+//! player.try_apply(TetrisCommand::Move(TetrominoMove::HardDrop), &mut rng, &mut garbage_rng)?;
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    OO   \n",
@@ -187,6 +190,7 @@
 //!         " XXXXXXXX\n", // garbage is right aligned as specified in `garbage_rng`
 //!         "---------\n",
 //!     ));
+//! # Ok::<(), GameOverError>(())
 //! ```
 
 mod circular_buffer;

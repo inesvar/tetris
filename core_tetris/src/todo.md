@@ -1,7 +1,7 @@
 ~~API TetrisPlayer should have 2 rngs, changeable anytime~~
 => the issue with this is that it makes everything generic (RenderTetrisCore) and muddies serialization
 
-1- BUG fix : TetrisPlayer should receive the number of garbage lines to add, not the number of completed lines !!
+1- BUG fix : TetrisPlayer should receive the number of garbage lines to add, not the number of completed lines !! *OK*
 Don't forget to update the doc.
 
 2- PERF try tweaking TetrisPlayer serialization so that the tetris grid isn't sent
