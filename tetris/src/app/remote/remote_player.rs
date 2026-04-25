@@ -1,4 +1,4 @@
-use super::MessageType;
+use super::InboundMessage;
 use crate::{
     app::{GameFlowChange, TetrisPlayer},
     once,
@@ -46,31 +46,31 @@ impl RemotePlayer {
             // for each incoming message
             for stream in listener.incoming() {
                 let stream = stream.unwrap();
-                let message = serde_cbor::from_reader::<MessageType, TcpStream>(stream).unwrap();
+                let message = serde_cbor::from_reader::<InboundMessage, TcpStream>(stream).unwrap();
                 once!("unwrapped from packet from remote");
                 match message {
-                    MessageType::TetrisPlayer(new_screen) => {
+                    InboundMessage::TetrisPlayer(new_screen) => {
                         self_for_listener.update_screen(new_screen)
                     }
-                    MessageType::Settings(new_settings) => {
+                    InboundMessage::Settings(new_settings) => {
                         self_for_listener.update_game_flow(GameFlowChange::Sync(new_settings));
                     }
-                    MessageType::GameOver => {
+                    InboundMessage::GameOver => {
                         self_for_listener.update_game_flow(GameFlowChange::GameOver);
                     }
-                    MessageType::Pause => {
+                    InboundMessage::Pause => {
                         self_for_listener.update_game_flow(GameFlowChange::Pause);
                     }
-                    MessageType::Restart => {
+                    InboundMessage::Restart => {
                         self_for_listener.update_game_flow(GameFlowChange::Restart);
                     }
-                    MessageType::Resume => {
+                    InboundMessage::Resume => {
                         self_for_listener.update_game_flow(GameFlowChange::Resume);
                     }
-                    MessageType::Hello(remote_ip) => {
+                    InboundMessage::Hello(remote_ip) => {
                         self_for_listener.update_game_flow(GameFlowChange::Hello(remote_ip));
                     }
-                    MessageType::Kill => {
+                    InboundMessage::Kill => {
                         break;
                     }
                 }

@@ -3,10 +3,8 @@ use super::{
     BagType, CircularBuffer, TetrisGrid, TetrisResult, Tetromino, TetrominoGenerator, TetrominoMove,
 };
 use rand::Rng;
-use serde::Deserialize;
-use std::{cell::RefCell, fmt::Display};
-
-mod custom_serialize_as_msg;
+use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 
 pub const NEXT_QUEUE_MAX_SIZE: usize = 6;
 
@@ -26,7 +24,7 @@ pub const NEXT_QUEUE_MAX_SIZE: usize = 6;
 /// to implement multi-player tetris games, however this is not very efficient because
 /// except the [TetrisPlayer::tetromino_in_play], most elements don't change between frames.
 ///
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct TetrisPlayer {
     /// Tetris grid.
     pub grid: TetrisGrid,
@@ -44,8 +42,6 @@ pub struct TetrisPlayer {
     pub new_completed_lines: u64,
     /// received_garbage_lines is set before the update and reset during the update.
     received_garbage_lines: u64,
-    /// Flag not to be modified except in Serialize. Set to true.
-    serialize_as_msg: RefCell<bool>,
 }
 
 /// All possible commands received by [TetrisPlayer].
@@ -144,7 +140,6 @@ impl TetrisPlayer {
             next_queue,
             tetromino_bag,
             received_garbage_lines: 0,
-            serialize_as_msg: true.into(),
         }
     }
 

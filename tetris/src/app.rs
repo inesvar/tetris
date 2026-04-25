@@ -7,7 +7,6 @@ mod update_app;
 use self::player::LocalPlayer;
 pub use self::player::TetrisPlayer;
 use self::remote::RemotePlayer;
-use crate::app::remote::MessageType;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
 use core_tetris::RunningState;
@@ -15,6 +14,7 @@ use local_ip_address::local_ip;
 use piston::MouseButton;
 use piston_window::Key;
 use rand::RngExt;
+pub(super) use remote::OutboundMessage;
 pub use render_app::RenderTetrisGame;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
 use std::net::TcpStream;
@@ -181,7 +181,7 @@ impl App {
             };
             //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
             if let Ok(stream) = TcpStream::connect(server) {
-                serde_cbor::to_writer::<TcpStream, MessageType>(stream, &MessageType::Kill)
+                serde_cbor::to_writer::<TcpStream, OutboundMessage>(stream, &OutboundMessage::Kill)
                     .unwrap();
             }
         }
@@ -432,11 +432,11 @@ impl App {
     fn pause(&mut self) {
         if self.running == RunningState::Paused {
             println!("RESUME");
-            self.send_message(MessageType::Resume);
+            self.send_message(OutboundMessage::Resume);
             self.running = RunningState::Running;
         } else if self.running == RunningState::Running {
             println!("PAUSE");
-            self.send_message(MessageType::Pause);
+            self.send_message(OutboundMessage::Pause);
             self.running = RunningState::Paused;
         }
     }
@@ -449,7 +449,7 @@ impl App {
             } => {
                 if self.is_synchronized {
                     println!("RESTART");
-                    self.send_message(MessageType::Restart);
+                    self.send_message(OutboundMessage::Restart);
                     self.running = RunningState::Starting;
                     self.clock = 0.0;
                 } else if self.is_host {
@@ -458,7 +458,7 @@ impl App {
                     self.settings_manager.seed = rng.random();
                     self.settings_manager.send();
                 } else {
-                    self.send_message(MessageType::Restart);
+                    self.send_message(OutboundMessage::Restart);
                 }
             }
             PlayerConfig::TwoLocal => {
@@ -495,20 +495,20 @@ impl App {
     /// Makes the game unactive.
     fn game_over(&mut self) {
         println!("GAMEOVER");
-        self.send_message(MessageType::GameOver);
+        self.send_message(OutboundMessage::GameOver);
         self.running = RunningState::NotRunning;
         self.is_synchronized = false;
     }
 
     /// Sends message to the remote if there's a remote.
-    fn send_message(&self, message: MessageType) {
+    fn send_message(&self, message: OutboundMessage) {
         if let PlayerConfig::TwoRemote {
             local_ip: _,
             remote_ip,
         } = &self.player_config
         {
             if let Ok(stream) = TcpStream::connect(remote_ip) {
-                serde_cbor::to_writer::<TcpStream, MessageType>(stream, &message).unwrap();
+                serde_cbor::to_writer::<TcpStream, OutboundMessage>(stream, &message).unwrap();
             }
         }
     }

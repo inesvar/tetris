@@ -1,7 +1,7 @@
 //! Define the update function of [App].
 //!
 //! [update()](App::update()) is called before each render when the game is active.
-use super::{remote::MessageType, App, PlayerConfig, RunningState, ViewState};
+use super::{remote::OutboundMessage, App, PlayerConfig, RunningState, ViewState};
 use crate::utils::formattings::format_seconds;
 use piston::UpdateArgs;
 use ui_tetris::interactive_widget_manager::ButtonType;
@@ -140,7 +140,7 @@ impl App {
                     remote_ip,
                 });
                 self.set_view(ViewState::Remote);
-                self.send_message(MessageType::Hello(local_ip));
+                self.send_message(OutboundMessage::Hello(local_ip));
                 self.local_players[0].send_serialized();
             }
             ButtonType::ToTwoLocalGame => {

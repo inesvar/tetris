@@ -1,6 +1,10 @@
 //! Define the general implementation of [LocalPlayer].
 use super::{input_commands::InputCommands, LocalPlayer, TetrisPlayer};
-use crate::{app::PlayerConfig, once, settings::BAG_TYPE};
+use crate::{
+    app::{remote::OutboundMessage, PlayerConfig},
+    once,
+    settings::BAG_TYPE,
+};
 use piston::Key;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
@@ -79,7 +83,11 @@ impl LocalPlayer {
     /// Sends the player screen to the remote player and resets the new_completed_lines attribute.
     pub(in crate::app) fn send_serialized(&mut self) {
         if let Ok(stream) = TcpStream::connect(&self.remote_ip) {
-            serde_cbor::to_writer::<TcpStream, TetrisPlayer>(stream, &self.player_screen).unwrap();
+            serde_cbor::to_writer::<TcpStream, OutboundMessage>(
+                stream,
+                &OutboundMessage::TetrisPlayer(&self.player_screen),
+            )
+            .unwrap();
         }
         once!("sent serialized data to the remote");
         // Set the number of completed lines to 0
