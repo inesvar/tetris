@@ -4,6 +4,8 @@
     but both should start when a new game is launched (countdown)
 - PERF use tokio to outsource tcp comms
 - FEAT today key inputs are sent to the tetris game and mouse inputs to the app... something more flexible would be great
+- BUG the tetrominos should not change the first time the game is started...
+- PERF share one TcpStream
 
 # new features
 - CHECK fix paths for Windows in assets.rs -> done, has to be checked
