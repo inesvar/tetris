@@ -1,4 +1,3 @@
-- CLEAN unwrap everywhere !
 - PERF instantiate the grid render: use the same texture for all colors ?
 - PERF add a bench for the grid render
 - USER assets load bug when too low in filesystem

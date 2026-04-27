@@ -3,7 +3,7 @@ use core_tetris::TetrisColor;
 use graphics::glyph_cache::rusttype::GlyphCache;
 use include_assets::NamedArchive;
 use opengl_graphics::*;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub struct Assets<'a> {
     pub cyan_texture: Texture,
@@ -20,20 +20,25 @@ pub struct Assets<'a> {
     pub main_font: GlyphCache<'a, (), Texture>,
 }
 
-const TEXTURE_FOLDER: &str = "assets/textures";
+const ASSETS_FOLDER: &str = "assets";
+const TEXTURES_FOLDER: &str = "textures";
 const TEXTURE_EXTENSION: &str = "bmp";
 
 fn get_texture(filename: &str) -> Texture {
-    let path = PathBuf::from(format!("{TEXTURE_FOLDER}/{filename}.{TEXTURE_EXTENSION}"));
+    let mut path: PathBuf = [ASSETS_FOLDER, TEXTURES_FOLDER].iter().collect();
+    path.push(format!("{filename}.{TEXTURE_EXTENSION}"));
 
-    Texture::from_path(&path, &TextureSettings::new()).unwrap()
+    Texture::from_path(&path, &TextureSettings::new())
+        .expect("Provided path should contain texture")
 }
 
-fn get_font<'a>(archive: &'a NamedArchive, path: &str) -> GlyphCache<'a, (), Texture> {
-    let path = PathBuf::from(path);
-    let tetris_font_bytes = archive.get(&path.to_string_lossy()).unwrap();
+fn get_font<'a>(archive: &'a NamedArchive, path: &Path) -> GlyphCache<'a, (), Texture> {
+    let tetris_font_bytes = archive
+        .get(&path.to_string_lossy())
+        .expect("Path should contain archive");
 
-    GlyphCache::from_bytes(tetris_font_bytes, (), TextureSettings::new()).unwrap()
+    GlyphCache::from_bytes(tetris_font_bytes, (), TextureSettings::new())
+        .expect("Bytes should contain valid font")
 }
 
 impl<'a> Assets<'a> {
@@ -48,8 +53,13 @@ impl<'a> Assets<'a> {
         let grey_texture = get_texture(TetrisColor::Grey.get_texture_filename());
         let sprite_sheet_texture = get_texture("sprite_sheet");
 
-        let tetris_font = get_font(assets, "fonts/tetris-blocks-font/TetrisBlocks-P99g.ttf");
-        let main_font = get_font(assets, "fonts/digitalt/Digitalt.otf");
+        let tetris_font_path: PathBuf = ["fonts", "tetris-blocks-font", "TetrisBlocks-P99g.ttf"]
+            .iter()
+            .collect();
+        let tetris_font = get_font(assets, &tetris_font_path);
+
+        let main_font_path: PathBuf = ["fonts", "digitalt", "Digitalt.otf"].iter().collect();
+        let main_font = get_font(assets, &main_font_path);
 
         Assets {
             cyan_texture,
