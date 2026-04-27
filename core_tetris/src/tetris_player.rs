@@ -27,6 +27,7 @@ pub const NEXT_QUEUE_MAX_SIZE: usize = 6;
 #[derive(Serialize, Deserialize)]
 pub struct TetrisPlayer {
     /// Tetris grid.
+    #[serde(skip)]
     pub grid: TetrisGrid,
     /// Currently falling tetromino.
     pub tetromino_in_play: Tetromino,

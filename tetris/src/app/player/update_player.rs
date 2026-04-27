@@ -36,7 +36,7 @@ impl LocalPlayer {
         self.keyboard.update();
 
         if self.sender {
-            // self.send_serialized();
+            self.send_serialized();
         }
 
         Ok(())
