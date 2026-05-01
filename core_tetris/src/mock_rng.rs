@@ -11,6 +11,7 @@ use std::{convert::Infallible, ops::Range};
 /// (more precisely, the gap in the garbage lines).
 pub struct MockRng(CircularBuffer<u32>);
 
+#[allow(missing_docs)] // TODO fix this !
 impl MockRng {
     pub fn tetromino_cycle(array: &[TetrominoKind]) -> Self {
         let mut indices = Vec::new();

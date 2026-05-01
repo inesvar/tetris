@@ -5,6 +5,7 @@ use super::{Position, RotationType};
 
 /// All possible [Tetromino](super::Tetromino) movements in the [TetrisGrid](super::TetrisGrid).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[allow(missing_docs)]
 pub enum TetrominoMove {
     Right,
     Left,

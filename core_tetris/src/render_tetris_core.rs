@@ -1,6 +1,7 @@
 use super::{Position, TetrisColor, TetrisGrid, TetrisPlayer, Tetromino};
 
 /// State of the game.
+#[allow(missing_docs)]
 #[derive(PartialEq, Clone, Copy)]
 pub enum RunningState {
     Running,
@@ -18,6 +19,7 @@ pub enum RunningState {
 ///
 /// In order to display the [TetrisPlayer::score], you might want to implement
 /// a `render_text` method.
+#[allow(missing_docs)]
 pub trait RenderTetrisCore {
     fn display_player(&mut self, player: &TetrisPlayer, state: RunningState) {
         self.display_tetris_grid(player, state);

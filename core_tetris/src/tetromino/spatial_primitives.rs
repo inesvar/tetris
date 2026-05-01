@@ -31,6 +31,7 @@ pub(super) enum Direction {
     West,
 }
 
+#[allow(missing_docs)] // TODO fix this !
 impl Position {
     pub const fn new(x: i32, y: i32) -> Self {
         Self { x, y }
@@ -65,6 +66,7 @@ impl Position {
 }
 
 /// Getters.
+#[allow(missing_docs)]
 impl Position {
     pub fn x(&self) -> i32 {
         self.x

@@ -1,3 +1,5 @@
+#![deny(missing_docs)]
+
 //! This library crate provides core functionality for the tetris game.
 //! It aims to follow the [2009 Tetris Guideline](<https://ia800405.us.archive.org/12/items/2009-tetris-variant-concepts_202201/2009%20Tetris%20Design%20Guideline.pdf>)
 //! as closely as possible.

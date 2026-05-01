@@ -63,6 +63,7 @@ impl<T: Debug> CircularBuffer<T> {
         }
     }
 
+    /// Get the buffer size.
     pub fn size(&self) -> usize {
         self.vec.len()
     }

@@ -67,12 +67,19 @@ impl TetrisPlayer {
         self.score
     }
 
+    #[allow(missing_docs)]
     pub fn new_completed_lines(&self) -> u64 {
         self.new_completed_lines
     }
-
+    
+    #[allow(missing_docs)]
     pub fn new_completed_lines_mut(&mut self) -> &mut u64 {
         &mut self.new_completed_lines
+    }
+
+    /// Bag type.
+    pub fn bag_type(&self) -> BagType {
+        self.tetromino_bag.bag_type()
     }
 }
 
@@ -124,10 +131,6 @@ impl TetrisPlayer {
 }
 
 impl TetrisPlayer {
-    pub fn bag_type(&self) -> BagType {
-        self.tetromino_bag.bag_type()
-    }
-
     /// Tries to apply [TetrisCommand], returns [TetrisResult] if the situation is a losing one.
     ///
     /// Refer to [TetrisCommand] documentation for more detail.
@@ -151,6 +154,7 @@ impl TetrisPlayer {
         }
     }
 
+    /// Tries to apply [TetrominoMove::Fall], returns whether the **Tetromino in Play** could be moved down.
     pub fn try_fall(&mut self) -> bool {
         self.tetromino_in_play
             .try_apply(TetrominoMove::Fall, &self.grid)

@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// Lists the 7 types of [Tetromino](super::Tetromino)s.
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
+#[allow(missing_docs)]
 pub enum TetrominoKind {
     O,
     I,
@@ -15,6 +16,7 @@ pub enum TetrominoKind {
 }
 
 impl TetrominoKind {
+    #[allow(missing_docs)]
     pub const ALL: [Self; 7] = [
         Self::O,
         Self::I,

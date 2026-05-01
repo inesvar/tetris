@@ -12,6 +12,7 @@ use std::str::FromStr;
 pub use tetris_color::TetrisColor;
 
 // TODO: fix UI when the value is different from 2.
+/// Number of visible lines above the **Skyline**.
 pub const NB_VISIBLE_BUFFER_ROWS: u32 = 2;
 
 /// Tetris grid.
@@ -59,6 +60,7 @@ pub enum GameOverError {
 }
 
 /// Constructors.
+#[allow(missing_docs)]
 impl TetrisGrid {
     /// Creates an empty grid of the specified size. Use [TetrisGrid::default] for **Tetris Guideline** official size.
     ///
@@ -279,6 +281,7 @@ impl TetrisGrid {
 }
 
 /// Getters.
+#[allow(missing_docs)]
 impl TetrisGrid {
     pub const fn nb_matrix_rows_i32(&self) -> i32 {
         self.nb_matrix_rows

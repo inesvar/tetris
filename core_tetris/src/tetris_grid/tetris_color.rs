@@ -4,6 +4,7 @@ use std::fmt;
 
 /// 7 Tetromino colors and 1 garbage color.
 #[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[allow(missing_docs)]
 pub enum TetrisColor {
     Cyan,
     Yellow,
@@ -52,6 +53,7 @@ impl TryFrom<char> for TetrisColor {
 }
 
 impl TetrisColor {
+    /// Get associated texture filename.
     pub fn get_texture_filename(&self) -> &str {
         match self {
             Self::Cyan => "cyan",
