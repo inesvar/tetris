@@ -20,8 +20,8 @@ pub const NB_VISIBLE_BUFFER_ROWS: u32 = 2;
 /// According to the **Tetris Guideline**, the grid has 2 components:
 /// - **Matrix**: "the rectangular arrangement of cells creating the active game area, usually 10 columns wide by 20 rows high.
 ///   Tetriminos fall from the top-middle just above the **Skyline** (off-screen) to the bottom."
-/// - **Buffer Zone**: "a 10-cell wide x 20-cell high invisible area above the Matrix used to detect Lock
-///   Out, Block Out, and Top Out **Game Over Conditions**."
+/// - **Buffer Zone**: "a 10-cell wide x 20-cell high invisible area above the Matrix used to detect **Lock
+///   Out**, **Block Out**, and **Top Out** **Game Over Conditions**."
 #[derive(Clone, PartialEq, Serialize, Deserialize)]
 pub struct TetrisGrid {
     nb_columns: i32,
@@ -52,9 +52,9 @@ pub enum GameOverError {
     LockOut,
     /// According to the **Tetris Guideline** :
     ///
-    /// "[...] occurs when an opponent’s Line Attack forces your Blocks past the top
+    /// "[...] occurs when an opponent’s **Line Attack** forces your Blocks past the top
     /// of the 20-line **Buffer zone**. It is highly unlikely that this will ever occur,
-    /// since Lock out [...] or Block out [...] will likely occur before a Block ever
+    /// since **Lock out** [...] or **Block out** [...] will likely occur before a Block ever
     /// gets pushed out of the **Buffer zone**."
     TopOut,
 }
@@ -156,127 +156,133 @@ impl TetrisGrid {
 }
 
 /// Methods used  by [Tetromino](super::tetromino::Tetromino) to enter, move and then lock down in the grid.
-#[doc = simple_mermaid::mermaid!("tetris_grid_internals.mmd")]
 impl TetrisGrid {
     /// Return the translation needed for `blocks` to enter the grid.
-    pub fn get_starting_position(&self) -> Position {
+    pub(crate) fn get_starting_position(&self) -> Position {
         Position::new((self.nb_columns + 1) / 2 - 2, 0)
     }
+}
 
-    /// Return true if the `block` is inside the grid in an empty slot.
-    pub(super) fn is_block_available(&self, block: &Position) -> bool {
-        self.is_in_grid(block) && self.is_block_empty(block)
-    }
+#[doc = simple_mermaid::mermaid!("tetris_grid_internals.mmd")]
+mod tetris_grid_internals {
+    use super::*;
 
-    /// Push the blocks into the grid and return the number of lines completed.
-    ///
-    /// # Panics
-    ///
-    /// If any of the `blocks` is outside the tetris grid or not empty.
-    pub(super) fn add_blocks_and_clear_lines(
-        &mut self,
-        blocks: &[Position],
-        tetris_color: TetrisColor,
-    ) -> Result<u64, GameOverError> {
-        let all_above_skyline = blocks.iter().all(|block| self.is_above_skyline(block));
-
-        for block in blocks {
-            self.add_block(block, tetris_color);
+    impl TetrisGrid {
+        /// Return true if the `block` is inside the grid in an empty slot.
+        pub(crate) fn is_block_available(&self, block: &Position) -> bool {
+            self.is_in_grid(block) && self.is_block_empty(block)
         }
 
-        // Only continue playing if there's a block below the skyline
-        if all_above_skyline {
-            return Err(GameOverError::LockOut);
-        }
+        /// Push the blocks into the grid and return the number of lines completed.
+        ///
+        /// # Panics
+        ///
+        /// If any of the `blocks` is outside the tetris grid or not empty.
+        pub(crate) fn add_blocks_and_clear_lines(
+            &mut self,
+            blocks: &[Position],
+            tetris_color: TetrisColor,
+        ) -> Result<u64, GameOverError> {
+            let all_above_skyline = blocks.iter().all(|block| self.is_above_skyline(block));
 
-        Ok(self.clear_lines())
-    }
-
-    /// Return whether `block` is available in the tetris grid.
-    ///
-    /// # Panics
-    ///
-    /// If `block` is outside the tetris grid.
-    fn is_block_empty(&self, block: &Position) -> bool {
-        self[block].is_none()
-    }
-
-    /// Return `true` is `block` is in the **Matrix** or the **Buffer Zone**.
-    fn is_in_grid(&self, block: &Position) -> bool {
-        let line = self.convert_position_y_to_grid_y(block.y());
-        block.x() >= 0
-            && line >= 0
-            && block.x() < self.nb_columns
-            && line < self.nb_matrix_rows + self.nb_buffer_rows
-    }
-
-    /// Remove complete lines, return number of cleared lines.
-    fn clear_lines(&mut self) -> u64 {
-        let mut score = 0;
-        for y in (0..self.nb_rows_usize()).rev() {
-            if self.line_sum[y] == self.nb_columns {
-                self.pop_row(y);
-                score += 1;
+            for block in blocks {
+                self.add_block(block, tetris_color);
             }
+
+            // Only continue playing if there's a block below the skyline
+            if all_above_skyline {
+                return Err(GameOverError::LockOut);
+            }
+
+            Ok(self.clear_lines())
         }
-        score
-    }
 
-    /// Remove `row` from the tetris grid (and add a new empty row at the top).
-    ///
-    /// # Panics
-    ///
-    /// If `row` is greater or equal to `self.cells.len()`.
-    fn pop_row(&mut self, row: usize) {
-        self.cells.remove(row);
-        self.line_sum.remove(row);
-
-        self.cells.insert(
-            self.nb_rows_usize() - 1,
-            vec![None; self.nb_columns as usize],
-        );
-        self.line_sum.insert(self.nb_rows_usize() - 1, 0);
-    }
-
-    /// Add garbage row to the tetris grid (only if the top row is empty).
-    ///
-    /// # Panics
-    ///
-    /// If `empty` is greater or equal to `self.nb_columns`, or `self.line_sum` is empty.
-    fn add_garbage_row(&mut self, empty: usize) -> TetrisResult {
-        if *self.line_sum.last().unwrap() > 0 {
-            return Err(GameOverError::TopOut);
+        /// Return whether `block` is available in the tetris grid.
+        ///
+        /// # Panics
+        ///
+        /// If `block` is outside the tetris grid.
+        pub(super) fn is_block_empty(&self, block: &Position) -> bool {
+            self[block].is_none()
         }
-        self.line_sum.insert(0, self.nb_columns - 1);
-        self.cells
-            .insert(0, vec![Some(TetrisColor::Grey); self.nb_columns as usize]);
-        self.cells[0][empty] = None;
 
-        self.line_sum.remove(self.nb_rows_usize());
-        self.cells.remove(self.nb_rows_usize());
-        Ok(())
-    }
-
-    /// Add `block` to the tetris grid.
-    ///
-    /// # Panics
-    ///
-    /// If `block` is outside the tetris grid or not empty.
-    fn add_block(&mut self, block: &Position, tetris_color: TetrisColor) {
-        if !self.is_block_empty(block) {
-            panic!("Tried adding a block to a non-empty cell")
+        /// Return `true` is `block` is in the **Matrix** or the **Buffer Zone**.
+        pub(super) fn is_in_grid(&self, block: &Position) -> bool {
+            let line = self.convert_position_y_to_grid_y(block.y());
+            block.x() >= 0
+                && line >= 0
+                && block.x() < self.nb_columns
+                && line < self.nb_matrix_rows + self.nb_buffer_rows
         }
-        let line = self.convert_position_y_to_grid_y(block.y()) as usize;
-        self.cells[line][block.x() as usize] = Some(tetris_color);
-        self.line_sum[line] += 1;
-    }
 
-    fn is_above_skyline(&self, block: &Position) -> bool {
-        self.convert_position_y_to_grid_y(block.y()) >= self.nb_matrix_rows
-    }
+        /// Remove complete lines, return number of cleared lines.
+        fn clear_lines(&mut self) -> u64 {
+            let mut score = 0;
+            for y in (0..self.nb_rows_usize()).rev() {
+                if self.line_sum[y] == self.nb_columns {
+                    self.pop_row(y);
+                    score += 1;
+                }
+            }
+            score
+        }
 
-    const fn nb_rows_usize(&self) -> usize {
-        (self.nb_matrix_rows + self.nb_buffer_rows) as usize
+        /// Remove `row` from the tetris grid (and add a new empty row at the top).
+        ///
+        /// # Panics
+        ///
+        /// If `row` is greater or equal to `self.cells.len()`.
+        pub(super) fn pop_row(&mut self, row: usize) {
+            self.cells.remove(row);
+            self.line_sum.remove(row);
+
+            self.cells.insert(
+                self.nb_rows_usize() - 1,
+                vec![None; self.nb_columns as usize],
+            );
+            self.line_sum.insert(self.nb_rows_usize() - 1, 0);
+        }
+
+        /// Add garbage row to the tetris grid (only if the top row is empty).
+        ///
+        /// # Panics
+        ///
+        /// If `empty` is greater or equal to `self.nb_columns`, or `self.line_sum` is empty.
+        pub(super) fn add_garbage_row(&mut self, empty: usize) -> TetrisResult {
+            if *self.line_sum.last().unwrap() > 0 {
+                return Err(GameOverError::TopOut);
+            }
+            self.line_sum.insert(0, self.nb_columns - 1);
+            self.cells
+                .insert(0, vec![Some(TetrisColor::Grey); self.nb_columns as usize]);
+            self.cells[0][empty] = None;
+
+            self.line_sum.remove(self.nb_rows_usize());
+            self.cells.remove(self.nb_rows_usize());
+            Ok(())
+        }
+
+        /// Add `block` to the tetris grid.
+        ///
+        /// # Panics
+        ///
+        /// If `block` is outside the tetris grid or not empty.
+        pub(super) fn add_block(&mut self, block: &Position, tetris_color: TetrisColor) {
+            if !self.is_block_empty(block) {
+                panic!("Tried adding a block to a non-empty cell")
+            }
+            let line = self.convert_position_y_to_grid_y(block.y()) as usize;
+            self.cells[line][block.x() as usize] = Some(tetris_color);
+            self.line_sum[line] += 1;
+        }
+
+        fn is_above_skyline(&self, block: &Position) -> bool {
+            self.convert_position_y_to_grid_y(block.y()) >= self.nb_matrix_rows
+        }
+
+        const fn nb_rows_usize(&self) -> usize {
+            (self.nb_matrix_rows + self.nb_buffer_rows) as usize
+        }
     }
 }
 

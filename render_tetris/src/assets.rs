@@ -43,14 +43,14 @@ fn get_font<'a>(archive: &'a NamedArchive, path: &Path) -> GlyphCache<'a, (), Te
 
 impl<'a> Assets<'a> {
     pub fn new(assets: &'a NamedArchive) -> Self {
-        let cyan_texture = get_texture(TetrisColor::Cyan.get_texture_filename());
-        let yellow_texture = get_texture(TetrisColor::Yellow.get_texture_filename());
-        let purple_texture = get_texture(TetrisColor::Purple.get_texture_filename());
-        let blue_texture = get_texture(TetrisColor::Blue.get_texture_filename());
-        let orange_texture = get_texture(TetrisColor::Orange.get_texture_filename());
-        let green_texture = get_texture(TetrisColor::Green.get_texture_filename());
-        let red_texture = get_texture(TetrisColor::Red.get_texture_filename());
-        let grey_texture = get_texture(TetrisColor::Grey.get_texture_filename());
+        let cyan_texture = get_texture(TetrisColor::Cyan.get_lowercase_name());
+        let yellow_texture = get_texture(TetrisColor::Yellow.get_lowercase_name());
+        let purple_texture = get_texture(TetrisColor::Purple.get_lowercase_name());
+        let blue_texture = get_texture(TetrisColor::Blue.get_lowercase_name());
+        let orange_texture = get_texture(TetrisColor::Orange.get_lowercase_name());
+        let green_texture = get_texture(TetrisColor::Green.get_lowercase_name());
+        let red_texture = get_texture(TetrisColor::Red.get_lowercase_name());
+        let grey_texture = get_texture(TetrisColor::Grey.get_lowercase_name());
         let sprite_sheet_texture = get_texture("sprite_sheet");
 
         let tetris_font_path: PathBuf = ["fonts", "tetris-blocks-font", "TetrisBlocks-P99g.ttf"]

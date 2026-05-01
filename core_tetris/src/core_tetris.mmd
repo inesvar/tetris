@@ -11,18 +11,18 @@ graph LR
     MockRng[[MockRng]]
     TetrisCommand[TetrisCommand]
     TetrominoKind[TetrominoKind]
-    RenderTetrisCore([RenderTetrisCore])
+    RenderTetrisPlayer([RenderTetrisPlayer])
     CircularBuffer[[CircularBuffer]]
 
     TetrisCommand --o TetrominoMove
-    RenderTetrisCore -.-> CircularBuffer
+    RenderTetrisPlayer -.-> CircularBuffer
 
     TetrisPlayer
     MockRng
-    RenderTetrisCore
+    RenderTetrisPlayer
 
     TetrisPlayer --o Tetromino
-    RenderTetrisCore -.-> Tetromino
+    RenderTetrisPlayer -.-> Tetromino
 
     subgraph tetromino[" "]
         Tetromino --o Position
@@ -37,7 +37,7 @@ graph LR
         TetrisGrid -.-> GameOverError
     end
 
-    RenderTetrisCore -.-> TetrisGrid
+    RenderTetrisPlayer -.-> TetrisGrid
     TetrisPlayer --o TetrisGrid
     TetrisPlayer --o BagType
 

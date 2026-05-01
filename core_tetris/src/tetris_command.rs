@@ -3,10 +3,10 @@ use super::TetrominoMove;
 /// Commands received by [TetrisPlayer](super::TetrisPlayer).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum TetrisCommand {
-    /// Move the tetromino in play.
+    /// Move the **Tetromino in Play**.
     Move(TetrominoMove),
-    /// Put the tetromino in play in the **Hold Queue**
-    /// (a new tetromino in play will automatically be moved to its starting position).
+    /// Put the **Tetromino in Play** in the **Hold Queue**
+    /// (a new tetromino will automatically be moved to its starting position).
     Hold,
 }
 

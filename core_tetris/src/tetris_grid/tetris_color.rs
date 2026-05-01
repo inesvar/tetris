@@ -2,7 +2,7 @@ use crate::TetrominoKind;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-/// 7 Tetromino colors and 1 garbage color.
+/// 7 [Tetromino](crate::Tetromino) colors and 1 garbage color.
 #[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[allow(missing_docs)]
 pub enum TetrisColor {
@@ -53,8 +53,8 @@ impl TryFrom<char> for TetrisColor {
 }
 
 impl TetrisColor {
-    /// Get associated texture filename.
-    pub fn get_texture_filename(&self) -> &str {
+    /// Get lowercase name.
+    pub fn get_lowercase_name(&self) -> &str {
         match self {
             Self::Cyan => "cyan",
             Self::Yellow => "yellow",

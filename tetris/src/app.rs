@@ -9,7 +9,7 @@ pub use self::player::TetrisPlayer;
 use self::remote::RemotePlayer;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
-use core_tetris::RunningState;
+use core_tetris::render::RunningState;
 use local_ip_address::local_ip;
 use piston::MouseButton;
 use piston_window::Key;

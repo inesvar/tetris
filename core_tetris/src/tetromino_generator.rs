@@ -14,7 +14,7 @@ pub struct TetrominoGenerator {
     bag_type: BagType,
 }
 
-/// Type of tetromino bag.
+/// Types of [Tetromino] bag.
 ///
 /// Using a shuffled bag instead of choosing each tetromino randomly
 /// helps prevent tetromino repetition.

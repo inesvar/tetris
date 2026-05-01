@@ -7,7 +7,7 @@
 //! # Scope
 //!
 //! This crate provides pure logic (no OS interaction), it's meant to be used by a tetris engine that will handle:
-//! - rendering (this crate provides the [RenderTetrisCore] trait)
+//! - rendering (this crate provides the [render::RenderTetrisPlayer] trait)
 //! - player input management (this crate expects [TetrisCommand]s as input)
 //! - time management (this crate doesn't know the time)
 //! - random generation (this crates only uses [MockRng] for testing and doc purposes)
@@ -26,14 +26,6 @@
 //! - support for sending/receiving garbage
 //! - all 3 game over conditions are supported (see [GameOverError])
 //! - customization of the tetris grid size, of the tetromino bags
-//!
-//! # Structure
-//!
-//! This crate provides `struct` [TetrisPlayer] and `enum` [TetrisCommand], which can be used
-//! to represent the state of a tetris player and its changes. It also provides `struct` [MockRng] to
-//! mock the random generation, and `trait` [RenderTetrisCore] to render a [TetrisPlayer].
-//!
-#![doc = simple_mermaid::mermaid!("core_tetris.mmd")]
 //!
 //! # Examples
 //!
@@ -185,10 +177,17 @@
 //!     ));
 //! # Ok::<(), GameOverError>(())
 //! ```
+//! # Structure
+//!
+//! This crate provides `struct` [TetrisPlayer] and `enum` [TetrisCommand], which can be used
+//! to represent the state of a tetris player and its changes. It also provides `struct` [MockRng] to
+//! mock the random generation, and `trait` [render::RenderTetrisPlayer] to render a [TetrisPlayer].
+//!
+#![doc = simple_mermaid::mermaid!("core_tetris.mmd")]
 
 mod circular_buffer;
 mod mock_rng;
-mod render_tetris_core;
+pub mod render;
 mod tetris_command;
 mod tetris_grid;
 mod tetris_player;
@@ -204,7 +203,6 @@ pub use tetromino::TetrominoMove;
 // used to render the TetrisPlayer
 pub use circular_buffer::CircularBuffer;
 pub use mock_rng::MockRng;
-pub use render_tetris_core::{RenderTetrisCore, RunningState};
 pub use tetris_grid::{TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS};
 pub use tetris_player::TetrisPlayer;
 pub use tetromino::{Position, Tetromino, TetrominoKind};

@@ -1,6 +1,10 @@
+//! Defines `trait` [RenderTetrisPlayer] and `enum` [RunningState].
+
 use super::{Position, TetrisColor, TetrisGrid, TetrisPlayer, Tetromino};
 
 /// State of the game.
+///
+/// Can be used to customize [TetrisPlayer] rendering through [RenderTetrisPlayer] functions.
 #[allow(missing_docs)]
 #[derive(PartialEq, Clone, Copy)]
 pub enum RunningState {
@@ -20,7 +24,7 @@ pub enum RunningState {
 /// In order to display the [TetrisPlayer::score], you might want to implement
 /// a `render_text` method.
 #[allow(missing_docs)]
-pub trait RenderTetrisCore {
+pub trait RenderTetrisPlayer {
     fn display_player(&mut self, player: &TetrisPlayer, state: RunningState) {
         self.display_tetris_grid(player, state);
         self.display_tetromino_in_play(player, state);

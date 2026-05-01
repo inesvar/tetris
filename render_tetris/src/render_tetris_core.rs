@@ -1,17 +1,17 @@
-//! Implement `trait` [RenderTetrisCore] for [Piston2dOpenGlRenderer].
+//! Implement `trait` [RenderTetrisPlayer] for [Piston2dOpenGlRenderer].
 use super::Piston2dOpenGlRenderer;
 use super::{
     BLOCK_SIZE, DEFAULT_GRID_X, DEFAULT_GRID_Y, GRID_BG_COLOR, GRID_COLOR, GRID_THICKNESS,
     TETROMINO_MAX_HEIGHT, TETROMINO_MAX_WIDTH,
 };
 use core_tetris::{
-    Position, RenderTetrisCore, RunningState, TetrisColor, TetrisGrid, TetrisPlayer,
-    NB_VISIBLE_BUFFER_ROWS,
+    render::{RenderTetrisPlayer, RunningState},
+    Position, TetrisColor, TetrisGrid, TetrisPlayer, NB_VISIBLE_BUFFER_ROWS,
 };
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
 
-impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
+impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
     fn display_player(&mut self, player: &TetrisPlayer, state: RunningState) {
         let old_transform = self.transform;
         let grid_transform = self.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);

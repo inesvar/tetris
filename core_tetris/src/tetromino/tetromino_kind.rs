@@ -2,7 +2,7 @@
 use super::{Direction, Position, RotationType};
 use serde::{Deserialize, Serialize};
 
-/// Lists the 7 types of [Tetromino](super::Tetromino)s.
+/// 7 types of [Tetromino](super::Tetromino)s.
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
 #[allow(missing_docs)]
 pub enum TetrominoKind {
@@ -16,7 +16,7 @@ pub enum TetrominoKind {
 }
 
 impl TetrominoKind {
-    #[allow(missing_docs)]
+    /// All [TetrominoKind]s.
     pub const ALL: [Self; 7] = [
         Self::O,
         Self::I,

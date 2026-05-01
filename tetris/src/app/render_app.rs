@@ -4,14 +4,14 @@ use crate::app::player::LocalPlayer;
 use crate::app::remote::RemotePlayer;
 use crate::once;
 use crate::settings::{BG_COLOR, DEFAULT_SCORE_TEXT_Y};
-use core_tetris::RenderTetrisCore;
+use core_tetris::render::RenderTetrisPlayer;
 use graphics::Transformed;
 use piston::RenderArgs;
 use render_tetris::Piston2dOpenGlRenderer;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
 use ui_tetris::{RenderTetrisUi, Text, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, SILVER};
 
-pub trait RenderTetrisGame: RenderTetrisCore + RenderTetrisUi {
+pub trait RenderTetrisGame: RenderTetrisPlayer + RenderTetrisUi {
     type RenderArgs;
     fn render_app(&mut self, render_args: &RenderArgs, app: &App);
     fn render_local_player(&mut self, local_player: &LocalPlayer, state: RunningState);

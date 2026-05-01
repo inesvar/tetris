@@ -110,7 +110,7 @@ impl Tetromino {
     /// Adds `self`'s blocks to [TetrisGrid] `grid`. If these blocks are all above the **Skyline**, returns [GameOverError::LockOut],
     /// otherwise returns the number of cleared lines.
     ///
-    /// Note that `self` is assumed to be on free blocks of `grid`, ie [try_enter_grid](Tetromino::try_enter_grid) was called successfully
+    /// Note that `self` is assumed to be on free blocks of `grid`, ie [is_valid_in_grid](Tetromino::is_valid_in_grid) was called successfully
     /// and since then, only `self` was only mutated by [try_apply](Tetromino::try_apply) (see state machine schematic).
     pub(crate) fn lock_down(self, grid: &mut TetrisGrid) -> Result<u64, GameOverError> {
         grid.add_blocks_and_clear_lines(&self.blocks, self.color())
@@ -392,7 +392,7 @@ mod tests {
     // should check that occupancy is taken into account
     // easier in an integration test
     #[rstest]
-    fn try_enter_grid_is_correct() {
+    fn enter_grid_and_check_is_correct() {
         let mut tetromino = Tetromino::new(TetrominoKind::O);
 
         let mut full_grid = TetrisGrid::default();
