@@ -23,8 +23,6 @@ pub const NEXT_QUEUE_MAX_SIZE: usize = 6;
 /// - **Hold Queue**: "allows the player to “hold” a falling tetrimino for as long as they wish.",
 ///   see [TetrisPlayer::hold_queue]
 ///
-///
-///
 /// [TetrisPlayer] is serializable and can be sent through the network
 /// to implement multi-player tetris games. Note that this is not very efficient because
 /// except the **Tetromino in Play**, most elements don't change between frames.
@@ -81,53 +79,36 @@ impl TetrisPlayer {
 /// Constructors.
 impl TetrisPlayer {
     /// Creates a [TetrisPlayer]:
-    /// - using `rng` and `bag_type` to generate the first tetrominos;
-    /// - using [TetrisGrid::DEFAULT_NB_COLUMNS], [TetrisGrid::DEFAULT_NB_MATRIX_ROWS]
-    ///   and [TetrisGrid::DEFAULT_NB_BUFFER_ROWS] for the **Matrix** size.
+    /// - generating the first tetrominos using `rng` and `bag_type`;
+    /// - creating a new **Matrix** using [TetrisGrid::default].
     pub fn default<R: Rng>(rng: &mut R, bag_type: BagType) -> Self {
-        TetrisPlayer::new(
-            rng,
-            bag_type,
-            TetrisGrid::DEFAULT_NB_COLUMNS,
-            TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
-            TetrisGrid::DEFAULT_NB_BUFFER_ROWS,
-        )
+        TetrisPlayer::from_matrix(rng, bag_type, TetrisGrid::default())
     }
 
     /// Creates a [TetrisPlayer]:
-    /// - using `rng` and `bag_type` to generate the first tetrominos;
-    /// - using [TetrisGrid::COMPACT_NB_COLUMNS], [TetrisGrid::COMPACT_NB_MATRIX_ROWS]
-    ///   and [TetrisGrid::COMPACT_NB_BUFFER_ROWS] for the **Matrix** size.
+    /// - generating the first tetrominos using `rng` and `bag_type`;
+    /// - creating a new **Matrix** using [TetrisGrid::compact_new].
     pub fn compact<R: Rng>(rng: &mut R, bag_type: BagType) -> Self {
-        TetrisPlayer::new(
-            rng,
-            bag_type,
-            TetrisGrid::COMPACT_NB_COLUMNS,
-            TetrisGrid::COMPACT_NB_MATRIX_ROWS,
-            TetrisGrid::COMPACT_NB_BUFFER_ROWS,
-        )
+        TetrisPlayer::from_matrix(rng, bag_type, TetrisGrid::compact_new())
     }
 
     /// Creates a [TetrisPlayer]:
-    /// - using `rng` and `bag_type` to generate the first tetrominos;
-    /// - using `nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` for the **Matrix** size.
+    /// - generating the first tetrominos using `rng` and `bag_type`;
+    /// - using `matrix` as the **Matrix** (`matrix` doesn't have to be empty).
     ///
     /// # Panics
     ///
-    /// If `nb_columns` or `nb_matrix_rows` or `nb_buffer_rows` aren't in the expected range (see [TetrisGrid::new]).
-    pub fn new<R: Rng>(
-        rng: &mut R,
-        bag_type: BagType,
-        nb_columns: u32,
-        nb_matrix_rows: u32,
-        nb_buffer_rows: u32,
-    ) -> Self {
-        let matrix = TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows);
+    /// If the first tetromino can't spawn in its starting position in the **Matrix**.
+    pub fn from_matrix<R: Rng>(rng: &mut R, bag_type: BagType, matrix: TetrisGrid) -> Self {
         let mut tetromino_bag = TetrominoGenerator::new(bag_type);
         let mut tetromino_in_play = tetromino_bag.get(rng);
         let next_tetrominos = tetromino_bag.get_chunk(rng, NEXT_QUEUE_MAX_SIZE);
         let next_queue = CircularBuffer::new(next_tetrominos);
         tetromino_in_play.enter_grid(&matrix);
+
+        tetromino_in_play
+            .is_valid_in_grid(&matrix)
+            .expect("`matrix` should be able to contain the tetromino in play");
 
         TetrisPlayer {
             grid: matrix,
@@ -140,7 +121,9 @@ impl TetrisPlayer {
             received_garbage_lines: 0,
         }
     }
+}
 
+impl TetrisPlayer {
     pub fn bag_type(&self) -> BagType {
         self.tetromino_bag.bag_type()
     }
@@ -294,7 +277,7 @@ mod tests {
             "         \n",
             "---------\n",
         ))]
-    #[case(TetrisPlayer::new(&mut MockRng::o_tetrominos(), BagType::NoBag, TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::COMPACT_NB_MATRIX_ROWS, TetrisGrid::COMPACT_NB_BUFFER_ROWS), concat!(
+    #[case(TetrisPlayer::from_matrix(&mut MockRng::o_tetrominos(), BagType::NoBag, TetrisGrid::new(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::COMPACT_NB_MATRIX_ROWS, TetrisGrid::COMPACT_NB_BUFFER_ROWS)), concat!(
             "----------\n",
             "    OO    \n",
             "    OO    \n",
@@ -336,6 +319,10 @@ mod tests {
         #[case] nb_matrix_rows: u32,
         #[case] nb_buffer_rows: u32,
     ) {
-        TetrisPlayer::new(rng, bag_type, nb_columns, nb_matrix_rows, nb_buffer_rows);
+        TetrisPlayer::from_matrix(
+            rng,
+            bag_type,
+            TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows),
+        );
     }
 }
