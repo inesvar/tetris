@@ -9,14 +9,14 @@ impl LocalPlayer {
         fall_speed_divide: u64,
         freeze: u64,
     ) -> TetrisResult {
-        for command in TetrisCommand::ALL_EXCEPT_FALL {
+        for command in TetrisCommand::ALL {
             if self.keyboard.should_apply_command(command) {
                 self.player_screen
                     .try_apply(command, &mut self.rng, &mut self.garbage_rng)?;
             }
         }
 
-        if self.should_apply_fall(frame_counter, fall_speed_divide)
+        if frame_counter % fall_speed_divide == 0
             && !self.player_screen.try_fall()
             && self.freeze_frame < frame_counter
         {
@@ -40,11 +40,5 @@ impl LocalPlayer {
         }
 
         Ok(())
-    }
-
-    fn should_apply_fall(&self, frame_counter: u64, fall_speed_divide: u64) -> bool {
-        self.keyboard
-            .should_apply_command(TetrominoMove::Fall.into())
-            || frame_counter % fall_speed_divide == 0
     }
 }

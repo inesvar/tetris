@@ -1,6 +1,7 @@
 //! Implement [TetrisPlayer].
 use super::{
-    BagType, CircularBuffer, TetrisGrid, TetrisResult, Tetromino, TetrominoGenerator, TetrominoMove,
+    BagType, CircularBuffer, TetrisCommand, TetrisGrid, TetrisResult, Tetromino,
+    TetrominoGenerator, TetrominoMove,
 };
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -42,45 +43,6 @@ pub struct TetrisPlayer {
     pub new_completed_lines: u64,
     /// received_garbage_lines is set before the update and reset during the update.
     received_garbage_lines: u64,
-}
-
-/// All possible commands received by [TetrisPlayer].
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum TetrisCommand {
-    /// A user command to move the [TetrisPlayer::tetromino_in_play]
-    /// (there are 7 possible moves described by [TetrominoMove]).
-    Move(TetrominoMove),
-    /// A user command to put the [TetrisPlayer::tetromino_in_play] in the **Hold Queue**
-    /// (a new [TetrisPlayer::tetromino_in_play] will automatically be moved to its starting position).
-    Hold,
-}
-
-impl TetrisCommand {
-    pub const ALL_EXCEPT_FALL: [TetrisCommand; 7] = [
-        TetrisCommand::Move(TetrominoMove::Right),
-        TetrisCommand::Move(TetrominoMove::Left),
-        TetrisCommand::Move(TetrominoMove::Clockwise),
-        TetrisCommand::Move(TetrominoMove::Counterclockwise),
-        TetrisCommand::Move(TetrominoMove::HalfTurn),
-        TetrisCommand::Move(TetrominoMove::HardDrop),
-        TetrisCommand::Hold,
-    ];
-
-    const HAS_AUTO_REPEAT: [TetrisCommand; 3] = [
-        TetrisCommand::Move(TetrominoMove::Right),
-        TetrisCommand::Move(TetrominoMove::Left),
-        TetrisCommand::Move(TetrominoMove::Fall),
-    ];
-
-    pub fn has_auto_repeat(&self) -> bool {
-        Self::HAS_AUTO_REPEAT.contains(self)
-    }
-}
-
-impl From<TetrominoMove> for TetrisCommand {
-    fn from(value: TetrominoMove) -> Self {
-        TetrisCommand::Move(value)
-    }
 }
 
 impl TetrisPlayer {
