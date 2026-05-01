@@ -202,7 +202,6 @@ mod tetris_player;
 mod tetromino;
 mod tetromino_generator;
 
-pub(crate) use circular_buffer::CircularBuffer;
 pub(crate) use tetromino_generator::TetrominoGenerator;
 
 // used to update the active tetromino
@@ -210,6 +209,7 @@ pub use tetris_command::TetrisCommand;
 pub use tetris_grid::{GameOverError, TetrisResult};
 pub use tetromino::TetrominoMove;
 // used to render the TetrisPlayer
+pub use circular_buffer::CircularBuffer;
 pub use mock_rng::MockRng;
 pub use render_tetris_core::{RenderTetrisCore, RunningState};
 pub use tetris_grid::{TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS};

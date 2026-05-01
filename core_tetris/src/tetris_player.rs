@@ -87,9 +87,9 @@ impl TetrisPlayer {
 
     /// Creates a [TetrisPlayer]:
     /// - generating the first tetrominos using `rng` and `bag_type`;
-    /// - creating a new **Matrix** using [TetrisGrid::compact_new].
+    /// - creating a new **Matrix** using [TetrisGrid::compact].
     pub fn compact<R: Rng>(rng: &mut R, bag_type: BagType) -> Self {
-        TetrisPlayer::from_matrix(rng, bag_type, TetrisGrid::compact_new())
+        TetrisPlayer::from_matrix(rng, bag_type, TetrisGrid::compact())
     }
 
     /// Creates a [TetrisPlayer]:
@@ -277,7 +277,7 @@ mod tests {
             "         \n",
             "---------\n",
         ))]
-    #[case(TetrisPlayer::from_matrix(&mut MockRng::o_tetrominos(), BagType::NoBag, TetrisGrid::new(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::COMPACT_NB_MATRIX_ROWS, TetrisGrid::COMPACT_NB_BUFFER_ROWS)), concat!(
+    #[case(TetrisPlayer::from_matrix(&mut MockRng::o_tetrominos(), BagType::NoBag, TetrisGrid::new(10, 6, 2)), concat!(
             "----------\n",
             "    OO    \n",
             "    OO    \n",
@@ -301,28 +301,14 @@ mod tests {
     }
 
     #[rstest]
-    #[case::compact(
-        TetrisGrid::COMPACT_NB_COLUMNS,
-        TetrisGrid::COMPACT_NB_MATRIX_ROWS,
-        TetrisGrid::COMPACT_NB_BUFFER_ROWS
-    )]
-    #[case::default(
-        TetrisGrid::DEFAULT_NB_COLUMNS,
-        TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
-        TetrisGrid::DEFAULT_NB_BUFFER_ROWS
-    )]
-    #[case::minimal(4, 6, 2)]
+    #[case::compact(TetrisGrid::compact())]
+    #[case::default(TetrisGrid::default())]
+    #[case::minimal(TetrisGrid::minimal())]
     fn new_does_not_panic(
         #[values(&mut MockRng::o_tetrominos())] rng: &mut MockRng,
         #[values(BagType::NoBag, BagType::Bag7, BagType::Bag14)] bag_type: BagType,
-        #[case] nb_columns: u32,
-        #[case] nb_matrix_rows: u32,
-        #[case] nb_buffer_rows: u32,
+        #[case] grid: TetrisGrid,
     ) {
-        TetrisPlayer::from_matrix(
-            rng,
-            bag_type,
-            TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows),
-        );
+        TetrisPlayer::from_matrix(rng, bag_type, grid);
     }
 }
