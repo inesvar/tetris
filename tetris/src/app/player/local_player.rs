@@ -75,7 +75,7 @@ impl LocalPlayer {
     }
 
     pub(in crate::app) fn score(&self) -> u64 {
-        self.player_screen.score
+        self.player_screen.score()
     }
 }
 
@@ -91,12 +91,12 @@ impl LocalPlayer {
         }
         once!("sent serialized data to the remote");
         // Set the number of completed lines to 0
-        if self.player_screen.new_completed_lines != 0 {
+        if self.player_screen.new_completed_lines() != 0 {
             once!(
                 "the {} completed lines were sent to the adversary and they were reset to 0",
-                self.player_screen.new_completed_lines
+                self.player_screen.new_completed_lines()
             );
-            self.player_screen.new_completed_lines = 0;
+            *self.player_screen.new_completed_lines_mut() = 0;
         }
     }
 }

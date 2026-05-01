@@ -1,4 +1,4 @@
-//! Implement [TetrisPlayer].
+//! Implements [TetrisPlayer].
 use super::{
     BagType, CircularBuffer, TetrisCommand, TetrisGrid, TetrisResult, Tetromino,
     TetrominoGenerator, TetrominoMove,
@@ -11,44 +11,79 @@ pub const NEXT_QUEUE_MAX_SIZE: usize = 6;
 
 /// State of a tetris player.
 ///
-/// According to the **Tetris Guideline**, the game elements include :
-/// - **Matrix**: "the area where game play occurs."
+/// According to the **Tetris Guideline**, the game elements namely include :
+/// - **Matrix**: "the area where game play occurs.", see [TetrisPlayer::grid].
 /// - **Tetromino in Play**: "the player can manipulate this tetrimino by moving it right or left,
-///   rotating it clockwise or counterclockwise, and Hard or Soft dropping it."
+///   rotating it clockwise or counterclockwise, and Hard or Soft dropping it.",
+///   see [TetrisPlayer::tetromino_in_play].
 ///   
 ///   NB: this implementation also supports 180° rotation.
 /// - **Next Queue**: "allows the player to see the next tetrimino
-///   that will be generated and put into play."
-/// - **Hold Queue**: "allows the player to “hold” a falling tetrimino for as long as they wish."
+///   that will be generated and put into play.", see [TetrisPlayer::next_queue]
+/// - **Hold Queue**: "allows the player to “hold” a falling tetrimino for as long as they wish.",
+///   see [TetrisPlayer::hold_queue]
+///
+///
 ///
 /// [TetrisPlayer] is serializable and can be sent through the network
-/// to implement multi-player tetris games, however this is not very efficient because
-/// except the [TetrisPlayer::tetromino_in_play], most elements don't change between frames.
-///
+/// to implement multi-player tetris games. Note that this is not very efficient because
+/// except the **Tetromino in Play**, most elements don't change between frames.
 #[derive(Serialize, Deserialize)]
 pub struct TetrisPlayer {
-    /// Tetris grid.
-    pub grid: TetrisGrid,
-    /// Currently falling tetromino.
-    pub tetromino_in_play: Tetromino,
-    /// Tetrominos in the **Next Queue**.
-    pub next_queue: CircularBuffer<Tetromino>,
-    /// Tetromino in the **Hold Queue**, if there's one.
-    pub hold_queue: Option<Tetromino>,
+    grid: TetrisGrid,
+    tetromino_in_play: Tetromino,
+    next_queue: CircularBuffer<Tetromino>,
+    hold_queue: Option<Tetromino>,
     /// Tetromino bag (used to refill the **Next Queue**).
-    pub tetromino_bag: TetrominoGenerator,
-    /// Total number of lines cleared.
-    pub score: u64,
-    // TODO : should be private
-    pub new_completed_lines: u64,
-    /// received_garbage_lines is set before the update and reset during the update.
+    tetromino_bag: TetrominoGenerator,
+    score: u64,
+    new_completed_lines: u64,
+    /// received_garbage_lines is set before the update and reset during the update. TODO: clarify
     received_garbage_lines: u64,
 }
 
+/// Getters and Setters.
+impl TetrisPlayer {
+    /// Tetris grid, or **Matrix**.
+    pub fn grid(&self) -> &TetrisGrid {
+        &self.grid
+    }
+
+    /// Currently falling tetromino.
+    pub fn tetromino_in_play(&self) -> &Tetromino {
+        &self.tetromino_in_play
+    }
+
+    /// Tetromino in the **Hold Queue**, if there's one.
+    pub fn hold_queue(&self) -> &Option<Tetromino> {
+        &self.hold_queue
+    }
+
+    /// Tetrominos in the **Next Queue**.
+    pub fn next_queue(&self) -> &CircularBuffer<Tetromino> {
+        &self.next_queue
+    }
+
+    /// Total number of lines cleared.
+    pub fn score(&self) -> u64 {
+        self.score
+    }
+
+    pub fn new_completed_lines(&self) -> u64 {
+        self.new_completed_lines
+    }
+
+    pub fn new_completed_lines_mut(&mut self) -> &mut u64 {
+        &mut self.new_completed_lines
+    }
+}
+
+/// Constructors.
 impl TetrisPlayer {
     /// Creates a [TetrisPlayer]:
-    /// - using `rng` and `bag_type` to generate tetrominos;
-    /// - using [TetrisGrid::DEFAULT_NB_COLUMNS], [TetrisGrid::DEFAULT_NB_MATRIX_ROWS] and [TetrisGrid::DEFAULT_NB_BUFFER_ROWS] to create the matrix.
+    /// - using `rng` and `bag_type` to generate the first tetrominos;
+    /// - using [TetrisGrid::DEFAULT_NB_COLUMNS], [TetrisGrid::DEFAULT_NB_MATRIX_ROWS]
+    ///   and [TetrisGrid::DEFAULT_NB_BUFFER_ROWS] for the **Matrix** size.
     pub fn default<R: Rng>(rng: &mut R, bag_type: BagType) -> Self {
         TetrisPlayer::new(
             rng,
@@ -60,8 +95,9 @@ impl TetrisPlayer {
     }
 
     /// Creates a [TetrisPlayer]:
-    /// - using `rng` and `bag_type` to generate tetrominos;
-    /// - using [TetrisGrid::COMPACT_NB_COLUMNS], [TetrisGrid::COMPACT_NB_MATRIX_ROWS] and [TetrisGrid::COMPACT_NB_BUFFER_ROWS] to create the matrix.
+    /// - using `rng` and `bag_type` to generate the first tetrominos;
+    /// - using [TetrisGrid::COMPACT_NB_COLUMNS], [TetrisGrid::COMPACT_NB_MATRIX_ROWS]
+    ///   and [TetrisGrid::COMPACT_NB_BUFFER_ROWS] for the **Matrix** size.
     pub fn compact<R: Rng>(rng: &mut R, bag_type: BagType) -> Self {
         TetrisPlayer::new(
             rng,
@@ -73,8 +109,8 @@ impl TetrisPlayer {
     }
 
     /// Creates a [TetrisPlayer]:
-    /// - using `rng` and `bag_type` to generate tetrominos;
-    /// - using `nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` to create the matrix.
+    /// - using `rng` and `bag_type` to generate the first tetrominos;
+    /// - using `nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` for the **Matrix** size.
     ///
     /// # Panics
     ///

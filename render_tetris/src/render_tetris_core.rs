@@ -29,7 +29,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
     }
 
     fn display_tetris_grid(&mut self, player: &TetrisPlayer, state: RunningState) {
-        let grid = &player.grid;
+        let grid = player.grid();
         let empty_dims: Rectangle = [
             0.0,
             hidden_height(grid),
@@ -50,13 +50,13 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
             };
 
             for position in blocks {
-                self.render_tetris_block(position, player.tetromino_in_play.color());
+                self.render_tetris_block(position, player.tetromino_in_play().color());
             }
         }
     }
 
     fn display_tetromino_in_play(&mut self, player: &TetrisPlayer, state: RunningState) {
-        let tetromino = &player.tetromino_in_play;
+        let tetromino = player.tetromino_in_play();
 
         if state == RunningState::Running {
             self.render_tetromino(tetromino);
@@ -75,7 +75,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         let old_transform = self.transform;
         self.transform = self.transform.trans(
             -(BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE + BLOCK_SIZE),
-            hidden_height(&player.grid),
+            hidden_height(player.grid()),
         );
         let rectangle_width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let rectangle_height = BLOCK_SIZE + TETROMINO_MAX_HEIGHT + BLOCK_SIZE;
@@ -85,7 +85,7 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         outline_rect.draw(dims, &self.draw_state, self.transform, &mut self.gl);
 
         // drawing the hold piece
-        if let Some(saved) = &player.hold_queue {
+        if let Some(saved) = player.hold_queue() {
             self.transform = old_transform.trans(
                 -TETROMINO_MAX_WIDTH - 2.0 * BLOCK_SIZE,
                 TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
@@ -101,24 +101,24 @@ impl RenderTetrisCore for Piston2dOpenGlRenderer<'_> {
         let old_transform = self.transform;
 
         self.transform = self.transform.trans(
-            total_width(&player.grid) + BLOCK_SIZE,
-            hidden_height(&player.grid),
+            total_width(player.grid()) + BLOCK_SIZE,
+            hidden_height(player.grid()),
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
         let height =
-            BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * player.next_queue.size() as f64;
+            BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * player.next_queue().size() as f64;
         let dims: Rectangle = [0.0, 0.0, width, height];
         rectangle(GRID_BG_COLOR, dims, self.transform, &mut self.gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
         outline_rect.draw(dims, &self.draw_state, self.transform, &mut self.gl);
 
         // drawing the next pieces
-        for i in 0..player.next_queue.size() {
+        for i in 0..player.next_queue().size() {
             self.transform = old_transform.trans(
-                total_width(&player.grid) + 2.0 * BLOCK_SIZE,
+                total_width(player.grid()) + 2.0 * BLOCK_SIZE,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
-            if let Some(tetromino) = player.next_queue.get(i) {
+            if let Some(tetromino) = player.next_queue().get(i) {
                 self.render_tetromino(tetromino);
             }
         }

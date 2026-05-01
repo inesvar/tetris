@@ -27,14 +27,14 @@ pub trait RenderTetrisCore {
     }
 
     fn display_tetris_grid(&mut self, player: &TetrisPlayer, _state: RunningState) {
-        self.render_tetris_grid(&player.grid);
+        self.render_tetris_grid(player.grid());
     }
 
     fn display_hold_queue(&mut self, _player: &TetrisPlayer, _state: RunningState) {}
     fn display_next_queue(&mut self, _player: &TetrisPlayer, _state: RunningState) {}
 
     fn display_tetromino_in_play(&mut self, player: &TetrisPlayer, _state: RunningState) {
-        self.render_tetromino(&player.tetromino_in_play);
+        self.render_tetromino(player.tetromino_in_play());
     }
 
     fn render_tetris_grid(&mut self, grid: &TetrisGrid) {

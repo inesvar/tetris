@@ -72,7 +72,7 @@ pub enum GameOverError {
 
 /// Methods to initialize the grid and send garbage.
 impl TetrisGrid {
-    /// Create an empty grid.
+    /// Creates an empty grid.
     ///
     /// # Panics
     ///

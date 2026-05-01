@@ -82,8 +82,8 @@ impl RemotePlayer {
     pub fn get_lines_completed(&mut self) -> u64 {
         {
             let mut screen = self.screen.lock().unwrap();
-            let lines = screen.new_completed_lines;
-            screen.new_completed_lines = 0;
+            let lines = screen.new_completed_lines();
+            *screen.new_completed_lines_mut() = 0;
             lines
         }
     }
@@ -94,10 +94,10 @@ impl RemotePlayer {
             let mut local_screen = self.screen.lock().unwrap();
             // TODO this should be simpler
             // if the new_completed_lines haven't been read yet, ensure it's not rewritten
-            if local_screen.new_completed_lines != 0 {
-                let a = local_screen.new_completed_lines;
+            if local_screen.new_completed_lines() != 0 {
+                let a = local_screen.new_completed_lines();
                 *local_screen = new_screen;
-                local_screen.new_completed_lines = a;
+                *local_screen.new_completed_lines_mut() = a;
             } else {
                 *local_screen = new_screen;
             }
@@ -145,7 +145,7 @@ impl RemotePlayer {
     pub(in crate::app) fn score(&self) -> u64 {
         {
             let player = self.get_player();
-            player.score
+            player.score()
         }
     }
 }
