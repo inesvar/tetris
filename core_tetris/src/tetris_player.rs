@@ -71,7 +71,7 @@ impl TetrisPlayer {
     pub fn new_completed_lines(&self) -> u64 {
         self.new_completed_lines
     }
-    
+
     #[allow(missing_docs)]
     pub fn new_completed_lines_mut(&mut self) -> &mut u64 {
         &mut self.new_completed_lines

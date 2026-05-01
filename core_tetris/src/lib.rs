@@ -3,31 +3,35 @@
 //! This library crate provides core functionality for the tetris game.
 //! It aims to follow the [2009 Tetris Guideline](<https://ia800405.us.archive.org/12/items/2009-tetris-variant-concepts_202201/2009%20Tetris%20Design%20Guideline.pdf>)
 //! as closely as possible.
+//!
+//! # Scope
+//!
 //! This crate provides pure logic (no OS interaction), it's meant to be used by a tetris engine that will handle:
 //! - rendering (this crate provides the [RenderTetrisCore] trait)
 //! - player input management (this crate expects [TetrisCommand]s as input)
 //! - time management (this crate doesn't know the time)
 //! - random generation (this crates only uses [MockRng] for testing and doc purposes)
-//! - player interactions: sending garbage from one player to another ([TetrisPlayer] has [TetrisPlayer::push_garbage] and [TetrisPlayer::get_lines_completed] methods)
+//! - player interactions: sending garbage from one player to another ([TetrisPlayer] is serializable and has methods to handle garbage)
+//!
+//! The restricted responsibilities of this crate mean everything is extensively testable,
+//! and the goal is indeed to test as much of the code as possible and make it super reliable.
+//!
+//! # Functionalities
 //!
 //! This crate has the following functionalities:
 //! - support for the 6 classic tetromino movements (left, right, clockwise, counter-clockwise, soft drop, hard drop), and additionally 180° turns
 //! - wallkick support using the Super Rotation System (when you try to rotate a tetromino next to a wall,
 //!   the regular move might be impossible but SRS will first translate the tetromino to make the rotation succeed)
-//! - support of the Hold Queue
+//! - support for the Hold Queue
 //! - support for sending/receiving garbage
 //! - all 3 game over conditions are supported (see [GameOverError])
 //! - customization of the tetris grid size, of the tetromino bags
 //!
-//! The restricted responsibilities of this crate mean everything is extensively testable,
-//! and the goal is indeed to test as much of the code as possible and make it super reliable.
+//! # Structure
 //!
 //! This crate provides `struct` [TetrisPlayer] and `enum` [TetrisCommand], which can be used
 //! to represent the state of a tetris player and its changes. It also provides `struct` [MockRng] to
-//! mock the random generation ([MockRng] is intended to be used with [BagType::NoBag]).
-//!
-//! [TetrisPlayer] is serializable and can be sent through the network
-//! to implement multi-player tetris games.
+//! mock the random generation, and `trait` [RenderTetrisCore] to render a [TetrisPlayer].
 //!
 #![doc = simple_mermaid::mermaid!("core_tetris.mmd")]
 //!
@@ -38,24 +42,11 @@
 //! #
 //! let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
 //! let mut garbage_rng = MockRng::right_aligned_garbage();
-//! // `compact` creates a smaller tetris grid which is nice for printing
 //! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! ```
-//! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s (or [TetrominoMove]s).
-//! ```
-//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
-//! #
-//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # let mut garbage_rng = MockRng::right_aligned_garbage();
-//! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
-//! player.try_apply(TetrominoMove::Left.into(), &mut rng, &mut garbage_rng)?;
-//! player.try_apply(TetrominoMove::Clockwise.into(), &mut rng, &mut garbage_rng)?;
-//! player.try_apply(TetrominoMove::HardDrop.into(), &mut rng, &mut garbage_rng)?;
-//! player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng)?;
-//! # Ok::<(), GameOverError>(())
-//! ```
+//! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s.
 //!
-//! Let's look at the results of these commands by printing [TetrisPlayer] after each command.
+//! Let's look at the results of some commands by printing [TetrisPlayer].
 //! Printing [TetrisPlayer] will only show the grid contents and the active tetromino, but [TetrisPlayer]
 //! also stores the **Hold Queue**, the **Next Queue**, the score, etc.
 //!
@@ -68,7 +59,7 @@
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    T    \n", // Buffer Zone
-//!         "   TTT   \n",
+//!         "   TTT   \n", // the first tetromino is a T, as specified by `rng`
 //!         "---------\n", // Skyline
 //!         "         \n", // Matrix
 //!         "         \n",
@@ -109,7 +100,7 @@
 //! player.try_apply(TetrominoMove::HardDrop.into(), &mut rng, &mut garbage_rng)?;
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
-//!         "    OO   \n",
+//!         "    OO   \n", // the second tetromino is an O, as specified by `rng`
 //!         "    OO   \n",
 //!         "---------\n",
 //!         "         \n",
@@ -138,8 +129,8 @@
 //! player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng)?;
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
-//!         "    T    \n",
-//!         "   TTT   \n",
+//!         "    T    \n", // a new tetromino is automatically addded to the grid
+//!         "   TTT   \n", // it's a T, as specified by `rng`
 //!         "---------\n",
 //!         "         \n",
 //!         "         \n",
