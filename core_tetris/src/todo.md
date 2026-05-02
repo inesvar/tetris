@@ -1,6 +1,6 @@
-- TESTS make core_tetris integration tests
-=> not a priority
+- TETRIS correct wallkicks using guidelines
 - TESTS make more tetris_grid unit tests
-- TETRIS correct srs using guidelines
-- TETRIS read tetris guidelines to update code and vocabulary
+- TESTS make core_tetris integration tests : hold, game over, wallkicks
+- DOC correct garbage functions doc
 - DOC improve MockRng doc
+- TETRIS read tetris guidelines to update code and vocabulary
