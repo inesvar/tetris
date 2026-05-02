@@ -26,7 +26,7 @@ pub const NEXT_QUEUE_MAX_SIZE: usize = 6;
 /// [TetrisPlayer] is serializable and can be sent through the network
 /// to implement multi-player tetris games. Note that this is not very efficient because
 /// except the **Tetromino in Play**, most elements don't change between frames.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TetrisPlayer {
     grid: TetrisGrid,
     tetromino_in_play: Tetromino,
@@ -264,55 +264,306 @@ impl Display for TetrisPlayer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::MockRng;
+    use crate::{MockRng, TetrominoKind};
     use rstest::rstest;
 
     #[rstest]
-    #[case(TetrisPlayer::compact(&mut MockRng::o_tetrominos(), BagType::NoBag), concat!(
-            "---------\n",
-            "    OO   \n",
-            "    OO   \n",
-            "---------\n",
-            "         \n",
-            "         \n",
-            "         \n",
-            "         \n",
-            "         \n",
-            "         \n",
-            "---------\n",
-        ))]
-    #[case(TetrisPlayer::from_matrix(&mut MockRng::o_tetrominos(), BagType::NoBag, TetrisGrid::new(10, 6, 2)), concat!(
-            "----------\n",
-            "    OO    \n",
-            "    OO    \n",
-            "----------\n",
-            "          \n",
-            "          \n",
-            "          \n",
-            "          \n",
-            "          \n",
-            "          \n",
-            "----------\n",
-        ))]
-    fn display_is_correct(#[case] player: TetrisPlayer, #[case] expected: &str) {
+    #[case::east_to_south(TetrominoMove::Clockwise.into(), TetrominoMove::Clockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "     IIII\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            ))]
+    #[case::east_to_north(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "     IIII\n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            ))]
+    #[case::west_to_north(TetrominoMove::Counterclockwise.into(), TetrominoMove::Clockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "     IIII\n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            ))]
+    #[case::west_to_south(TetrominoMove::Counterclockwise.into(), TetrominoMove::Counterclockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "     IIII\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            ))]
+    fn i_off_the_right_wall(
+        #[case] initial_rotation: TetrisCommand,
+        #[case] rotation: TetrisCommand,
+        #[case] expected: &str,
+    ) -> TetrisResult {
+        let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
+        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+
         assert_eq!(
             player.to_string(),
-            expected,
-            "player:\n{}, expected:\n{}",
-            player,
-            expected
+            concat!(
+                "---------\n",
+                "         \n",
+                "   IIII  \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            )
         );
+        player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
+        player.try_apply(TetrominoMove::HardRight.into(), &mut rng, &mut garbage_rng)?;
+
+        assert_eq!(
+            player.to_string(),
+            concat!(
+                "---------\n",
+                "        I\n",
+                "        I\n",
+                "---------\n",
+                "        I\n",
+                "        I\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            )
+        );
+
+        player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+
+        assert_eq!(player.to_string(), expected);
+
+        Ok(())
     }
 
     #[rstest]
-    #[case::compact(TetrisGrid::compact())]
-    #[case::default(TetrisGrid::default())]
-    #[case::minimal(TetrisGrid::minimal())]
-    fn new_does_not_panic(
-        #[values(&mut MockRng::o_tetrominos())] rng: &mut MockRng,
-        #[values(BagType::NoBag, BagType::Bag7, BagType::Bag14)] bag_type: BagType,
-        #[case] grid: TetrisGrid,
-    ) {
-        TetrisPlayer::from_matrix(rng, bag_type, grid);
+    #[case::east_to_south(TetrominoMove::Clockwise.into(), TetrominoMove::Clockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "IIII     \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            ))]
+    #[case::east_to_north(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "IIII     \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            ))]
+    #[case::west_to_north(TetrominoMove::Counterclockwise.into(), TetrominoMove::Clockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "IIII     \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            ))]
+    #[case::west_to_south(TetrominoMove::Counterclockwise.into(), TetrominoMove::Counterclockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "IIII     \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            ))]
+    fn i_off_the_left_wall(
+        #[case] initial_rotation: TetrisCommand,
+        #[case] rotation: TetrisCommand,
+        #[case] expected: &str,
+    ) -> TetrisResult {
+        let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
+        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+
+        assert_eq!(
+            player.to_string(),
+            concat!(
+                "---------\n",
+                "         \n",
+                "   IIII  \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            )
+        );
+        player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
+        player.try_apply(TetrominoMove::HardLeft.into(), &mut rng, &mut garbage_rng)?;
+
+        assert_eq!(
+            player.to_string(),
+            concat!(
+                "---------\n",
+                "I        \n",
+                "I        \n",
+                "---------\n",
+                "I        \n",
+                "I        \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            )
+        );
+
+        player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+
+        assert_eq!(player.to_string(), expected);
+
+        Ok(())
+    }
+
+    #[rstest]
+    /// Testing that operations "moving to the right wall" and "turning 90°" are commutable,
+    /// in situations where the tetromino faces east or west (this encompasses all situations that
+    /// only work thanks to wall kicks).
+    fn off_the_right_wall(
+        #[values(
+            TetrominoKind::O,
+            TetrominoKind::I,
+            TetrominoKind::T,
+            TetrominoKind::L,
+            TetrominoKind::J,
+            TetrominoKind::S,
+            TetrominoKind::Z
+        )]
+        kind: TetrominoKind,
+        #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
+        initial_rotation: TetrisCommand,
+        #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
+        rotation: TetrisCommand,
+    ) -> TetrisResult {
+        let mut rng = MockRng::tetromino_cycle(&[kind]);
+        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+
+        player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
+
+        let mut no_wall_kick_player = player.clone();
+        no_wall_kick_player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+
+        for _ in 0..5 {
+            player.try_apply(TetrominoMove::Right.into(), &mut rng, &mut garbage_rng)?;
+            no_wall_kick_player.try_apply(
+                TetrominoMove::Right.into(),
+                &mut rng,
+                &mut garbage_rng,
+            )?;
+        }
+
+        player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+
+        assert_eq!(player.to_string(), no_wall_kick_player.to_string());
+
+        Ok(())
+    }
+
+    #[rstest]
+    /// Testing that operations "moving to the left wall" and "turning 90°" are commutable,
+    /// in situations where the tetromino faces east or west (this encompasses all situations that
+    /// only work thanks to wall kicks).
+    fn off_the_left_wall(
+        #[values(
+            TetrominoKind::O,
+            TetrominoKind::I,
+            TetrominoKind::T,
+            TetrominoKind::L,
+            TetrominoKind::J,
+            TetrominoKind::S,
+            TetrominoKind::Z
+        )]
+        kind: TetrominoKind,
+        #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
+        initial_rotation: TetrisCommand,
+        #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
+        rotation: TetrisCommand,
+    ) -> TetrisResult {
+        let mut rng = MockRng::tetromino_cycle(&[kind]);
+        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+
+        player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
+
+        let mut no_wall_kick_player = player.clone();
+        no_wall_kick_player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+
+        for _ in 0..5 {
+            player.try_apply(TetrominoMove::Left.into(), &mut rng, &mut garbage_rng)?;
+            no_wall_kick_player.try_apply(
+                TetrominoMove::Left.into(),
+                &mut rng,
+                &mut garbage_rng,
+            )?;
+        }
+
+        player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+
+        assert_eq!(player.to_string(), no_wall_kick_player.to_string());
+
+        Ok(())
     }
 }

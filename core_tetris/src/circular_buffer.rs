@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 
 /// Push back pop front circular buffer.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CircularBuffer<T: Debug> {
     vec: Vec<T>,
     begin: usize,
