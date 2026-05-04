@@ -18,6 +18,10 @@ pub enum TetrominoMove {
     HardRight,
     #[cfg(test)]
     HardLeft,
+    #[cfg(test)]
+    HardSoftDrop,
+    #[cfg(test)]
+    NoMove,
 }
 
 #[cfg(not(test))]
@@ -48,12 +52,15 @@ impl TetrominoMove {
 #[cfg(test)]
 impl TetrominoMove {
     pub(super) fn is_repeated(&self) -> bool {
-        *self == Self::HardDrop || *self == Self::HardLeft || *self == Self::HardRight
+        *self == Self::HardDrop
+            || *self == Self::HardLeft
+            || *self == Self::HardRight
+            || *self == Self::HardSoftDrop
     }
 
     pub(super) fn get_translation(&self) -> Position {
         match self {
-            Self::Fall | Self::HardDrop => Position::FALL,
+            Self::Fall | Self::HardDrop | Self::HardSoftDrop => Position::FALL,
             Self::Right | Self::HardRight => Position::RIGHT,
             Self::Left | Self::HardLeft => Position::LEFT,
             _ => Position::default(),

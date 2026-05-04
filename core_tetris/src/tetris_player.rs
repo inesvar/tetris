@@ -478,6 +478,115 @@ mod tests {
     }
 
     #[rstest]
+    #[case::north_to_east(TetrominoMove::NoMove.into(), TetrominoMove::Clockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "      I  \n",
+                "      I  \n",
+                "      I  \n",
+                "      I  \n",
+                "---------\n",
+            ))]
+    #[case::north_to_west(TetrominoMove::NoMove.into(), TetrominoMove::Counterclockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "   I     \n",
+                "   I     \n",
+                "   I     \n",
+                "   I     \n",
+                "---------\n",
+            ))]
+    #[case::south_to_west(TetrominoMove::HalfTurn.into(), TetrominoMove::Clockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "      I  \n",
+                "      I  \n",
+                "      I  \n",
+                "      I  \n",
+                "---------\n",
+            ))]
+    #[case::south_to_east(TetrominoMove::HalfTurn.into(), TetrominoMove::Counterclockwise.into(), concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "   I     \n",
+                "   I     \n",
+                "   I     \n",
+                "   I     \n",
+                "---------\n",
+            ))]
+    fn i_off_the_floor(
+        #[case] initial_rotation: TetrisCommand,
+        #[case] rotation: TetrisCommand,
+        #[case] expected: &str,
+    ) -> TetrisResult {
+        let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
+        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+
+        assert_eq!(
+            player.to_string(),
+            concat!(
+                "---------\n",
+                "         \n",
+                "   IIII  \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "---------\n",
+            )
+        );
+        player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
+        player.try_apply(
+            TetrominoMove::HardSoftDrop.into(),
+            &mut rng,
+            &mut garbage_rng,
+        )?;
+
+        assert_eq!(
+            player.to_string(),
+            concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "   IIII  \n",
+                "---------\n",
+            )
+        );
+
+        player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+
+        assert_eq!(player.to_string(), expected);
+
+        Ok(())
+    }
+
+    #[rstest]
     /// Testing that operations "moving to the right wall" and "turning 90°" are commutable,
     /// in situations where the tetromino faces east or west (this encompasses all situations that
     /// only work thanks to wall kicks).
