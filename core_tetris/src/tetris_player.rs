@@ -160,6 +160,20 @@ impl TetrisPlayer {
             .try_apply(TetrominoMove::Fall, &self.grid)
     }
 
+    #[cfg(test)]
+    /// Tries to apply [TetrominoMove::Right], returns whether the **Tetromino in Play** could be moved down.
+    pub fn try_right(&mut self) -> bool {
+        self.tetromino_in_play
+            .try_apply(TetrominoMove::Right, &self.grid)
+    }
+
+    #[cfg(test)]
+    /// Tries to apply [TetrominoMove::Left], returns whether the **Tetromino in Play** could be moved down.
+    pub fn try_left(&mut self) -> bool {
+        self.tetromino_in_play
+            .try_apply(TetrominoMove::Left, &self.grid)
+    }
+
     /// Swap `tetromino_in_play` and `swap`.
     fn swap_tetromino_in_play_with(&mut self, swap: &mut Tetromino) {
         std::mem::swap(&mut self.tetromino_in_play, swap);
@@ -346,7 +360,7 @@ mod tests {
             )
         );
         player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
-        player.try_apply(TetrominoMove::HardRight.into(), &mut rng, &mut garbage_rng)?;
+        while player.try_right() {}
 
         assert_eq!(
             player.to_string(),
@@ -451,7 +465,7 @@ mod tests {
             )
         );
         player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
-        player.try_apply(TetrominoMove::HardLeft.into(), &mut rng, &mut garbage_rng)?;
+        while player.try_left() {}
 
         assert_eq!(
             player.to_string(),
@@ -478,7 +492,7 @@ mod tests {
     }
 
     #[rstest]
-    #[case::north_to_east(TetrominoMove::NoMove.into(), TetrominoMove::Clockwise.into(), concat!(
+    #[case::north_to_east(None, TetrominoMove::Clockwise.into(), concat!(
                 "---------\n",
                 "         \n",
                 "         \n",
@@ -491,7 +505,7 @@ mod tests {
                 "      I  \n",
                 "---------\n",
             ))]
-    #[case::north_to_west(TetrominoMove::NoMove.into(), TetrominoMove::Counterclockwise.into(), concat!(
+    #[case::north_to_west(None, TetrominoMove::Counterclockwise.into(), concat!(
                 "---------\n",
                 "         \n",
                 "         \n",
@@ -504,7 +518,7 @@ mod tests {
                 "   I     \n",
                 "---------\n",
             ))]
-    #[case::south_to_west(TetrominoMove::HalfTurn.into(), TetrominoMove::Clockwise.into(), concat!(
+    #[case::south_to_west(Some(TetrominoMove::HalfTurn.into()), TetrominoMove::Clockwise.into(), concat!(
                 "---------\n",
                 "         \n",
                 "         \n",
@@ -517,7 +531,7 @@ mod tests {
                 "      I  \n",
                 "---------\n",
             ))]
-    #[case::south_to_east(TetrominoMove::HalfTurn.into(), TetrominoMove::Counterclockwise.into(), concat!(
+    #[case::south_to_east(Some(TetrominoMove::HalfTurn.into()), TetrominoMove::Counterclockwise.into(), concat!(
                 "---------\n",
                 "         \n",
                 "         \n",
@@ -531,7 +545,7 @@ mod tests {
                 "---------\n",
             ))]
     fn i_off_the_floor(
-        #[case] initial_rotation: TetrisCommand,
+        #[case] initial_rotation: Option<TetrisCommand>,
         #[case] rotation: TetrisCommand,
         #[case] expected: &str,
     ) -> TetrisResult {
@@ -555,12 +569,11 @@ mod tests {
                 "---------\n",
             )
         );
-        player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
-        player.try_apply(
-            TetrominoMove::HardSoftDrop.into(),
-            &mut rng,
-            &mut garbage_rng,
-        )?;
+
+        if let Some(command) = initial_rotation {
+            player.try_apply(command, &mut rng, &mut garbage_rng)?;
+        }
+        while player.try_fall() {}
 
         assert_eq!(
             player.to_string(),

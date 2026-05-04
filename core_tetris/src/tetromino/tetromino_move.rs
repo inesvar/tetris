@@ -14,17 +14,8 @@ pub enum TetrominoMove {
     Clockwise,
     Counterclockwise,
     HalfTurn,
-    #[cfg(test)]
-    HardRight,
-    #[cfg(test)]
-    HardLeft,
-    #[cfg(test)]
-    HardSoftDrop,
-    #[cfg(test)]
-    NoMove,
 }
 
-#[cfg(not(test))]
 impl TetrominoMove {
     pub(super) fn is_repeated(&self) -> bool {
         *self == Self::HardDrop
@@ -35,34 +26,6 @@ impl TetrominoMove {
             Self::Fall | Self::HardDrop => Position::FALL,
             Self::Right => Position::RIGHT,
             Self::Left => Position::LEFT,
-            _ => Position::default(),
-        }
-    }
-
-    pub(super) fn get_rotation_type(&self) -> RotationType {
-        match self {
-            Self::Clockwise => RotationType::Clockwise,
-            Self::Counterclockwise => RotationType::Counterclockwise,
-            Self::HalfTurn => RotationType::HalfTurn,
-            _ => RotationType::Identity,
-        }
-    }
-}
-
-#[cfg(test)]
-impl TetrominoMove {
-    pub(super) fn is_repeated(&self) -> bool {
-        *self == Self::HardDrop
-            || *self == Self::HardLeft
-            || *self == Self::HardRight
-            || *self == Self::HardSoftDrop
-    }
-
-    pub(super) fn get_translation(&self) -> Position {
-        match self {
-            Self::Fall | Self::HardDrop | Self::HardSoftDrop => Position::FALL,
-            Self::Right | Self::HardRight => Position::RIGHT,
-            Self::Left | Self::HardLeft => Position::LEFT,
             _ => Position::default(),
         }
     }
