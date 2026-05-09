@@ -1,4 +1,5 @@
 //! Define [CircularBuffer] and methods to use it.
+use super::CoreTetrisError;
 use core::fmt::{Debug, Display};
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
@@ -21,19 +22,25 @@ impl<T: Debug> Display for CircularBuffer<T> {
 }
 
 impl<T: Debug> CircularBuffer<T> {
-    /// Construct a new circular buffer of size K for type T.
+    /// Creates a new circular buffer containing `array` values.
     ///
     /// # Panics
     ///
     /// If `array` is empty.
-    pub fn new(array: Vec<T>) -> Self {
+    pub(super) fn new(array: Vec<T>) -> Self {
+        Self::try_new(array).expect("CircularBuffer should not be empty")
+    }
+
+    /// Tries to create a new circular buffer of size K for type T.
+    /// Fails if `array` is empty.
+    pub(super) fn try_new(array: Vec<T>) -> Result<Self, CoreTetrisError> {
         if array.is_empty() {
-            panic!("CircularBuffer::new()'s first argument `array: Vec<T>` shouldn't be empty.")
+            return Err(CoreTetrisError::EmptyCircularBuffer);
         }
-        CircularBuffer::<T> {
+        Ok(CircularBuffer::<T> {
             vec: array,
             begin: 0,
-        }
+        })
     }
 
     pub(super) fn get_front_push_back(&mut self, replacement: &mut T) {

@@ -1,4 +1,4 @@
-use super::{CircularBuffer, TetrominoKind};
+use super::{CircularBuffer, CoreTetrisError, TetrominoKind};
 use rand::TryRng;
 use std::{convert::Infallible, ops::Range};
 
@@ -13,7 +13,7 @@ pub struct MockRng(CircularBuffer<u32>);
 
 #[allow(missing_docs)] // TODO fix this ! add examples !!
 impl MockRng {
-    pub fn tetromino_cycle(array: &[TetrominoKind]) -> Self {
+    pub fn tetromino_cycle(array: &[TetrominoKind]) -> Result<Self, CoreTetrisError> {
         let mut indices = Vec::new();
         for kind in array {
             // Little retro-engineering of `rand::seq::IndexedRandom::choose` on `TetrominoKind::ALL`.
@@ -24,14 +24,14 @@ impl MockRng {
                 as u32;
             indices.push((index + 1) << 29);
         }
-        Self(CircularBuffer::new(indices))
+        CircularBuffer::try_new(indices).map(Self)
     }
 
     pub fn o_tetrominos() -> Self {
-        Self::tetromino_cycle(&[TetrominoKind::O])
+        Self::tetromino_cycle(&[TetrominoKind::O]).expect("CircularBuffer should not be empty")
     }
 
-    pub fn garbage_cycle(values: &[u32], range: Range<u32>) -> Self {
+    pub fn garbage_cycle(values: &[u32], range: Range<u32>) -> Result<Self, CoreTetrisError> {
         let mut spaced_values = Vec::new();
         let len = range
             .end
@@ -45,11 +45,10 @@ impl MockRng {
             let spaced_value = u32::MAX / len * *value;
             spaced_values.push(spaced_value);
         }
-        Self(CircularBuffer::new(spaced_values))
+        CircularBuffer::try_new(spaced_values).map(Self)
     }
     pub fn right_aligned_garbage() -> Self {
-        let values = vec![0];
-        Self(CircularBuffer::new(values))
+        Self(CircularBuffer::new(vec![0]))
     }
 
     fn next(&mut self) -> u32 {
@@ -100,7 +99,7 @@ mod tests {
         #[case] kind: TetrominoKind,
         #[case] expected: u32,
     ) {
-        let mut mock = MockRng::tetromino_cycle(&[kind]);
+        let mut mock = MockRng::tetromino_cycle(&[kind]).unwrap();
         assert_eq!(TetrominoKind::ALL.choose(&mut mock), Some(&kind));
         assert_eq!(mock.next(), expected);
     }
@@ -109,7 +108,7 @@ mod tests {
     #[case::tetromino_kind_all(Vec::from(TetrominoKind::ALL))]
     #[case::tetromino_kind_t_l_j(TetrominoKind::ALL[2..5].to_vec())]
     fn choose_tetromino_using_tetromino_cycle_is_correct(#[case] values: Vec<TetrominoKind>) {
-        let mut mock = MockRng::tetromino_cycle(&values);
+        let mut mock = MockRng::tetromino_cycle(&values).unwrap();
 
         let generated_values = Vec::from_iter(
             std::iter::repeat_with(|| *TetrominoKind::ALL.choose(&mut mock).unwrap())
@@ -129,7 +128,7 @@ mod tests {
         #[case] garbage_gaps: Vec<u32>,
         #[case] range: Range<u32>,
     ) {
-        let mut mock = MockRng::garbage_cycle(&garbage_gaps, range.clone());
+        let mut mock = MockRng::garbage_cycle(&garbage_gaps, range.clone()).unwrap();
 
         let generated_gaps = Vec::from_iter(
             std::iter::repeat_with(|| mock.random_range(range.clone())).take(garbage_gaps.len()),

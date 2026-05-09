@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 #[test]
 fn line_clear_from_setup() -> TetrisResult {
-    let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
+    let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]).unwrap();
     let mut garbage_rng = MockRng::right_aligned_garbage();
     let grid = TetrisGrid::from_str(concat!(
         "---------\n",
@@ -104,7 +104,7 @@ fn line_clear_from_setup() -> TetrisResult {
 
 #[test]
 fn manual_line_clear() -> TetrisResult {
-    let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::O, TetrominoKind::I]);
+    let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::O, TetrominoKind::I]).unwrap();
     let mut garbage_rng = MockRng::right_aligned_garbage();
     let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 

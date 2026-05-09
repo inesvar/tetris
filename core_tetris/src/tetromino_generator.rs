@@ -171,8 +171,8 @@ mod tests {
 
     #[rstest]
     #[case::tetromino_kind_o(&mut MockRng::o_tetrominos(), vec![TetrominoKind::O; 7])]
-    #[case::tetromino_kind_t(&mut MockRng::tetromino_cycle(&[TetrominoKind::T]), vec![TetrominoKind::T; 7])]
-    #[case::tetromino_kind_all(&mut MockRng::tetromino_cycle(&TetrominoKind::ALL), Vec::from(TetrominoKind::ALL))]
+    #[case::tetromino_kind_t(&mut MockRng::tetromino_cycle(&[TetrominoKind::T]).unwrap(), vec![TetrominoKind::T; 7])]
+    #[case::tetromino_kind_all(&mut MockRng::tetromino_cycle(&TetrominoKind::ALL).unwrap(), Vec::from(TetrominoKind::ALL))]
     fn get_chunk_using_no_bag_and_mock_rng_is_correct(
         #[case] rng: &mut MockRng,
         #[case] expected: Vec<TetrominoKind>,

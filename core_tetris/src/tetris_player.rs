@@ -339,7 +339,7 @@ mod tests {
         #[case] rotation: TetrisCommand,
         #[case] expected: &str,
     ) -> TetrisResult {
-        let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
+        let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]).unwrap();
         let mut garbage_rng = MockRng::right_aligned_garbage();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
@@ -444,7 +444,7 @@ mod tests {
         #[case] rotation: TetrisCommand,
         #[case] expected: &str,
     ) -> TetrisResult {
-        let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
+        let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]).unwrap();
         let mut garbage_rng = MockRng::right_aligned_garbage();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
@@ -549,7 +549,7 @@ mod tests {
         #[case] rotation: TetrisCommand,
         #[case] expected: &str,
     ) -> TetrisResult {
-        let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
+        let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]).unwrap();
         let mut garbage_rng = MockRng::right_aligned_garbage();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
@@ -619,7 +619,7 @@ mod tests {
         #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
         rotation: TetrisCommand,
     ) -> TetrisResult {
-        let mut rng = MockRng::tetromino_cycle(&[kind]);
+        let mut rng = MockRng::tetromino_cycle(&[kind]).unwrap();
         let mut garbage_rng = MockRng::right_aligned_garbage();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
@@ -658,7 +658,7 @@ mod tests {
         #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
         rotation: TetrisCommand,
     ) -> TetrisResult {
-        let mut rng = MockRng::tetromino_cycle(&[kind]);
+        let mut rng = MockRng::tetromino_cycle(&[kind]).unwrap();
         let mut garbage_rng = MockRng::right_aligned_garbage();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
@@ -694,7 +694,7 @@ mod tests {
         #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
         rotation: TetrisCommand,
     ) -> TetrisResult {
-        let mut rng = MockRng::tetromino_cycle(&[kind]);
+        let mut rng = MockRng::tetromino_cycle(&[kind]).unwrap();
         let mut garbage_rng = MockRng::right_aligned_garbage();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 

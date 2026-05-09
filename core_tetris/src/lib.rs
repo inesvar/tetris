@@ -32,7 +32,7 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]).unwrap();
 //! let mut garbage_rng = MockRng::right_aligned_garbage();
 //! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! ```
@@ -45,7 +45,7 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]).unwrap();
 //! # let mut garbage_rng = MockRng::right_aligned_garbage();
 //! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! assert_eq!(player.to_string(), concat!(
@@ -112,7 +112,7 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]).unwrap();
 //! # let mut garbage_rng = MockRng::right_aligned_garbage();
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng, &mut garbage_rng);
@@ -153,7 +153,7 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
-//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]).unwrap();
 //! # let mut garbage_rng = MockRng::right_aligned_garbage();
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng, &mut garbage_rng);
@@ -186,6 +186,7 @@
 #![doc = simple_mermaid::mermaid!("core_tetris.mmd")]
 
 mod circular_buffer;
+mod core_tetris_error;
 mod mock_rng;
 pub mod render;
 mod tetris_command;
@@ -206,5 +207,7 @@ pub use mock_rng::MockRng;
 pub use tetris_grid::{TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS};
 pub use tetris_player::TetrisPlayer;
 pub use tetromino::{Position, Tetromino, TetrominoKind};
+// error type
+pub use core_tetris_error::CoreTetrisError;
 // currently unused, TODO: propose different constructors for TetrisPlayer
 pub use tetromino_generator::BagType;
