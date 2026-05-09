@@ -1,6 +1,6 @@
 //! Implements [TetrisPlayer].
 use super::{
-    BagType, CircularBuffer, TetrisCommand, TetrisGrid, TetrisResult, Tetromino,
+    BagType, CircularBuffer, GameOverError, TetrisCommand, TetrisGrid, TetrisResult, Tetromino,
     TetrominoGenerator, TetrominoMove,
 };
 use rand::Rng;
@@ -89,35 +89,37 @@ impl TetrisPlayer {
     /// - generating the first tetrominos using `rng` and `bag_type`;
     /// - creating a new **Matrix** using [TetrisGrid::default].
     pub fn default<R: Rng>(rng: &mut R, bag_type: BagType) -> Self {
-        TetrisPlayer::from_matrix(rng, bag_type, TetrisGrid::default())
+        TetrisPlayer::try_from_matrix(rng, bag_type, TetrisGrid::default())
+            .expect("there should be place for a tetromino to spawn in the grid")
     }
 
     /// Creates a [TetrisPlayer]:
     /// - generating the first tetrominos using `rng` and `bag_type`;
     /// - creating a new **Matrix** using [TetrisGrid::compact].
     pub fn compact<R: Rng>(rng: &mut R, bag_type: BagType) -> Self {
-        TetrisPlayer::from_matrix(rng, bag_type, TetrisGrid::compact())
+        TetrisPlayer::try_from_matrix(rng, bag_type, TetrisGrid::compact())
+            .expect("there should be place for a tetromino to spawn in the grid")
     }
 
-    /// Creates a [TetrisPlayer]:
+    /// Tries to create a [TetrisPlayer]:
     /// - generating the first tetrominos using `rng` and `bag_type`;
     /// - using `matrix` as the **Matrix** (`matrix` doesn't have to be empty).
     ///
-    /// # Panics
-    ///
-    /// If the first tetromino can't spawn in its starting position in the **Matrix**.
-    pub fn from_matrix<R: Rng>(rng: &mut R, bag_type: BagType, matrix: TetrisGrid) -> Self {
+    /// Fails if the first tetromino can't spawn in its starting position in the **Matrix**.
+    pub fn try_from_matrix<R: Rng>(
+        rng: &mut R,
+        bag_type: BagType,
+        matrix: TetrisGrid,
+    ) -> Result<Self, GameOverError> {
         let mut tetromino_bag = TetrominoGenerator::new(bag_type);
         let mut tetromino_in_play = tetromino_bag.get(rng);
         let next_tetrominos = tetromino_bag.get_chunk(rng, NEXT_QUEUE_MAX_SIZE);
         let next_queue = CircularBuffer::new(next_tetrominos);
         tetromino_in_play.enter_grid(&matrix);
 
-        tetromino_in_play
-            .is_valid_in_grid(&matrix)
-            .expect("`matrix` should be able to contain the tetromino in play");
+        tetromino_in_play.is_valid_in_grid(&matrix)?;
 
-        TetrisPlayer {
+        Ok(TetrisPlayer {
             grid: matrix,
             score: 0,
             new_completed_lines: 0,
@@ -126,7 +128,7 @@ impl TetrisPlayer {
             next_queue,
             tetromino_bag,
             received_garbage_lines: 0,
-        }
+        })
     }
 }
 

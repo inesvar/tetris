@@ -264,9 +264,7 @@ mod tetris_grid_internals {
             self.cells.remove(row);
             self.line_sum.remove(row);
 
-            self.cells.push(
-                vec![None; self.nb_columns as usize],
-            );
+            self.cells.push(vec![None; self.nb_columns as usize]);
             self.line_sum.push(0);
         }
 
@@ -390,7 +388,10 @@ mod tetris_grid_internals {
         #[case(TetrisGrid::default(), Position::new(10, 21))]
         #[case(TetrisGrid::default(), Position::new(9, 22))]
         #[should_panic]
-        fn is_block_empty_panics_outside_of_the_grid(#[case] grid: TetrisGrid, #[case] pos: Position) {
+        fn is_block_empty_panics_outside_of_the_grid(
+            #[case] grid: TetrisGrid,
+            #[case] pos: Position,
+        ) {
             grid.is_block_empty(&pos);
         }
 

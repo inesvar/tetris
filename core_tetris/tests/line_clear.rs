@@ -21,7 +21,7 @@ fn line_clear_from_setup() -> TetrisResult {
         "---------\n",
     ))
     .unwrap();
-    let mut player = TetrisPlayer::from_matrix(&mut rng, BagType::NoBag, grid);
+    let mut player = TetrisPlayer::try_from_matrix(&mut rng, BagType::NoBag, grid).unwrap();
 
     assert_eq!(
         player.to_string(),

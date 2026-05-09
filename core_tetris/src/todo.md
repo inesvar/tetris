@@ -6,7 +6,4 @@
 - TETRIS read tetris guidelines to update code and vocabulary
 
 
-- NEXT reduce the number of panics
-- NEXT update panic doc
-- NEXT review recent CoreTetrisError changes
 - NEXT check error messages
