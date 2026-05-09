@@ -97,6 +97,9 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
     }
 
     fn display_next_queue(&mut self, player: &TetrisPlayer, _: RunningState) {
+        let Some(next_queue) = player.next_queue() else {
+            return;
+        };
         // drawing a border for the fifo of next pieces
         let old_transform = self.transform;
 
@@ -105,20 +108,19 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
             hidden_height(player.grid()),
         );
         let width = BLOCK_SIZE + TETROMINO_MAX_WIDTH + BLOCK_SIZE;
-        let height =
-            BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * player.next_queue().size() as f64;
+        let height = BLOCK_SIZE + (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * next_queue.size() as f64;
         let dims: Rectangle = [0.0, 0.0, width, height];
         rectangle(GRID_BG_COLOR, dims, self.transform, &mut self.gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
         outline_rect.draw(dims, &self.draw_state, self.transform, &mut self.gl);
 
         // drawing the next pieces
-        for i in 0..player.next_queue().size() {
+        for i in 0..next_queue.size() {
             self.transform = old_transform.trans(
                 total_width(player.grid()) + 2.0 * BLOCK_SIZE,
                 (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
             );
-            if let Some(tetromino) = player.next_queue().get(i) {
+            if let Some(tetromino) = next_queue.get(i) {
                 self.render_tetromino(tetromino);
             }
         }

@@ -30,7 +30,7 @@ pub const NEXT_QUEUE_MAX_SIZE: usize = 6;
 pub struct TetrisPlayer {
     grid: TetrisGrid,
     tetromino_in_play: Tetromino,
-    next_queue: CircularBuffer<Tetromino>,
+    next_queue: Option<CircularBuffer<Tetromino>>,
     hold_queue: Option<Tetromino>,
     /// Tetromino bag (used to refill the **Next Queue**).
     tetromino_bag: TetrominoGenerator,
@@ -58,7 +58,7 @@ impl TetrisPlayer {
     }
 
     /// Tetrominos in the **Next Queue**.
-    pub fn next_queue(&self) -> &CircularBuffer<Tetromino> {
+    pub fn next_queue(&self) -> &Option<CircularBuffer<Tetromino>> {
         &self.next_queue
     }
 
@@ -183,7 +183,11 @@ impl TetrisPlayer {
     /// Get a new `tetromino_in_play` from the **Next Queue** and return the previous one.
     fn replace_tetromino_in_play<R: Rng>(&mut self, rng: &mut R) -> Tetromino {
         let mut swap = self.tetromino_bag.get(rng);
-        self.next_queue.get_front_push_back(&mut swap);
+
+        if let Some(next_queue) = self.next_queue.as_mut() {
+            next_queue.get_front_push_back(&mut swap);
+        }
+
         self.swap_tetromino_in_play_with(&mut swap);
 
         swap
@@ -340,7 +344,7 @@ mod tests {
         #[case] expected: &str,
     ) -> TetrisResult {
         let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
-        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut garbage_rng = MockRng::garbage_cycle(&[], 0);
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
         assert_eq!(
@@ -445,7 +449,7 @@ mod tests {
         #[case] expected: &str,
     ) -> TetrisResult {
         let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
-        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut garbage_rng = MockRng::default();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
         assert_eq!(
@@ -550,7 +554,7 @@ mod tests {
         #[case] expected: &str,
     ) -> TetrisResult {
         let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
-        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut garbage_rng = MockRng::default();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
         assert_eq!(
@@ -620,7 +624,7 @@ mod tests {
         rotation: TetrisCommand,
     ) -> TetrisResult {
         let mut rng = MockRng::tetromino_cycle(&[kind]);
-        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut garbage_rng = MockRng::default();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
         player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
@@ -659,7 +663,7 @@ mod tests {
         rotation: TetrisCommand,
     ) -> TetrisResult {
         let mut rng = MockRng::tetromino_cycle(&[kind]);
-        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut garbage_rng = MockRng::default();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
         player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
@@ -695,7 +699,7 @@ mod tests {
         rotation: TetrisCommand,
     ) -> TetrisResult {
         let mut rng = MockRng::tetromino_cycle(&[kind]);
-        let mut garbage_rng = MockRng::right_aligned_garbage();
+        let mut garbage_rng = MockRng::default();
         let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 
         let mut no_wall_kick_player = player.clone();

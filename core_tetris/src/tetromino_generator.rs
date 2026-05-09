@@ -118,7 +118,7 @@ mod tests {
     ) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        bag.draw_new_bag(&mut MockRng::o_tetrominos());
+        bag.draw_new_bag(&mut MockRng::default());
 
         assert!(!bag.tetrominos.is_empty());
         assert_eq!(bag.tetrominos.len(), bag_size);
@@ -131,7 +131,7 @@ mod tests {
     fn get_doesnt_panic_after_new(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        bag.get(&mut MockRng::o_tetrominos());
+        bag.get(&mut MockRng::default());
     }
 
     #[rstest]
@@ -141,7 +141,7 @@ mod tests {
     fn get_chunk_doesnt_panic_when_chunk_is_very_big(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        bag.get_chunk(&mut MockRng::o_tetrominos(), 50);
+        bag.get_chunk(&mut MockRng::default(), 50);
     }
 
     #[rstest]
@@ -150,7 +150,7 @@ mod tests {
     fn get_chunk_14_returns_2_occurences_of_each_type(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        let tetrominos = bag.get_chunk(&mut MockRng::o_tetrominos(), 14);
+        let tetrominos = bag.get_chunk(&mut MockRng::default(), 14);
 
         for kind in TetrominoKind::ALL {
             assert_eq!(tetrominos.iter().filter(|&t| t.kind() == kind).count(), 2);
@@ -162,7 +162,7 @@ mod tests {
     fn get_chunk_7_with_bag_type_7_is_correct(#[case] bag_type: BagType) {
         let mut bag = TetrominoGenerator::new(bag_type);
 
-        let tetrominos = bag.get_chunk(&mut MockRng::o_tetrominos(), 7);
+        let tetrominos = bag.get_chunk(&mut MockRng::default(), 7);
 
         for kind in TetrominoKind::ALL {
             assert_eq!(tetrominos.iter().filter(|&t| t.kind() == kind).count(), 1);
@@ -170,7 +170,7 @@ mod tests {
     }
 
     #[rstest]
-    #[case::tetromino_kind_o(&mut MockRng::o_tetrominos(), vec![TetrominoKind::O; 7])]
+    #[case::tetromino_kind_o(&mut MockRng::default(), vec![TetrominoKind::O; 7])]
     #[case::tetromino_kind_t(&mut MockRng::tetromino_cycle(&[TetrominoKind::T]), vec![TetrominoKind::T; 7])]
     #[case::tetromino_kind_all(&mut MockRng::tetromino_cycle(&TetrominoKind::ALL), Vec::from(TetrominoKind::ALL))]
     fn get_chunk_using_no_bag_and_mock_rng_is_correct(

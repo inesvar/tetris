@@ -10,6 +10,15 @@ pub struct CircularBuffer<T: Debug> {
     begin: usize,
 }
 
+impl Default for CircularBuffer<u32> {
+    fn default() -> Self {
+        Self {
+            vec: vec![0],
+            begin: 0,
+        }
+    }
+}
+
 impl<T: Debug> Display for CircularBuffer<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "begin {}, content", self.begin)?;
@@ -21,18 +30,15 @@ impl<T: Debug> Display for CircularBuffer<T> {
 }
 
 impl<T: Debug> CircularBuffer<T> {
-    /// Construct a new circular buffer of size K for type T.
-    ///
-    /// # Panics
-    ///
-    /// If `array` is empty.
-    pub fn new(array: Vec<T>) -> Self {
+    /// Tries to create a new [CircularBuffer], returns [None] is `array` is empty.
+    pub fn new(array: Vec<T>) -> Option<Self> {
         if array.is_empty() {
-            panic!("CircularBuffer::new()'s first argument `array: Vec<T>` shouldn't be empty.")
-        }
-        CircularBuffer::<T> {
-            vec: array,
-            begin: 0,
+            None
+        } else {
+            Some(CircularBuffer::<T> {
+                vec: array,
+                begin: 0,
+            })
         }
     }
 
@@ -75,22 +81,24 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case(CircularBuffer::new(vec![0; 5]))]
-    #[case(CircularBuffer::new(vec![10; 4]))]
-    fn new_is_correct(#[case] buffer: CircularBuffer<usize>) {
-        assert_eq!(buffer.begin, 0);
+    #[case(Vec::new(), false)]
+    #[case(vec![0; 5], true)]
+    #[case(vec![10; 4], true)]
+    fn new_doesnt_panic(#[case] buffer: Vec<usize>, #[case] is_some: bool) {
+        let buffer = CircularBuffer::new(buffer);
+        assert_eq!(buffer.is_some(), is_some);
     }
 
     #[rstest]
-    #[case(CircularBuffer::new(vec![0, 1, 2, 3, 4]), "begin 0, content 0 1 2 3 4")]
-    #[case(CircularBuffer::new(vec![3, 3, 3]), "begin 0, content 3 3 3")]
+    #[case(CircularBuffer::new(vec![0, 1, 2, 3, 4]).unwrap(), "begin 0, content 0 1 2 3 4")]
+    #[case(CircularBuffer::new(vec![3, 3, 3]).unwrap(), "begin 0, content 3 3 3")]
     fn display_is_correct(#[case] circ_array: CircularBuffer<i32>, #[case] expected: &str) {
         assert_eq!(circ_array.to_string(), expected);
     }
 
     #[rstest]
-    #[case(CircularBuffer::new(vec![0, 1, 2, 3, 4]))]
-    #[case(CircularBuffer::new(vec![0, 1, 2, 3]))]
+    #[case(CircularBuffer::new(vec![0, 1, 2, 3, 4]).unwrap())]
+    #[case(CircularBuffer::new(vec![0, 1, 2, 3]).unwrap())]
     fn get_is_correct(#[case] buffer: CircularBuffer<usize>) {
         let size = buffer.vec.len();
         for i in 0..size {
@@ -100,8 +108,8 @@ mod tests {
     }
 
     #[rstest]
-    #[case(CircularBuffer::new(vec![55, 22, 33]))]
-    #[case(CircularBuffer::new(vec![44, 66, 0, 88]))]
+    #[case(CircularBuffer::new(vec![55, 22, 33]).unwrap())]
+    #[case(CircularBuffer::new(vec![44, 66, 0, 88]).unwrap())]
     fn get_front_push_back_is_correct(#[case] mut buffer: CircularBuffer<usize>) {
         let size = buffer.vec.len();
         let mut replacement;
@@ -118,8 +126,8 @@ mod tests {
     }
 
     #[rstest]
-    #[case(CircularBuffer::new(vec![55, 22, 33]))]
-    #[case(CircularBuffer::new(vec![44, 66, 0, 88]))]
+    #[case(CircularBuffer::new(vec![55, 22, 33]).unwrap())]
+    #[case(CircularBuffer::new(vec![44, 66, 0, 88]).unwrap())]
     fn get_back_push_front_is_correct(#[case] mut buffer: CircularBuffer<usize>) {
         let size = buffer.vec.len();
         let mut replacement;

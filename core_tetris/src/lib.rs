@@ -33,7 +33,7 @@
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! let mut garbage_rng = MockRng::right_aligned_garbage();
+//! let mut garbage_rng = MockRng::default();
 //! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! ```
 //! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s.
@@ -46,7 +46,7 @@
 //! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # let mut garbage_rng = MockRng::right_aligned_garbage();
+//! # let mut garbage_rng = MockRng::default();
 //! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
@@ -113,7 +113,7 @@
 //! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # let mut garbage_rng = MockRng::right_aligned_garbage();
+//! # let mut garbage_rng = MockRng::default();
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng, &mut garbage_rng);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng, &mut garbage_rng);
@@ -154,7 +154,7 @@
 //! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoMove, TetrominoKind, MockRng, BagType};
 //! #
 //! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # let mut garbage_rng = MockRng::right_aligned_garbage();
+//! # let mut garbage_rng = MockRng::default();
 //! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Left), &mut rng, &mut garbage_rng);
 //! # player.try_apply(TetrisCommand::Move(TetrominoMove::Clockwise), &mut rng, &mut garbage_rng);

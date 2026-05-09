@@ -1,21 +1,40 @@
 use super::{CircularBuffer, TetrominoKind};
 use rand::TryRng;
-use std::{convert::Infallible, ops::Range};
+use std::convert::Infallible;
 
 /// [MockRng] implements [TryRng] and is designed to control the output of random generation.
 ///
-/// [MockRng::tetromino_cycle] and [MockRng::o_tetrominos] controls
-/// tetromino generation (this only works with [super::BagType::NoBag]).
-///
-/// [MockRng::garbage_cycle] and [MockRng::right_aligned_garbage] controls garbage generation
-/// (more precisely, the gap in the garbage lines).
+/// - [MockRng::tetromino_cycle] controls tetromino generation (this only works with [super::BagType::NoBag]);
+/// - [MockRng::garbage_cycle] controls garbage generation (more precisely, the gap in the garbage lines).
 pub struct MockRng(CircularBuffer<u32>);
 
-#[allow(missing_docs)] // TODO fix this ! add examples !!
+impl Default for MockRng {
+    /// If used for tetromino generation, will yield `TetrominoKind::ALL[0]`.
+    /// If used for garbage generation, will yield right aligned garbage (with a gap in the leftmost column).
+    fn default() -> Self {
+        Self(CircularBuffer::default())
+    }
+}
+
 impl MockRng {
-    pub fn tetromino_cycle(array: &[TetrominoKind]) -> Self {
+    /// Creates a [MockRng] that will generate `tetrominos`.
+    ///
+    /// If `tetrominos` is empty, returns [MockRng::default].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use core_tetris::{MockRng, TetrominoKind};
+    /// # use rand::seq::IndexedRandom;
+    /// let mut mock_rng = MockRng::tetromino_cycle(&[TetrominoKind::I, TetrominoKind::O]);
+    /// assert_eq!(TetrominoKind::ALL.choose(&mut mock_rng), Some(&TetrominoKind::I));
+    /// assert_eq!(TetrominoKind::ALL.choose(&mut mock_rng), Some(&TetrominoKind::O));
+    /// // etc.
+    /// ```
+    pub fn tetromino_cycle(tetrominos: &[TetrominoKind]) -> Self {
         let mut indices = Vec::new();
-        for kind in array {
+
+        for kind in tetrominos {
             // Little retro-engineering of `rand::seq::IndexedRandom::choose` on `TetrominoKind::ALL`.
             let index = TetrominoKind::ALL
                 .iter()
@@ -24,32 +43,39 @@ impl MockRng {
                 as u32;
             indices.push((index + 1) << 29);
         }
-        Self(CircularBuffer::new(indices))
+
+        CircularBuffer::new(indices).map(Self).unwrap_or_default()
     }
 
-    pub fn o_tetrominos() -> Self {
-        Self::tetromino_cycle(&[TetrominoKind::O])
-    }
-
-    pub fn garbage_cycle(values: &[u32], range: Range<u32>) -> Self {
+    /// Creates a [MockRng] that will generate garbage with a gap in `columns`,
+    /// supposing there are `nb_columns` in the grid.
+    ///
+    /// If `columns` is empty or `nb_columns` is 0, returns [MockRng::default].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use core_tetris::{MockRng};
+    /// # use rand::RngExt;
+    /// let mut mock_rng = MockRng::garbage_cycle(&[0, 1, 5], 6);
+    /// assert_eq!(mock_rng.random_range(0..6), 0);
+    /// assert_eq!(mock_rng.random_range(0..6), 1);
+    /// assert_eq!(mock_rng.random_range(0..6), 5);
+    /// // etc.
+    /// ```
+    pub fn garbage_cycle(columns: &[u32], nb_columns: u32) -> Self {
         let mut spaced_values = Vec::new();
-        let len = range
-            .end
-            .saturating_sub(1)
-            .saturating_sub(range.start)
-            .max(1);
-        for value in values {
-            if !range.contains(value) {
-                panic!("`values` should be contained in `range`")
+
+        if let Some(quotient) = nb_columns.checked_sub(1) {
+            for value in columns {
+                let spaced_value = u32::MAX / quotient * *value;
+                spaced_values.push(spaced_value);
             }
-            let spaced_value = u32::MAX / len * *value;
-            spaced_values.push(spaced_value);
         }
-        Self(CircularBuffer::new(spaced_values))
-    }
-    pub fn right_aligned_garbage() -> Self {
-        let values = vec![0];
-        Self(CircularBuffer::new(values))
+
+        CircularBuffer::new(spaced_values)
+            .map(Self)
+            .unwrap_or_default()
     }
 
     fn next(&mut self) -> u32 {
@@ -120,19 +146,19 @@ mod tests {
     }
 
     #[rstest]
-    #[case(vec![0], 0..10)]
-    #[case(vec![9], 0..10)]
-    #[case(vec![10], 0..11)]
-    #[case(Vec::from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), 0..10)]
-    #[case(Vec::from([0, 1, 1, 1, 1, 1, 1, 2, 3, 3]), 0..4)]
+    #[case(vec![0], 10)]
+    #[case(vec![9], 10)]
+    #[case(vec![10], 11)]
+    #[case(Vec::from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), 10)]
+    #[case(Vec::from([0, 1, 1, 1, 1, 1, 1, 2, 3, 3]), 4)]
     fn random_garbage_using_garbage_cycle_is_correct(
         #[case] garbage_gaps: Vec<u32>,
-        #[case] range: Range<u32>,
+        #[case] nb_columns: u32,
     ) {
-        let mut mock = MockRng::garbage_cycle(&garbage_gaps, range.clone());
+        let mut mock = MockRng::garbage_cycle(&garbage_gaps, nb_columns);
 
         let generated_gaps = Vec::from_iter(
-            std::iter::repeat_with(|| mock.random_range(range.clone())).take(garbage_gaps.len()),
+            std::iter::repeat_with(|| mock.random_range(0..nb_columns)).take(garbage_gaps.len()),
         );
 
         assert_eq!(generated_gaps, garbage_gaps);
