@@ -6,6 +6,7 @@ mod tetris_color;
 use super::Position;
 use rand::{Rng, RngExt};
 use serde::{Deserialize, Serialize};
+use std::error::Error;
 use std::fmt::Display;
 use std::ops::{Index, IndexMut};
 use std::str::FromStr;
@@ -38,7 +39,7 @@ pub type TetrisResult = Result<(), GameOverError>;
 
 // same visibility as TetrisColor
 /// **Tetris Guideline** Game Over Conditions.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 #[allow(clippy::enum_variant_names)]
 pub enum GameOverError {
     /// According to the **Tetris Guideline** :
@@ -58,6 +59,18 @@ pub enum GameOverError {
     /// gets pushed out of the **Buffer zone**."
     TopOut,
 }
+
+impl Display for GameOverError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::BlockOut => write!(f, "can not spawn tetromino in the Matrix"),
+            Self::LockOut => write!(f, "tetromino locked down above the Skyline"),
+            Self::TopOut => write!(f, "a Block was pushed past the top of the Buffer Zone"),
+        }
+    }
+}
+
+impl Error for GameOverError {}
 
 /// Constructors.
 #[allow(missing_docs)]
