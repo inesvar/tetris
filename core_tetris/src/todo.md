@@ -1,6 +1,5 @@
-- TETRIS correct wallkicks using guidelines
 - TESTS make more tetris_grid unit tests
-- TESTS make core_tetris integration tests : hold, game over, wallkicks
+- TESTS make core_tetris integration tests : hold, game over
 - DOC correct garbage functions doc
 - TETRIS read tetris guidelines to update code and vocabulary
 - NEXT check error messages

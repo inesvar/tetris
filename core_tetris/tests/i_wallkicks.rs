@@ -1,9 +1,9 @@
-use std::str::FromStr;
-
 use core_tetris::{
-    BagType, MockRng, TetrisCommand, TetrisGrid, TetrisPlayer, TetrisResult, TetrominoKind, TetrominoMove
+    BagType, MockRng, TetrisCommand, TetrisGrid, TetrisPlayer, TetrisResult, TetrominoKind,
+    TetrominoMove,
 };
 use rstest::rstest;
+use std::str::FromStr;
 
 #[rstest]
 #[case::east_to_south(TetrominoMove::Clockwise.into(), TetrominoMove::Clockwise.into())]
@@ -435,18 +435,19 @@ fn i_out_of_right_well(
     let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
     let mut garbage_rng = MockRng::default();
     let grid = TetrisGrid::from_str(concat!(
-            "---------\n",
-            "         \n",
-            "         \n",
-            "---------\n",
-            "         \n",
-            "         \n",
-            "         \n",
-            "XXXXXXXX \n",
-            "XXXXXXXX \n",
-            "XXXXXXXX \n",
-            "---------\n",
-        )).unwrap();
+        "---------\n",
+        "         \n",
+        "         \n",
+        "---------\n",
+        "         \n",
+        "         \n",
+        "         \n",
+        "XXXXXXXX \n",
+        "XXXXXXXX \n",
+        "XXXXXXXX \n",
+        "---------\n",
+    ))
+    .unwrap();
     let mut player = TetrisPlayer::try_from_matrix(&mut rng, BagType::NoBag, grid).unwrap();
 
     assert_eq!(
@@ -486,10 +487,7 @@ fn i_out_of_right_well(
         )
     );
 
-    assert!(player.try_fall());
-    assert!(player.try_fall());
-    assert!(player.try_fall());
-    assert!(player.try_fall());
+    while player.try_fall() {}
 
     assert_eq!(
         player.to_string(),
@@ -531,8 +529,8 @@ fn i_out_of_right_well(
 }
 
 #[rstest]
-#[case::east_to_south(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
-#[case::west_to_north(TetrominoMove::Counterclockwise.into(), TetrominoMove::Counterclockwise.into())]
+#[case::east_to_north(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
+#[case::west_to_south(TetrominoMove::Counterclockwise.into(), TetrominoMove::Counterclockwise.into())]
 fn i_out_of_left_well(
     #[case] initial_rotation: TetrisCommand,
     #[case] rotation: TetrisCommand,
@@ -540,18 +538,19 @@ fn i_out_of_left_well(
     let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::I]);
     let mut garbage_rng = MockRng::default();
     let grid = TetrisGrid::from_str(concat!(
-            "---------\n",
-            "         \n",
-            "         \n",
-            "---------\n",
-            "         \n",
-            "         \n",
-            "         \n",
-            " XXXXXXXX\n",
-            " XXXXXXXX\n",
-            " XXXXXXXX\n",
-            "---------\n",
-        )).unwrap();
+        "---------\n",
+        "         \n",
+        "         \n",
+        "---------\n",
+        "         \n",
+        "         \n",
+        "         \n",
+        " XXXXXXXX\n",
+        " XXXXXXXX\n",
+        " XXXXXXXX\n",
+        "---------\n",
+    ))
+    .unwrap();
     let mut player = TetrisPlayer::try_from_matrix(&mut rng, BagType::NoBag, grid).unwrap();
 
     assert_eq!(
@@ -591,10 +590,7 @@ fn i_out_of_left_well(
         )
     );
 
-    assert!(player.try_fall());
-    assert!(player.try_fall());
-    assert!(player.try_fall());
-    assert!(player.try_fall());
+    while player.try_fall() {}
 
     assert_eq!(
         player.to_string(),
