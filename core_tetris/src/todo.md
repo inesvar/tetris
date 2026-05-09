@@ -2,8 +2,6 @@
 - TESTS make more tetris_grid unit tests
 - TESTS make core_tetris integration tests : hold, game over, wallkicks
 - DOC correct garbage functions doc
-- DOC improve MockRng doc
 - TETRIS read tetris guidelines to update code and vocabulary
-
-
 - NEXT check error messages
+- BUG clarify NB_VISIBLE_BUFFER_ROWS utility
