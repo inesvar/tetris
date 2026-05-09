@@ -22,7 +22,7 @@ pub const NB_VISIBLE_BUFFER_ROWS: u32 = 2;
 ///   Tetriminos fall from the top-middle just above the **Skyline** (off-screen) to the bottom."
 /// - **Buffer Zone**: "a 10-cell wide x 20-cell high invisible area above the Matrix used to detect **Lock
 ///   Out**, **Block Out**, and **Top Out** **Game Over Conditions**."
-#[derive(Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TetrisGrid {
     nb_columns: i32,
     nb_matrix_rows: i32,
@@ -59,42 +59,69 @@ pub enum GameOverError {
     TopOut,
 }
 
+/// Lists incorrect dimensions when creating a [TetrisGrid].
+#[derive(Clone, Debug, PartialEq)]
+#[allow(missing_docs)]
+pub enum TetrisGridDimensionError {
+    TooLarge,
+    NotEnoughColumns,
+    NotEnoughMatrixRows,
+    NotEnoughBufferRows,
+}
+
+impl std::error::Error for TetrisGridDimensionError {}
+
+impl Display for TetrisGridDimensionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::TooLarge => write!(f, "`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `TetrisGrid::MAX`"),
+            Self::NotEnoughColumns => write!(f, "`nb_columns` should be greater than or equal to `TetrisGrid::MINIMAL_NB_COLUMNS`"),
+            Self::NotEnoughMatrixRows => write!(f, "`nb_matrix_rows` should be greater than or equal to `TetrisGrid::MINIMAL_NB_MATRIX_ROWS`"),
+            Self::NotEnoughBufferRows => write!(f, "`nb_buffer_rows` should be greater than or equal to `TetrisGrid::MINIMAL_NB_BUFFER_ROWS`"),
+        }
+    }
+}
+
 /// Constructors.
 #[allow(missing_docs)]
 impl TetrisGrid {
-    /// Creates an empty grid of the specified size. Use [TetrisGrid::default] for **Tetris Guideline** official size.
+    /// Tries to create an empty grid of the specified size. Use [TetrisGrid::default] for **Tetris Guideline** official size.
     ///
-    /// # Panics
+    /// Fails with [TetrisGridDimensionError] if `nb_columns` or `nb_matrix_rows` or `nb_buffer_rows` aren't in the expected range.
     ///
-    /// If `nb_columns` or `nb_matrix_rows` or `nb_buffer_rows` aren't in the expected range.
+    /// - `nb_columns` has to be between [TetrisGrid::MINIMAL_NB_COLUMNS (4)](TetrisGrid::MINIMAL_NB_COLUMNS) and [TetrisGrid::MAX (100)](TetrisGrid::MAX).
+    ///   Should be [TetrisGrid::DEFAULT_NB_COLUMNS (10)](TetrisGrid::DEFAULT_NB_COLUMNS) according to the **Tetris Guideline**.
     ///
-    /// `nb_columns` has to be between [TetrisGrid::MINIMAL_NB_COLUMNS (4)](TetrisGrid::MINIMAL_NB_COLUMNS) and [TetrisGrid::MAX (100)](TetrisGrid::MAX).
-    /// Should be [TetrisGrid::DEFAULT_NB_COLUMNS (10)](TetrisGrid::DEFAULT_NB_COLUMNS) according to the **Tetris Guideline**.
+    /// - `nb_matrix_rows` has to be between [TetrisGrid::MINIMAL_NB_MATRIX_ROWS (6)](TetrisGrid::MINIMAL_NB_MATRIX_ROWS) and [TetrisGrid::MAX (100)](TetrisGrid::MAX).
+    ///   Should be [TetrisGrid::DEFAULT_NB_MATRIX_ROWS (20)](TetrisGrid::DEFAULT_NB_MATRIX_ROWS) according to the **Tetris Guideline**.
     ///
-    /// `nb_matrix_rows` has to be between [TetrisGrid::MINIMAL_NB_MATRIX_ROWS (6)](TetrisGrid::MINIMAL_NB_MATRIX_ROWS) and [TetrisGrid::MAX (100)](TetrisGrid::MAX).
-    /// Should be [TetrisGrid::DEFAULT_NB_MATRIX_ROWS (20)](TetrisGrid::DEFAULT_NB_MATRIX_ROWS) according to the **Tetris Guideline**.
-    ///
-    /// `nb_buffer_rows` has to be between [TetrisGrid::MINIMAL_NB_BUFFER_ROWS (2)](TetrisGrid::MINIMAL_NB_BUFFER_ROWS) and [TetrisGrid::MAX (100)](TetrisGrid::MAX).
-    /// Should be [TetrisGrid::DEFAULT_NB_BUFFER_ROWS (20)](TetrisGrid::DEFAULT_NB_BUFFER_ROWS) according to the **Tetris Guideline**.
-    pub fn new(nb_columns: u32, nb_matrix_rows: u32, nb_buffer_rows: u32) -> Self {
+    /// - `nb_buffer_rows` has to be between [TetrisGrid::MINIMAL_NB_BUFFER_ROWS (2)](TetrisGrid::MINIMAL_NB_BUFFER_ROWS) and [TetrisGrid::MAX (100)](TetrisGrid::MAX).
+    ///   Should be [TetrisGrid::DEFAULT_NB_BUFFER_ROWS (20)](TetrisGrid::DEFAULT_NB_BUFFER_ROWS) according to the **Tetris Guideline**.
+    pub fn try_new(
+        nb_columns: u32,
+        nb_matrix_rows: u32,
+        nb_buffer_rows: u32,
+    ) -> Result<Self, TetrisGridDimensionError> {
         if nb_columns > TetrisGrid::MAX
             || nb_matrix_rows > TetrisGrid::MAX
             || nb_buffer_rows > TetrisGrid::MAX
         {
-            panic!("`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `TetrisGrid::MAX`");
+            return Err(TetrisGridDimensionError::TooLarge);
         }
         if nb_columns < TetrisGrid::MINIMAL_NB_COLUMNS {
-            panic!(
-                "`nb_columns` should be greater than or equal to `TetrisGrid::MINIMAL_NB_COLUMNS`"
-            );
+            return Err(TetrisGridDimensionError::NotEnoughColumns);
         }
         if nb_matrix_rows < TetrisGrid::MINIMAL_NB_MATRIX_ROWS {
-            panic!("`nb_matrix_rows` should be greater than or equal to `TetrisGrid::MINIMAL_NB_MATRIX_ROWS`");
+            return Err(TetrisGridDimensionError::NotEnoughMatrixRows);
         }
         if nb_buffer_rows < TetrisGrid::MINIMAL_NB_BUFFER_ROWS {
-            panic!("`nb_buffer_rows` should be greater than or equal to `TetrisGrid::MINIMAL_NB_BUFFER_ROWS`");
+            return Err(TetrisGridDimensionError::NotEnoughBufferRows);
         }
 
+        Ok(Self::new(nb_columns, nb_matrix_rows, nb_buffer_rows))
+    }
+
+    fn new(nb_columns: u32, nb_matrix_rows: u32, nb_buffer_rows: u32) -> Self {
         let nb_rows_usize = (nb_matrix_rows + nb_buffer_rows) as usize;
         let mut matrix = Vec::with_capacity(nb_rows_usize);
         for _ in 0..nb_rows_usize {
@@ -370,9 +397,6 @@ impl Display for TetrisGrid {
 impl FromStr for TetrisGrid {
     type Err = String;
 
-    /// # Panics
-    ///
-    /// See [TetrisGrid::new].
     fn from_str(string: &str) -> Result<Self, Self::Err> {
         let lines: Vec<&str> = string.split_terminator('\n').collect();
 
@@ -401,11 +425,12 @@ impl FromStr for TetrisGrid {
 
         let nb_matrix_rows = matrix.len();
         let nb_buffer_rows = buffer.len();
-        let mut tetris_grid = TetrisGrid::new(
+        let mut tetris_grid = TetrisGrid::try_new(
             nb_columns as u32,
             nb_matrix_rows as u32,
             nb_buffer_rows as u32,
-        );
+        )
+        .map_err(|e| e.to_string())?;
 
         let cells = [buffer, matrix].concat();
 
@@ -440,70 +465,56 @@ mod tests {
     #[case(TetrisGrid::MAX + 1, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, TetrisGrid::DEFAULT_NB_BUFFER_ROWS)]
     #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::MAX + 1, TetrisGrid::DEFAULT_NB_BUFFER_ROWS)]
     #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, TetrisGrid::MAX + 1)]
-    #[should_panic(
-        expected = "`nb_columns`, `nb_matrix_rows` and `nb_buffer_rows` should be less than `TetrisGrid::MAX`"
-    )]
-    fn new_panics_if_any_arg_is_too_big(
+    fn try_new_fails_if_any_arg_is_too_big(
         #[case] nb_columns: u32,
         #[case] nb_matrix_rows: u32,
         #[case] nb_buffer_rows: u32,
     ) {
-        TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows);
+        assert_eq!(
+            TetrisGrid::try_new(nb_columns, nb_matrix_rows, nb_buffer_rows),
+            Err(TetrisGridDimensionError::TooLarge)
+        );
     }
 
     #[rstest]
-    #[should_panic(
-        expected = "`nb_columns` should be greater than or equal to `TetrisGrid::MINIMAL_NB_COLUMNS`"
-    )]
     #[case(
         TetrisGrid::MINIMAL_NB_COLUMNS - 1,
         TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
-        TetrisGrid::DEFAULT_NB_BUFFER_ROWS
+        TetrisGrid::DEFAULT_NB_BUFFER_ROWS, TetrisGridDimensionError::NotEnoughColumns
     )]
-    #[should_panic(
-        expected = "`nb_matrix_rows` should be greater than or equal to `TetrisGrid::MINIMAL_NB_MATRIX_ROWS`"
-    )]
-    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::MINIMAL_NB_MATRIX_ROWS - 1, TetrisGrid::DEFAULT_NB_BUFFER_ROWS)]
-    #[should_panic(
-        expected = "`nb_buffer_rows` should be greater than or equal to `TetrisGrid::MINIMAL_NB_BUFFER_ROWS`"
-    )]
-    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, TetrisGrid::MINIMAL_NB_BUFFER_ROWS - 1)]
-    fn new_panics_if_any_arg_is_too_small(
+    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::MINIMAL_NB_MATRIX_ROWS - 1, TetrisGrid::DEFAULT_NB_BUFFER_ROWS, TetrisGridDimensionError::NotEnoughMatrixRows)]
+    #[case(TetrisGrid::DEFAULT_NB_COLUMNS, TetrisGrid::DEFAULT_NB_MATRIX_ROWS, TetrisGrid::MINIMAL_NB_BUFFER_ROWS - 1, TetrisGridDimensionError::NotEnoughBufferRows)]
+    fn try_new_fails_if_any_arg_is_too_small(
         #[case] nb_columns: u32,
         #[case] nb_matrix_rows: u32,
         #[case] nb_buffer_rows: u32,
+        #[case] error: TetrisGridDimensionError,
     ) {
-        TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows);
+        assert_eq!(
+            TetrisGrid::try_new(nb_columns, nb_matrix_rows, nb_buffer_rows),
+            Err(error)
+        );
     }
 
     #[rstest]
-    #[case::default(TetrisGrid::default())]
-    #[case::compact(TetrisGrid::compact())]
-    #[case::smallest_possible_grid(TetrisGrid::minimal())]
-    #[case::biggest_possible_grid(TetrisGrid::new(
-        TetrisGrid::MAX,
-        TetrisGrid::MAX,
-        TetrisGrid::MAX
-    ))]
-    fn new_doesnt_panic_if_all_args_are_correct(#[case] _grid: TetrisGrid) {}
-
-    #[rstest]
+    #[case::minimal(
+        TetrisGrid::MINIMAL_NB_COLUMNS,
+        TetrisGrid::MINIMAL_NB_MATRIX_ROWS,
+        TetrisGrid::MINIMAL_NB_BUFFER_ROWS
+    )]
+    #[case::max(TetrisGrid::MAX, TetrisGrid::MAX, TetrisGrid::MAX)]
     #[case::default(
         TetrisGrid::DEFAULT_NB_COLUMNS,
         TetrisGrid::DEFAULT_NB_MATRIX_ROWS,
         TetrisGrid::DEFAULT_NB_BUFFER_ROWS
     )]
-    #[case::biggest_possible(TetrisGrid::MAX, TetrisGrid::MAX, TetrisGrid::MAX)]
-    fn new_is_correct(
+    #[case::compact(9, 6, 2)]
+    fn try_new_succeeds_if_all_args_are_correct(
         #[case] nb_columns: u32,
         #[case] nb_matrix_rows: u32,
         #[case] nb_buffer_rows: u32,
     ) {
-        let grid = TetrisGrid::new(nb_columns, nb_matrix_rows, nb_buffer_rows);
-
-        assert_eq!(grid.nb_columns, nb_columns as i32);
-        assert_eq!(grid.nb_matrix_rows, nb_matrix_rows as i32);
-        assert_eq!(grid.nb_buffer_rows, nb_buffer_rows as i32);
+        assert!(TetrisGrid::try_new(nb_columns, nb_matrix_rows, nb_buffer_rows).is_ok());
     }
 
     #[fixture]

@@ -198,7 +198,7 @@ pub(crate) use tetromino_generator::TetrominoGenerator;
 
 // used to update the active tetromino
 pub use tetris_command::TetrisCommand;
-pub use tetris_grid::{GameOverError, TetrisResult};
+pub use tetris_grid::{GameOverError, TetrisGridDimensionError, TetrisResult};
 pub use tetromino::TetrominoMove;
 // used to render the TetrisPlayer
 pub use circular_buffer::CircularBuffer;
