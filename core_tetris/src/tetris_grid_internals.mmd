@@ -1,39 +1,41 @@
-graph LR
+graph TD
     %% tetris grid
-    clear_lines(clear_lines)
-    pop_row(pop_row)
-    is_above_skyline(is_above_skyline)
-    add_block(add_block)
-
-    is_block_empty(is_block_empty)
-    convert_position_y_to_grid_y(convert_position_y_to_grid_y)
-
-    is_in_grid(is_in_grid)
-
-    add_blocks(add_blocks)
-    try_spawn_blocks(try_spawn_blocks)
     is_block_available(is_block_available)
 
-    subgraph tetris_grid
-        subgraph "pub(super)"
-            add_blocks
-            try_spawn_blocks
-            is_block_available
-        end
-        add_blocks -.-> is_above_skyline
-        add_blocks -.-> clear_lines
-        add_blocks -.-> add_block
-    
-        is_above_skyline -.-> convert_position_y_to_grid_y
-        clear_lines -.-> pop_row
-        add_block -.-> is_block_empty
-        add_block -.-> convert_position_y_to_grid_y
-    
-        is_block_empty -.-> convert_position_y_to_grid_y
+    is_in_grid(is_in_grid)
+    is_block_empty(is_block_empty !)
 
-        is_in_grid -.-> convert_position_y_to_grid_y
+    add_blocks(add_blocks_and_clear_lines !)
 
-        try_spawn_blocks -.-> is_block_empty
-        is_block_available -.-> is_in_grid
-        is_block_available -.-> is_block_empty
+    add_block(add_block !)
+    is_above_skyline(is_above_skyline)
+    clear_lines(clear_lines)
+    pop_row(pop_row !)
+
+    convert_position_y_to_grid_y(convert_position_y_to_grid_y)
+
+    apply_received_garbage(apply_received_garbage)
+
+    add_garbage_row(add_garbage_row)
+
+    subgraph "pub(crate)"
+        is_block_available
+        add_blocks
+        apply_received_garbage
     end
+    is_block_available -.-> is_in_grid
+    is_in_grid -.-> convert_position_y_to_grid_y
+
+    is_block_available -.-> is_block_empty
+    is_block_empty -.-> convert_position_y_to_grid_y
+
+    add_blocks -.-> add_block
+    add_blocks -.-> is_above_skyline
+    add_blocks -.-> clear_lines
+
+    is_above_skyline -.-> convert_position_y_to_grid_y
+    clear_lines -.-> pop_row
+    add_block -.-> is_block_empty
+    add_block -.-> convert_position_y_to_grid_y
+
+    apply_received_garbage -.-> add_garbage_row

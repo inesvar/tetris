@@ -229,12 +229,12 @@ mod tetris_grid_internals {
         /// # Panics
         ///
         /// If `block` is outside the tetris grid.
-        pub(super) fn is_block_empty(&self, block: &Position) -> bool {
+        fn is_block_empty(&self, block: &Position) -> bool {
             self[block].is_none()
         }
 
         /// Return `true` is `block` is in the **Matrix** or the **Buffer Zone**.
-        pub(super) fn is_in_grid(&self, block: &Position) -> bool {
+        fn is_in_grid(&self, block: &Position) -> bool {
             let line = self.convert_position_y_to_grid_y(block.y());
             block.x() >= 0
                 && line >= 0
@@ -242,6 +242,7 @@ mod tetris_grid_internals {
                 && line < self.nb_matrix_rows + self.nb_buffer_rows
         }
 
+        // NOTE: this is not efficient
         /// Remove complete lines, return number of cleared lines.
         fn clear_lines(&mut self) -> u64 {
             let mut score = 0;
@@ -259,15 +260,14 @@ mod tetris_grid_internals {
         /// # Panics
         ///
         /// If `row` is greater or equal to `self.cells.len()`.
-        pub(super) fn pop_row(&mut self, row: usize) {
+        fn pop_row(&mut self, row: usize) {
             self.cells.remove(row);
             self.line_sum.remove(row);
 
-            self.cells.insert(
-                self.nb_rows_usize() - 1,
+            self.cells.push(
                 vec![None; self.nb_columns as usize],
             );
-            self.line_sum.insert(self.nb_rows_usize() - 1, 0);
+            self.line_sum.push(0);
         }
 
         /// Add garbage row to the tetris grid (only if the top row is empty).
@@ -309,6 +309,177 @@ mod tetris_grid_internals {
 
         const fn nb_rows_usize(&self) -> usize {
             (self.nb_matrix_rows + self.nb_buffer_rows) as usize
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+        use rstest::rstest;
+
+        #[test]
+        fn pop_row_is_correct() {
+            let mut tetris_grid = TetrisGrid::from_str(concat!(
+                "-------------\n",
+                "             \n",
+                "             \n",
+                "-------------\n",
+                "             \n",
+                "             \n",
+                "XX XX X X X X\n",
+                " X X X XX XX \n",
+                "X X XX XX X X\n",
+                "XXXXXXXXXXXXX\n",
+                "-------------\n",
+            ))
+            .unwrap();
+
+            tetris_grid.pop_row(3);
+
+            assert_eq!(
+                tetris_grid.to_string(),
+                concat!(
+                    "-------------\n",
+                    "             \n",
+                    "             \n",
+                    "-------------\n",
+                    "             \n",
+                    "             \n",
+                    "             \n",
+                    " X X X XX XX \n",
+                    "X X XX XX X X\n",
+                    "XXXXXXXXXXXXX\n",
+                    "-------------\n",
+                ),
+                "Actual grid:\n{}",
+                tetris_grid
+            );
+        }
+
+        #[test]
+        fn is_block_empty_is_correct() {
+            let grid = TetrisGrid::from_str(concat!(
+                "---------\n",
+                "        X\n",
+                "X       X\n",
+                "---------\n",
+                "X        \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "         \n",
+                "X       X\n",
+                "---------\n",
+            ))
+            .unwrap();
+
+            assert!(grid.is_block_empty(&Position::new(0, 0)));
+            assert!(!grid.is_block_empty(&Position::new(8, 0)));
+            assert!(!grid.is_block_empty(&Position::new(0, 1)));
+            assert!(!grid.is_block_empty(&Position::new(8, 1)));
+
+            assert!(!grid.is_block_empty(&Position::new(0, 2)));
+            assert!(grid.is_block_empty(&Position::new(8, 2)));
+            assert!(!grid.is_block_empty(&Position::new(0, 7)));
+            assert!(!grid.is_block_empty(&Position::new(8, 7)));
+        }
+
+        #[rstest]
+        #[case(TetrisGrid::default(), Position::new(-1, -18))]
+        #[case(TetrisGrid::default(), Position::new(0, -19))]
+        #[case(TetrisGrid::default(), Position::new(10, 21))]
+        #[case(TetrisGrid::default(), Position::new(9, 22))]
+        #[should_panic]
+        fn is_block_empty_panics_outside_of_the_grid(#[case] grid: TetrisGrid, #[case] pos: Position) {
+            grid.is_block_empty(&pos);
+        }
+
+        #[rstest]
+        #[case(TetrisGrid::default(), Position::new(0, -18), Position::new(9, 21))]
+        #[case(TetrisGrid::minimal(), Position::new(0, 0), Position::new(3, 7))]
+        fn is_in_grid_is_correct(
+            #[case] grid: TetrisGrid,
+            #[case] top_left: Position,
+            #[case] bottom_right: Position,
+        ) {
+            assert!(grid.is_in_grid(&top_left));
+            assert!(grid.is_in_grid(&bottom_right));
+
+            // neighbors of the grid corners that are outside of the grid
+            // horizontal offset :
+            assert!(!grid.is_in_grid(&(top_left + Position::new(-1, 0))));
+            assert!(!grid.is_in_grid(&(bottom_right + Position::new(1, 0))));
+            // vertical offset :
+            assert!(!grid.is_in_grid(&(top_left + Position::new(0, -1))));
+            assert!(!grid.is_in_grid(&(bottom_right + Position::new(0, 1))));
+        }
+
+        #[test]
+        fn add_garbage_is_correct() {
+            let mut grid = TetrisGrid::from_str(concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "         \n",
+                "         \n",
+                "        X\n",
+                "X        \n",
+                "XX       \n",
+                "XXX      \n",
+                "---------\n",
+            ))
+            .unwrap();
+
+            assert!(grid.add_garbage_row(0).is_ok());
+            assert!(grid.add_garbage_row(1).is_ok());
+            assert!(grid.add_garbage_row(3).is_ok());
+
+            assert_eq!(
+                grid.to_string(),
+                concat!(
+                    "---------\n",
+                    "         \n",
+                    "        X\n",
+                    "---------\n",
+                    "X        \n",
+                    "XX       \n",
+                    "XXX      \n",
+                    " XXXXXXXX\n",
+                    "X XXXXXXX\n",
+                    "XXX XXXXX\n",
+                    "---------\n",
+                ),
+                "Actual grid:\n{}",
+                grid
+            );
+        }
+
+        #[test]
+        fn add_garbage_returns_error_on_top_out() {
+            let mut grid = TetrisGrid::from_str(concat!(
+                "---------\n",
+                "         \n",
+                "         \n",
+                "---------\n",
+                "        X\n",
+                "        X\n",
+                "        X\n",
+                "        X\n",
+                "        X\n",
+                "        X\n",
+                "---------\n",
+            ))
+            .unwrap();
+
+            assert!(grid.add_garbage_row(0).is_ok());
+            assert!(grid.add_garbage_row(0).is_ok());
+            assert_eq!(
+                grid.add_garbage_row(0),
+                Err(GameOverError::TopOut),
+                "Actual grid:\n{}",
+                grid
+            );
         }
     }
 }
@@ -547,74 +718,6 @@ mod tests {
         assert!(TetrisGrid::from_str(grid).is_ok());
     }
 
-    #[test]
-    fn add_garbage_is_correct() {
-        let mut grid = TetrisGrid::from_str(concat!(
-            "---------\n",
-            "         \n",
-            "         \n",
-            "---------\n",
-            "         \n",
-            "         \n",
-            "        X\n",
-            "X        \n",
-            "XX       \n",
-            "XXX      \n",
-            "---------\n",
-        ))
-        .unwrap();
-
-        assert!(grid.add_garbage_row(0).is_ok());
-        assert!(grid.add_garbage_row(1).is_ok());
-        assert!(grid.add_garbage_row(3).is_ok());
-
-        assert_eq!(
-            grid.to_string(),
-            concat!(
-                "---------\n",
-                "         \n",
-                "        X\n",
-                "---------\n",
-                "X        \n",
-                "XX       \n",
-                "XXX      \n",
-                " XXXXXXXX\n",
-                "X XXXXXXX\n",
-                "XXX XXXXX\n",
-                "---------\n",
-            ),
-            "Actual grid:\n{}",
-            grid
-        );
-    }
-
-    #[test]
-    fn add_garbage_returns_error_on_top_out() {
-        let mut grid = TetrisGrid::from_str(concat!(
-            "---------\n",
-            "         \n",
-            "         \n",
-            "---------\n",
-            "        X\n",
-            "        X\n",
-            "        X\n",
-            "        X\n",
-            "        X\n",
-            "        X\n",
-            "---------\n",
-        ))
-        .unwrap();
-
-        assert!(grid.add_garbage_row(0).is_ok());
-        assert!(grid.add_garbage_row(0).is_ok());
-        assert_eq!(
-            grid.add_garbage_row(0),
-            Err(GameOverError::TopOut),
-            "Actual grid:\n{}",
-            grid
-        );
-    }
-
     #[rstest]
     #[case(TetrisGrid::default(), 0, 20 + NB_VISIBLE_BUFFER_ROWS as i32 - 1)]
     #[case(TetrisGrid::default(), NB_VISIBLE_BUFFER_ROWS as i32, 20 - 1)]
@@ -637,64 +740,6 @@ mod tests {
         assert_eq!(grid.convert_grid_y_to_position_y(input), expected);
     }
 
-    #[test]
-    fn is_block_empty_is_correct() {
-        let grid = TetrisGrid::from_str(concat!(
-            "---------\n",
-            "        X\n",
-            "X       X\n",
-            "---------\n",
-            "X        \n",
-            "         \n",
-            "         \n",
-            "         \n",
-            "         \n",
-            "X       X\n",
-            "---------\n",
-        ))
-        .unwrap();
-
-        assert!(grid.is_block_empty(&Position::new(0, 0)));
-        assert!(!grid.is_block_empty(&Position::new(8, 0)));
-        assert!(!grid.is_block_empty(&Position::new(0, 1)));
-        assert!(!grid.is_block_empty(&Position::new(8, 1)));
-
-        assert!(!grid.is_block_empty(&Position::new(0, 2)));
-        assert!(grid.is_block_empty(&Position::new(8, 2)));
-        assert!(!grid.is_block_empty(&Position::new(0, 7)));
-        assert!(!grid.is_block_empty(&Position::new(8, 7)));
-    }
-
-    #[rstest]
-    #[case(TetrisGrid::default(), Position::new(-1, -18))]
-    #[case(TetrisGrid::default(), Position::new(0, -19))]
-    #[case(TetrisGrid::default(), Position::new(10, 21))]
-    #[case(TetrisGrid::default(), Position::new(9, 22))]
-    #[should_panic]
-    fn is_block_empty_panics_outside_of_the_grid(#[case] grid: TetrisGrid, #[case] pos: Position) {
-        grid.is_block_empty(&pos);
-    }
-
-    #[rstest]
-    #[case(TetrisGrid::default(), Position::new(0, -18), Position::new(9, 21))]
-    #[case(TetrisGrid::minimal(), Position::new(0, 0), Position::new(3, 7))]
-    fn is_in_grid_is_correct(
-        #[case] grid: TetrisGrid,
-        #[case] top_left: Position,
-        #[case] bottom_right: Position,
-    ) {
-        assert!(grid.is_in_grid(&top_left));
-        assert!(grid.is_in_grid(&bottom_right));
-
-        // neighbors of the grid corners that are outside of the grid
-        // horizontal offset :
-        assert!(!grid.is_in_grid(&(top_left + Position::new(-1, 0))));
-        assert!(!grid.is_in_grid(&(bottom_right + Position::new(1, 0))));
-        // vertical offset :
-        assert!(!grid.is_in_grid(&(top_left + Position::new(0, -1))));
-        assert!(!grid.is_in_grid(&(bottom_right + Position::new(0, 1))));
-    }
-
     #[rstest]
     #[case(TetrisGrid::default(), Position::new(-1, -18))]
     #[case(TetrisGrid::default(), Position::new(0, -19))]
@@ -705,44 +750,5 @@ mod tests {
         #[case] outside_pos: Position,
     ) {
         assert!(!grid.is_block_available(&outside_pos));
-    }
-
-    #[test]
-    fn pop_row_is_correct() {
-        let mut tetris_grid = TetrisGrid::from_str(concat!(
-            "-------------\n",
-            "             \n",
-            "             \n",
-            "-------------\n",
-            "             \n",
-            "             \n",
-            "XX XX X X X X\n",
-            " X X X XX XX \n",
-            "X X XX XX X X\n",
-            "XXXXXXXXXXXXX\n",
-            "-------------\n",
-        ))
-        .unwrap();
-
-        tetris_grid.pop_row(3);
-
-        assert_eq!(
-            tetris_grid.to_string(),
-            concat!(
-                "-------------\n",
-                "             \n",
-                "             \n",
-                "-------------\n",
-                "             \n",
-                "             \n",
-                "             \n",
-                " X X X XX XX \n",
-                "X X XX XX X X\n",
-                "XXXXXXXXXXXXX\n",
-                "-------------\n",
-            ),
-            "Actual grid:\n{}",
-            tetris_grid
-        );
     }
 }
