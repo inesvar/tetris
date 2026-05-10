@@ -190,7 +190,7 @@ impl TetrisGrid {
 impl TetrisGrid {
     /// Return the translation needed for `blocks` to enter the grid.
     pub(crate) fn get_starting_position(&self) -> Position {
-        Position::new((self.nb_columns + 1) / 2 - 2, 0)
+        Position::new((self.nb_columns + 1) / 2 - 2, NB_VISIBLE_BUFFER_ROWS as i32 - 2)
     }
 }
 

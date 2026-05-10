@@ -3,4 +3,4 @@
 - BUG clarify NB_VISIBLE_BUFFER_ROWS utility
 
 it more or less works but :
-- the tetromino should start just above the grid even when NB_VISIBLE_BUFFER_ROWS != 2
+- render should not even care what NB_BUFFER is....
