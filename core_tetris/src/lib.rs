@@ -203,7 +203,7 @@ pub use tetromino::TetrominoMove;
 // used to render the TetrisPlayer
 pub use circular_buffer::CircularBuffer;
 pub use mock_rng::MockRng;
-pub use tetris_grid::{TetrisColor, TetrisGrid, NB_VISIBLE_BUFFER_ROWS};
+pub use tetris_grid::{TetrisColor, TetrisGrid};
 pub use tetris_player::TetrisPlayer;
 pub use tetromino::{Position, Tetromino, TetrominoKind};
 // currently unused, TODO: propose different constructors for TetrisPlayer

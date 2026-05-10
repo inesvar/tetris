@@ -6,7 +6,7 @@ use super::{
 };
 use core_tetris::{
     render::{RenderTetrisPlayer, RunningState},
-    Position, TetrisColor, TetrisGrid, TetrisPlayer, NB_VISIBLE_BUFFER_ROWS,
+    Position, TetrisColor, TetrisGrid, TetrisPlayer,
 };
 use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
@@ -86,10 +86,7 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
 
         // drawing the hold piece
         if let Some(saved) = player.hold_queue() {
-            self.transform = self.transform.trans(
-                BLOCK_SIZE,
-                BLOCK_SIZE,
-            );
+            self.transform = self.transform.trans(BLOCK_SIZE, BLOCK_SIZE);
             self.render_tetromino(saved);
         }
 
@@ -114,19 +111,13 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
         outline_rect.draw(dims, &self.draw_state, self.transform, &mut self.gl);
 
-        self.transform = self.transform.trans(
-            BLOCK_SIZE,
-            BLOCK_SIZE,
-        );
+        self.transform = self.transform.trans(BLOCK_SIZE, BLOCK_SIZE);
         // drawing the next pieces
         for i in 0..next_queue.size() {
             if let Some(tetromino) = next_queue.get(i) {
                 self.render_tetromino(tetromino);
             }
-            self.transform = self.transform.trans(
-                0.0,
-                BLOCK_SIZE + TETROMINO_MAX_HEIGHT,
-            );
+            self.transform = self.transform.trans(0.0, BLOCK_SIZE + TETROMINO_MAX_HEIGHT);
         }
 
         self.transform = old_transform;
@@ -196,7 +187,7 @@ fn center_in_grid(grid: &TetrisGrid, x: i32, y: i32) -> Position {
     match (x, y) {
         (x @ -2..2, y @ -2..3) => Position::new(
             grid.nb_columns_i32() / 2 + x,
-            grid.nb_matrix_rows_i32() / 2 + y + NB_VISIBLE_BUFFER_ROWS as i32,
+            grid.nb_matrix_rows_i32() / 2 + y + 2,
         ),
         _ => {
             panic!("x (resp. y) should be between -2 and 2 excluded (resp. -2 and 3 excluded)")
@@ -213,5 +204,5 @@ fn visible_height(grid: &TetrisGrid) -> f64 {
 }
 
 fn hidden_height(_grid: &TetrisGrid) -> f64 {
-    NB_VISIBLE_BUFFER_ROWS as f64 * BLOCK_SIZE
+    2.0 * BLOCK_SIZE
 }

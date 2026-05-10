@@ -11,10 +11,6 @@ use std::ops::{Index, IndexMut};
 use std::str::FromStr;
 pub use tetris_color::TetrisColor;
 
-// TODO: fix UI when the value is different from 2.
-/// Number of visible lines above the **Skyline**.
-pub const NB_VISIBLE_BUFFER_ROWS: u32 = 5;
-
 /// Tetris grid.
 ///
 /// According to the **Tetris Guideline**, the grid has 2 components:
@@ -190,7 +186,7 @@ impl TetrisGrid {
 impl TetrisGrid {
     /// Return the translation needed for `blocks` to enter the grid.
     pub(crate) fn get_starting_position(&self) -> Position {
-        Position::new((self.nb_columns + 1) / 2 - 2, NB_VISIBLE_BUFFER_ROWS as i32 - 2)
+        Position::new((self.nb_columns + 1) / 2 - 2, 0)
     }
 }
 
@@ -512,11 +508,11 @@ impl TetrisGrid {
 
 impl TetrisGrid {
     fn convert_position_y_to_grid_y(&self, y: i32) -> i32 {
-        -y + self.nb_matrix_rows + NB_VISIBLE_BUFFER_ROWS as i32 - 1
+        -y + self.nb_matrix_rows + 1
     }
 
     fn convert_grid_y_to_position_y(&self, y: i32) -> i32 {
-        -y + self.nb_matrix_rows + NB_VISIBLE_BUFFER_ROWS as i32 - 1
+        -y + self.nb_matrix_rows + 1
     }
 }
 
@@ -720,8 +716,8 @@ mod tests {
     }
 
     #[rstest]
-    #[case(TetrisGrid::default(), 0, 20 + NB_VISIBLE_BUFFER_ROWS as i32 - 1)]
-    #[case(TetrisGrid::default(), NB_VISIBLE_BUFFER_ROWS as i32, 20 - 1)]
+    #[case(TetrisGrid::default(), 0, 21)]
+    #[case(TetrisGrid::default(), 2, 19)]
     fn convert_position_y_to_grid_y_is_correct(
         #[case] grid: TetrisGrid,
         #[case] input: i32,
@@ -731,8 +727,8 @@ mod tests {
     }
 
     #[rstest]
-    #[case(TetrisGrid::default(), 20 - 1, NB_VISIBLE_BUFFER_ROWS as i32)]
-    #[case(TetrisGrid::default(), 20 + NB_VISIBLE_BUFFER_ROWS as i32 - 1, 0)]
+    #[case(TetrisGrid::default(), 19, 2)]
+    #[case(TetrisGrid::default(), 21, 0)]
     fn convert_grid_y_to_position_y_is_correct(
         #[case] grid: TetrisGrid,
         #[case] input: i32,
