@@ -51,9 +51,8 @@ impl Tetromino {
         self.kind.into()
     }
 
-    #[cfg(test)]
     /// Returns `self`'s [TetrominoKind].
-    pub(super) fn kind(&self) -> TetrominoKind {
+    pub fn kind(&self) -> TetrominoKind {
         self.kind
     }
 }

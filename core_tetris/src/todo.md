@@ -1,5 +1,5 @@
 - TESTS make more tetris_grid unit tests
-- TESTS make core_tetris integration tests : hold, game over
+- TESTS make core_tetris integration tests : game over
 - DOC correct garbage functions doc
 - TETRIS read tetris guidelines to update code and vocabulary
 - NEXT check error messages
