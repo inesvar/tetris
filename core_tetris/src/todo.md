@@ -1,6 +1,6 @@
 - TESTS make more tetris_grid unit tests
-- TESTS make core_tetris integration tests : game over
 - DOC correct garbage functions doc
 - TETRIS read tetris guidelines to update code and vocabulary
 - NEXT check error messages
 - BUG clarify NB_VISIBLE_BUFFER_ROWS utility
+- try_from_matrix : multiple problems could arise, no place to spawn the first tetromino, invalid grid (filled lines)
