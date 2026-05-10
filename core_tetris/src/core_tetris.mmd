@@ -13,7 +13,7 @@ graph LR
     TetrominoKind[TetrominoKind]
     RenderTetrisPlayer([RenderTetrisPlayer])
     CircularBuffer[[CircularBuffer]]
-    TetrisGridDimensionError[TetrisGridDimensionError]
+    TetrisGridCreationError[TetrisGridCreationError]
 
     TetrisCommand --o TetrominoMove
     RenderTetrisPlayer -.-> CircularBuffer
@@ -33,7 +33,7 @@ graph LR
 
     subgraph tetris_grid[" "]
         TetrisGrid --o TetrisColor
-        TetrisGrid -.-> TetrisGridDimensionError
+        TetrisGrid -.-> TetrisGridCreationError
         TetrisGrid -.-> TetrisResult
         TetrisResult --o GameOverError
         TetrisGrid -.-> GameOverError
