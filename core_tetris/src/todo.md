@@ -1,4 +1,3 @@
 - DOC correct garbage functions doc (logic should be in core_tetris, see guideline)
-- NEXT check error messages
+- NEXT check error messages (tetrisplayer, tetrisgrid)
 - BUG clarify NB_VISIBLE_BUFFER_ROWS utility
-- try_from_matrix : multiple problems could arise, no place to spawn the first tetromino, invalid grid (filled lines)

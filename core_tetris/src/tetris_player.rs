@@ -105,7 +105,7 @@ impl TetrisPlayer {
     /// - generating the first tetrominos using `rng` and `bag_type`;
     /// - using `matrix` as the **Matrix** (`matrix` doesn't have to be empty).
     ///
-    /// Fails if the first tetromino can't spawn in its starting position in the **Matrix**.
+    /// Fails if the game is instantly lost when spawning the first tetromino.
     pub fn try_from_matrix<R: Rng>(
         rng: &mut R,
         bag_type: BagType,
