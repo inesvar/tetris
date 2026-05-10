@@ -65,6 +65,7 @@ pub enum TetrisGridCreationError {
     NotEnoughBufferRows,
     UnequalLines(String),
     MissingSeparators(String),
+    EmptyString,
 }
 
 impl std::error::Error for TetrisGridCreationError {}
@@ -72,12 +73,13 @@ impl std::error::Error for TetrisGridCreationError {}
 impl Display for TetrisGridCreationError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::TooLarge => write!(f, "Number of columns, matrix rows and buffer rows should be less than or equal to `TetrisGrid::MAX`"),
-            Self::NotEnoughColumns => write!(f, "Number of columns should be greater than or equal to `TetrisGrid::MINIMAL_NB_COLUMNS`"),
-            Self::NotEnoughMatrixRows => write!(f, "Number of matrix rows should be greater than or equal to `TetrisGrid::MINIMAL_NB_MATRIX_ROWS`"),
-            Self::NotEnoughBufferRows => write!(f, "Number of buffer rows should be greater than or equal to `TetrisGrid::MINIMAL_NB_BUFFER_ROWS`"),
-            Self::UnequalLines(invalid_grid) => write!(f, "Expected lines of equal length.\n{invalid_grid:?}"),
-            Self::MissingSeparators(invalid_grid) => write!(f, "Expected 3 lines of '-'.\n{invalid_grid:?}"),
+            Self::TooLarge => write!(f, "number of columns, matrix rows and buffer rows should be less than or equal to `TetrisGrid::MAX`"),
+            Self::NotEnoughColumns => write!(f, "number of columns should be greater than or equal to `TetrisGrid::MINIMAL_NB_COLUMNS`"),
+            Self::NotEnoughMatrixRows => write!(f, "number of matrix rows should be greater than or equal to `TetrisGrid::MINIMAL_NB_MATRIX_ROWS`"),
+            Self::NotEnoughBufferRows => write!(f, "number of buffer rows should be greater than or equal to `TetrisGrid::MINIMAL_NB_BUFFER_ROWS`"),
+            Self::UnequalLines(invalid_grid) => write!(f, "expected lines of equal length\n{invalid_grid:?}"),
+            Self::MissingSeparators(invalid_grid) => write!(f, "expected 3 lines of '-'n{invalid_grid:?}"),
+            Self::EmptyString => write!(f, "unable to create `TetrisGrid` from empty string"),
         }
     }
 }
@@ -572,19 +574,27 @@ impl FromStr for TetrisGrid {
     fn from_str(string: &str) -> Result<Self, Self::Err> {
         let lines: Vec<&str> = string.split_terminator('\n').collect();
 
-        let nb_columns = lines[0].len();
-        if !lines.iter().all(|line| line.len() == nb_columns) {
+        let Some(first_line) = lines.first() else {
+            return Err(TetrisGridCreationError::EmptyString);
+        };
+        let nb_columns = first_line.len();
+        if lines.iter().any(|line| line.len() != nb_columns) {
             return Err(TetrisGridCreationError::UnequalLines(string.to_owned()));
         }
 
-        let mut iter = lines.split(|line| line.chars().all(|char| char == '-'));
-
-        let Some(buffer) = iter.nth(1) else {
+        let separator = "-".repeat(nb_columns);
+        let Some(lines) = lines
+            .strip_prefix(&[&separator[..]])
+            .and_then(|lines| lines.strip_suffix(&[&separator[..]]))
+        else {
             return Err(TetrisGridCreationError::MissingSeparators(
                 string.to_owned(),
             ));
         };
-        let Some(matrix) = iter.next() else {
+
+        let mut iter = lines.split(|line| *line == separator);
+
+        let (Some(buffer), Some(matrix), None) = (iter.next(), iter.next(), iter.next()) else {
             return Err(TetrisGridCreationError::MissingSeparators(
                 string.to_owned(),
             ));

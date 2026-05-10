@@ -1,2 +1,1 @@
 - DOC correct garbage functions doc (logic should be in core_tetris, see guideline)
-- NEXT check error messages (tetrisplayer, tetrisgrid)
