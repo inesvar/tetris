@@ -86,9 +86,9 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
 
         // drawing the hold piece
         if let Some(saved) = player.hold_queue() {
-            self.transform = old_transform.trans(
-                -TETROMINO_MAX_WIDTH - 2.0 * BLOCK_SIZE,
-                TETROMINO_MAX_HEIGHT + BLOCK_SIZE,
+            self.transform = self.transform.trans(
+                BLOCK_SIZE,
+                BLOCK_SIZE,
             );
             self.render_tetromino(saved);
         }
@@ -114,15 +114,19 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS);
         outline_rect.draw(dims, &self.draw_state, self.transform, &mut self.gl);
 
+        self.transform = self.transform.trans(
+            BLOCK_SIZE,
+            BLOCK_SIZE,
+        );
         // drawing the next pieces
         for i in 0..next_queue.size() {
-            self.transform = old_transform.trans(
-                total_width(player.grid()) + 2.0 * BLOCK_SIZE,
-                (BLOCK_SIZE + TETROMINO_MAX_HEIGHT) * (i as f64 + 1.0),
-            );
             if let Some(tetromino) = next_queue.get(i) {
                 self.render_tetromino(tetromino);
             }
+            self.transform = self.transform.trans(
+                0.0,
+                BLOCK_SIZE + TETROMINO_MAX_HEIGHT,
+            );
         }
 
         self.transform = old_transform;

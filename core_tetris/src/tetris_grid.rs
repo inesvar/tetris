@@ -13,7 +13,7 @@ pub use tetris_color::TetrisColor;
 
 // TODO: fix UI when the value is different from 2.
 /// Number of visible lines above the **Skyline**.
-pub const NB_VISIBLE_BUFFER_ROWS: u32 = 2;
+pub const NB_VISIBLE_BUFFER_ROWS: u32 = 5;
 
 /// Tetris grid.
 ///
