@@ -1,5 +1,3 @@
-use super::ScoredAction;
-
 /// Commands received by [TetrisPlayer](super::TetrisPlayer).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[allow(missing_docs)]
@@ -39,14 +37,12 @@ impl TetrisCommand {
     pub fn has_auto_repeat(&self) -> bool {
         Self::HAS_AUTO_REPEAT.contains(self)
     }
-}
 
-impl ScoredAction for TetrisCommand {
-    fn score(&self) -> u32 {
+    pub(super) fn score(&self) -> u32 {
         match self {
             // NOTE: at the moment we don't know how much lines a hard drop did...
             // maybe it is not TetrisCommand that should be scored ?
-            TetrisCommand::Fall => 1,
+            TetrisCommand::Fall | TetrisCommand::HardDrop => 1,
             _ => 0,
         }
     }

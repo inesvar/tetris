@@ -197,7 +197,6 @@ mod tetromino;
 mod tetromino_generator;
 
 pub(crate) use line_clear::LineClear;
-pub(crate) use score_manager::ScoredAction;
 pub(crate) use tetromino_generator::TetrominoGenerator;
 
 // used to update the active tetromino

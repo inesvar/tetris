@@ -1,5 +1,4 @@
 #![allow(unused)]
-use super::ScoredAction;
 
 pub(super) enum LineClear {
     None,
@@ -54,10 +53,8 @@ impl LineClear {
             LineClear::Tetris => 4,
         }
     }
-}
 
-impl ScoredAction for LineClear {
-    fn score(&self) -> u32 {
+    pub(super) fn score(&self) -> u32 {
         match self {
             LineClear::None => 0,
             LineClear::Single | LineClear::MiniTSpin => 100,
