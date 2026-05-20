@@ -195,6 +195,7 @@ impl TetrisGrid {
 #[doc = simple_mermaid::mermaid!("tetris_grid_internals.mmd")]
 mod tetris_grid_internals {
     use super::*;
+    use crate::LineClear;
 
     impl TetrisGrid {
         /// Return true if the `block` is inside the grid in an empty slot.
@@ -211,7 +212,7 @@ mod tetris_grid_internals {
             &mut self,
             blocks: &[Position],
             tetris_color: TetrisColor,
-        ) -> Result<u64, GameOverError> {
+        ) -> Result<LineClear, GameOverError> {
             let all_above_skyline = blocks.iter().all(|block| self.is_above_skyline(block));
 
             for block in blocks {
@@ -246,15 +247,15 @@ mod tetris_grid_internals {
 
         // NOTE: this is not efficient
         /// Remove complete lines, return number of cleared lines.
-        pub(super) fn clear_lines(&mut self) -> u64 {
-            let mut score = 0;
+        pub(super) fn clear_lines(&mut self) -> LineClear {
+            let mut nb_lines_cleared = 0;
             for y in (0..self.nb_rows_usize()).rev() {
                 if self.line_sum[y] == self.nb_columns {
                     self.pop_row(y);
-                    score += 1;
+                    nb_lines_cleared += 1;
                 }
             }
-            score
+            LineClear::new(nb_lines_cleared)
         }
 
         /// Remove `row` from the tetris grid (and add a new empty row at the top).

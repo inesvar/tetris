@@ -229,8 +229,8 @@ impl TetrisPlayer {
     fn lock_down<R1: Rng, R2: Rng>(&mut self, rng: &mut R1, garbage_rng: &mut R2) -> TetrisResult {
         let previously_active = self.replace_tetromino_in_play(rng);
 
-        let new_completed_lines = previously_active.lock_down(&mut self.grid)?;
-        self.update_new_completed_lines(new_completed_lines);
+        let result = previously_active.lock_down(&mut self.grid)?;
+        self.update_new_completed_lines(result.nb_lines_cleared());
 
         self.grid
             .apply_received_garbage(self.received_garbage_lines, garbage_rng)?;

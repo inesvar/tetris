@@ -1,6 +1,7 @@
 use super::ScoredAction;
 
 pub(super) enum LineClear {
+    None,
     Single,
     Double,
     Triple,
@@ -14,18 +15,18 @@ pub(super) enum LineClear {
 }
 
 impl LineClear {
-    fn line_clear(nb_lines_cleared: u32) -> Option<Self> {
+    pub(super) fn new(nb_lines_cleared: u32) -> Self {
         match nb_lines_cleared {
-            0 => None,
-            1 => Some(Self::Single),
-            2 => Some(Self::Double),
-            3 => Some(Self::Triple),
-            4 => Some(Self::Tetris),
+            0 => Self::None,
+            1 => Self::Single,
+            2 => Self::Double,
+            3 => Self::Triple,
+            4 => Self::Tetris,
             _ => panic!("More than 4 lines can't be cleared by a single tetromino"),
         }
     }
 
-    fn mini_t_spin(nb_lines_cleared: u32) -> Self {
+    pub(super) fn mini_t_spin(nb_lines_cleared: u32) -> Self {
         match nb_lines_cleared {
             0 => Self::MiniTSpin,
             1 => Self::MiniTSpinSingle,
@@ -33,7 +34,7 @@ impl LineClear {
         }
     }
 
-    fn t_spin(nb_lines_cleared: u32) -> Self {
+    pub(super) fn t_spin(nb_lines_cleared: u32) -> Self {
         match nb_lines_cleared {
             0 => Self::TSpin,
             1 => Self::TSpinSingle,
@@ -43,9 +44,9 @@ impl LineClear {
         }
     }
 
-    fn nb_lines_cleared(&self) -> u32 {
+    pub(super) fn nb_lines_cleared(&self) -> u64 {
         match self {
-            LineClear::MiniTSpin | LineClear::TSpin => 0,
+            LineClear::None | LineClear::MiniTSpin | LineClear::TSpin => 0,
             LineClear::Single | LineClear::MiniTSpinSingle | LineClear::TSpinSingle => 1,
             LineClear::Double | LineClear::TSpinDouble => 2,
             LineClear::Triple | LineClear::TSpinTriple => 3,
@@ -57,6 +58,7 @@ impl LineClear {
 impl ScoredAction for LineClear {
     fn score(&self) -> u32 {
         match self {
+            LineClear::None => 0,
             LineClear::Single | LineClear::MiniTSpin => 100,
             LineClear::MiniTSpinSingle => 200,
             LineClear::Double => 300,

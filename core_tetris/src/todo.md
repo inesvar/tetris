@@ -2,7 +2,7 @@
 - CLEAN score should be nb lines cleared
 - FEATURE correct scoring and garbage :
     - ~~add an enum for all line clear configurations~~
-    - return a Option<LineClear> when locking down
+    - ~~return a Option<LineClear> when locking down~~
     - somehow compute the number of hard dropped lines
     - t spin & mini t spin detection
     - back to backs
