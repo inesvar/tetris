@@ -144,13 +144,15 @@ impl TetrisPlayer {
     ) -> TetrisResult {
         match order {
             TetrisCommand::HardDrop => {
-                self.tetromino_in_play
+                let _nb_moves = self
+                    .tetromino_in_play
                     .try_apply(TetrisCommand::HardDrop.into(), &self.grid);
                 self.lock_down(rng, garbage_rng)
             }
             TetrisCommand::Hold => self.hold_tetromino(rng),
             tetromino_move => {
-                self.tetromino_in_play
+                let _nb_moves = self
+                    .tetromino_in_play
                     .try_apply(tetromino_move.into(), &self.grid);
                 Ok(())
             }
@@ -161,18 +163,21 @@ impl TetrisPlayer {
     pub fn try_fall(&mut self) -> bool {
         self.tetromino_in_play
             .try_apply(TetrisCommand::Fall.into(), &self.grid)
+            > 0
     }
 
     /// Tries to apply [TetrisCommand::Right], returns whether the **Tetromino in Play** could be moved down.
     pub fn try_right(&mut self) -> bool {
         self.tetromino_in_play
             .try_apply(TetrisCommand::Right.into(), &self.grid)
+            > 0
     }
 
     /// Tries to apply [TetrisCommand::Left], returns whether the **Tetromino in Play** could be moved down.
     pub fn try_left(&mut self) -> bool {
         self.tetromino_in_play
             .try_apply(TetrisCommand::Left.into(), &self.grid)
+            > 0
     }
 
     /// Swap `tetromino_in_play` and `swap`.

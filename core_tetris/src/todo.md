@@ -3,7 +3,7 @@
 - FEATURE correct scoring and garbage :
     - ~~add an enum for all line clear configurations~~
     - ~~return a Option<LineClear> when locking down~~
-    - somehow compute the number of hard dropped lines
+    - ~~somehow compute the number of hard dropped lines~~
     - t spin & mini t spin detection
     - back to backs
     - compute the "fake number of lines cleared"

@@ -97,12 +97,13 @@ impl Tetromino {
         }
     }
 
-    /// Applies [TetrominoMove] `tetromino_move` to `self` if the target blocks are free and inside the grid, otherwise returns `false`.
-    pub(crate) fn try_apply(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
+    /// Applies [TetrominoMove] `tetromino_move` to `self` if the target blocks are free and inside the grid.
+    /// Returns the number of times `tetromino_move` was applied (will be 0 or 1 if the move is not repeated).
+    pub(crate) fn try_apply(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> u32 {
         if tetromino_move.get_rotation_type() == RotationType::Identity {
             self.apply_translation(tetromino_move, grid)
         } else {
-            self.apply_rotation(tetromino_move, grid)
+            self.apply_rotation(tetromino_move, grid).into()
         }
     }
 
@@ -115,15 +116,17 @@ impl Tetromino {
         grid.add_blocks_and_clear_lines(&self.blocks, self.color())
     }
 
-    fn apply_translation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
+    fn apply_translation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> u32 {
         let translation = RotationTranslation::translation(tetromino_move.get_translation());
-        let moved = self.try_move(grid, &translation);
+        let mut nb_moves = self.try_move(grid, &translation).into();
 
-        if tetromino_move.is_repeated() && moved {
-            while self.try_move(grid, &translation) {}
+        if tetromino_move.is_repeated() {
+            while self.try_move(grid, &translation) {
+                nb_moves += 1;
+            }
         }
 
-        moved
+        nb_moves
     }
 
     fn apply_rotation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> bool {
@@ -397,7 +400,10 @@ mod tests {
         let mut full_grid = TetrisGrid::default();
         tetromino.enter_grid(&full_grid);
         assert!(tetromino.is_valid_in_grid(&full_grid).is_ok());
-        assert!(tetromino.try_apply(TetrominoMove::translation(Position::FALL), &full_grid));
+        assert_eq!(
+            tetromino.try_apply(TetrominoMove::translation(Position::FALL), &full_grid),
+            1
+        );
         assert!(tetromino.lock_down(&mut full_grid).is_ok());
 
         let empty_grid = TetrisGrid::default();
