@@ -1,5 +1,5 @@
 use core_tetris::{
-    BagType, GameOverError, MockRng, TetrisGrid, TetrisPlayer, TetrisResult, TetrominoMove,
+    BagType, GameOverError, MockRng, TetrisCommand, TetrisGrid, TetrisPlayer, TetrisResult,
 };
 use std::str::FromStr;
 
@@ -41,7 +41,7 @@ fn lock_out() -> TetrisResult {
     );
 
     assert_eq!(
-        player.try_apply(TetrominoMove::HardDrop.into(), rng, garbage_rng),
+        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
         Err(GameOverError::LockOut)
     );
 
@@ -120,7 +120,7 @@ fn block_out() -> TetrisResult {
     );
 
     assert_eq!(
-        player.try_apply(TetrominoMove::HardDrop.into(), rng, garbage_rng),
+        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
         Err(GameOverError::BlockOut)
     );
 
@@ -199,9 +199,8 @@ fn top_out() -> TetrisResult {
     );
 
     player.push_garbage(2);
-    // player.try_apply(TetrominoMove::HardDrop.into(), rng, garbage_rng)?;
     assert_eq!(
-        player.try_apply(TetrominoMove::HardDrop.into(), rng, garbage_rng),
+        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
         Err(GameOverError::TopOut)
     );
 

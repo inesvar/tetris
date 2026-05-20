@@ -1,6 +1,6 @@
 //! Define `struct` [InputCommands].
 use crate::settings::{AUTO_REPEAT_DELAY, AUTO_REPEAT_SPEED};
-use core_tetris::{TetrisCommand, TetrominoMove};
+use core_tetris::TetrisCommand;
 use piston::Key;
 use std::collections::HashMap;
 use ui_tetris::Keybindings;
@@ -135,8 +135,8 @@ impl KeyLookup {
 
 fn has_opposite_command(command: TetrisCommand) -> Option<TetrisCommand> {
     match command {
-        TetrisCommand::Move(TetrominoMove::Left) => Some(TetrominoMove::Right.into()),
-        TetrisCommand::Move(TetrominoMove::Right) => Some(TetrominoMove::Left.into()),
+        TetrisCommand::Left => Some(TetrisCommand::Right),
+        TetrisCommand::Right => Some(TetrisCommand::Left),
         _ => None,
     }
 }

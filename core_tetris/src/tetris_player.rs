@@ -1,7 +1,7 @@
 //! Implements [TetrisPlayer].
 use super::{
     BagType, CircularBuffer, GameOverError, TetrisCommand, TetrisGrid, TetrisResult, Tetromino,
-    TetrominoGenerator, TetrominoMove,
+    TetrominoGenerator,
 };
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -143,35 +143,36 @@ impl TetrisPlayer {
         garbage_rng: &mut R2,
     ) -> TetrisResult {
         match order {
-            TetrisCommand::Move(TetrominoMove::HardDrop) => {
+            TetrisCommand::HardDrop => {
                 self.tetromino_in_play
-                    .try_apply(TetrominoMove::HardDrop, &self.grid);
+                    .try_apply(TetrisCommand::HardDrop.into(), &self.grid);
                 self.lock_down(rng, garbage_rng)
             }
-            TetrisCommand::Move(tetromino_move) => {
-                self.tetromino_in_play.try_apply(tetromino_move, &self.grid);
+            TetrisCommand::Hold => self.hold_tetromino(rng),
+            tetromino_move => {
+                self.tetromino_in_play
+                    .try_apply(tetromino_move.into(), &self.grid);
                 Ok(())
             }
-            TetrisCommand::Hold => self.hold_tetromino(rng),
         }
     }
 
-    /// Tries to apply [TetrominoMove::Fall], returns whether the **Tetromino in Play** could be moved down.
+    /// Tries to apply [TetrisCommand::Fall], returns whether the **Tetromino in Play** could be moved down.
     pub fn try_fall(&mut self) -> bool {
         self.tetromino_in_play
-            .try_apply(TetrominoMove::Fall, &self.grid)
+            .try_apply(TetrisCommand::Fall.into(), &self.grid)
     }
 
-    /// Tries to apply [TetrominoMove::Right], returns whether the **Tetromino in Play** could be moved down.
+    /// Tries to apply [TetrisCommand::Right], returns whether the **Tetromino in Play** could be moved down.
     pub fn try_right(&mut self) -> bool {
         self.tetromino_in_play
-            .try_apply(TetrominoMove::Right, &self.grid)
+            .try_apply(TetrisCommand::Right.into(), &self.grid)
     }
 
-    /// Tries to apply [TetrominoMove::Left], returns whether the **Tetromino in Play** could be moved down.
+    /// Tries to apply [TetrisCommand::Left], returns whether the **Tetromino in Play** could be moved down.
     pub fn try_left(&mut self) -> bool {
         self.tetromino_in_play
-            .try_apply(TetrominoMove::Left, &self.grid)
+            .try_apply(TetrisCommand::Left.into(), &self.grid)
     }
 
     /// Swap `tetromino_in_play` and `swap`.
@@ -263,7 +264,7 @@ impl TetrisPlayer {
     /// Returns a hard-dropped copy of the [TetrisPlayer::tetromino_in_play].
     pub fn get_ghost_tetromino(&self) -> Tetromino {
         let mut ghost_tetromino = self.tetromino_in_play.clone();
-        ghost_tetromino.try_apply(TetrominoMove::HardDrop, &self.grid);
+        ghost_tetromino.try_apply(TetrisCommand::HardDrop.into(), &self.grid);
         ghost_tetromino
     }
 }

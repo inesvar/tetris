@@ -1,3 +1,4 @@
+#![allow(unused)]
 use super::ScoredAction;
 
 pub(super) enum LineClear {

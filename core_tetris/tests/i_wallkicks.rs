@@ -1,13 +1,12 @@
 use core_tetris::{
     BagType, MockRng, TetrisCommand, TetrisGrid, TetrisPlayer, TetrisResult, TetrominoKind,
-    TetrominoMove,
 };
 use rstest::rstest;
 use std::str::FromStr;
 
 #[rstest]
-#[case::east_to_south(TetrominoMove::Clockwise.into(), TetrominoMove::Clockwise.into())]
-#[case::west_to_south(TetrominoMove::Counterclockwise.into(), TetrominoMove::Counterclockwise.into())]
+#[case::east_to_south(TetrisCommand::Clockwise, TetrisCommand::Clockwise)]
+#[case::west_to_south(TetrisCommand::Counterclockwise, TetrisCommand::Counterclockwise)]
 fn i_off_the_right_wall_to_the_bottom(
     #[case] initial_rotation: TetrisCommand,
     #[case] rotation: TetrisCommand,
@@ -75,8 +74,8 @@ fn i_off_the_right_wall_to_the_bottom(
 }
 
 #[rstest]
-#[case::east_to_north(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
-#[case::west_to_north(TetrominoMove::Counterclockwise.into(), TetrominoMove::Clockwise.into())]
+#[case::east_to_north(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)]
+#[case::west_to_north(TetrisCommand::Counterclockwise, TetrisCommand::Clockwise)]
 fn i_off_the_right_wall_to_the_top(
     #[case] initial_rotation: TetrisCommand,
     #[case] rotation: TetrisCommand,
@@ -144,8 +143,8 @@ fn i_off_the_right_wall_to_the_top(
 }
 
 #[rstest]
-#[case::east_to_south(TetrominoMove::Clockwise.into(), TetrominoMove::Clockwise.into())]
-#[case::west_to_south(TetrominoMove::Counterclockwise.into(), TetrominoMove::Counterclockwise.into())]
+#[case::east_to_south(TetrisCommand::Clockwise, TetrisCommand::Clockwise)]
+#[case::west_to_south(TetrisCommand::Counterclockwise, TetrisCommand::Counterclockwise)]
 fn i_off_the_left_wall_to_the_bottom(
     #[case] initial_rotation: TetrisCommand,
     #[case] rotation: TetrisCommand,
@@ -213,8 +212,8 @@ fn i_off_the_left_wall_to_the_bottom(
 }
 
 #[rstest]
-#[case::east_to_north(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
-#[case::west_to_north(TetrominoMove::Counterclockwise.into(), TetrominoMove::Clockwise.into())]
+#[case::east_to_north(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)]
+#[case::west_to_north(TetrisCommand::Counterclockwise, TetrisCommand::Clockwise)]
 fn i_off_the_left_wall_to_the_top(
     #[case] initial_rotation: TetrisCommand,
     #[case] rotation: TetrisCommand,
@@ -282,8 +281,8 @@ fn i_off_the_left_wall_to_the_top(
 }
 
 #[rstest]
-#[case::north_to_west(None, TetrominoMove::Counterclockwise.into())]
-#[case::south_to_east(Some(TetrominoMove::HalfTurn.into()), TetrominoMove::Counterclockwise.into())]
+#[case::north_to_west(None, TetrisCommand::Counterclockwise)]
+#[case::south_to_east(Some(TetrisCommand::HalfTurn), TetrisCommand::Counterclockwise)]
 fn i_off_the_floor_to_the_left(
     #[case] initial_rotation: Option<TetrisCommand>,
     #[case] rotation: TetrisCommand,
@@ -354,8 +353,8 @@ fn i_off_the_floor_to_the_left(
 }
 
 #[rstest]
-#[case::north_to_east(None, TetrominoMove::Clockwise.into())]
-#[case::south_to_west(Some(TetrominoMove::HalfTurn.into()), TetrominoMove::Clockwise.into())]
+#[case::north_to_east(None, TetrisCommand::Clockwise)]
+#[case::south_to_west(Some(TetrisCommand::HalfTurn), TetrisCommand::Clockwise)]
 fn i_off_the_floor_to_the_right(
     #[case] initial_rotation: Option<TetrisCommand>,
     #[case] rotation: TetrisCommand,
@@ -426,8 +425,8 @@ fn i_off_the_floor_to_the_right(
 }
 
 #[rstest]
-#[case::east_to_south(TetrominoMove::Clockwise.into(), TetrominoMove::Clockwise.into())]
-#[case::west_to_north(TetrominoMove::Counterclockwise.into(), TetrominoMove::Clockwise.into())]
+#[case::east_to_south(TetrisCommand::Clockwise, TetrisCommand::Clockwise)]
+#[case::west_to_north(TetrisCommand::Counterclockwise, TetrisCommand::Clockwise)]
 fn i_out_of_right_well(
     #[case] initial_rotation: TetrisCommand,
     #[case] rotation: TetrisCommand,
@@ -529,8 +528,8 @@ fn i_out_of_right_well(
 }
 
 #[rstest]
-#[case::east_to_north(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
-#[case::west_to_south(TetrominoMove::Counterclockwise.into(), TetrominoMove::Counterclockwise.into())]
+#[case::east_to_north(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)]
+#[case::west_to_south(TetrisCommand::Counterclockwise, TetrisCommand::Counterclockwise)]
 fn i_out_of_left_well(
     #[case] initial_rotation: TetrisCommand,
     #[case] rotation: TetrisCommand,

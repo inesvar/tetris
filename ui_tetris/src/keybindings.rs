@@ -1,4 +1,4 @@
-use core_tetris::{TetrisCommand, TetrominoMove};
+use core_tetris::TetrisCommand;
 use piston::Key;
 use std::collections::HashMap;
 
@@ -34,19 +34,16 @@ impl Keybindings {
 
     pub fn new_local() -> Self {
         let keys = [
-            (TetrominoMove::Fall.into(), Vec::from(FALL_KEYS_1P)),
-            (TetrominoMove::HardDrop.into(), Vec::from(HARD_DROP_KEYS_1P)),
-            (TetrominoMove::Right.into(), Vec::from(RIGHT_KEYS_1P)),
-            (TetrominoMove::Left.into(), Vec::from(LEFT_KEYS_1P)),
+            (TetrisCommand::Fall, Vec::from(FALL_KEYS_1P)),
+            (TetrisCommand::HardDrop, Vec::from(HARD_DROP_KEYS_1P)),
+            (TetrisCommand::Right, Vec::from(RIGHT_KEYS_1P)),
+            (TetrisCommand::Left, Vec::from(LEFT_KEYS_1P)),
+            (TetrisCommand::Clockwise, Vec::from(CLOCKWISE_KEYS_1P)),
             (
-                TetrominoMove::Clockwise.into(),
-                Vec::from(CLOCKWISE_KEYS_1P),
-            ),
-            (
-                TetrominoMove::Counterclockwise.into(),
+                TetrisCommand::Counterclockwise,
                 Vec::from(COUNTERCLOCKWISE_KEYS_1P),
             ),
-            (TetrominoMove::HalfTurn.into(), Vec::from(HALF_TURN_1P)),
+            (TetrisCommand::HalfTurn, Vec::from(HALF_TURN_1P)),
             (TetrisCommand::Hold, Vec::from(HOLD_KEYS_1P)),
         ];
 
@@ -56,30 +53,30 @@ impl Keybindings {
     pub fn new_two_local(id: usize) -> Self {
         let keys = if id == 0 {
             [
-                (TetrominoMove::Fall.into(), vec![FALL_KEYS_2P[0]]),
-                (TetrominoMove::HardDrop.into(), vec![HARD_DROP_KEYS_2P[0]]),
-                (TetrominoMove::Right.into(), vec![RIGHT_KEYS_2P[0]]),
-                (TetrominoMove::Left.into(), vec![LEFT_KEYS_2P[0]]),
-                (TetrominoMove::Clockwise.into(), vec![CLOCKWISE_KEYS_2P[0]]),
+                (TetrisCommand::Fall, vec![FALL_KEYS_2P[0]]),
+                (TetrisCommand::HardDrop, vec![HARD_DROP_KEYS_2P[0]]),
+                (TetrisCommand::Right, vec![RIGHT_KEYS_2P[0]]),
+                (TetrisCommand::Left, vec![LEFT_KEYS_2P[0]]),
+                (TetrisCommand::Clockwise, vec![CLOCKWISE_KEYS_2P[0]]),
                 (
-                    TetrominoMove::Counterclockwise.into(),
+                    TetrisCommand::Counterclockwise,
                     vec![COUNTERCLOCKWISE_KEYS_2P[0]],
                 ),
-                (TetrominoMove::HalfTurn.into(), vec![HALF_TURN_2P[0]]),
+                (TetrisCommand::HalfTurn, vec![HALF_TURN_2P[0]]),
                 (TetrisCommand::Hold, vec![HOLD_KEYS_2P[0]]),
             ]
         } else {
             [
-                (TetrominoMove::Fall.into(), vec![FALL_KEYS_2P[1]]),
-                (TetrominoMove::HardDrop.into(), vec![HARD_DROP_KEYS_2P[1]]),
-                (TetrominoMove::Right.into(), vec![RIGHT_KEYS_2P[1]]),
-                (TetrominoMove::Left.into(), vec![LEFT_KEYS_2P[1]]),
-                (TetrominoMove::Clockwise.into(), vec![CLOCKWISE_KEYS_2P[1]]),
+                (TetrisCommand::Fall, vec![FALL_KEYS_2P[1]]),
+                (TetrisCommand::HardDrop, vec![HARD_DROP_KEYS_2P[1]]),
+                (TetrisCommand::Right, vec![RIGHT_KEYS_2P[1]]),
+                (TetrisCommand::Left, vec![LEFT_KEYS_2P[1]]),
+                (TetrisCommand::Clockwise, vec![CLOCKWISE_KEYS_2P[1]]),
                 (
-                    TetrominoMove::Counterclockwise.into(),
+                    TetrisCommand::Counterclockwise,
                     vec![COUNTERCLOCKWISE_KEYS_2P[1]],
                 ),
-                (TetrominoMove::HalfTurn.into(), vec![HALF_TURN_2P[1]]),
+                (TetrisCommand::HalfTurn, vec![HALF_TURN_2P[1]]),
                 (TetrisCommand::Hold, vec![HOLD_KEYS_2P[1]]),
             ]
         };

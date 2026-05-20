@@ -1,6 +1,4 @@
-use core_tetris::{
-    BagType, MockRng, TetrisCommand, TetrisPlayer, TetrisResult, TetrominoKind, TetrominoMove,
-};
+use core_tetris::{BagType, MockRng, TetrisCommand, TetrisPlayer, TetrisResult, TetrominoKind};
 
 #[test]
 fn hold_resets() -> TetrisResult {
@@ -27,7 +25,7 @@ fn hold_resets() -> TetrisResult {
     );
     assert!(player.hold_queue().is_none());
 
-    player.try_apply(TetrominoMove::Clockwise.into(), rng, garbage_rng)?;
+    player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -69,7 +67,7 @@ fn hold_resets() -> TetrisResult {
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
-    player.try_apply(TetrominoMove::Clockwise.into(), rng, garbage_rng)?;
+    player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -192,11 +190,11 @@ fn hold_remembers() -> TetrisResult {
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
-    player.try_apply(TetrominoMove::HardDrop.into(), rng, garbage_rng)?;
+    player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng)?;
     while player.try_left() {}
-    player.try_apply(TetrominoMove::HardDrop.into(), rng, garbage_rng)?;
+    player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng)?;
     while player.try_right() {}
-    player.try_apply(TetrominoMove::HardDrop.into(), rng, garbage_rng)?;
+    player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),

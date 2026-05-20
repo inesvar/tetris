@@ -18,6 +18,7 @@ impl Position {
     pub(crate) const RIGHT: Position = Position::new(1, 0);
     pub(crate) const FALL: Position = Position::new(0, 1);
     pub(crate) const LEFT: Position = Position::new(-1, 0);
+    pub(crate) const ZERO: Position = Position::new(0, 0);
 }
 
 /// Four cardinal directions.

@@ -1,6 +1,6 @@
 //! Define [LocalPlayer::update] function.
 use super::LocalPlayer;
-use core_tetris::{TetrisCommand, TetrisResult, TetrominoMove};
+use core_tetris::{TetrisCommand, TetrisResult};
 
 impl LocalPlayer {
     pub fn update(
@@ -27,7 +27,7 @@ impl LocalPlayer {
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame && !self.player_screen.try_fall() {
             self.player_screen.try_apply(
-                TetrominoMove::HardDrop.into(),
+                TetrisCommand::HardDrop,
                 &mut self.rng,
                 &mut self.garbage_rng,
             )?;

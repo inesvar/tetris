@@ -14,11 +14,11 @@ use self::{
 use super::{GameOverError, LineClear, TetrisColor, TetrisGrid, TetrisResult};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
+use tetromino_move::TetrominoMove;
 
 pub(super) use rotation_translation::RotationType;
 pub use spatial_primitives::Position;
 pub use tetromino_kind::TetrominoKind;
-pub use tetromino_move::TetrominoMove;
 
 /// Tetromino.
 ///
@@ -358,13 +358,13 @@ mod tests {
         match direction {
             Direction::North => {}
             Direction::East => {
-                tetromino.try_apply(TetrominoMove::Clockwise, &empty_grid);
+                tetromino.try_apply(RotationType::Clockwise.into(), &empty_grid);
             }
             Direction::South => {
-                tetromino.try_apply(TetrominoMove::HalfTurn, &empty_grid);
+                tetromino.try_apply(RotationType::HalfTurn.into(), &empty_grid);
             }
             Direction::West => {
-                tetromino.try_apply(TetrominoMove::Counterclockwise, &empty_grid);
+                tetromino.try_apply(RotationType::Counterclockwise.into(), &empty_grid);
             }
         }
 
@@ -376,8 +376,8 @@ mod tests {
     fn reset_is_correct(#[values(TetrominoKind::O, TetrominoKind::I)] kind: TetrominoKind) {
         let mut tetromino = Tetromino::new(kind);
         let empty_grid = TetrisGrid::default();
-        tetromino.try_apply(TetrominoMove::Clockwise, &empty_grid);
-        tetromino.try_apply(TetrominoMove::HardDrop, &empty_grid);
+        tetromino.try_apply(RotationType::Clockwise.into(), &empty_grid);
+        tetromino.try_apply(TetrominoMove::repeat(Position::FALL), &empty_grid);
 
         assert_ne!(tetromino, Tetromino::new(kind));
         assert_ne!(tetromino.direction, Direction::North);
@@ -397,7 +397,7 @@ mod tests {
         let mut full_grid = TetrisGrid::default();
         tetromino.enter_grid(&full_grid);
         assert!(tetromino.is_valid_in_grid(&full_grid).is_ok());
-        assert!(tetromino.try_apply(TetrominoMove::Fall, &full_grid));
+        assert!(tetromino.try_apply(TetrominoMove::translation(Position::FALL), &full_grid));
         assert!(tetromino.lock_down(&mut full_grid).is_ok());
 
         let empty_grid = TetrisGrid::default();

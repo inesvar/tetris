@@ -1,6 +1,5 @@
 use core_tetris::{
     BagType, MockRng, TetrisCommand, TetrisGrid, TetrisPlayer, TetrisResult, TetrominoKind,
-    TetrominoMove,
 };
 use rstest::rstest;
 use std::str::FromStr;
@@ -19,10 +18,9 @@ fn off_the_right_wall(
         TetrominoKind::Z
     )]
     kind: TetrominoKind,
-    #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
+    #[values(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)]
     initial_rotation: TetrisCommand,
-    #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
-    rotation: TetrisCommand,
+    #[values(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)] rotation: TetrisCommand,
 ) -> TetrisResult {
     let mut rng = MockRng::tetromino_cycle(&[kind]);
     let mut garbage_rng = MockRng::default();
@@ -57,10 +55,9 @@ fn off_the_left_wall(
         TetrominoKind::Z
     )]
     kind: TetrominoKind,
-    #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
+    #[values(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)]
     initial_rotation: TetrisCommand,
-    #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
-    rotation: TetrisCommand,
+    #[values(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)] rotation: TetrisCommand,
 ) -> TetrisResult {
     let mut rng = MockRng::tetromino_cycle(&[kind]);
     let mut garbage_rng = MockRng::default();
@@ -94,8 +91,7 @@ fn off_the_floor(
         TetrominoKind::Z
     )]
     kind: TetrominoKind,
-    #[values(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
-    rotation: TetrisCommand,
+    #[values(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)] rotation: TetrisCommand,
 ) -> TetrisResult {
     let mut rng = MockRng::tetromino_cycle(&[kind]);
     let mut garbage_rng = MockRng::default();
@@ -105,8 +101,8 @@ fn off_the_floor(
     no_wall_kick_player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
 
     match rotation {
-        TetrisCommand::Move(TetrominoMove::Clockwise) => no_wall_kick_player.try_left(),
-        TetrisCommand::Move(TetrominoMove::Counterclockwise) => no_wall_kick_player.try_right(),
+        TetrisCommand::Clockwise => no_wall_kick_player.try_left(),
+        TetrisCommand::Counterclockwise => no_wall_kick_player.try_right(),
         _ => unreachable!(),
     };
 
@@ -121,8 +117,8 @@ fn off_the_floor(
 }
 
 #[rstest]
-#[case::east_to_north(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
-#[case::west_to_north(TetrominoMove::Counterclockwise.into(), TetrominoMove::Clockwise.into())]
+#[case::east_to_north(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)]
+#[case::west_to_north(TetrisCommand::Counterclockwise, TetrisCommand::Clockwise)]
 fn out_of_right_well(
     #[case] initial_rotation: TetrisCommand,
     #[case] rotation: TetrisCommand,
@@ -170,8 +166,8 @@ fn out_of_right_well(
 }
 
 #[rstest]
-#[case::east_to_north(TetrominoMove::Clockwise.into(), TetrominoMove::Counterclockwise.into())]
-#[case::west_to_north(TetrominoMove::Counterclockwise.into(), TetrominoMove::Clockwise.into())]
+#[case::east_to_north(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)]
+#[case::west_to_north(TetrisCommand::Counterclockwise, TetrisCommand::Clockwise)]
 fn out_of_left_well(
     #[case] initial_rotation: TetrisCommand,
     #[case] rotation: TetrisCommand,
