@@ -1,1 +1,11 @@
-- DOC correct garbage functions doc (logic should be in core_tetris, see guideline)
+- TETRIS hold : "a lock down must take place between holds"
+- CLEAN score should be nb lines cleared
+- FEATURE correct scoring and garbage :
+    - ~~add an enum for all line clear configurations~~
+    - return a Option<LineClear> when locking down
+    - somehow compute the number of hard dropped lines
+    - t spin & mini t spin detection
+    - back to backs
+    - compute the "fake number of lines cleared"
+    - compute the garbage
+    - integration / unit tests for t spin

@@ -186,14 +186,17 @@
 #![doc = simple_mermaid::mermaid!("core_tetris.mmd")]
 
 mod circular_buffer;
+mod line_clear;
 mod mock_rng;
 pub mod render;
+mod score_manager;
 mod tetris_command;
 mod tetris_grid;
 mod tetris_player;
 mod tetromino;
 mod tetromino_generator;
 
+pub(crate) use score_manager::ScoredAction;
 pub(crate) use tetromino_generator::TetrominoGenerator;
 
 // used to update the active tetromino

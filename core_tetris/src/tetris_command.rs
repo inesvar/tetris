@@ -1,4 +1,4 @@
-use super::TetrominoMove;
+use super::{ScoredAction, TetrominoMove};
 
 /// Commands received by [TetrisPlayer](super::TetrisPlayer).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -32,6 +32,16 @@ impl TetrisCommand {
     /// Whether the [TetrisCommand] should be repeated on a long key press.
     pub fn has_auto_repeat(&self) -> bool {
         Self::HAS_AUTO_REPEAT.contains(self)
+    }
+}
+
+impl ScoredAction for TetrisCommand {
+    fn score(&self) -> u32 {
+        match self {
+            // NOTE: at the moment we don't know how much lines a hard drop did...
+            TetrisCommand::Move(TetrominoMove::Fall) => 1,
+            _ => 0,
+        }
     }
 }
 
