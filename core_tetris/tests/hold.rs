@@ -67,6 +67,7 @@ fn hold_resets() -> TetrisResult {
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
+    player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng)?;
     player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
 
     assert_eq!(
@@ -80,8 +81,8 @@ fn hold_resets() -> TetrisResult {
             "         \n",
             "         \n",
             "         \n",
-            "         \n",
-            "         \n",
+            "    T    \n",
+            "   TTT   \n",
             "---------\n",
         )
     );
@@ -99,8 +100,8 @@ fn hold_resets() -> TetrisResult {
             "         \n",
             "         \n",
             "         \n",
-            "         \n",
-            "         \n",
+            "    T    \n",
+            "   TTT   \n",
             "---------\n",
         )
     );
@@ -108,6 +109,80 @@ fn hold_resets() -> TetrisResult {
         .hold_queue()
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::T));
+
+    player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng)?;
+
+    assert_eq!(
+        player.to_string(),
+        concat!(
+            "---------\n",
+            "         \n",
+            "   IIII  \n",
+            "---------\n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "   IIII  \n",
+            "    T    \n",
+            "   TTT   \n",
+            "---------\n",
+        )
+    );
+    assert!(player
+        .hold_queue()
+        .as_ref()
+        .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::T));
+
+    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+
+    assert_eq!(
+        player.to_string(),
+        concat!(
+            "---------\n",
+            "    T    \n",
+            "   TTT   \n",
+            "---------\n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "   IIII  \n",
+            "    T    \n",
+            "   TTT   \n",
+            "---------\n",
+        )
+    );
+    assert!(player
+        .hold_queue()
+        .as_ref()
+        .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
+
+    Ok(())
+}
+
+#[test]
+fn cant_hold_twice() -> TetrisResult {
+    let rng =
+        &mut MockRng::tetromino_cycle(&[TetrominoKind::I, TetrominoKind::T, TetrominoKind::T]);
+    let garbage_rng = &mut MockRng::default();
+    let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
+
+    assert_eq!(
+        player.to_string(),
+        concat!(
+            "---------\n",
+            "         \n",
+            "   IIII  \n",
+            "---------\n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "---------\n",
+        )
+    );
+    assert!(player.hold_queue().is_none());
 
     player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
 
@@ -131,6 +206,75 @@ fn hold_resets() -> TetrisResult {
         .hold_queue()
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
+
+    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+
+    assert_eq!(
+        player.to_string(),
+        concat!(
+            "---------\n",
+            "    T    \n",
+            "   TTT   \n",
+            "---------\n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "---------\n",
+        )
+    );
+    assert!(player
+        .hold_queue()
+        .as_ref()
+        .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
+
+    player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng)?;
+
+    assert_eq!(
+        player.to_string(),
+        concat!(
+            "---------\n",
+            "    T    \n",
+            "   TTT   \n",
+            "---------\n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "    T    \n",
+            "   TTT   \n",
+            "---------\n",
+        )
+    );
+    assert!(player
+        .hold_queue()
+        .as_ref()
+        .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
+
+    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+
+    assert_eq!(
+        player.to_string(),
+        concat!(
+            "---------\n",
+            "         \n",
+            "   IIII  \n",
+            "---------\n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "         \n",
+            "    T    \n",
+            "   TTT   \n",
+            "---------\n",
+        )
+    );
+    assert!(player
+        .hold_queue()
+        .as_ref()
+        .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::T));
 
     Ok(())
 }

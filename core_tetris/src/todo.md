@@ -1,4 +1,4 @@
-- TETRIS hold : "a lock down must take place between holds"
+- ~~TETRIS hold : "a lock down must take place between holds"~~
 - CLEAN score should be nb lines cleared
 - FEATURE correct scoring and garbage :
     - ~~add an enum for all line clear configurations~~
