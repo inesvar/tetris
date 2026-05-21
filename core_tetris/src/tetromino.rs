@@ -11,7 +11,7 @@ use self::{
     moving_primitives::ApplyRotationTranslation, rotation_translation::RotationTranslation,
     spatial_primitives::Direction,
 };
-use super::{GameOverError, LineClear, TetrisColor, TetrisGrid, TetrisResult};
+use super::{GameOverError, TetrisColor, TetrisGrid, TetrisResult};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use tetromino_move::TetrominoMove;
@@ -112,8 +112,8 @@ impl Tetromino {
     ///
     /// Note that `self` is assumed to be on free blocks of `grid`, ie [is_valid_in_grid](Tetromino::is_valid_in_grid) was called successfully
     /// and since then, only `self` was only mutated by [try_apply](Tetromino::try_apply) (see state machine schematic).
-    pub(crate) fn lock_down(self, grid: &mut TetrisGrid) -> Result<LineClear, GameOverError> {
-        grid.add_blocks_and_clear_lines(&self.blocks, self.color())
+    pub(crate) fn lock_down(self, grid: &mut TetrisGrid) -> Result<u32, GameOverError> {
+        grid.add_blocks_and_clear_lines(self.blocks, self.color())
     }
 
     fn apply_translation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> u32 {

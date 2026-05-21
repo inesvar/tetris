@@ -34,10 +34,10 @@ pub struct TetrisPlayer {
     hold_queue: Option<Tetromino>,
     /// Tetromino bag (used to refill the **Next Queue**).
     tetromino_bag: TetrominoGenerator,
-    score: u64,
-    new_completed_lines: u64,
+    score: u32,
+    new_completed_lines: u32,
     /// received_garbage_lines is set before the update and reset during the update. TODO: clarify
-    received_garbage_lines: u64,
+    received_garbage_lines: u32,
     used_hold_after_lock_down: bool,
 }
 
@@ -64,17 +64,17 @@ impl TetrisPlayer {
     }
 
     /// Total number of lines cleared.
-    pub fn score(&self) -> u64 {
+    pub fn score(&self) -> u32 {
         self.score
     }
 
     #[allow(missing_docs)]
-    pub fn new_completed_lines(&self) -> u64 {
+    pub fn new_completed_lines(&self) -> u32 {
         self.new_completed_lines
     }
 
     #[allow(missing_docs)]
-    pub fn new_completed_lines_mut(&mut self) -> &mut u64 {
+    pub fn new_completed_lines_mut(&mut self) -> &mut u32 {
         &mut self.new_completed_lines
     }
 
@@ -246,7 +246,7 @@ impl TetrisPlayer {
         let previously_active = self.replace_tetromino_in_play(rng);
 
         let result = previously_active.lock_down(&mut self.grid)?;
-        self.update_new_completed_lines(result.nb_lines_cleared());
+        self.update_new_completed_lines(result);
 
         self.grid
             .apply_received_garbage(self.received_garbage_lines, garbage_rng)?;
@@ -257,7 +257,7 @@ impl TetrisPlayer {
 
     /// Increase counters ([TetrisPlayer::new_completed_lines] and [TetrisPlayer::score])
     /// after `new_completed_lines` lines have been cleared.
-    fn update_new_completed_lines(&mut self, new_completed_lines: u64) {
+    fn update_new_completed_lines(&mut self, new_completed_lines: u32) {
         self.new_completed_lines += new_completed_lines;
         self.score += new_completed_lines;
     }
@@ -265,12 +265,12 @@ impl TetrisPlayer {
     /// Increase the count of received garbage lines.
     ///
     /// Garbage lines will be pushed to the grid later (during **Lock Down**).
-    pub fn push_garbage(&mut self, nb_completed_lines: u64) {
+    pub fn push_garbage(&mut self, nb_completed_lines: u32) {
         self.received_garbage_lines += nb_completed_lines;
     }
 
     /// Return the number of lines completed since the last call [TetrisPlayer::new_completed_lines].
-    pub fn get_lines_completed(&mut self) -> u64 {
+    pub fn get_lines_completed(&mut self) -> u32 {
         let lines = self.new_completed_lines;
         self.new_completed_lines = 0;
         lines

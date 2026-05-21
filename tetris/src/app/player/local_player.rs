@@ -66,15 +66,15 @@ impl LocalPlayer {
         self.freeze_frame = 0;
     }
 
-    pub fn push_garbage(&mut self, completed_lines: u64) {
+    pub fn push_garbage(&mut self, completed_lines: u32) {
         self.player_screen.push_garbage(completed_lines);
     }
 
-    pub fn get_lines_completed(&mut self) -> u64 {
+    pub fn get_lines_completed(&mut self) -> u32 {
         self.player_screen.get_lines_completed()
     }
 
-    pub(in crate::app) fn score(&self) -> u64 {
+    pub(in crate::app) fn score(&self) -> u32 {
         self.player_screen.score()
     }
 }

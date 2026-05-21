@@ -173,7 +173,7 @@ impl TetrisGrid {
     /// Add garbage lines at the bottom of the grid depending on the number of completed lines.
     pub(crate) fn apply_received_garbage<R: Rng>(
         &mut self,
-        nb_garbage_lines: u64,
+        nb_garbage_lines: u32,
         rng: &mut R,
     ) -> TetrisResult {
         for _ in 0..nb_garbage_lines {
@@ -195,7 +195,6 @@ impl TetrisGrid {
 #[doc = simple_mermaid::mermaid!("tetris_grid_internals.mmd")]
 mod tetris_grid_internals {
     use super::*;
-    use crate::LineClear;
 
     impl TetrisGrid {
         /// Return true if the `block` is inside the grid in an empty slot.
@@ -208,15 +207,16 @@ mod tetris_grid_internals {
         /// # Panics
         ///
         /// If any of the `blocks` is outside the tetris grid or not empty.
+        /// If no `LineClear` variant matches the number of completed lines.
         pub(crate) fn add_blocks_and_clear_lines(
             &mut self,
-            blocks: &[Position],
+            blocks: [Position; 4],
             tetris_color: TetrisColor,
-        ) -> Result<LineClear, GameOverError> {
+        ) -> Result<u32, GameOverError> {
             let all_above_skyline = blocks.iter().all(|block| self.is_above_skyline(block));
 
             for block in blocks {
-                self.add_block(block, tetris_color);
+                self.add_block(&block, tetris_color);
             }
 
             // Only continue playing if there's a block below the skyline
@@ -247,7 +247,7 @@ mod tetris_grid_internals {
 
         // NOTE: this is not efficient
         /// Remove complete lines, return number of cleared lines.
-        pub(super) fn clear_lines(&mut self) -> LineClear {
+        pub(super) fn clear_lines(&mut self) -> u32 {
             let mut nb_lines_cleared = 0;
             for y in (0..self.nb_rows_usize()).rev() {
                 if self.line_sum[y] == self.nb_columns {
@@ -255,7 +255,7 @@ mod tetris_grid_internals {
                     nb_lines_cleared += 1;
                 }
             }
-            LineClear::new(nb_lines_cleared)
+            nb_lines_cleared
         }
 
         /// Remove `row` from the tetris grid (and add a new empty row at the top).

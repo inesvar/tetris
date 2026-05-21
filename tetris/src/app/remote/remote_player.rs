@@ -79,7 +79,7 @@ impl RemotePlayer {
         });
     }
 
-    pub fn get_lines_completed(&mut self) -> u64 {
+    pub fn get_lines_completed(&mut self) -> u32 {
         {
             let mut screen = self.screen.lock().unwrap();
             let lines = screen.new_completed_lines();
@@ -142,7 +142,7 @@ impl RemotePlayer {
         self.screen.lock().unwrap()
     }
 
-    pub(in crate::app) fn score(&self) -> u64 {
+    pub(in crate::app) fn score(&self) -> u32 {
         {
             let player = self.get_player();
             player.score()

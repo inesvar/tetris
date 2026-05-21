@@ -44,7 +44,7 @@ impl LineClear {
         }
     }
 
-    pub(super) fn nb_lines_cleared(&self) -> u64 {
+    pub(super) fn nb_lines_cleared(&self) -> u32 {
         match self {
             LineClear::None | LineClear::MiniTSpin | LineClear::TSpin => 0,
             LineClear::Single | LineClear::MiniTSpinSingle | LineClear::TSpinSingle => 1,
