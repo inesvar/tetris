@@ -97,6 +97,25 @@ impl Tetromino {
         }
     }
 
+    fn is_in_t_slot(&self, grid: &TetrisGrid) -> bool {
+        if self.kind != TetrominoKind::T {
+            return false;
+        }
+        let corners = [
+            self.center + Position::new(-1, -1),
+            self.center + Position::new(1, -1),
+            self.center + Position::new(-1, 1),
+            self.center + Position::new(1, 1),
+        ];
+        let mut nb_available_corners = 0;
+        for corner in corners {
+            if grid.is_block_available(&corner) {
+                nb_available_corners += 1;
+            }
+        }
+        nb_available_corners < 2
+    }
+
     /// Applies [TetrominoMove] `tetromino_move` to `self` if the target blocks are free and inside the grid.
     /// Returns the number of times `tetromino_move` was applied (will be 0 or 1 if the move is not repeated).
     pub(crate) fn try_apply(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> u32 {
