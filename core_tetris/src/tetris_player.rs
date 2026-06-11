@@ -38,7 +38,7 @@ pub struct TetrisPlayer {
     new_completed_lines: u32,
     /// received_garbage_lines is set before the update and reset during the update. TODO: clarify
     received_garbage_lines: u32,
-    used_hold_after_lock_down: bool,
+    is_hold_allowed: bool,
 }
 
 /// Getters and Setters.
@@ -129,7 +129,7 @@ impl TetrisPlayer {
             next_queue,
             tetromino_bag,
             received_garbage_lines: 0,
-            used_hold_after_lock_down: false,
+            is_hold_allowed: true,
         })
     }
 }
@@ -149,12 +149,12 @@ impl TetrisPlayer {
                 let _nb_moves = self
                     .tetromino_in_play
                     .try_apply(TetrisCommand::HardDrop.into(), &self.grid);
-                self.used_hold_after_lock_down = false;
+                self.is_hold_allowed = true;
                 self.lock_down(rng, garbage_rng)
             }
             TetrisCommand::Hold => {
-                if !self.used_hold_after_lock_down {
-                    self.used_hold_after_lock_down = true;
+                if self.is_hold_allowed {
+                    self.is_hold_allowed = false;
                     self.hold_tetromino(rng)
                 } else {
                     Ok(())
