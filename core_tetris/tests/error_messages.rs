@@ -5,18 +5,7 @@ use std::str::FromStr;
 #[rstest]
 #[case("", "unable to create `TetrisGrid` from empty string")]
 #[case(" \n\n", "expected lines of equal length")]
-#[case(concat!(
-    "---------\n",
-    "         \n",
-    "         \n",
-    "---------\n",
-    "         \n",
-    "         \n",
-    "         \n",
-    "         \n",
-    "         \n",
-    "         \n",
-), "expected 3 lines of '-'")]
+#[case("---------\n", "expected 3 lines of '-'")]
 #[case(concat!(
     "---------\n",
     "         \n",
