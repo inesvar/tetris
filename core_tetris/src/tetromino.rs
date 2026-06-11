@@ -11,7 +11,7 @@ use self::{
     moving_primitives::ApplyRotationTranslation, rotation_translation::RotationTranslation,
     spatial_primitives::Direction,
 };
-use super::{GameOverError, TetrisColor, TetrisGrid, TetrisResult};
+use super::{GameOverError, LineClear, TetrisColor, TetrisGrid, TetrisResult};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use tetromino_move::TetrominoMove;
@@ -36,6 +36,7 @@ pub struct Tetromino {
     center: Position,
     pub(super) blocks: [Position; 4],
     direction: Direction,
+    is_last_move_rotation: bool,
 }
 
 // #[doc = simple_mermaid::mermaid!("tetromino/tetromino_internals.mmd")]
@@ -66,6 +67,7 @@ impl Tetromino {
             center: positions[0],
             blocks: [positions[1], positions[2], positions[3], positions[4]],
             direction: Direction::default(),
+            is_last_move_rotation: false,
         }
     }
 
@@ -77,7 +79,7 @@ impl Tetromino {
     /// Translates `self` to its starting position in [TetrisGrid] `grid`.
     ///
     /// Note that:
-    /// - `self` is assumed to be in its default position and orientation;
+    /// - `self` is assumed to be reset;
     /// - the translation applied depends on the size of `grid`.
     pub(crate) fn enter_grid(&mut self, grid: &TetrisGrid) {
         let translation = RotationTranslation::translation(grid.get_starting_position());
@@ -131,8 +133,14 @@ impl Tetromino {
     ///
     /// Note that `self` is assumed to be on free blocks of `grid`, ie [is_valid_in_grid](Tetromino::is_valid_in_grid) was called successfully
     /// and since then, only `self` was only mutated by [try_apply](Tetromino::try_apply) (see state machine schematic).
-    pub(crate) fn lock_down(self, grid: &mut TetrisGrid) -> Result<u32, GameOverError> {
+    pub(crate) fn lock_down(self, grid: &mut TetrisGrid) -> Result<LineClear, GameOverError> {
+        let f = if self.is_last_move_rotation && self.is_in_t_slot(grid) {
+            LineClear::t_spin
+        } else {
+            LineClear::new
+        };
         grid.add_blocks_and_clear_lines(self.blocks, self.color())
+            .map(f)
     }
 
     fn apply_translation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> u32 {
@@ -180,6 +188,7 @@ impl Tetromino {
         self.blocks = new_blocks;
         self.direction.move_by(movement);
         self.center.translate_by(movement);
+        self.is_last_move_rotation = movement.rotation_type != RotationType::Identity;
         true
     }
 

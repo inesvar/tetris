@@ -246,7 +246,7 @@ impl TetrisPlayer {
         let previously_active = self.replace_tetromino_in_play(rng);
 
         let result = previously_active.lock_down(&mut self.grid)?;
-        self.update_new_completed_lines(result);
+        self.update_new_completed_lines(result.nb_lines_cleared());
 
         self.grid
             .apply_received_garbage(self.received_garbage_lines, garbage_rng)?;
