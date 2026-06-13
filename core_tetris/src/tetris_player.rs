@@ -1,7 +1,7 @@
 //! Implements [TetrisPlayer].
 use super::{
-    BagType, CircularBuffer, GameOverError, TetrisCommand, TetrisGrid, TetrisResult, Tetromino,
-    TetrominoGenerator,
+    BagType, CircularBuffer, GameOverError, LineClear, TetrisCommand, TetrisGrid, TetrisResult,
+    Tetromino, TetrominoGenerator,
 };
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -143,30 +143,26 @@ impl TetrisPlayer {
         order: TetrisCommand,
         rng: &mut R1,
         garbage_rng: &mut R2,
-    ) -> TetrisResult {
+    ) -> Result<LineClear, GameOverError> {
         match order {
             TetrisCommand::HardDrop => {
-                let _nb_moves = self
-                    .tetromino_in_play
-                    .try_apply(TetrisCommand::HardDrop.into(), &self.grid);
+                let _nb_moves = self.tetromino_in_play.try_apply(order.into(), &self.grid);
                 self.is_hold_allowed = true;
-                self.lock_down(rng, garbage_rng)
+                return self.lock_down(rng, garbage_rng);
             }
             TetrisCommand::Hold => {
                 if self.is_hold_allowed {
                     self.is_hold_allowed = false;
-                    self.hold_tetromino(rng)
-                } else {
-                    Ok(())
+                    self.hold_tetromino(rng)?
                 }
             }
             tetromino_move => {
                 let _nb_moves = self
                     .tetromino_in_play
                     .try_apply(tetromino_move.into(), &self.grid);
-                Ok(())
             }
         }
+        Ok(LineClear::None)
     }
 
     /// Tries to apply [TetrisCommand::Fall], returns whether the **Tetromino in Play** could be moved down.
@@ -242,17 +238,23 @@ impl TetrisPlayer {
     /// - add the [TetrisPlayer::tetromino_in_play] to the [TetrisPlayer::grid] (this can fail with [GameOverError::LockOut]);
     /// - add the accumulated garbage to the [TetrisPlayer::grid] (this can fail with [GameOverError::TopOut]);
     /// - move the new [TetrisPlayer::tetromino_in_play] to its starting position (this can fail with [GameOverError::BlockOut]).
-    fn lock_down<R1: Rng, R2: Rng>(&mut self, rng: &mut R1, garbage_rng: &mut R2) -> TetrisResult {
+    fn lock_down<R1: Rng, R2: Rng>(
+        &mut self,
+        rng: &mut R1,
+        garbage_rng: &mut R2,
+    ) -> Result<LineClear, GameOverError> {
         let previously_active = self.replace_tetromino_in_play(rng);
 
-        let result = previously_active.lock_down(&mut self.grid)?;
-        self.update_new_completed_lines(result.nb_lines_cleared());
+        let line_clear = previously_active.lock_down(&mut self.grid)?;
+        self.update_new_completed_lines(line_clear.nb_lines_cleared());
 
         self.grid
             .apply_received_garbage(self.received_garbage_lines, garbage_rng)?;
         self.received_garbage_lines = 0;
 
-        self.tetromino_in_play.is_valid_in_grid(&self.grid)
+        self.tetromino_in_play.is_valid_in_grid(&self.grid)?;
+
+        Ok(line_clear)
     }
 
     /// Increase counters ([TetrisPlayer::new_completed_lines] and [TetrisPlayer::score])

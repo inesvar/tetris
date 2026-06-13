@@ -8,8 +8,9 @@ graph LR
     Position[[Position]]
     TetrisColor[TetrisColor]
     TetrisPlayer[[TetrisPlayer]]
-    MockRng[[MockRng]]
+    LineClear[LineClear]
     TetrisCommand[TetrisCommand]
+    MockRng[[MockRng]]
     TetrominoKind[TetrominoKind]
     RenderTetrisPlayer([RenderTetrisPlayer])
     CircularBuffer[[CircularBuffer]]
@@ -41,6 +42,6 @@ graph LR
     RenderTetrisPlayer -.-> TetrisGrid
     TetrisPlayer --o TetrisGrid
     TetrisPlayer --o BagType
+    LineClear
 
-    
     style TetrisResult stroke-dasharray: 5 5;

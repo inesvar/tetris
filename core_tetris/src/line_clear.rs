@@ -1,6 +1,6 @@
-#![allow(unused)]
-
-pub(super) enum LineClear {
+#[allow(missing_docs)]
+#[derive(PartialEq, Eq, Debug)]
+pub enum LineClear {
     None,
     Single,
     Double,

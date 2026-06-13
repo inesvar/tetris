@@ -1,5 +1,6 @@
 use core_tetris::{
-    BagType, MockRng, TetrisCommand, TetrisGrid, TetrisPlayer, TetrisResult, TetrominoKind,
+    BagType, LineClear, MockRng, TetrisCommand, TetrisGrid, TetrisPlayer, TetrisResult,
+    TetrominoKind,
 };
 use std::str::FromStr;
 
@@ -77,7 +78,10 @@ fn line_clear_from_setup() -> TetrisResult {
     );
     assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 0);
-    player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng)?;
+    assert_eq!(
+        player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng),
+        Ok(LineClear::Tetris)
+    );
     assert_eq!(
         player.to_string(),
         concat!(
@@ -175,7 +179,10 @@ fn t_spin_double_from_setup() -> TetrisResult {
     );
     assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 0);
-    player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng)?;
+    assert_eq!(
+        player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng),
+        Ok(LineClear::TSpinDouble)
+    );
     assert_eq!(
         player.to_string(),
         concat!(
@@ -274,7 +281,10 @@ fn t_spin_triple_from_setup() -> TetrisResult {
     );
     assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 0);
-    player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng)?;
+    assert_eq!(
+        player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng),
+        Ok(LineClear::TSpinTriple)
+    );
     assert_eq!(
         player.to_string(),
         concat!(
@@ -338,7 +348,10 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
-    player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng)?;
+    assert_eq!(
+        player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng),
+        Ok(LineClear::None)
+    );
     assert_eq!(
         player.to_string(),
         concat!(
@@ -373,7 +386,10 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
-    player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng)?;
+    assert_eq!(
+        player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng),
+        Ok(LineClear::None)
+    );
     assert_eq!(
         player.to_string(),
         concat!(
@@ -410,7 +426,10 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
-    player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng)?;
+    assert_eq!(
+        player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng),
+        Ok(LineClear::None)
+    );
     assert_eq!(
         player.to_string(),
         concat!(
@@ -465,7 +484,10 @@ fn manual_line_clear() -> TetrisResult {
     );
     assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 0);
-    player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng)?;
+    assert_eq!(
+        player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng),
+        Ok(LineClear::Single)
+    );
     assert_eq!(
         player.to_string(),
         concat!(

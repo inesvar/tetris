@@ -43,7 +43,7 @@
 //! also stores the **Hold Queue**, the **Next Queue**, the score, etc.
 //!
 //! ```
-//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoKind, MockRng, BagType};
+//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoKind, MockRng, BagType, LineClear};
 //! #
 //! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
 //! # let mut garbage_rng = MockRng::default();
@@ -89,7 +89,7 @@
 //!         "         \n",
 //!         "---------\n",
 //!     ));
-//! player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng)?;
+//! assert_eq!(player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng), Ok(LineClear::None));
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    OO   \n", // the second tetromino is an O, as specified by `rng`
@@ -151,7 +151,7 @@
 //! [TetrisPlayer::push_garbage] doesn't have an immediate result, garbage can only be added to the grid
 //! during the lock down stage. Let's trigger one to see what happens.
 //! ```
-//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoKind, MockRng, BagType};
+//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoKind, MockRng, BagType, LineClear};
 //! #
 //! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
 //! # let mut garbage_rng = MockRng::default();
@@ -161,7 +161,7 @@
 //! # player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng);
 //! # player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng);
 //! # player.push_garbage(1);
-//! player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng)?;
+//! assert_eq!(player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng), Ok(LineClear::None));
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    OO   \n",
@@ -196,10 +196,10 @@ mod tetris_player;
 mod tetromino;
 mod tetromino_generator;
 
-pub(crate) use line_clear::LineClear;
 pub(crate) use tetromino_generator::TetrominoGenerator;
 
 // used to update the active tetromino
+pub use line_clear::LineClear;
 pub use tetris_command::TetrisCommand;
 pub use tetris_grid::{GameOverError, TetrisGridCreationError, TetrisResult};
 // used to render the TetrisPlayer
