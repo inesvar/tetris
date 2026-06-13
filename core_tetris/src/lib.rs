@@ -32,9 +32,9 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoKind, MockRng, BagType};
 //! #
-//! let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! let mut garbage_rng = MockRng::default();
-//! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+//! let rng = &mut MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! let garbage_rng = &mut MockRng::default();
+//! let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
 //! ```
 //! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s.
 //!
@@ -45,9 +45,9 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoKind, MockRng, BagType, LineClear};
 //! #
-//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # let mut garbage_rng = MockRng::default();
-//! let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+//! # let rng = &mut MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! # let garbage_rng = &mut MockRng::default();
+//! let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    T    \n", // Buffer Zone
@@ -61,7 +61,7 @@
 //!         "         \n",
 //!         "---------\n",
 //!     ));
-//! player.try_apply(TetrisCommand::Left, &mut rng, &mut garbage_rng)?;
+//! player.try_apply(TetrisCommand::Left, rng, garbage_rng)?;
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "   T     \n",
@@ -75,7 +75,7 @@
 //!         "         \n",
 //!         "---------\n",
 //!     ));
-//! player.try_apply(TetrisCommand::Clockwise, &mut rng, &mut garbage_rng)?;
+//! player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "   T     \n",
@@ -89,7 +89,7 @@
 //!         "         \n",
 //!         "---------\n",
 //!     ));
-//! assert_eq!(player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng), Ok(LineClear::None));
+//! assert_eq!(player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng), Ok(LineClear::None));
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    OO   \n", // the second tetromino is an O, as specified by `rng`
@@ -112,13 +112,13 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoKind, MockRng, BagType};
 //! #
-//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # let mut garbage_rng = MockRng::default();
-//! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
-//! # player.try_apply(TetrisCommand::Left, &mut rng, &mut garbage_rng);
-//! # player.try_apply(TetrisCommand::Clockwise, &mut rng, &mut garbage_rng);
-//! # player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng);
-//! player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng)?;
+//! # let rng = &mut MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! # let garbage_rng = &mut MockRng::default();
+//! # let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
+//! # player.try_apply(TetrisCommand::Left, rng, garbage_rng);
+//! # player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng);
+//! # player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng);
+//! player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    T    \n", // a new tetromino is automatically addded to the grid
@@ -153,15 +153,15 @@
 //! ```
 //! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoKind, MockRng, BagType, LineClear};
 //! #
-//! # let mut rng = MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # let mut garbage_rng = MockRng::default();
-//! # let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
-//! # player.try_apply(TetrisCommand::Left, &mut rng, &mut garbage_rng);
-//! # player.try_apply(TetrisCommand::Clockwise, &mut rng, &mut garbage_rng);
-//! # player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng);
-//! # player.try_apply(TetrisCommand::Hold, &mut rng, &mut garbage_rng);
+//! # let rng = &mut MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
+//! # let garbage_rng = &mut MockRng::default();
+//! # let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
+//! # player.try_apply(TetrisCommand::Left, rng, garbage_rng);
+//! # player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng);
+//! # player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng);
+//! # player.try_apply(TetrisCommand::Hold, rng, garbage_rng);
 //! # player.push_garbage(1);
-//! assert_eq!(player.try_apply(TetrisCommand::HardDrop, &mut rng, &mut garbage_rng), Ok(LineClear::None));
+//! assert_eq!(player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng), Ok(LineClear::None));
 //! assert_eq!(player.to_string(), concat!(
 //!         "---------\n",
 //!         "    OO   \n",

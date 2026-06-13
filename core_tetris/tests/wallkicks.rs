@@ -22,19 +22,19 @@ fn off_the_right_wall(
     initial_rotation: TetrisCommand,
     #[values(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)] rotation: TetrisCommand,
 ) -> TetrisResult {
-    let mut rng = MockRng::tetromino_cycle(&[kind]);
-    let mut garbage_rng = MockRng::default();
-    let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+    let rng = &mut MockRng::tetromino_cycle(&[kind]);
+    let garbage_rng = &mut MockRng::default();
+    let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
 
-    player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
+    player.try_apply(initial_rotation, rng, garbage_rng)?;
 
     let mut no_wall_kick_player = player.clone();
-    no_wall_kick_player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+    no_wall_kick_player.try_apply(rotation, rng, garbage_rng)?;
 
     while player.try_right() {}
     while no_wall_kick_player.try_right() {}
 
-    player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+    player.try_apply(rotation, rng, garbage_rng)?;
 
     assert_eq!(player.to_string(), no_wall_kick_player.to_string());
 
@@ -59,19 +59,19 @@ fn off_the_left_wall(
     initial_rotation: TetrisCommand,
     #[values(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)] rotation: TetrisCommand,
 ) -> TetrisResult {
-    let mut rng = MockRng::tetromino_cycle(&[kind]);
-    let mut garbage_rng = MockRng::default();
-    let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+    let rng = &mut MockRng::tetromino_cycle(&[kind]);
+    let garbage_rng = &mut MockRng::default();
+    let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
 
-    player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
+    player.try_apply(initial_rotation, rng, garbage_rng)?;
 
     let mut no_wall_kick_player = player.clone();
-    no_wall_kick_player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+    no_wall_kick_player.try_apply(rotation, rng, garbage_rng)?;
 
     while player.try_left() {}
     while no_wall_kick_player.try_left() {}
 
-    player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+    player.try_apply(rotation, rng, garbage_rng)?;
 
     assert_eq!(player.to_string(), no_wall_kick_player.to_string());
 
@@ -93,12 +93,12 @@ fn off_the_floor(
     kind: TetrominoKind,
     #[values(TetrisCommand::Clockwise, TetrisCommand::Counterclockwise)] rotation: TetrisCommand,
 ) -> TetrisResult {
-    let mut rng = MockRng::tetromino_cycle(&[kind]);
-    let mut garbage_rng = MockRng::default();
-    let mut player = TetrisPlayer::compact(&mut rng, BagType::NoBag);
+    let rng = &mut MockRng::tetromino_cycle(&[kind]);
+    let garbage_rng = &mut MockRng::default();
+    let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
 
     let mut no_wall_kick_player = player.clone();
-    no_wall_kick_player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+    no_wall_kick_player.try_apply(rotation, rng, garbage_rng)?;
 
     match rotation {
         TetrisCommand::Clockwise => no_wall_kick_player.try_left(),
@@ -109,7 +109,7 @@ fn off_the_floor(
     while player.try_fall() {}
     while no_wall_kick_player.try_fall() {}
 
-    player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+    player.try_apply(rotation, rng, garbage_rng)?;
 
     assert_eq!(player.to_string(), no_wall_kick_player.to_string());
 
@@ -131,8 +131,8 @@ fn out_of_right_well(
     )]
     kind: TetrominoKind,
 ) -> TetrisResult {
-    let mut rng = MockRng::tetromino_cycle(&[kind]);
-    let mut garbage_rng = MockRng::default();
+    let rng = &mut MockRng::tetromino_cycle(&[kind]);
+    let garbage_rng = &mut MockRng::default();
     let grid = TetrisGrid::from_str(concat!(
         "---------\n",
         "         \n",
@@ -147,10 +147,10 @@ fn out_of_right_well(
         "---------\n",
     ))
     .unwrap();
-    let mut player = TetrisPlayer::try_from_matrix(&mut rng, BagType::NoBag, grid).unwrap();
+    let mut player = TetrisPlayer::try_from_matrix(rng, BagType::NoBag, grid).unwrap();
     let mut no_wall_kick_player = player.clone();
 
-    player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
+    player.try_apply(initial_rotation, rng, garbage_rng)?;
 
     while player.try_right() {}
     while no_wall_kick_player.try_fall() {}
@@ -158,7 +158,7 @@ fn out_of_right_well(
     while player.try_fall() {}
     while no_wall_kick_player.try_right() {}
 
-    player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+    player.try_apply(rotation, rng, garbage_rng)?;
 
     assert_eq!(player.to_string(), no_wall_kick_player.to_string());
 
@@ -180,8 +180,8 @@ fn out_of_left_well(
     )]
     kind: TetrominoKind,
 ) -> TetrisResult {
-    let mut rng = MockRng::tetromino_cycle(&[kind]);
-    let mut garbage_rng = MockRng::default();
+    let rng = &mut MockRng::tetromino_cycle(&[kind]);
+    let garbage_rng = &mut MockRng::default();
     let grid = TetrisGrid::from_str(concat!(
         "---------\n",
         "         \n",
@@ -196,10 +196,10 @@ fn out_of_left_well(
         "---------\n",
     ))
     .unwrap();
-    let mut player = TetrisPlayer::try_from_matrix(&mut rng, BagType::NoBag, grid).unwrap();
+    let mut player = TetrisPlayer::try_from_matrix(rng, BagType::NoBag, grid).unwrap();
     let mut no_wall_kick_player = player.clone();
 
-    player.try_apply(initial_rotation, &mut rng, &mut garbage_rng)?;
+    player.try_apply(initial_rotation, rng, garbage_rng)?;
 
     while player.try_left() {}
     while no_wall_kick_player.try_fall() {}
@@ -207,7 +207,7 @@ fn out_of_left_well(
     while player.try_fall() {}
     while no_wall_kick_player.try_left() {}
 
-    player.try_apply(rotation, &mut rng, &mut garbage_rng)?;
+    player.try_apply(rotation, rng, garbage_rng)?;
 
     assert_eq!(player.to_string(), no_wall_kick_player.to_string());
 
