@@ -1,0 +1,18 @@
+graph LR
+    %% objects
+    TetrisPlayer::try_from_matrix(TetrisPlayer::try_from_matrix)
+    MockRng[[MockRng]]
+    BagType[BagType]
+    TetrisGrid[[TetrisGrid]]
+    TetrisPlayer[[TetrisPlayer]]
+    GameOverError[GameOverError]
+
+    subgraph Initialization
+        direction LR
+        MockRng --> TetrisPlayer::try_from_matrix
+        BagType --> TetrisPlayer::try_from_matrix
+        TetrisGrid --> TetrisPlayer::try_from_matrix
+        TetrisPlayer::try_from_matrix --> TetrisPlayer
+        TetrisPlayer::try_from_matrix -.-> GameOverError
+    end
+

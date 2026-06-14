@@ -1,47 +1,39 @@
 graph LR
     %% objects
-    BagType[BagType]
-    TetrisGrid[[TetrisGrid]]
-    GameOverError[GameOverError]
-    TetrisResult[TetrisResult]
-    Tetromino[[Tetromino]]
-    Position[[Position]]
-    TetrisColor[TetrisColor]
     TetrisPlayer[[TetrisPlayer]]
-    LineClear[LineClear]
-    TetrisCommand[TetrisCommand]
-    MockRng[[MockRng]]
-    TetrominoKind[TetrominoKind]
-    RenderTetrisPlayer([RenderTetrisPlayer])
-    CircularBuffer[[CircularBuffer]]
+
+    TetrisGrid[[TetrisGrid]]
+    TetrisColor[TetrisColor]
+    GameOverError[GameOverError]
     TetrisGridCreationError[TetrisGridCreationError]
 
-    RenderTetrisPlayer -.-> CircularBuffer
+    BagType[BagType]
+    CircularBuffer[[CircularBuffer]]
+    Tetromino[[Tetromino]]
+    TetrominoKind[TetrominoKind]
+    Position[[Position]]
 
-    TetrisPlayer
-    MockRng
-    RenderTetrisPlayer
-
-    TetrisPlayer --o Tetromino
-    RenderTetrisPlayer -.-> Tetromino
-
-    subgraph tetromino[" "]
-        Tetromino --o Position
-        Tetromino --o TetrominoKind
-    end
+    TetrisCommand[TetrisCommand]
+    LineClear[LineClear]
+    MockRng[[MockRng]]
 
 
-    subgraph tetris_grid[" "]
+    TetrisPlayer -.-> TetrisCommand
+    TetrisPlayer -.-> MockRng
+    TetrisPlayer -.-> LineClear
+
+    TetrisPlayer ---o TetrisGrid
+    %% subgraph tetris_grid[" "]
         TetrisGrid --o TetrisColor
-        TetrisGrid -.-> TetrisGridCreationError
-        TetrisGrid -.-> TetrisResult
-        TetrisResult --o GameOverError
         TetrisGrid -.-> GameOverError
-    end
+        TetrisGrid -.-> TetrisGridCreationError
+    %% end
 
-    RenderTetrisPlayer -.-> TetrisGrid
-    TetrisPlayer --o TetrisGrid
-    TetrisPlayer --o BagType
-    LineClear
+    TetrisPlayer ---o CircularBuffer
+    TetrisPlayer ---o BagType
 
-    style TetrisResult stroke-dasharray: 5 5;
+    TetrisPlayer ---o Tetromino
+    %% subgraph tetromino[" "]
+        Tetromino --o TetrominoKind
+        Tetromino --o Position
+    %% end

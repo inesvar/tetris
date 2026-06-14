@@ -1,0 +1,16 @@
+graph LR
+    %% objects
+    TetrisPlayer::try_apply(TetrisPlayer::try_apply)
+    TetrisCommand[TetrisCommand]
+    MockRng[[MockRng]]
+    LineClear[LineClear]
+    GameOverError[GameOverError]
+
+    subgraph Usage
+        direction LR
+        TetrisCommand --> TetrisPlayer::try_apply
+        MockRng --> TetrisPlayer::try_apply
+        TetrisPlayer::try_apply --> LineClear
+        TetrisPlayer::try_apply -.-> GameOverError
+    end
+

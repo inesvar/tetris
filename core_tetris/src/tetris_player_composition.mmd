@@ -1,0 +1,24 @@
+graph LR
+    %% objects
+    TetrisPlayer[[TetrisPlayer]]
+    TetrisGrid[[TetrisGrid]]
+    TetrisColor[TetrisColor]
+    Tetromino[[Tetromino]]
+    TetrominoKind[TetrominoKind]
+    Position[[Position]]
+    CircularBuffer[[CircularBuffer]]
+    BagType[BagType]
+
+    subgraph Composition
+        direction TD
+        TetrisPlayer --o TetrisGrid
+        TetrisGrid --o TetrisColor
+
+        TetrisPlayer --o Tetromino
+        Tetromino --o TetrominoKind
+        Tetromino --o Position
+
+        TetrisPlayer --o BagType
+
+        TetrisPlayer --o CircularBuffer
+    end
