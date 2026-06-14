@@ -27,14 +27,21 @@
 //! - all 3 game over conditions are supported (see [GameOverError])
 //! - customization of the tetris grid size, of the tetromino bags
 //!
+//! # Structure
+//!
+//! This crate namely provides `struct` [TetrisPlayer], `enum` [TetrisCommand] and `enum` [LineClear],
+//! which represent the state of play, the player actions and the result of these actions.
+//! It also provides `struct` [MockRng] to mock the random generation,
+//! and `trait` [render::RenderTetrisPlayer] to render a [TetrisPlayer].
+//!
+#![doc = simple_mermaid::mermaid!("core_tetris.mmd")]
+//!
 //! # Examples
 //!
-//! ```
-//! # use core_tetris::{TetrisPlayer, TetrisCommand, TetrominoKind, MockRng, BagType};
-//! #
-//! let rng = &mut MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! let garbage_rng = &mut MockRng::default();
-//! let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
+//! Let's go through a simple usage example.
+//!
+//! ```rust
+#![doc = include_doctest!("examples/simple.rs", region = "tetris_player_creation")]
 //! ```
 //! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s.
 //!
@@ -42,148 +49,23 @@
 //! Printing [TetrisPlayer] will only show the grid contents and the active tetromino, but [TetrisPlayer]
 //! also stores the **Hold Queue**, the **Next Queue**, the score, etc.
 //!
-//! ```
-//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoKind, MockRng, BagType, LineClear};
-//! #
-//! # let rng = &mut MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # let garbage_rng = &mut MockRng::default();
-//! let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
-//! assert_eq!(player.to_string(), concat!(
-//!         "---------\n",
-//!         "    T    \n", // Buffer Zone
-//!         "   TTT   \n", // the first tetromino is a T, as specified by `rng`
-//!         "---------\n", // Skyline
-//!         "         \n", // Matrix
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "---------\n",
-//!     ));
-//! player.try_apply(TetrisCommand::Left, rng, garbage_rng)?;
-//! assert_eq!(player.to_string(), concat!(
-//!         "---------\n",
-//!         "   T     \n",
-//!         "  TTT    \n",
-//!         "---------\n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "---------\n",
-//!     ));
-//! player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
-//! assert_eq!(player.to_string(), concat!(
-//!         "---------\n",
-//!         "   T     \n",
-//!         "   TT    \n",
-//!         "---------\n",
-//!         "   T     \n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "---------\n",
-//!     ));
-//! assert_eq!(player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng), Ok(LineClear::None));
-//! assert_eq!(player.to_string(), concat!(
-//!         "---------\n",
-//!         "    OO   \n", // the second tetromino is an O, as specified by `rng`
-//!         "    OO   \n",
-//!         "---------\n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "   T     \n",
-//!         "   TT    \n",
-//!         "   T     \n",
-//!         "---------\n",
-//!     ));
-//! # Ok::<(), GameOverError>(())
+//! ```rust
+#![doc = include_doctest!("examples/simple.rs", region = "tetris_player_basic_commands")]
 //! ```
 //! NB: [TetrisCommand::HardDrop] should be used to lock down the tetromino in play some time after it reaches the bottom.
 //! This crate doesn't know the time, so it doesn't know when it's the right time to do that.
 //! Likewise, this crate wouldn't know when to call [TetrisCommand::Fall] to make the active tetromino
 //! fall towards the bottom, it's the job of the tetris engine to regularly call [TetrisCommand::Fall].
-//! ```
-//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoKind, MockRng, BagType};
-//! #
-//! # let rng = &mut MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # let garbage_rng = &mut MockRng::default();
-//! # let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
-//! # player.try_apply(TetrisCommand::Left, rng, garbage_rng);
-//! # player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng);
-//! # player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng);
-//! player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
-//! assert_eq!(player.to_string(), concat!(
-//!         "---------\n",
-//!         "    T    \n", // a new tetromino is automatically addded to the grid
-//!         "   TTT   \n", // it's a T, as specified by `rng`
-//!         "---------\n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "   T     \n",
-//!         "   TT    \n",
-//!         "   T     \n",
-//!         "---------\n",
-//!     ));
-//! player.push_garbage(1);
-//! assert_eq!(player.to_string(), concat!(
-//!         "---------\n",
-//!         "    T    \n",
-//!         "   TTT   \n",
-//!         "---------\n",
-//!         "         \n",
-//!         "         \n",
-//!         "         \n",
-//!         "   T     \n",
-//!         "   TT    \n",
-//!         "   T     \n",
-//!         "---------\n",
-//!     ));
-//! # Ok::<(), GameOverError>(())
+//!
+//! ```rust
+#![doc = include_doctest!("examples/simple.rs", region = "tetris_player_hold_command")]
 //! ```
 //! [TetrisPlayer::push_garbage] doesn't have an immediate result, garbage can only be added to the grid
 //! during the lock down stage. Let's trigger one to see what happens.
-//! ```
-//! # use core_tetris::{TetrisPlayer, GameOverError, TetrisCommand, TetrominoKind, MockRng, BagType, LineClear};
-//! #
-//! # let rng = &mut MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-//! # let garbage_rng = &mut MockRng::default();
-//! # let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
-//! # player.try_apply(TetrisCommand::Left, rng, garbage_rng);
-//! # player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng);
-//! # player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng);
-//! # player.try_apply(TetrisCommand::Hold, rng, garbage_rng);
-//! # player.push_garbage(1);
-//! assert_eq!(player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng), Ok(LineClear::None));
-//! assert_eq!(player.to_string(), concat!(
-//!         "---------\n",
-//!         "    OO   \n",
-//!         "    OO   \n",
-//!         "---------\n",
-//!         "    T    \n",
-//!         "   TTT   \n",
-//!         "   T     \n",
-//!         "   TT    \n",
-//!         "   T     \n",
-//!         " XXXXXXXX\n", // garbage is right aligned as specified in `garbage_rng`
-//!         "---------\n",
-//!     ));
-//! # Ok::<(), GameOverError>(())
-//! ```
-//! # Structure
 //!
-//! This crate provides `struct` [TetrisPlayer] and `enum` [TetrisCommand], which can be used
-//! to represent the state of a tetris player and its changes. It also provides `struct` [MockRng] to
-//! mock the random generation, and `trait` [render::RenderTetrisPlayer] to render a [TetrisPlayer].
-//!
-#![doc = simple_mermaid::mermaid!("core_tetris.mmd")]
+//! ```rust
+#![doc = include_doctest!("examples/simple.rs", region = "tetris_player_garbage")]
+//! ```
 
 mod circular_buffer;
 mod line_clear;
@@ -196,6 +78,7 @@ mod tetris_player;
 mod tetromino;
 mod tetromino_generator;
 
+use doctest_file::include_doctest;
 pub(crate) use tetromino_generator::TetrominoGenerator;
 
 // used to update the active tetromino

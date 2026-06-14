@@ -423,6 +423,7 @@ dependencies = [
 name = "core_tetris"
 version = "0.1.0"
 dependencies = [
+ "doctest-file",
  "rand 0.10.0",
  "rstest",
  "serde",
@@ -514,6 +515,12 @@ checksum = "330c60081dcc4c72131f8eb70510f1ac07223e5d4163db481a04a0befcffa412"
 dependencies = [
  "libloading 0.8.5",
 ]
+
+[[package]]
+name = "doctest-file"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2db04e74f0a9a93103b50e90b96024c9b2bdca8bce6a632ec71b88736d3d359"
 
 [[package]]
 name = "downcast-rs"
