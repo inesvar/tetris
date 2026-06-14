@@ -5,16 +5,13 @@ use core_tetris::{
 fn main() -> TetrisResult {
     // ANCHOR: tetris_player_creation
     let rng = &mut MockRng::tetromino_cycle(&[TetrominoKind::T, TetrominoKind::O]);
-    let garbage_rng = &mut MockRng::default();
     let mut player = TetrisPlayer::compact(rng, BagType::NoBag);
-    // ANCHOR_END: tetris_player_creation
-    // ANCHOR: tetris_player_basic_commands
     assert_eq!(
         player.to_string(),
         concat!(
             "---------\n",
             "    T    \n", // Buffer Zone
-            "   TTT   \n", // the first tetromino is a T, as specified by `rng`
+            "   TTT   \n", // the first tetromino was chosen according to `rng`
             "---------\n", // Skyline
             "         \n", // Matrix
             "         \n",
@@ -25,7 +22,13 @@ fn main() -> TetrisResult {
             "---------\n",
         )
     );
-    player.try_apply(TetrisCommand::Left, rng, garbage_rng)?;
+    // ANCHOR_END: tetris_player_creation
+    // ANCHOR: tetris_player_basic_commands
+    let garbage_rng = &mut MockRng::default(); // right-aligned garbage
+    assert_eq!(
+        player.try_apply(TetrisCommand::Left, rng, garbage_rng),
+        Ok(LineClear::None)
+    );
     assert_eq!(
         player.to_string(),
         concat!(
@@ -42,7 +45,10 @@ fn main() -> TetrisResult {
             "---------\n",
         )
     );
-    player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
+    assert_eq!(
+        player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng),
+        Ok(LineClear::None)
+    );
     assert_eq!(
         player.to_string(),
         concat!(
@@ -67,7 +73,7 @@ fn main() -> TetrisResult {
         player.to_string(),
         concat!(
             "---------\n",
-            "    OO   \n", // the second tetromino is an O, as specified by `rng`
+            "    OO   \n", // the second tetromino was chosen according to `rng`
             "    OO   \n",
             "---------\n",
             "         \n",
@@ -81,13 +87,16 @@ fn main() -> TetrisResult {
     );
     // ANCHOR_END: tetris_player_basic_commands
     // ANCHOR: tetris_player_hold_command
-    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+    assert_eq!(
+        player.try_apply(TetrisCommand::Hold, rng, garbage_rng),
+        Ok(LineClear::None)
+    );
     assert_eq!(
         player.to_string(),
         concat!(
             "---------\n",
-            "    T    \n", // a new tetromino is automatically addded to the grid
-            "   TTT   \n", // it's a T, as specified by `rng`
+            "    T    \n", // the third tetromino was chosen according to `rng`
+            "   TTT   \n",
             "---------\n",
             "         \n",
             "         \n",
@@ -134,6 +143,26 @@ fn main() -> TetrisResult {
             "   TT    \n",
             "   T     \n",
             " XXXXXXXX\n", // garbage is right aligned as specified in `garbage_rng`
+            "---------\n",
+        )
+    );
+    assert_eq!(
+        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        Err(core_tetris::GameOverError::LockOut)
+    );
+    assert_eq!(
+        player.to_string(),
+        concat!(
+            "---------\n",
+            "    TO   \n",
+            "   TTT   \n", // the active tetromino is not in a valid state wrt the grid
+            "---------\n",
+            "    T    \n",
+            "   TTT   \n",
+            "   T     \n",
+            "   TT    \n",
+            "   T     \n",
+            " XXXXXXXX\n",
             "---------\n",
         )
     );

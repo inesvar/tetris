@@ -1,6 +1,6 @@
 #![deny(missing_docs)]
 
-//! This library crate provides core functionality for the tetris game.
+//! This library crate provides logic for the tetris game.
 //! It aims to follow the [2009 Tetris Guideline](<https://ia800405.us.archive.org/12/items/2009-tetris-variant-concepts_202201/2009%20Tetris%20Design%20Guideline.pdf>)
 //! as closely as possible.
 //!
@@ -19,34 +19,27 @@
 //! # Functionalities
 //!
 //! This crate has the following functionalities:
-//! - support for the 6 classic tetromino movements (left, right, clockwise, counter-clockwise, soft drop, hard drop), and additionally 180° turns
-//! - wallkick support using the Super Rotation System (when you try to rotate a tetromino next to a wall,
+//! - 6 classic tetromino moves, and additionally 180° turns (see [TetrisCommand])
+//! - **Hold Queue** and associated [TetrisCommand::Hold]
+//! - wallkick support using the **Super Rotation System** (when you try to rotate a tetromino next to a wall,
 //!   the regular move might be impossible but SRS will first translate the tetromino to make the rotation succeed)
-//! - support for the Hold Queue
-//! - support for sending/receiving garbage
-//! - all 3 game over conditions are supported (see [GameOverError])
+//! - adding garbage and storing garbage count
+//! - 3 official game over conditions are supported (see [GameOverError])
+//! - T-spin detection
 //! - customization of the tetris grid size, of the tetromino bags
-//!
-//! # Structure
-//!
-//! This crate namely provides `struct` [TetrisPlayer], `enum` [TetrisCommand] and `enum` [LineClear],
-//! which represent the state of play, the player actions and the result of these actions.
-//! It also provides `struct` [MockRng] to mock the random generation,
-//! and `trait` [render::RenderTetrisPlayer] to render a [TetrisPlayer].
-//!
-#![doc = simple_mermaid::mermaid!("core_tetris.mmd")]
 //!
 //! # Examples
 //!
 //! Let's go through a simple usage example.
 //!
+//! To create a [TetrisPlayer], you have to choose a [TetrisGrid] size ([TetrisPlayer::compact] creates a small 9x(6+2) grid)
+//! and a random generator for the first [Tetromino]s.
+//!
 //! ```rust
 #![doc = include_doctest!("examples/simple.rs", region = "tetris_player_creation")]
 //! ```
 //! Once created, a [TetrisPlayer] can be controlled with [TetrisCommand]s.
-//!
-//! Let's look at the results of some commands by printing [TetrisPlayer].
-//! Printing [TetrisPlayer] will only show the grid contents and the active tetromino, but [TetrisPlayer]
+//! Printing [TetrisPlayer] only shows the grid and the active tetromino, but [TetrisPlayer]
 //! also stores the **Hold Queue**, the **Next Queue**, the score, etc.
 //!
 //! ```rust
@@ -66,6 +59,15 @@
 //! ```rust
 #![doc = include_doctest!("examples/simple.rs", region = "tetris_player_garbage")]
 //! ```
+//!
+//! # Structure
+//!
+//! This crate namely provides `struct` [TetrisPlayer], `enum` [TetrisCommand] and `enum` [LineClear],
+//! which represent the state of play, the player actions and the result of these actions.
+//! It also provides `struct` [MockRng] to mock the random generation,
+//! and `trait` [render::RenderTetrisPlayer] to render a [TetrisPlayer].
+//!
+#![doc = simple_mermaid::mermaid!("core_tetris.mmd")]
 
 mod circular_buffer;
 mod line_clear;
