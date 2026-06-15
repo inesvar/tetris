@@ -99,9 +99,9 @@ fn line_clear_from_setup() -> TetrisResult {
         )
     );
     assert_eq!(player.get_lines_completed(), 4);
-    assert_eq!(player.score(), 4);
+    assert_eq!(player.score(), 800);
     assert_eq!(player.get_lines_completed(), 0);
-    assert_eq!(player.score(), 4);
+    assert_eq!(player.score(), 800);
 
     Ok(())
 }
@@ -302,9 +302,9 @@ fn manual_line_clear() -> TetrisResult {
         )
     );
     assert_eq!(player.get_lines_completed(), 1);
-    assert_eq!(player.score(), 1);
+    assert_eq!(player.score(), 100);
     assert_eq!(player.get_lines_completed(), 0);
-    assert_eq!(player.score(), 1);
+    assert_eq!(player.score(), 100);
 
     Ok(())
 }

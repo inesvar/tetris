@@ -258,9 +258,9 @@ fn t_spin_double_from_setup() -> TetrisResult {
         )
     );
     assert_eq!(player.get_lines_completed(), 2);
-    assert_eq!(player.score(), 2);
+    assert_eq!(player.score(), 1200);
     assert_eq!(player.get_lines_completed(), 0);
-    assert_eq!(player.score(), 2);
+    assert_eq!(player.score(), 1200);
 
     Ok(())
 }
@@ -360,9 +360,9 @@ fn t_spin_triple_from_setup() -> TetrisResult {
         )
     );
     assert_eq!(player.get_lines_completed(), 3);
-    assert_eq!(player.score(), 3);
+    assert_eq!(player.score(), 1600);
     assert_eq!(player.get_lines_completed(), 0);
-    assert_eq!(player.score(), 3);
+    assert_eq!(player.score(), 1600);
 
     Ok(())
 }

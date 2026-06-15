@@ -246,7 +246,7 @@ impl TetrisPlayer {
         let previously_active = self.replace_tetromino_in_play(rng);
 
         let line_clear = previously_active.lock_down(&mut self.grid)?;
-        self.update_new_completed_lines(line_clear.nb_lines_cleared());
+        self.update_new_completed_lines(line_clear);
 
         self.grid
             .apply_received_garbage(self.received_garbage_lines, garbage_rng)?;
@@ -259,9 +259,9 @@ impl TetrisPlayer {
 
     /// Increase counters ([TetrisPlayer::new_completed_lines] and [TetrisPlayer::score])
     /// after `new_completed_lines` lines have been cleared.
-    fn update_new_completed_lines(&mut self, new_completed_lines: u32) {
-        self.new_completed_lines += new_completed_lines;
-        self.score += new_completed_lines;
+    fn update_new_completed_lines(&mut self, line_clear: LineClear) {
+        self.new_completed_lines += line_clear.nb_lines_cleared();
+        self.score += line_clear.score();
     }
 
     /// Increase the count of received garbage lines.

@@ -1,5 +1,5 @@
 #[allow(missing_docs)]
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 /// Types of line clears (simple line clear or T-spin ? how many cleared lines ?).
 pub enum LineClear {
     None,
