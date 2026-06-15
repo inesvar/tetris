@@ -9,7 +9,7 @@
     - ~~last successful is rotate before lockdown (think about this)~~
     - fix t tetromino wallkicks
     - ~~right before lock down : is t in t slot ? is last succesful rotate ? => t_spin~~
-    - t spin & mini t spin detection
+    - ~~t spin & mini t spin detection~~
     - back to backs
     - compute the "fake number of lines cleared"
     - compute the garbage

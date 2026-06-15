@@ -142,7 +142,7 @@ fn t_spin_single() -> TetrisResult {
 
     assert_eq!(
         player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::TSpinSingle)
+        Ok(LineClear::MiniTSpinSingle)
     );
     assert_eq!(
         player.to_string(),

@@ -13,7 +13,6 @@ pub struct Position {
 
 impl Position {
     // y increases from top to bottom
-    #[cfg(test)]
     pub(crate) const RISE: Position = Position::new(0, -1);
     pub(crate) const RIGHT: Position = Position::new(1, 0);
     pub(crate) const FALL: Position = Position::new(0, 1);
@@ -76,6 +75,10 @@ impl Position {
     pub fn y(&self) -> i32 {
         self.y
     }
+
+    pub fn dot(self, other: Position) -> i32 {
+        self.x * other.x + self.y * other.y
+    }
 }
 
 /// In [spatial_primitives](super::spatial_primitives), helpers used by
@@ -97,6 +100,17 @@ impl Direction {
             Direction::West => *self = Direction::South,
             Direction::South => *self = Direction::East,
             Direction::East => *self = Direction::North,
+        }
+    }
+}
+
+impl From<Direction> for Position {
+    fn from(value: Direction) -> Self {
+        match value {
+            Direction::North => Position::RISE,
+            Direction::East => Position::RIGHT,
+            Direction::South => Position::FALL,
+            Direction::West => Position::LEFT,
         }
     }
 }

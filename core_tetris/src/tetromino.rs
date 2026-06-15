@@ -39,6 +39,11 @@ pub struct Tetromino {
     is_last_move_rotation: bool,
 }
 
+enum TSlot {
+    MiniTSlot,
+    TSlot,
+}
+
 // #[doc = simple_mermaid::mermaid!("tetromino/tetromino_internals.mmd")]
 /// Getters.
 impl Tetromino {
@@ -99,9 +104,9 @@ impl Tetromino {
         }
     }
 
-    fn is_in_t_slot(&self, grid: &TetrisGrid) -> bool {
+    fn is_in_t_slot(&self, grid: &TetrisGrid) -> Option<TSlot> {
         if self.kind != TetrominoKind::T {
-            return false;
+            return None;
         }
         let corners = [
             self.center + Position::new(-1, -1),
@@ -109,13 +114,22 @@ impl Tetromino {
             self.center + Position::new(-1, 1),
             self.center + Position::new(1, 1),
         ];
-        let mut nb_available_corners = 0;
+        let mut only_free_corner = None;
         for corner in corners {
             if grid.is_block_available(&corner) {
-                nb_available_corners += 1;
+                if only_free_corner.is_none() {
+                    only_free_corner = Some(corner);
+                } else {
+                    return None;
+                }
             }
         }
-        nb_available_corners < 2
+
+        if only_free_corner.is_none_or(|corner| corner.dot(self.direction.into()) < 0) {
+            Some(TSlot::TSlot)
+        } else {
+            Some(TSlot::MiniTSlot)
+        }
     }
 
     /// Applies [TetrominoMove] `tetromino_move` to `self` if the target blocks are free and inside the grid.
@@ -134,13 +148,18 @@ impl Tetromino {
     /// Note that `self` is assumed to be on free blocks of `grid`, ie [is_valid_in_grid](Tetromino::is_valid_in_grid) was called successfully
     /// and since then, only `self` was only mutated by [try_apply](Tetromino::try_apply) (see state machine schematic).
     pub(crate) fn lock_down(self, grid: &mut TetrisGrid) -> Result<LineClear, GameOverError> {
-        let f = if self.is_last_move_rotation && self.is_in_t_slot(grid) {
-            LineClear::t_spin
+        let line_clear = if self.is_last_move_rotation {
+            match self.is_in_t_slot(grid) {
+                Some(TSlot::TSlot) => LineClear::t_spin,
+                Some(TSlot::MiniTSlot) => LineClear::mini_t_spin,
+                None => LineClear::new,
+            }
         } else {
             LineClear::new
         };
+
         grid.add_blocks_and_clear_lines(self.blocks, self.color())
-            .map(f)
+            .map(line_clear)
     }
 
     fn apply_translation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> u32 {
