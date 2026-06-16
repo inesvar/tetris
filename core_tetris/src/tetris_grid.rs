@@ -213,6 +213,8 @@ mod tetris_grid_internals {
             blocks: [Position; 4],
             tetris_color: TetrisColor,
         ) -> Result<u32, GameOverError> {
+            debug_assert_eq!(self.clear_lines(), 0);
+
             let all_above_skyline = blocks.iter().all(|block| self.is_above_skyline(block));
 
             for block in blocks {
@@ -624,6 +626,8 @@ impl FromStr for TetrisGrid {
         }
 
         tetris_grid.clear_lines();
+
+        debug_assert_eq!(tetris_grid.clear_lines(), 0);
 
         Ok(tetris_grid)
     }
