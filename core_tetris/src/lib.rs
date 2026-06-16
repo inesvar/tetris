@@ -81,6 +81,7 @@ mod tetromino;
 mod tetromino_generator;
 
 use doctest_file::include_doctest;
+pub(crate) use line_clear::LineClearType;
 pub(crate) use tetromino_generator::TetrominoGenerator;
 
 // used to update the active tetromino

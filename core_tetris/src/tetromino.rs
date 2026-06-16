@@ -11,7 +11,7 @@ use self::{
     moving_primitives::ApplyRotationTranslation, rotation_translation::RotationTranslation,
     spatial_primitives::Direction,
 };
-use super::{GameOverError, LineClear, TetrisColor, TetrisGrid, TetrisResult};
+use super::{GameOverError, LineClear, LineClearType, TetrisColor, TetrisGrid, TetrisResult};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use tetromino_move::TetrominoMove;
@@ -37,11 +37,6 @@ pub struct Tetromino {
     pub(super) blocks: [Position; 4],
     direction: Direction,
     is_last_move_rotation: bool,
-}
-
-enum TSlot {
-    MiniTSlot,
-    TSlot,
 }
 
 // #[doc = simple_mermaid::mermaid!("tetromino/tetromino_internals.mmd")]
@@ -104,31 +99,34 @@ impl Tetromino {
         }
     }
 
-    fn is_in_t_slot(&self, grid: &TetrisGrid) -> Option<TSlot> {
-        if self.kind != TetrominoKind::T {
-            return None;
-        }
+    fn get_t_slot_type(&self, grid: &TetrisGrid) -> LineClearType {
+        debug_assert_eq!(self.kind, TetrominoKind::T);
+
         let corners = [
             self.center + Position::new(-1, -1),
             self.center + Position::new(1, -1),
             self.center + Position::new(-1, 1),
             self.center + Position::new(1, 1),
         ];
-        let mut only_free_corner = None;
+        let mut first_free_corner = None;
         for corner in corners {
             if grid.is_block_available(&corner) {
-                if only_free_corner.is_none() {
-                    only_free_corner = Some(corner);
+                if first_free_corner.is_none() {
+                    first_free_corner = Some(corner);
                 } else {
-                    return None;
+                    return LineClearType::Regular;
                 }
             }
         }
 
-        if only_free_corner.is_none_or(|corner| corner.dot(self.direction.into()) < 0) {
-            Some(TSlot::TSlot)
+        let Some(only_free_corner) = first_free_corner else {
+            return LineClearType::TSpin;
+        };
+
+        if only_free_corner.dot(self.direction.into()) < 0 {
+            LineClearType::TSpin
         } else {
-            Some(TSlot::MiniTSlot)
+            LineClearType::MiniTSpin
         }
     }
 
@@ -143,23 +141,20 @@ impl Tetromino {
     }
 
     /// Adds `self`'s blocks to [TetrisGrid] `grid`. If these blocks are all above the **Skyline**, returns [GameOverError::LockOut],
-    /// otherwise returns the number of cleared lines.
+    /// otherwise returns [LineClear].
     ///
     /// Note that `self` is assumed to be on free blocks of `grid`, ie [is_valid_in_grid](Tetromino::is_valid_in_grid) was called successfully
     /// and since then, only `self` was only mutated by [try_apply](Tetromino::try_apply) (see state machine schematic).
     pub(crate) fn lock_down(self, grid: &mut TetrisGrid) -> Result<LineClear, GameOverError> {
-        let line_clear = if self.is_last_move_rotation {
-            match self.is_in_t_slot(grid) {
-                Some(TSlot::TSlot) => LineClear::t_spin,
-                Some(TSlot::MiniTSlot) => LineClear::mini_t_spin,
-                None => LineClear::new,
-            }
-        } else {
-            LineClear::new
-        };
+        let mut line_clear_type = LineClearType::default();
 
-        grid.add_blocks_and_clear_lines(self.blocks, self.color())
-            .map(line_clear)
+        if self.kind == TetrominoKind::T && self.is_last_move_rotation {
+            line_clear_type = self.get_t_slot_type(grid);
+        }
+
+        let nb_lines_cleared = grid.add_blocks_and_clear_lines(self.blocks, self.color())?;
+
+        Ok(LineClear::new(nb_lines_cleared, line_clear_type))
     }
 
     fn apply_translation(&mut self, tetromino_move: TetrominoMove, grid: &TetrisGrid) -> u32 {
