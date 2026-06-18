@@ -54,7 +54,7 @@ impl From<TetrisCommand> for TetrominoMove {
         match value {
             TetrisCommand::Right => Self::translation(Position::RIGHT),
             TetrisCommand::Left => Self::translation(Position::LEFT),
-            TetrisCommand::Fall => Self::translation(Position::FALL),
+            TetrisCommand::SoftDrop => Self::translation(Position::FALL),
             TetrisCommand::HardDrop => Self::repeat(Position::FALL),
             TetrisCommand::Clockwise => Self::rotation(RotationType::Clockwise),
             TetrisCommand::Counterclockwise => Self::rotation(RotationType::Counterclockwise),
@@ -76,7 +76,7 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case::fall(TetrisCommand::Fall, Position::FALL, RotationType::Identity, false)]
+    #[case::fall(TetrisCommand::SoftDrop, Position::FALL, RotationType::Identity, false)]
     #[case::right(TetrisCommand::Right, Position::RIGHT, RotationType::Identity, false)]
     #[case::left(TetrisCommand::Left, Position::LEFT, RotationType::Identity, false)]
     #[case::hard_drop(TetrisCommand::HardDrop, Position::FALL, RotationType::Identity, true)]

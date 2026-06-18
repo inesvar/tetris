@@ -167,10 +167,10 @@ impl TetrisPlayer {
         Ok(LineClear::None)
     }
 
-    /// Tries to apply [TetrisCommand::Fall], returns whether the **Tetromino in Play** could be moved down.
+    /// Tries to apply [TetrisCommand::SoftDrop], returns whether the **Tetromino in Play** could be moved down.
     pub fn try_fall(&mut self) -> bool {
         self.tetromino_in_play
-            .try_apply(TetrisCommand::Fall.into(), &self.grid)
+            .try_apply(TetrisCommand::SoftDrop.into(), &self.grid)
             > 0
     }
 

@@ -48,8 +48,8 @@
 //! ```
 //! NB: [TetrisCommand::HardDrop] should be used to lock down the tetromino in play some time after it reaches the bottom.
 //! This crate doesn't know the time, so it doesn't know when it's the right time to do that.
-//! Likewise, this crate wouldn't know when to call [TetrisCommand::Fall] to make the active tetromino
-//! fall towards the bottom, it's the job of the tetris engine to regularly call [TetrisCommand::Fall].
+//! Likewise, this crate wouldn't know when to call [TetrisCommand::SoftDrop] to make the active tetromino
+//! fall towards the bottom, it's the job of the tetris engine to regularly call [TetrisCommand::SoftDrop].
 //!
 //! ```rust
 #![doc = include_doctest!("examples/simple.rs", region = "tetris_player_hold_command")]

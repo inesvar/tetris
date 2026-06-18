@@ -472,7 +472,7 @@ mod tests {
     //
     // let mut o_tetromino = Tetromino::default();
     // assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
-    // assert!(o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid));
+    // assert!(o_tetromino.try_apply(TetrominoMove::SoftDrop, &empty_grid));
     // assert!(o_tetromino.lock_down(&mut empty_grid).is_ok());
     // ```
     //
@@ -486,6 +486,6 @@ mod tests {
     // # assert!(o_tetromino.try_enter_grid(&empty_grid).is_ok());
     // #
     // assert!(o_tetromino.try_apply(TetrominoMove::HardDrop, &empty_grid));
-    // assert!(!o_tetromino.try_apply(TetrominoMove::Fall, &empty_grid));
+    // assert!(!o_tetromino.try_apply(TetrominoMove::SoftDrop, &empty_grid));
     // ```
 }

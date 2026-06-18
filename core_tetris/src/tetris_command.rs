@@ -4,7 +4,7 @@
 pub enum TetrisCommand {
     Right,
     Left,
-    Fall,
+    SoftDrop,
     HardDrop,
     Clockwise,
     Counterclockwise,
@@ -19,7 +19,7 @@ impl TetrisCommand {
     pub const ALL: [TetrisCommand; 8] = [
         TetrisCommand::Right,
         TetrisCommand::Left,
-        TetrisCommand::Fall,
+        TetrisCommand::SoftDrop,
         TetrisCommand::Clockwise,
         TetrisCommand::Counterclockwise,
         TetrisCommand::HalfTurn,
@@ -30,7 +30,7 @@ impl TetrisCommand {
     const HAS_AUTO_REPEAT: [TetrisCommand; 3] = [
         TetrisCommand::Right,
         TetrisCommand::Left,
-        TetrisCommand::Fall,
+        TetrisCommand::SoftDrop,
     ];
 
     /// Whether the [TetrisCommand] should be repeated on a long key press.
@@ -41,7 +41,7 @@ impl TetrisCommand {
     pub(super) fn score(&self) -> u32 {
         match self {
             TetrisCommand::HardDrop => 2,
-            TetrisCommand::Fall => 1,
+            TetrisCommand::SoftDrop => 1,
             _ => 0,
         }
     }

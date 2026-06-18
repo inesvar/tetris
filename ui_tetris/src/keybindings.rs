@@ -34,7 +34,7 @@ impl Keybindings {
 
     pub fn new_local() -> Self {
         let keys = [
-            (TetrisCommand::Fall, Vec::from(FALL_KEYS_1P)),
+            (TetrisCommand::SoftDrop, Vec::from(FALL_KEYS_1P)),
             (TetrisCommand::HardDrop, Vec::from(HARD_DROP_KEYS_1P)),
             (TetrisCommand::Right, Vec::from(RIGHT_KEYS_1P)),
             (TetrisCommand::Left, Vec::from(LEFT_KEYS_1P)),
@@ -53,7 +53,7 @@ impl Keybindings {
     pub fn new_two_local(id: usize) -> Self {
         let keys = if id == 0 {
             [
-                (TetrisCommand::Fall, vec![FALL_KEYS_2P[0]]),
+                (TetrisCommand::SoftDrop, vec![FALL_KEYS_2P[0]]),
                 (TetrisCommand::HardDrop, vec![HARD_DROP_KEYS_2P[0]]),
                 (TetrisCommand::Right, vec![RIGHT_KEYS_2P[0]]),
                 (TetrisCommand::Left, vec![LEFT_KEYS_2P[0]]),
@@ -67,7 +67,7 @@ impl Keybindings {
             ]
         } else {
             [
-                (TetrisCommand::Fall, vec![FALL_KEYS_2P[1]]),
+                (TetrisCommand::SoftDrop, vec![FALL_KEYS_2P[1]]),
                 (TetrisCommand::HardDrop, vec![HARD_DROP_KEYS_2P[1]]),
                 (TetrisCommand::Right, vec![RIGHT_KEYS_2P[1]]),
                 (TetrisCommand::Left, vec![LEFT_KEYS_2P[1]]),

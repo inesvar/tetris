@@ -135,8 +135,8 @@ impl InteractiveWidgetManager {
             DEFAULT_WINDOW_HEIGHT / 2.0,
             DEFAULT_KEY_INPUT_WIDTH,
             DEFAULT_KEY_INPUT_HEIGHT,
-            settings.get_keys(TetrisCommand::Fall),
-            "Fall Keys :",
+            settings.get_keys(TetrisCommand::SoftDrop),
+            "Soft Drop Keys :",
         );
 
         let hard_drop_keys_input = KeyInput::new_with_info(
@@ -257,7 +257,7 @@ impl InteractiveWidgetManager {
         let text_inputs = HashMap::new();
 
         let mut key_inputs = HashMap::new();
-        key_inputs.insert(TetrisCommand::Fall, fall_keys_input);
+        key_inputs.insert(TetrisCommand::SoftDrop, fall_keys_input);
         key_inputs.insert(TetrisCommand::HardDrop, hard_drop_keys_input);
         key_inputs.insert(TetrisCommand::Right, right_keys_input);
         key_inputs.insert(TetrisCommand::Left, left_keys_input);
