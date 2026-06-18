@@ -1,7 +1,7 @@
 //! Implements [TetrisPlayer].
 use super::{
-    BagType, CircularBuffer, GameOverError, LineClear, TetrisCommand, TetrisGrid, TetrisResult,
-    Tetromino, TetrominoGenerator,
+    BagType, CircularBuffer, GameOverError, LineClear, ScoreManager, TetrisCommand, TetrisGrid,
+    TetrisResult, Tetromino, TetrominoGenerator,
 };
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -34,7 +34,7 @@ pub struct TetrisPlayer {
     hold_queue: Option<Tetromino>,
     /// Tetromino bag (used to refill the **Next Queue**).
     tetromino_bag: TetrominoGenerator,
-    score: u32,
+    score_manager: ScoreManager,
     new_completed_lines: u32,
     /// received_garbage_lines is set before the update and reset during the update. TODO: clarify
     received_garbage_lines: u32,
@@ -65,7 +65,7 @@ impl TetrisPlayer {
 
     /// Total number of lines cleared.
     pub fn score(&self) -> u32 {
-        self.score
+        self.score_manager.score()
     }
 
     #[allow(missing_docs)]
@@ -122,7 +122,7 @@ impl TetrisPlayer {
 
         Ok(TetrisPlayer {
             grid: matrix,
-            score: 0,
+            score_manager: ScoreManager::default(),
             new_completed_lines: 0,
             tetromino_in_play,
             hold_queue: None,
@@ -146,7 +146,8 @@ impl TetrisPlayer {
     ) -> Result<LineClear, GameOverError> {
         match order {
             TetrisCommand::HardDrop => {
-                let _nb_moves = self.tetromino_in_play.try_apply(order.into(), &self.grid);
+                let nb_moves = self.tetromino_in_play.try_apply(order.into(), &self.grid);
+                self.score_manager.score_tetris_command(order, nb_moves);
                 self.is_hold_allowed = true;
                 return self.lock_down(rng, garbage_rng);
             }
@@ -157,9 +158,10 @@ impl TetrisPlayer {
                 }
             }
             tetromino_move => {
-                let _nb_moves = self
+                let nb_moves = self
                     .tetromino_in_play
                     .try_apply(tetromino_move.into(), &self.grid);
+                self.score_manager.score_tetris_command(order, nb_moves);
             }
         }
         Ok(LineClear::None)
@@ -246,7 +248,7 @@ impl TetrisPlayer {
         let previously_active = self.replace_tetromino_in_play(rng);
 
         let line_clear = previously_active.lock_down(&mut self.grid)?;
-        self.update_new_completed_lines(line_clear);
+        self.update_from_line_clear(line_clear);
 
         self.grid
             .apply_received_garbage(self.received_garbage_lines, garbage_rng)?;
@@ -259,9 +261,9 @@ impl TetrisPlayer {
 
     /// Increase counters ([TetrisPlayer::new_completed_lines] and [TetrisPlayer::score])
     /// after `new_completed_lines` lines have been cleared.
-    fn update_new_completed_lines(&mut self, line_clear: LineClear) {
+    fn update_from_line_clear(&mut self, line_clear: LineClear) {
         self.new_completed_lines += line_clear.nb_lines_cleared();
-        self.score += line_clear.score();
+        self.score_manager.score_line_clear(line_clear);
     }
 
     /// Increase the count of received garbage lines.

@@ -1,12 +1,12 @@
 #![deny(missing_docs)]
 
-//! This library crate provides logic for the tetris game.
+//! This library crate provides logic for the tetris game (no OS interaction, only logic).
 //! It aims to follow the [2009 Tetris Guideline](<https://ia800405.us.archive.org/12/items/2009-tetris-variant-concepts_202201/2009%20Tetris%20Design%20Guideline.pdf>)
 //! as closely as possible.
 //!
 //! # Scope
 //!
-//! This crate provides pure logic (no OS interaction), it's meant to be used by a tetris engine that will handle:
+//! This crate is meant to be used by a tetris engine that will handle:
 //! - rendering (this crate provides the [render::RenderTetrisPlayer] trait)
 //! - player input management (this crate expects [TetrisCommand]s as input)
 //! - time management (this crate doesn't know the time)
@@ -23,6 +23,7 @@
 //! - **Hold Queue** and associated [TetrisCommand::Hold]
 //! - wallkick support using the **Super Rotation System** (when you try to rotate a tetromino next to a wall,
 //!   the regular move might be impossible but SRS will first translate the tetromino to make the rotation succeed)
+//! - scoring according to the 2009 Guideline
 //! - adding garbage and storing garbage count
 //! - 3 official game over conditions are supported (see [GameOverError])
 //! - T-spin detection
@@ -82,6 +83,7 @@ mod tetromino_generator;
 
 use doctest_file::include_doctest;
 pub(crate) use line_clear::LineClearType;
+pub(crate) use score_manager::ScoreManager;
 pub(crate) use tetromino_generator::TetrominoGenerator;
 
 // used to update the active tetromino

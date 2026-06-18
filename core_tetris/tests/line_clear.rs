@@ -57,9 +57,7 @@ fn line_clear_from_setup() -> TetrisResult {
             "---------\n",
         )
     );
-    player.try_apply(TetrisCommand::Right, rng, garbage_rng)?;
-    player.try_apply(TetrisCommand::Right, rng, garbage_rng)?;
-    player.try_apply(TetrisCommand::Right, rng, garbage_rng)?;
+    while player.try_right() {}
     assert_eq!(
         player.to_string(),
         concat!(
@@ -99,9 +97,9 @@ fn line_clear_from_setup() -> TetrisResult {
         )
     );
     assert_eq!(player.get_lines_completed(), 4);
-    assert_eq!(player.score(), 800);
+    assert_eq!(player.score(), 808);
     assert_eq!(player.get_lines_completed(), 0);
-    assert_eq!(player.score(), 800);
+    assert_eq!(player.score(), 808);
 
     Ok(())
 }
@@ -165,8 +163,8 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
-    player.try_apply(TetrisCommand::Right, rng, garbage_rng)?;
-    player.try_apply(TetrisCommand::Right, rng, garbage_rng)?;
+    assert_eq!(player.score(), 12);
+    while player.try_right() {}
     assert_eq!(
         player.to_string(),
         concat!(
@@ -203,10 +201,8 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
-    player.try_apply(TetrisCommand::Left, rng, garbage_rng)?;
-    player.try_apply(TetrisCommand::Left, rng, garbage_rng)?;
-    player.try_apply(TetrisCommand::Left, rng, garbage_rng)?;
-    player.try_apply(TetrisCommand::Left, rng, garbage_rng)?;
+    assert_eq!(player.score(), 24);
+    while player.try_left() {}
     assert_eq!(
         player.to_string(),
         concat!(
@@ -243,6 +239,7 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
+    assert_eq!(player.score(), 36);
     player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
     assert_eq!(
         player.to_string(),
@@ -280,7 +277,6 @@ fn manual_line_clear() -> TetrisResult {
         )
     );
     assert_eq!(player.get_lines_completed(), 0);
-    assert_eq!(player.score(), 0);
     assert_eq!(
         player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::Single)
@@ -302,9 +298,9 @@ fn manual_line_clear() -> TetrisResult {
         )
     );
     assert_eq!(player.get_lines_completed(), 1);
-    assert_eq!(player.score(), 100);
+    assert_eq!(player.score(), 144);
     assert_eq!(player.get_lines_completed(), 0);
-    assert_eq!(player.score(), 100);
+    assert_eq!(player.score(), 144);
 
     Ok(())
 }

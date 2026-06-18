@@ -40,9 +40,8 @@ impl TetrisCommand {
 
     pub(super) fn score(&self) -> u32 {
         match self {
-            // NOTE: at the moment we don't know how much lines a hard drop did...
-            // maybe it is not TetrisCommand that should be scored ?
-            TetrisCommand::Fall | TetrisCommand::HardDrop => 1,
+            TetrisCommand::HardDrop => 2,
+            TetrisCommand::Fall => 1,
             _ => 0,
         }
     }

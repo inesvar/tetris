@@ -26,17 +26,21 @@ pub(super) enum LineClearType {
 }
 
 impl LineClear {
-    fn get_type(&self) -> LineClearType {
-        match self {
-            Self::MiniTSpin | Self::MiniTSpinSingle | Self::MiniTSpinDouble => {
-                LineClearType::MiniTSpin
-            }
-            Self::TSpin | Self::TSpinSingle | Self::TSpinDouble | Self::TSpinTriple => {
-                LineClearType::TSpin
-            }
-            _ => LineClearType::Regular,
-        }
-    }
+    #[cfg(test)]
+    const ALL: [LineClear; 12] = [
+        Self::None,
+        Self::Single,
+        Self::Double,
+        Self::Triple,
+        Self::Tetris,
+        Self::MiniTSpin,
+        Self::MiniTSpinSingle,
+        Self::MiniTSpinDouble,
+        Self::TSpin,
+        Self::TSpinSingle,
+        Self::TSpinDouble,
+        Self::TSpinTriple,
+    ];
 
     pub(super) fn new(nb_lines_cleared: u32, line_clear: LineClearType) -> Self {
         match line_clear {
@@ -88,8 +92,8 @@ impl LineClear {
         }
     }
 
-    pub(super) fn continues_back_to_back_sequence(&self) -> bool {
-        !matches!(self, Self::Single | Self::Double | Self::Triple)
+    pub(super) fn stops_back_to_back_sequence(&self) -> bool {
+        matches!(self, Self::Single | Self::Double | Self::Triple)
     }
 
     pub(super) fn begins_back_to_back_sequence(&self) -> bool {
@@ -104,5 +108,20 @@ impl LineClear {
             self,
             Self::Single | Self::Double | Self::Triple | Self::MiniTSpin | Self::TSpin
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn if_you_begin_a_b2b_sequence_you_dont_stop_it() {
+        for line_clear in LineClear::ALL {
+            assert!(
+                !line_clear.begins_back_to_back_sequence()
+                    || !line_clear.stops_back_to_back_sequence()
+            );
+        }
     }
 }
