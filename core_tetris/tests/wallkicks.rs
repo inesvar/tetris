@@ -31,8 +31,8 @@ fn off_the_right_wall(
     let mut no_wall_kick_player = player.clone();
     no_wall_kick_player.apply_player_move(rotation, rng, garbage_rng)?;
 
-    while player.try_right() {}
-    while no_wall_kick_player.try_right() {}
+    while player.apply_right() {}
+    while no_wall_kick_player.apply_right() {}
 
     player.apply_player_move(rotation, rng, garbage_rng)?;
 
@@ -68,8 +68,8 @@ fn off_the_left_wall(
     let mut no_wall_kick_player = player.clone();
     no_wall_kick_player.apply_player_move(rotation, rng, garbage_rng)?;
 
-    while player.try_left() {}
-    while no_wall_kick_player.try_left() {}
+    while player.apply_left() {}
+    while no_wall_kick_player.apply_left() {}
 
     player.apply_player_move(rotation, rng, garbage_rng)?;
 
@@ -101,13 +101,13 @@ fn off_the_floor(
     no_wall_kick_player.apply_player_move(rotation, rng, garbage_rng)?;
 
     match rotation {
-        TetrisCommand::Clockwise => no_wall_kick_player.try_left(),
-        TetrisCommand::Counterclockwise => no_wall_kick_player.try_right(),
+        TetrisCommand::Clockwise => no_wall_kick_player.apply_left(),
+        TetrisCommand::Counterclockwise => no_wall_kick_player.apply_right(),
         _ => unreachable!(),
     };
 
-    while player.try_fall() {}
-    while no_wall_kick_player.try_fall() {}
+    while player.apply_gravity() {}
+    while no_wall_kick_player.apply_gravity() {}
 
     player.apply_player_move(rotation, rng, garbage_rng)?;
 
@@ -152,11 +152,11 @@ fn out_of_right_well(
 
     player.apply_player_move(initial_rotation, rng, garbage_rng)?;
 
-    while player.try_right() {}
-    while no_wall_kick_player.try_fall() {}
+    while player.apply_right() {}
+    while no_wall_kick_player.apply_gravity() {}
 
-    while player.try_fall() {}
-    while no_wall_kick_player.try_right() {}
+    while player.apply_gravity() {}
+    while no_wall_kick_player.apply_right() {}
 
     player.apply_player_move(rotation, rng, garbage_rng)?;
 
@@ -201,11 +201,11 @@ fn out_of_left_well(
 
     player.apply_player_move(initial_rotation, rng, garbage_rng)?;
 
-    while player.try_left() {}
-    while no_wall_kick_player.try_fall() {}
+    while player.apply_left() {}
+    while no_wall_kick_player.apply_gravity() {}
 
-    while player.try_fall() {}
-    while no_wall_kick_player.try_left() {}
+    while player.apply_gravity() {}
+    while no_wall_kick_player.apply_left() {}
 
     player.apply_player_move(rotation, rng, garbage_rng)?;
 

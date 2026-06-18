@@ -135,7 +135,8 @@ impl TetrisPlayer {
 }
 
 impl TetrisPlayer {
-    /// Tries to apply [TetrisCommand], returns [TetrisResult] if the situation is a losing one.
+    /// Tries to apply [TetrisCommand], returns [TetrisResult] if the situation is a losing one,
+    /// returns [LineClear] otherwise.
     ///
     /// Refer to [TetrisCommand] documentation for more detail.
     pub fn apply_player_move<R1: Rng, R2: Rng>(
@@ -167,22 +168,24 @@ impl TetrisPlayer {
         Ok(LineClear::None)
     }
 
-    /// Tries to apply [TetrisCommand::SoftDrop], returns whether the **Tetromino in Play** could be moved down.
-    pub fn try_fall(&mut self) -> bool {
+    /// Tries to apply gravity (move the **Tetromino in Play** one line lower), returns `true` on success.
+    ///
+    /// The score won't be increased if the [Tetromino] is successfully lowered.
+    pub fn apply_gravity(&mut self) -> bool {
         self.tetromino_in_play
             .try_apply(TetrisCommand::SoftDrop.into(), &self.grid)
             > 0
     }
 
-    /// Tries to apply [TetrisCommand::Right], returns whether the **Tetromino in Play** could be moved down.
-    pub fn try_right(&mut self) -> bool {
+    /// Tries to amove the **Tetromino in Play** to the right, returns `true` on success.
+    pub fn apply_right(&mut self) -> bool {
         self.tetromino_in_play
             .try_apply(TetrisCommand::Right.into(), &self.grid)
             > 0
     }
 
-    /// Tries to apply [TetrisCommand::Left], returns whether the **Tetromino in Play** could be moved down.
-    pub fn try_left(&mut self) -> bool {
+    /// Tries to amove the **Tetromino in Play** to the left, returns `true` on success.
+    pub fn apply_left(&mut self) -> bool {
         self.tetromino_in_play
             .try_apply(TetrisCommand::Left.into(), &self.grid)
             > 0

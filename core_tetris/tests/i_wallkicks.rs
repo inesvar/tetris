@@ -32,7 +32,7 @@ fn i_off_the_right_wall_to_the_bottom(
         )
     );
     player.apply_player_move(initial_rotation, rng, garbage_rng)?;
-    while player.try_right() {}
+    while player.apply_right() {}
 
     assert_eq!(
         player.to_string(),
@@ -101,7 +101,7 @@ fn i_off_the_right_wall_to_the_top(
         )
     );
     player.apply_player_move(initial_rotation, rng, garbage_rng)?;
-    while player.try_right() {}
+    while player.apply_right() {}
 
     assert_eq!(
         player.to_string(),
@@ -170,7 +170,7 @@ fn i_off_the_left_wall_to_the_bottom(
         )
     );
     player.apply_player_move(initial_rotation, rng, garbage_rng)?;
-    while player.try_left() {}
+    while player.apply_left() {}
 
     assert_eq!(
         player.to_string(),
@@ -239,7 +239,7 @@ fn i_off_the_left_wall_to_the_top(
         )
     );
     player.apply_player_move(initial_rotation, rng, garbage_rng)?;
-    while player.try_left() {}
+    while player.apply_left() {}
 
     assert_eq!(
         player.to_string(),
@@ -311,7 +311,7 @@ fn i_off_the_floor_to_the_left(
     if let Some(command) = initial_rotation {
         player.apply_player_move(command, rng, garbage_rng)?;
     }
-    while player.try_fall() {}
+    while player.apply_gravity() {}
 
     assert_eq!(
         player.to_string(),
@@ -383,7 +383,7 @@ fn i_off_the_floor_to_the_right(
     if let Some(command) = initial_rotation {
         player.apply_player_move(command, rng, garbage_rng)?;
     }
-    while player.try_fall() {}
+    while player.apply_gravity() {}
 
     assert_eq!(
         player.to_string(),
@@ -467,7 +467,7 @@ fn i_out_of_right_well(
     );
 
     player.apply_player_move(initial_rotation, rng, garbage_rng)?;
-    while player.try_right() {}
+    while player.apply_right() {}
 
     assert_eq!(
         player.to_string(),
@@ -486,7 +486,7 @@ fn i_out_of_right_well(
         )
     );
 
-    while player.try_fall() {}
+    while player.apply_gravity() {}
 
     assert_eq!(
         player.to_string(),
@@ -570,7 +570,7 @@ fn i_out_of_left_well(
     );
 
     player.apply_player_move(initial_rotation, rng, garbage_rng)?;
-    while player.try_left() {}
+    while player.apply_left() {}
 
     assert_eq!(
         player.to_string(),
@@ -589,7 +589,7 @@ fn i_out_of_left_well(
         )
     );
 
-    while player.try_fall() {}
+    while player.apply_gravity() {}
 
     assert_eq!(
         player.to_string(),

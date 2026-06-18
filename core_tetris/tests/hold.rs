@@ -349,12 +349,12 @@ fn hold_remembers() -> TetrisResult {
         player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::None)
     );
-    while player.try_left() {}
+    while player.apply_left() {}
     assert_eq!(
         player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::None)
     );
-    while player.try_right() {}
+    while player.apply_right() {}
     assert_eq!(
         player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::Single)

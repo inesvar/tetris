@@ -57,7 +57,7 @@ fn line_clear_from_setup() -> TetrisResult {
             "---------\n",
         )
     );
-    while player.try_right() {}
+    while player.apply_right() {}
     assert_eq!(
         player.to_string(),
         concat!(
@@ -164,7 +164,7 @@ fn manual_line_clear() -> TetrisResult {
         )
     );
     assert_eq!(player.score(), 12);
-    while player.try_right() {}
+    while player.apply_right() {}
     assert_eq!(
         player.to_string(),
         concat!(
@@ -202,7 +202,7 @@ fn manual_line_clear() -> TetrisResult {
         )
     );
     assert_eq!(player.score(), 24);
-    while player.try_left() {}
+    while player.apply_left() {}
     assert_eq!(
         player.to_string(),
         concat!(

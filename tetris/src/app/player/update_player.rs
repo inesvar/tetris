@@ -20,7 +20,7 @@ impl LocalPlayer {
         }
 
         if frame_counter % fall_speed_divide == 0
-            && !self.player_screen.try_fall()
+            && !self.player_screen.apply_gravity()
             && self.freeze_frame < frame_counter
         {
             // if the tetromino just reached the bottom, update the freeze_frame
@@ -28,7 +28,7 @@ impl LocalPlayer {
         }
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
-        if frame_counter == self.freeze_frame && !self.player_screen.try_fall() {
+        if frame_counter == self.freeze_frame && !self.player_screen.apply_gravity() {
             self.player_screen.apply_player_move(
                 TetrisCommand::HardDrop,
                 &mut self.rng,
