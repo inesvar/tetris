@@ -26,6 +26,18 @@ pub(super) enum LineClearType {
 }
 
 impl LineClear {
+    fn get_type(&self) -> LineClearType {
+        match self {
+            Self::MiniTSpin | Self::MiniTSpinSingle | Self::MiniTSpinDouble => {
+                LineClearType::MiniTSpin
+            }
+            Self::TSpin | Self::TSpinSingle | Self::TSpinDouble | Self::TSpinTriple => {
+                LineClearType::TSpin
+            }
+            _ => LineClearType::Regular,
+        }
+    }
+
     pub(super) fn new(nb_lines_cleared: u32, line_clear: LineClearType) -> Self {
         match line_clear {
             LineClearType::Regular => match nb_lines_cleared {
@@ -54,25 +66,43 @@ impl LineClear {
 
     pub(super) fn nb_lines_cleared(&self) -> u32 {
         match self {
-            LineClear::None | LineClear::MiniTSpin | LineClear::TSpin => 0,
-            LineClear::Single | LineClear::MiniTSpinSingle | LineClear::TSpinSingle => 1,
-            LineClear::Double | LineClear::MiniTSpinDouble | LineClear::TSpinDouble => 2,
-            LineClear::Triple | LineClear::TSpinTriple => 3,
-            LineClear::Tetris => 4,
+            Self::None | Self::MiniTSpin | Self::TSpin => 0,
+            Self::Single | Self::MiniTSpinSingle | Self::TSpinSingle => 1,
+            Self::Double | Self::MiniTSpinDouble | Self::TSpinDouble => 2,
+            Self::Triple | Self::TSpinTriple => 3,
+            Self::Tetris => 4,
         }
     }
 
     pub(super) fn score(&self) -> u32 {
         match self {
-            LineClear::None => 0,
-            LineClear::Single | LineClear::MiniTSpin => 100,
-            LineClear::MiniTSpinSingle => 200,
-            LineClear::Double => 300,
-            LineClear::TSpin | LineClear::MiniTSpinDouble => 400,
-            LineClear::Triple => 500,
-            LineClear::Tetris | LineClear::TSpinSingle => 800,
-            LineClear::TSpinDouble => 1200,
-            LineClear::TSpinTriple => 1600,
+            Self::None => 0,
+            Self::Single | Self::MiniTSpin => 100,
+            Self::MiniTSpinSingle => 200,
+            Self::Double => 300,
+            Self::TSpin | Self::MiniTSpinDouble => 400,
+            Self::Triple => 500,
+            Self::Tetris | Self::TSpinSingle => 800,
+            Self::TSpinDouble => 1200,
+            Self::TSpinTriple => 1600,
         }
+    }
+
+    pub(super) fn continues_back_to_back_sequence(&self) -> bool {
+        !matches!(self, Self::Single | Self::Double | Self::Triple)
+    }
+
+    pub(super) fn begins_back_to_back_sequence(&self) -> bool {
+        !matches!(
+            self,
+            Self::Single | Self::Double | Self::Triple | Self::MiniTSpin | Self::TSpin
+        )
+    }
+
+    pub(super) fn has_back_to_back_bonus(&self) -> bool {
+        !matches!(
+            self,
+            Self::Single | Self::Double | Self::Triple | Self::MiniTSpin | Self::TSpin
+        )
     }
 }
