@@ -41,7 +41,7 @@ fn lock_out() -> TetrisResult {
     );
 
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Err(GameOverError::LockOut)
     );
 
@@ -120,7 +120,7 @@ fn block_out() -> TetrisResult {
     );
 
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Err(GameOverError::BlockOut)
     );
 
@@ -200,7 +200,7 @@ fn top_out() -> TetrisResult {
 
     player.push_garbage(2);
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Err(GameOverError::TopOut)
     );
 

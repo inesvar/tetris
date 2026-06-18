@@ -1,6 +1,6 @@
 graph LR
     %% objects
-    TetrisPlayer::try_apply(TetrisPlayer::try_apply)
+    TetrisPlayer::apply_player_move(TetrisPlayer::apply_player_move)
     TetrisCommand[TetrisCommand]
     MockRng[[MockRng]]
     LineClear[LineClear]
@@ -8,9 +8,9 @@ graph LR
 
     subgraph Usage
         direction LR
-        TetrisCommand --> TetrisPlayer::try_apply
-        MockRng --> TetrisPlayer::try_apply
-        TetrisPlayer::try_apply --> LineClear
-        TetrisPlayer::try_apply -.-> GameOverError
+        TetrisCommand --> TetrisPlayer::apply_player_move
+        MockRng --> TetrisPlayer::apply_player_move
+        TetrisPlayer::apply_player_move --> LineClear
+        TetrisPlayer::apply_player_move -.-> GameOverError
     end
 

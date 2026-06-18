@@ -26,7 +26,7 @@ fn main() -> TetrisResult {
     // ANCHOR: tetris_player_basic_commands
     let garbage_rng = &mut MockRng::default(); // right-aligned garbage
     assert_eq!(
-        player.try_apply(TetrisCommand::Left, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::Left, rng, garbage_rng),
         Ok(LineClear::None)
     );
     assert_eq!(
@@ -46,7 +46,7 @@ fn main() -> TetrisResult {
         )
     );
     assert_eq!(
-        player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::Clockwise, rng, garbage_rng),
         Ok(LineClear::None)
     );
     assert_eq!(
@@ -66,7 +66,7 @@ fn main() -> TetrisResult {
         )
     );
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::None)
     );
     assert_eq!(
@@ -88,7 +88,7 @@ fn main() -> TetrisResult {
     // ANCHOR_END: tetris_player_basic_commands
     // ANCHOR: tetris_player_hold_command
     assert_eq!(
-        player.try_apply(TetrisCommand::Hold, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng),
         Ok(LineClear::None)
     );
     assert_eq!(
@@ -127,7 +127,7 @@ fn main() -> TetrisResult {
     // ANCHOR_END: tetris_player_hold_command
     // ANCHOR: tetris_player_garbage
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::None)
     );
     assert_eq!(
@@ -147,7 +147,7 @@ fn main() -> TetrisResult {
         )
     );
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Err(core_tetris::GameOverError::LockOut)
     );
     assert_eq!(

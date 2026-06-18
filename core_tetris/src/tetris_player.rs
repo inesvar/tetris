@@ -138,7 +138,7 @@ impl TetrisPlayer {
     /// Tries to apply [TetrisCommand], returns [TetrisResult] if the situation is a losing one.
     ///
     /// Refer to [TetrisCommand] documentation for more detail.
-    pub fn try_apply<R1: Rng, R2: Rng>(
+    pub fn apply_player_move<R1: Rng, R2: Rng>(
         &mut self,
         order: TetrisCommand,
         rng: &mut R1,

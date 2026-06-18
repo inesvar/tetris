@@ -27,7 +27,7 @@ fn hold_resets() -> TetrisResult {
     );
     assert!(player.hold_queue().is_none());
 
-    player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Clockwise, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -46,7 +46,7 @@ fn hold_resets() -> TetrisResult {
         )
     );
 
-    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -70,10 +70,10 @@ fn hold_resets() -> TetrisResult {
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::None)
     );
-    player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Clockwise, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -92,7 +92,7 @@ fn hold_resets() -> TetrisResult {
         )
     );
 
-    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -116,7 +116,7 @@ fn hold_resets() -> TetrisResult {
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::T));
 
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::None)
     );
 
@@ -141,7 +141,7 @@ fn hold_resets() -> TetrisResult {
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::T));
 
-    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -192,7 +192,7 @@ fn cant_hold_twice() -> TetrisResult {
     );
     assert!(player.hold_queue().is_none());
 
-    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -215,7 +215,7 @@ fn cant_hold_twice() -> TetrisResult {
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
-    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -239,7 +239,7 @@ fn cant_hold_twice() -> TetrisResult {
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::None)
     );
 
@@ -264,7 +264,7 @@ fn cant_hold_twice() -> TetrisResult {
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
-    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -322,7 +322,7 @@ fn hold_remembers() -> TetrisResult {
     );
     assert!(player.hold_queue().is_none());
 
-    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -346,17 +346,17 @@ fn hold_remembers() -> TetrisResult {
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::None)
     );
     while player.try_left() {}
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::None)
     );
     while player.try_right() {}
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::Single)
     );
 
@@ -377,7 +377,7 @@ fn hold_remembers() -> TetrisResult {
         )
     );
 
-    player.try_apply(TetrisCommand::Hold, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),

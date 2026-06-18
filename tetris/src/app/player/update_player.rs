@@ -11,8 +11,11 @@ impl LocalPlayer {
     ) -> TetrisResult {
         for command in TetrisCommand::ALL {
             if self.keyboard.should_apply_command(command) {
-                self.player_screen
-                    .try_apply(command, &mut self.rng, &mut self.garbage_rng)?;
+                self.player_screen.apply_player_move(
+                    command,
+                    &mut self.rng,
+                    &mut self.garbage_rng,
+                )?;
             }
         }
 
@@ -26,7 +29,7 @@ impl LocalPlayer {
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame && !self.player_screen.try_fall() {
-            self.player_screen.try_apply(
+            self.player_screen.apply_player_move(
                 TetrisCommand::HardDrop,
                 &mut self.rng,
                 &mut self.garbage_rng,

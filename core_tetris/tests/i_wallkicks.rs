@@ -31,7 +31,7 @@ fn i_off_the_right_wall_to_the_bottom(
             "---------\n",
         )
     );
-    player.try_apply(initial_rotation, rng, garbage_rng)?;
+    player.apply_player_move(initial_rotation, rng, garbage_rng)?;
     while player.try_right() {}
 
     assert_eq!(
@@ -51,7 +51,7 @@ fn i_off_the_right_wall_to_the_bottom(
         )
     );
 
-    player.try_apply(rotation, rng, garbage_rng)?;
+    player.apply_player_move(rotation, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -100,7 +100,7 @@ fn i_off_the_right_wall_to_the_top(
             "---------\n",
         )
     );
-    player.try_apply(initial_rotation, rng, garbage_rng)?;
+    player.apply_player_move(initial_rotation, rng, garbage_rng)?;
     while player.try_right() {}
 
     assert_eq!(
@@ -120,7 +120,7 @@ fn i_off_the_right_wall_to_the_top(
         )
     );
 
-    player.try_apply(rotation, rng, garbage_rng)?;
+    player.apply_player_move(rotation, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -169,7 +169,7 @@ fn i_off_the_left_wall_to_the_bottom(
             "---------\n",
         )
     );
-    player.try_apply(initial_rotation, rng, garbage_rng)?;
+    player.apply_player_move(initial_rotation, rng, garbage_rng)?;
     while player.try_left() {}
 
     assert_eq!(
@@ -189,7 +189,7 @@ fn i_off_the_left_wall_to_the_bottom(
         )
     );
 
-    player.try_apply(rotation, rng, garbage_rng)?;
+    player.apply_player_move(rotation, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -238,7 +238,7 @@ fn i_off_the_left_wall_to_the_top(
             "---------\n",
         )
     );
-    player.try_apply(initial_rotation, rng, garbage_rng)?;
+    player.apply_player_move(initial_rotation, rng, garbage_rng)?;
     while player.try_left() {}
 
     assert_eq!(
@@ -258,7 +258,7 @@ fn i_off_the_left_wall_to_the_top(
         )
     );
 
-    player.try_apply(rotation, rng, garbage_rng)?;
+    player.apply_player_move(rotation, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -309,7 +309,7 @@ fn i_off_the_floor_to_the_left(
     );
 
     if let Some(command) = initial_rotation {
-        player.try_apply(command, rng, garbage_rng)?;
+        player.apply_player_move(command, rng, garbage_rng)?;
     }
     while player.try_fall() {}
 
@@ -330,7 +330,7 @@ fn i_off_the_floor_to_the_left(
         )
     );
 
-    player.try_apply(rotation, rng, garbage_rng)?;
+    player.apply_player_move(rotation, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -381,7 +381,7 @@ fn i_off_the_floor_to_the_right(
     );
 
     if let Some(command) = initial_rotation {
-        player.try_apply(command, rng, garbage_rng)?;
+        player.apply_player_move(command, rng, garbage_rng)?;
     }
     while player.try_fall() {}
 
@@ -402,7 +402,7 @@ fn i_off_the_floor_to_the_right(
         )
     );
 
-    player.try_apply(rotation, rng, garbage_rng)?;
+    player.apply_player_move(rotation, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -466,7 +466,7 @@ fn i_out_of_right_well(
         )
     );
 
-    player.try_apply(initial_rotation, rng, garbage_rng)?;
+    player.apply_player_move(initial_rotation, rng, garbage_rng)?;
     while player.try_right() {}
 
     assert_eq!(
@@ -505,7 +505,7 @@ fn i_out_of_right_well(
         )
     );
 
-    player.try_apply(rotation, rng, garbage_rng)?;
+    player.apply_player_move(rotation, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),
@@ -569,7 +569,7 @@ fn i_out_of_left_well(
         )
     );
 
-    player.try_apply(initial_rotation, rng, garbage_rng)?;
+    player.apply_player_move(initial_rotation, rng, garbage_rng)?;
     while player.try_left() {}
 
     assert_eq!(
@@ -608,7 +608,7 @@ fn i_out_of_left_well(
         )
     );
 
-    player.try_apply(rotation, rng, garbage_rng)?;
+    player.apply_player_move(rotation, rng, garbage_rng)?;
 
     assert_eq!(
         player.to_string(),

@@ -40,7 +40,7 @@ fn almost_t_spin() -> TetrisResult {
         )
     );
 
-    player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Clockwise, rng, garbage_rng)?;
     while player.try_left() {}
     while player.try_fall() {}
     assert_eq!(
@@ -61,7 +61,7 @@ fn almost_t_spin() -> TetrisResult {
     );
 
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::Single)
     );
     assert_eq!(
@@ -122,7 +122,7 @@ fn t_spin_single() -> TetrisResult {
 
     while player.try_left() {}
     while player.try_fall() {}
-    player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Clockwise, rng, garbage_rng)?;
     assert_eq!(
         player.to_string(),
         concat!(
@@ -141,7 +141,7 @@ fn t_spin_single() -> TetrisResult {
     );
 
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::MiniTSpinSingle)
     );
     assert_eq!(
@@ -201,7 +201,7 @@ fn t_spin_double_from_setup() -> TetrisResult {
         )
     );
     while player.try_fall() {}
-    player.try_apply(TetrisCommand::Right, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Right, rng, garbage_rng)?;
     assert_eq!(
         player.to_string(),
         concat!(
@@ -218,7 +218,7 @@ fn t_spin_double_from_setup() -> TetrisResult {
             "----------\n",
         )
     );
-    player.try_apply(TetrisCommand::Counterclockwise, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Counterclockwise, rng, garbage_rng)?;
     assert_eq!(
         player.to_string(),
         concat!(
@@ -238,7 +238,7 @@ fn t_spin_double_from_setup() -> TetrisResult {
     assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 0);
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::TSpinDouble)
     );
     assert_eq!(
@@ -301,9 +301,9 @@ fn t_spin_triple_from_setup() -> TetrisResult {
             "----------\n",
         )
     );
-    player.try_apply(TetrisCommand::Right, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Right, rng, garbage_rng)?;
     while player.try_fall() {}
-    player.try_apply(TetrisCommand::Left, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Left, rng, garbage_rng)?;
     assert_eq!(
         player.to_string(),
         concat!(
@@ -320,7 +320,7 @@ fn t_spin_triple_from_setup() -> TetrisResult {
             "----------\n",
         )
     );
-    player.try_apply(TetrisCommand::Clockwise, rng, garbage_rng)?;
+    player.apply_player_move(TetrisCommand::Clockwise, rng, garbage_rng)?;
     assert_eq!(
         player.to_string(),
         concat!(
@@ -340,7 +340,7 @@ fn t_spin_triple_from_setup() -> TetrisResult {
     assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 0);
     assert_eq!(
-        player.try_apply(TetrisCommand::HardDrop, rng, garbage_rng),
+        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
         Ok(LineClear::TSpinTriple)
     );
     assert_eq!(
