@@ -59,15 +59,12 @@ impl App {
                 }
             }
             // update
-            let update_res = self.local_players.iter_mut().try_for_each(|player| {
-                player.update(self.frame_counter, self.fall_speed_divide, self.freeze)
-            });
-            // taking into account the player states after a new piece was added
-            // two options :
-            // either the player didn't lose => nothing to do
-            // there was a game over => the running must be set to NotRunning
-            if update_res.is_err() {
-                self.game_over();
+            for local_player in &mut self.local_players {
+                let res = local_player.update(self.frame_counter, self.fall_speed_divide, self.freeze);
+                if res.is_err() {
+                    self.game_over();
+                    break;
+                }
             }
 
             // update the falling speed and freeze speed

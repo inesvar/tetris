@@ -15,3 +15,5 @@
     - compute the "fake number of lines cleared"
     - compute the garbage
     - integration / unit tests for t spin
+- CLEAN return the number of garbage lines to send to the ennemy
+(this is a big change, requires lots of preparation)
