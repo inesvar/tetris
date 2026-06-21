@@ -78,12 +78,6 @@ impl Settings {
 
     /// Sends serialized settings to the remote. Should never be called when there's no remote.
     pub fn send(&self) {
-        /* serialized_as_msg absolutely needs to be set to true
-         * as it is used as a flag during the serialization
-         * intuitively, Settings need to be serialized twice :
-         * first as the SettingsMsg enum variant
-         * then as the actual Settings struct
-         */
         if self.remote_ip.is_none() {
             unreachable!()
         }
