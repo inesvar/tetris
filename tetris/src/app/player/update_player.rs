@@ -16,6 +16,9 @@ impl LocalPlayer {
                     &mut self.rng,
                     &mut self.garbage_rng,
                 )?;
+                if command == TetrisCommand::HardDrop {
+                    self.freeze_frame = frame_counter.wrapping_sub(1);
+                }
             }
         }
 
