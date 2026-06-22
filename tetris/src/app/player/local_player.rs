@@ -70,10 +70,6 @@ impl LocalPlayer {
         self.player_screen.push_garbage(completed_lines);
     }
 
-    pub fn get_lines_completed(&mut self) -> u32 {
-        self.player_screen.get_lines_completed()
-    }
-
     pub(in crate::app) fn score(&self) -> u32 {
         self.player_screen.score()
     }
@@ -81,22 +77,14 @@ impl LocalPlayer {
 
 impl LocalPlayer {
     /// Sends the player screen to the remote player and resets the new_completed_lines attribute.
-    pub(in crate::app) fn send_serialized(&mut self) {
+    pub(in crate::app) fn send_serialized(&mut self, garbage_to_send: u32) {
         if let Ok(stream) = TcpStream::connect(&self.remote_ip) {
             serde_cbor::to_writer::<TcpStream, OutboundMessage>(
                 stream,
-                &OutboundMessage::TetrisPlayer(&self.player_screen),
+                &OutboundMessage::TetrisPlayer((&self.player_screen, garbage_to_send)),
             )
             .unwrap();
         }
         once!("sent serialized data to the remote");
-        // Set the number of completed lines to 0
-        if self.player_screen.new_completed_lines() != 0 {
-            once!(
-                "the {} completed lines were sent to the adversary and they were reset to 0",
-                self.player_screen.new_completed_lines()
-            );
-            *self.player_screen.new_completed_lines_mut() = 0;
-        }
     }
 }

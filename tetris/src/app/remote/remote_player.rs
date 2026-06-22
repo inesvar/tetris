@@ -16,6 +16,7 @@ pub struct RemotePlayer {
     screen: Arc<Mutex<TetrisPlayer>>,
     first_screen_received: Arc<Mutex<bool>>,
     game_flow_message: Arc<Mutex<GameFlowChange>>,
+    garbage_to_send: Arc<Mutex<u32>>,
 }
 
 impl RemotePlayer {
@@ -26,6 +27,7 @@ impl RemotePlayer {
             screen: arc,
             first_screen_received: Arc::new(Mutex::new(false)),
             game_flow_message: Arc::new(Mutex::new(GameFlowChange::GameOver)),
+            garbage_to_send: Arc::new(Mutex::new(0)),
         }
     }
 
@@ -35,10 +37,12 @@ impl RemotePlayer {
         let screen = Arc::clone(&self.screen);
         let first_screen_received = Arc::clone(&self.first_screen_received);
         let game_flow_message = Arc::clone(&self.game_flow_message);
+        let garbage_to_send = Arc::clone(&self.garbage_to_send);
         let self_for_listener = RemotePlayer {
             screen,
             first_screen_received,
             game_flow_message,
+            garbage_to_send,
         };
         // creating a listener in a separate thread
         let listener = TcpListener::bind(local_ip).unwrap();
@@ -49,8 +53,8 @@ impl RemotePlayer {
                 let message = serde_cbor::from_reader::<InboundMessage, TcpStream>(stream).unwrap();
                 once!("unwrapped from packet from remote");
                 match message {
-                    InboundMessage::TetrisPlayer(new_screen) => {
-                        self_for_listener.update_screen(new_screen)
+                    InboundMessage::TetrisPlayer((new_screen, garbage_to_send)) => {
+                        self_for_listener.update_screen(new_screen, garbage_to_send)
                     }
                     InboundMessage::Settings(new_settings) => {
                         self_for_listener.update_game_flow(GameFlowChange::Sync(new_settings));
@@ -79,28 +83,25 @@ impl RemotePlayer {
         });
     }
 
-    pub fn get_lines_completed(&mut self) -> u32 {
+    pub fn get_garbage_to_send(&mut self) -> u32 {
         {
-            let mut screen = self.screen.lock().unwrap();
-            let lines = screen.new_completed_lines();
-            *screen.new_completed_lines_mut() = 0;
-            lines
+            let mut garbage = self.garbage_to_send.lock().unwrap();
+            let g = *garbage;
+            *garbage = 0;
+            g
         }
     }
 
     /// Updates the remote player with the new_screen received.
-    fn update_screen(&self, new_screen: TetrisPlayer) {
+    fn update_screen(&self, new_screen: TetrisPlayer, garbage_to_send: u32) {
         {
             let mut local_screen = self.screen.lock().unwrap();
-            // TODO this should be simpler
-            // if the new_completed_lines haven't been read yet, ensure it's not rewritten
-            if local_screen.new_completed_lines() != 0 {
-                let a = local_screen.new_completed_lines();
-                *local_screen = new_screen;
-                *local_screen.new_completed_lines_mut() = a;
-            } else {
-                *local_screen = new_screen;
-            }
+            *local_screen = new_screen;
+        }
+        {
+            let mut garbage = self.garbage_to_send.lock().unwrap();
+            debug_assert_eq!(*garbage, 0);
+            *garbage += garbage_to_send;
         }
         // if this is the first new_screen received, set the first_screen_received bit
         {

@@ -1,6 +1,6 @@
 //! Define [LocalPlayer::update] function.
 use super::LocalPlayer;
-use core_tetris::{TetrisCommand, TetrisResult};
+use core_tetris::{GameOverError, TetrisCommand};
 
 impl LocalPlayer {
     pub fn update(
@@ -8,10 +8,11 @@ impl LocalPlayer {
         frame_counter: u64,
         fall_speed_divide: u64,
         freeze: u64,
-    ) -> TetrisResult {
+    ) -> Result<u32, GameOverError> {
+        let mut garbage_to_send = 0;
         for command in TetrisCommand::ALL {
             if self.keyboard.should_apply_command(command) {
-                self.player_screen.apply_player_move(
+                garbage_to_send += self.player_screen.apply_player_move(
                     command,
                     &mut self.rng,
                     &mut self.garbage_rng,
@@ -32,7 +33,7 @@ impl LocalPlayer {
 
         // Freeze the tetromino if it reached the bottom previously and can't go down anymore
         if frame_counter == self.freeze_frame && !self.player_screen.apply_gravity() {
-            self.player_screen.apply_player_move(
+            garbage_to_send += self.player_screen.apply_player_move(
                 TetrisCommand::HardDrop,
                 &mut self.rng,
                 &mut self.garbage_rng,
@@ -42,9 +43,9 @@ impl LocalPlayer {
         self.keyboard.update();
 
         if self.sender {
-            self.send_serialized();
+            self.send_serialized(garbage_to_send);
         }
 
-        Ok(())
+        Ok(garbage_to_send)
     }
 }

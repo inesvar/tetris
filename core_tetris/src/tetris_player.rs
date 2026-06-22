@@ -68,16 +68,6 @@ impl TetrisPlayer {
         self.score_manager.score()
     }
 
-    #[allow(missing_docs)]
-    pub fn new_completed_lines(&self) -> u32 {
-        self.new_completed_lines
-    }
-
-    #[allow(missing_docs)]
-    pub fn new_completed_lines_mut(&mut self) -> &mut u32 {
-        &mut self.new_completed_lines
-    }
-
     /// Bag type.
     pub fn bag_type(&self) -> BagType {
         self.tetromino_bag.bag_type()
@@ -144,13 +134,16 @@ impl TetrisPlayer {
         order: TetrisCommand,
         rng: &mut R1,
         garbage_rng: &mut R2,
-    ) -> Result<LineClear, GameOverError> {
+    ) -> Result<u32, GameOverError> {
         match order {
             TetrisCommand::HardDrop => {
                 let nb_moves = self.tetromino_in_play.try_apply(order.into(), &self.grid);
                 self.score_manager.score_tetris_command(order, nb_moves);
                 self.is_hold_allowed = true;
-                return self.lock_down(rng, garbage_rng);
+                self.lock_down(rng, garbage_rng)?;
+                let garbage_to_send = self.new_completed_lines;
+                self.new_completed_lines = 0;
+                return Ok(garbage_to_send);
             }
             TetrisCommand::Hold => {
                 if self.is_hold_allowed {
@@ -165,7 +158,7 @@ impl TetrisPlayer {
                 self.score_manager.score_tetris_command(order, nb_moves);
             }
         }
-        Ok(LineClear::None)
+        Ok(0)
     }
 
     /// Tries to apply gravity (move the **Tetromino in Play** one line lower), returns `true` on success.
@@ -274,13 +267,6 @@ impl TetrisPlayer {
     /// Garbage lines will be pushed to the grid later (during **Lock Down**).
     pub fn push_garbage(&mut self, nb_completed_lines: u32) {
         self.received_garbage_lines += nb_completed_lines;
-    }
-
-    /// Return the number of lines completed since the last call [TetrisPlayer::new_completed_lines].
-    pub fn get_lines_completed(&mut self) -> u32 {
-        let lines = self.new_completed_lines;
-        self.new_completed_lines = 0;
-        lines
     }
 
     /// Returns a hard-dropped copy of the [TetrisPlayer::tetromino_in_play].

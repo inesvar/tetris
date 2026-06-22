@@ -7,6 +7,65 @@ use piston::UpdateArgs;
 use ui_tetris::interactive_widget_manager::ButtonType;
 
 impl App {
+    fn update_running_game(&mut self) {
+        self.timer_text.set_text(format_seconds(self.clock));
+        self.frame_counter = self.frame_counter.wrapping_add(1);
+        // update the falling speed and freeze speed
+        match self.clock {
+            i if i <= 30.0 => {
+                self.fall_speed_divide = 50;
+                self.freeze = 50
+            }
+            i if i <= 60.0 => {
+                self.fall_speed_divide = 40;
+                self.freeze = 50
+            }
+            i if i <= 90.0 => {
+                self.fall_speed_divide = 30;
+                self.freeze = 50
+            }
+            i if i <= 120.0 => {
+                self.fall_speed_divide = 20;
+                self.freeze = 50
+            }
+            _ => {
+                self.fall_speed_divide = 15;
+                self.freeze = 50
+            }
+        }
+
+        if let PlayerConfig::TwoRemote {
+            local_ip: _,
+            remote_ip: _,
+        } = self.player_config
+        {
+            // add garbage
+            for player in &mut self.local_players {
+                let completed_lines = self.remote_player[0].get_garbage_to_send();
+                if completed_lines != 0 {
+                    println!("the adversary completed {} lines", completed_lines);
+                }
+                player.push_garbage(completed_lines);
+            }
+        }
+        // update
+        let mut garbage_to_send = Vec::new();
+        for local_player in &mut self.local_players {
+            let res = local_player.update(self.frame_counter, self.fall_speed_divide, self.freeze);
+            let Ok(garbage) = res else {
+                self.game_over();
+                return;
+            };
+            garbage_to_send.push(garbage);
+        }
+
+        if let PlayerConfig::TwoLocal = self.player_config {
+            // add garbage
+            self.local_players[1].push_garbage(garbage_to_send[0]);
+            self.local_players[0].push_garbage(garbage_to_send[1]);
+        }
+    }
+
     /// update is called before each render so that the informations on the screen are as recent as possible.
     ///
     /// It's responsible for the following :
@@ -29,67 +88,10 @@ impl App {
                 self.start();
             }
             for player in &mut self.local_players {
-                player.send_serialized();
+                player.send_serialized(0);
             }
         } else if self.view_state.is_game() && self.running == RunningState::Running {
-            self.timer_text.set_text(format_seconds(self.clock));
-            self.frame_counter = self.frame_counter.wrapping_add(1);
-            if let PlayerConfig::TwoRemote {
-                local_ip: _,
-                remote_ip: _,
-            } = self.player_config
-            {
-                // add garbage
-                for player in &mut self.local_players {
-                    let completed_lines = self.remote_player[0].get_lines_completed();
-                    if completed_lines != 0 {
-                        println!("the adversary completed {} lines", completed_lines);
-                        player.push_garbage(completed_lines);
-                    }
-                }
-            } else if let PlayerConfig::TwoLocal = self.player_config {
-                // add garbage
-                let completed_lines = self.local_players[0].get_lines_completed();
-                if completed_lines != 0 {
-                    self.local_players[1].push_garbage(completed_lines);
-                }
-                let completed_lines = self.local_players[1].get_lines_completed();
-                if completed_lines != 0 {
-                    self.local_players[0].push_garbage(completed_lines);
-                }
-            }
-            // update
-            for local_player in &mut self.local_players {
-                let res = local_player.update(self.frame_counter, self.fall_speed_divide, self.freeze);
-                if res.is_err() {
-                    self.game_over();
-                    break;
-                }
-            }
-
-            // update the falling speed and freeze speed
-            match self.clock {
-                i if i <= 30.0 => {
-                    self.fall_speed_divide = 50;
-                    self.freeze = 50
-                }
-                i if i <= 60.0 => {
-                    self.fall_speed_divide = 40;
-                    self.freeze = 50
-                }
-                i if i <= 90.0 => {
-                    self.fall_speed_divide = 30;
-                    self.freeze = 50
-                }
-                i if i <= 120.0 => {
-                    self.fall_speed_divide = 20;
-                    self.freeze = 50
-                }
-                _ => {
-                    self.fall_speed_divide = 15;
-                    self.freeze = 50
-                }
-            }
+            self.update_running_game();
         }
 
         // then eventually change the view
@@ -138,7 +140,7 @@ impl App {
                 });
                 self.set_view(ViewState::Remote);
                 self.send_message(OutboundMessage::Hello(local_ip));
-                self.local_players[0].send_serialized();
+                self.local_players[0].send_serialized(0);
             }
             ButtonType::ToTwoLocalGame => {
                 if self.player_config != PlayerConfig::TwoLocal {

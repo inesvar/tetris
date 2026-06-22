@@ -333,7 +333,7 @@ impl App {
                 };
                 self.set_player_config(player_config);
                 self.set_view(ViewState::Remote);
-                self.local_players[0].send_serialized();
+                self.local_players[0].send_serialized(0);
             }
             _ => {}
         }

@@ -20,8 +20,8 @@ use serde::{Deserialize, Serialize};
 /// accordingly in case of change of MessageType.
 #[derive(Serialize)]
 pub enum OutboundMessage<'a> {
-    TetrisPlayer(&'a TetrisPlayer), // not acknowledged as it's sent regularly
-    Settings(&'a Settings),         // sent by the host of the room
+    TetrisPlayer((&'a TetrisPlayer, u32)), // not acknowledged as it's sent regularly
+    Settings(&'a Settings),                // sent by the host of the room
     Restart,
     Pause,
     Resume,
@@ -32,8 +32,8 @@ pub enum OutboundMessage<'a> {
 
 #[derive(Deserialize)]
 pub enum InboundMessage {
-    TetrisPlayer(TetrisPlayer), // not acknowledged as it's sent regularly
-    Settings(Settings),         // sent by the host of the room
+    TetrisPlayer((TetrisPlayer, u32)), // not acknowledged as it's sent regularly
+    Settings(Settings),                // sent by the host of the room
     Restart,
     Pause,
     Resume,
