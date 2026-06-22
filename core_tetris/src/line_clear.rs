@@ -68,6 +68,7 @@ impl LineClear {
         }
     }
 
+    #[allow(unused)]
     pub(super) fn nb_lines_cleared(&self) -> u32 {
         match self {
             Self::None | Self::MiniTSpin | Self::TSpin => 0,

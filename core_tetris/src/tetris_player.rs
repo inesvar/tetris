@@ -1,7 +1,7 @@
 //! Implements [TetrisPlayer].
 use super::{
-    BagType, CircularBuffer, GameOverError, LineClear, ScoreManager, TetrisCommand, TetrisGrid,
-    TetrisResult, Tetromino, TetrominoGenerator,
+    BagType, CircularBuffer, GameOverError, ScoreManager, TetrisCommand, TetrisGrid, TetrisResult,
+    Tetromino, TetrominoGenerator,
 };
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -35,9 +35,6 @@ pub struct TetrisPlayer {
     /// Tetromino bag (used to refill the **Next Queue**).
     tetromino_bag: TetrominoGenerator,
     score_manager: ScoreManager,
-    new_completed_lines: u32,
-    /// received_garbage_lines is set before the update and reset during the update. TODO: clarify
-    received_garbage_lines: u32,
     is_hold_allowed: bool,
 }
 
@@ -112,13 +109,11 @@ impl TetrisPlayer {
 
         Ok(TetrisPlayer {
             grid: matrix,
-            score_manager: ScoreManager::default(),
-            new_completed_lines: 0,
             tetromino_in_play,
             hold_queue: None,
             next_queue,
             tetromino_bag,
-            received_garbage_lines: 0,
+            score_manager: ScoreManager::default(),
             is_hold_allowed: true,
         })
     }
@@ -241,29 +236,19 @@ impl TetrisPlayer {
         let previously_active = self.replace_tetromino_in_play(rng);
 
         let line_clear = previously_active.lock_down(&mut self.grid)?;
-        self.update_from_line_clear(line_clear);
         let garbage_balance = self.score_manager.score_line_clear(line_clear);
 
         self.grid
             .apply_received_garbage(garbage_balance.garbage_lines_to_add(), garbage_rng)?;
-        self.received_garbage_lines = 0;
 
         self.tetromino_in_play.is_valid_in_grid(&self.grid)?;
 
         Ok(garbage_balance.garbage_lines_to_send())
     }
-
-    /// Increase counters ([TetrisPlayer::new_completed_lines] and [TetrisPlayer::score])
-    /// after `new_completed_lines` lines have been cleared.
-    fn update_from_line_clear(&mut self, line_clear: LineClear) {
-        self.new_completed_lines += line_clear.nb_lines_cleared();
-    }
-
     /// Increase the count of received garbage lines.
     ///
     /// Garbage lines will be pushed to the grid later (during **Lock Down**).
     pub fn push_garbage(&mut self, nb_completed_lines: u32) {
-        self.received_garbage_lines += nb_completed_lines;
         self.score_manager.push_garbage(nb_completed_lines);
     }
 
