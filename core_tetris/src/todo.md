@@ -11,7 +11,7 @@
     - ~~right before lock down : is t in t slot ? is last succesful rotate ? => t_spin~~
     - ~~t spin & mini t spin detection~~
     - ~~create enum LineClearType~~
-    - back to backs
+    - ~~back to backs~~
     - compute the "fake number of lines cleared"
     - compute the garbage
     - integration / unit tests for t spin

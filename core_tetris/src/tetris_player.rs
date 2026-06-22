@@ -140,10 +140,7 @@ impl TetrisPlayer {
                 let nb_moves = self.tetromino_in_play.try_apply(order.into(), &self.grid);
                 self.score_manager.score_tetris_command(order, nb_moves);
                 self.is_hold_allowed = true;
-                self.lock_down(rng, garbage_rng)?;
-                let garbage_to_send = self.new_completed_lines;
-                self.new_completed_lines = 0;
-                return Ok(garbage_to_send);
+                return self.lock_down(rng, garbage_rng);
             }
             TetrisCommand::Hold => {
                 if self.is_hold_allowed {
@@ -240,26 +237,26 @@ impl TetrisPlayer {
         &mut self,
         rng: &mut R1,
         garbage_rng: &mut R2,
-    ) -> Result<LineClear, GameOverError> {
+    ) -> Result<u32, GameOverError> {
         let previously_active = self.replace_tetromino_in_play(rng);
 
         let line_clear = previously_active.lock_down(&mut self.grid)?;
         self.update_from_line_clear(line_clear);
+        let garbage_balance = self.score_manager.score_line_clear(line_clear);
 
         self.grid
-            .apply_received_garbage(self.received_garbage_lines, garbage_rng)?;
+            .apply_received_garbage(garbage_balance.garbage_lines_to_add(), garbage_rng)?;
         self.received_garbage_lines = 0;
 
         self.tetromino_in_play.is_valid_in_grid(&self.grid)?;
 
-        Ok(line_clear)
+        Ok(garbage_balance.garbage_lines_to_send())
     }
 
     /// Increase counters ([TetrisPlayer::new_completed_lines] and [TetrisPlayer::score])
     /// after `new_completed_lines` lines have been cleared.
     fn update_from_line_clear(&mut self, line_clear: LineClear) {
         self.new_completed_lines += line_clear.nb_lines_cleared();
-        self.score_manager.score_line_clear(line_clear);
     }
 
     /// Increase the count of received garbage lines.
@@ -267,6 +264,7 @@ impl TetrisPlayer {
     /// Garbage lines will be pushed to the grid later (during **Lock Down**).
     pub fn push_garbage(&mut self, nb_completed_lines: u32) {
         self.received_garbage_lines += nb_completed_lines;
+        self.score_manager.push_garbage(nb_completed_lines);
     }
 
     /// Returns a hard-dropped copy of the [TetrisPlayer::tetromino_in_play].

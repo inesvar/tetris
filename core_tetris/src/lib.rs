@@ -23,11 +23,12 @@
 //! - **Hold Queue** and associated [TetrisCommand::Hold]
 //! - wallkick support using the **Super Rotation System** (when you try to rotate a tetromino next to a wall,
 //!   the regular move might be impossible but SRS will first translate the tetromino to make the rotation succeed)
-//! - scoring according to the 2009 Guideline
-//! - adding garbage and storing garbage count
+//! - scoring and garbage according to the 2009 Guideline (back-to-backs...)
 //! - 3 official game over conditions are supported (see [GameOverError])
-//! - T-spin detection
+//! - T-spin and mini-T-spin detection
 //! - customization of the tetris grid size, of the tetromino bags
+//!
+//! For a list of points where the implementation is different from the 2009 Guideline, see the Nitpicks section at the bottom.
 //!
 //! # Examples
 //!
@@ -60,6 +61,21 @@
 //! ```rust
 #![doc = include_doctest!("examples/simple.rs", region = "tetris_player_garbage")]
 //! ```
+//!
+//! # Nitpicks
+//!
+//! The code is mostly based on the 2009 Guideline, but there are several places where it's not the case, for various reasons.
+//!
+//! - I didn't bother yet / personally there was no point for my use case
+//!     - T tetromino wallkicks are not exactly correct, the 2009 Guideline removes the 3rd wallkick in some situations
+//!     - levels, the Guideline has detailed instructions about how levels affect scoring and fall speed
+//! - the 2009 seemed to have forgotten
+//!     - mini-T-spins double, so I invented all the score and garbage values
+//! - I might have misunderstood the 2009 Guideline
+//!     - on garbage back-to-backs, I was a bit confused with the handling of the mini-T-spin single
+//!       (it has no bonus, yet it can start a back-to-back sequence)
+//! - I absolutely wanted this unofficial feature
+//!     - half-turns
 //!
 //! # Structure
 //!

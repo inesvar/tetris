@@ -78,7 +78,20 @@ impl LineClear {
         }
     }
 
+    pub(super) fn nb_garbage_lines(&self) -> u32 {
+        match self {
+            Self::None | Self::Single | Self::MiniTSpin | Self::MiniTSpinSingle | Self::TSpin => 0,
+            Self::Double | Self::MiniTSpinDouble => 1,
+            Self::Triple | Self::TSpinSingle => 2,
+            Self::Tetris | Self::TSpinDouble => 4,
+            Self::TSpinTriple => 6,
+        }
+    }
+
     pub(super) fn score(&self) -> u32 {
+        // Same scoring as on https://play.tetris.com/, except
+        // the website doesn't recognize mini-T-spin doubles
+        // (therefore they're scored as plain doubles).
         match self {
             Self::None => 0,
             Self::Single | Self::MiniTSpin => 100,
@@ -103,10 +116,22 @@ impl LineClear {
         )
     }
 
-    pub(super) fn has_back_to_back_bonus(&self) -> bool {
+    pub(super) fn has_score_b2b_bonus(&self) -> bool {
         !matches!(
             self,
             Self::Single | Self::Double | Self::Triple | Self::MiniTSpin | Self::TSpin
+        )
+    }
+
+    pub(super) fn has_garbage_b2b_bonus(&self) -> bool {
+        !matches!(
+            self,
+            Self::Single
+                | Self::Double
+                | Self::Triple
+                | Self::MiniTSpin
+                | Self::TSpin
+                | Self::MiniTSpinSingle
         )
     }
 }
