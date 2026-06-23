@@ -25,10 +25,8 @@ fn main() -> TetrisResult {
     // ANCHOR_END: tetris_player_creation
     // ANCHOR: tetris_player_basic_commands
     let garbage_rng = &mut MockRng::default(); // right-aligned garbage
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::Left, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::Left, rng, garbage_rng)?;
+    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -45,10 +43,8 @@ fn main() -> TetrisResult {
             "---------\n",
         )
     );
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::Clockwise, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::Clockwise, rng, garbage_rng)?;
+    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -65,10 +61,8 @@ fn main() -> TetrisResult {
             "---------\n",
         )
     );
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
+    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -87,10 +81,8 @@ fn main() -> TetrisResult {
     );
     // ANCHOR_END: tetris_player_basic_commands
     // ANCHOR: tetris_player_hold_command
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
+    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -126,10 +118,8 @@ fn main() -> TetrisResult {
     );
     // ANCHOR_END: tetris_player_hold_command
     // ANCHOR: tetris_player_garbage
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
+    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(

@@ -74,12 +74,12 @@ fn line_clear_from_setup() -> TetrisResult {
             "---------\n",
         )
     );
-    assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 0);
     assert_eq!(
         player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::Tetris)
+        Ok(4)
     );
+    assert_eq!(player.last_line_clear(), LineClear::Tetris);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -96,9 +96,6 @@ fn line_clear_from_setup() -> TetrisResult {
             "---------\n",
         )
     );
-    assert_eq!(player.get_lines_completed(), 4);
-    assert_eq!(player.score(), 808);
-    assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 808);
 
     Ok(())
@@ -143,10 +140,8 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
+    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -181,10 +176,8 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
+    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -219,10 +212,8 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
+    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -276,11 +267,11 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
-    assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(
         player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::Single)
+        Ok(0)
     );
+    assert_eq!(player.last_line_clear(), LineClear::Single);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -297,9 +288,6 @@ fn manual_line_clear() -> TetrisResult {
             "---------\n",
         )
     );
-    assert_eq!(player.get_lines_completed(), 1);
-    assert_eq!(player.score(), 144);
-    assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 144);
 
     Ok(())

@@ -62,8 +62,9 @@ fn almost_t_spin() -> TetrisResult {
 
     assert_eq!(
         player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::Single)
+        Ok(0)
     );
+    assert_eq!(player.last_line_clear(), LineClear::Single);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -142,8 +143,9 @@ fn t_spin_single() -> TetrisResult {
 
     assert_eq!(
         player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::MiniTSpinSingle)
+        Ok(0)
     );
+    assert_eq!(player.last_line_clear(), LineClear::MiniTSpinSingle);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -235,12 +237,12 @@ fn t_spin_double_from_setup() -> TetrisResult {
             "----------\n",
         )
     );
-    assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 0);
     assert_eq!(
         player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::TSpinDouble)
+        Ok(4)
     );
+    assert_eq!(player.last_line_clear(), LineClear::TSpinDouble);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -257,9 +259,6 @@ fn t_spin_double_from_setup() -> TetrisResult {
             "----------\n",
         )
     );
-    assert_eq!(player.get_lines_completed(), 2);
-    assert_eq!(player.score(), 1200);
-    assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 1200);
 
     Ok(())
@@ -337,12 +336,12 @@ fn t_spin_triple_from_setup() -> TetrisResult {
             "----------\n",
         )
     );
-    assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 0);
     assert_eq!(
         player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::TSpinTriple)
+        Ok(6)
     );
+    assert_eq!(player.last_line_clear(), LineClear::TSpinTriple);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -359,9 +358,6 @@ fn t_spin_triple_from_setup() -> TetrisResult {
             "----------\n",
         )
     );
-    assert_eq!(player.get_lines_completed(), 3);
-    assert_eq!(player.score(), 1600);
-    assert_eq!(player.get_lines_completed(), 0);
     assert_eq!(player.score(), 1600);
 
     Ok(())

@@ -69,10 +69,9 @@ fn hold_resets() -> TetrisResult {
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
+
+    assert_eq!(player.last_line_clear(), LineClear::None);
     player.apply_player_move(TetrisCommand::Clockwise, rng, garbage_rng)?;
 
     assert_eq!(
@@ -115,10 +114,9 @@ fn hold_resets() -> TetrisResult {
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::T));
 
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
+
+    assert_eq!(player.last_line_clear(), LineClear::None);
 
     assert_eq!(
         player.to_string(),
@@ -238,10 +236,9 @@ fn cant_hold_twice() -> TetrisResult {
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
+
+    assert_eq!(player.last_line_clear(), LineClear::None);
 
     assert_eq!(
         player.to_string(),
@@ -345,20 +342,18 @@ fn hold_remembers() -> TetrisResult {
         .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
+
+    assert_eq!(player.last_line_clear(), LineClear::None);
     while player.apply_left() {}
-    assert_eq!(
-        player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::None)
-    );
+    player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
+    assert_eq!(player.last_line_clear(), LineClear::None);
     while player.apply_right() {}
     assert_eq!(
         player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng),
-        Ok(LineClear::Single)
+        Ok(0)
     );
+    assert_eq!(player.last_line_clear(), LineClear::Single);
 
     assert_eq!(
         player.to_string(),
