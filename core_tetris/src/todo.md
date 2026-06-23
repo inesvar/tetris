@@ -13,7 +13,12 @@
     - ~~create enum LineClearType~~
     - ~~back to backs~~
     - compute the "fake number of lines cleared"
-    - compute the garbage
-    - integration / unit tests for t spin
+    - ~~compute the garbage~~
+    - ~~integration / unit tests for t spin~~
 - CLEAN return the number of garbage lines to send to the ennemy
 (this is a big change, requires lots of preparation)
+    - decide whether to return LineClear or not
+    - decide whether to store LineClear or not (cool for rendering !!)
+    - fix tests
+    - fix doc
+    - well done !

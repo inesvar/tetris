@@ -1,4 +1,6 @@
 //! Implements [TetrisPlayer].
+use crate::LineClear;
+
 use super::{
     BagType, CircularBuffer, GameOverError, ScoreManager, TetrisCommand, TetrisGrid, TetrisResult,
     Tetromino, TetrominoGenerator,
@@ -68,6 +70,11 @@ impl TetrisPlayer {
     /// Bag type.
     pub fn bag_type(&self) -> BagType {
         self.tetromino_bag.bag_type()
+    }
+
+    /// Last [LineClear], initialized with [LineClear::None].
+    pub fn last_line_clear(&self) -> LineClear {
+        self.score_manager.last_line_clear()
     }
 }
 

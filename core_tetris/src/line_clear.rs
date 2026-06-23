@@ -1,5 +1,7 @@
+use serde::{Deserialize, Serialize};
+
 #[allow(missing_docs)]
-#[derive(PartialEq, Eq, Debug, Clone, Copy, Default)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy, Default, Serialize, Deserialize)]
 /// Types of line clears (simple line clear or T-spin ? how many cleared lines ?).
 pub enum LineClear {
     #[default]

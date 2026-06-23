@@ -6,6 +6,7 @@ pub(super) struct ScoreManager {
     score: u32,
     back_to_back: bool,
     received_garbage_lines: u32,
+    last_line_clear: LineClear,
 }
 
 #[derive(Default, PartialEq, Eq, Debug)]
@@ -18,12 +19,18 @@ impl ScoreManager {
         self.score
     }
 
+    pub(super) fn last_line_clear(&self) -> LineClear {
+        self.last_line_clear
+    }
+
     pub(super) fn score_tetris_command(&mut self, command: TetrisCommand, nb_moves: u32) {
         self.score += command.score() * nb_moves;
     }
 
     /// Update the score accoding to `line_clear`, return the garbage balance.
     pub(super) fn score_line_clear(&mut self, line_clear: LineClear) -> GarbageBalance {
+        self.last_line_clear = line_clear;
+
         if line_clear.stops_back_to_back_sequence() {
             self.back_to_back = false;
         }
