@@ -115,21 +115,22 @@ impl LineClear {
     pub(super) fn begins_back_to_back_sequence(&self) -> bool {
         !matches!(
             self,
-            Self::Single | Self::Double | Self::Triple | Self::MiniTSpin | Self::TSpin
+            Self::None | Self::Single | Self::Double | Self::Triple | Self::MiniTSpin | Self::TSpin
         )
     }
 
     pub(super) fn has_score_b2b_bonus(&self) -> bool {
         !matches!(
             self,
-            Self::Single | Self::Double | Self::Triple | Self::MiniTSpin | Self::TSpin
+            Self::None | Self::Single | Self::Double | Self::Triple | Self::MiniTSpin | Self::TSpin
         )
     }
 
     pub(super) fn has_garbage_b2b_bonus(&self) -> bool {
         !matches!(
             self,
-            Self::Single
+            Self::None
+                | Self::Single
                 | Self::Double
                 | Self::Triple
                 | Self::MiniTSpin

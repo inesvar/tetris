@@ -66,7 +66,7 @@ impl ScoreManager {
 impl GarbageBalance {
     fn new(lines_received: u32, lines_to_send: u32) -> Self {
         Self {
-            garbage: (lines_to_send - lines_received) as i32,
+            garbage: lines_to_send.wrapping_sub(lines_received) as i32,
         }
     }
 
@@ -117,7 +117,7 @@ mod tests {
         assert_eq!(garbage.garbage_lines_to_send(), 4);
 
         score_manager.push_garbage(3);
-        let garbage = score_manager.score_line_clear(LineClear::None);
+        let garbage = score_manager.score_line_clear(LineClear::Single); // to break b2b
         assert_eq!(garbage.garbage_lines_to_add(), 3);
         assert_eq!(garbage.garbage_lines_to_send(), 0);
 
@@ -128,7 +128,7 @@ mod tests {
 
         score_manager.push_garbage(2);
         score_manager.push_garbage(4);
-        let garbage = score_manager.score_line_clear(LineClear::Triple);
+        let garbage = score_manager.score_line_clear(LineClear::Triple); // to break b2b
         assert_eq!(garbage.garbage_lines_to_add(), 4);
         assert_eq!(garbage.garbage_lines_to_send(), 0);
 
