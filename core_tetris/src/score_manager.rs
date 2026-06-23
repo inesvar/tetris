@@ -23,6 +23,10 @@ impl ScoreManager {
         self.last_line_clear
     }
 
+    pub(super) fn received_garbage(&self) -> u32 {
+        self.received_garbage_lines
+    }
+
     pub(super) fn score_tetris_command(&mut self, command: TetrisCommand, nb_moves: u32) {
         self.score += command.score() * nb_moves;
     }

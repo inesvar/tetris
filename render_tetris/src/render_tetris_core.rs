@@ -53,6 +53,12 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
                 self.render_tetris_block(position, player.tetromino_in_play().color());
             }
         }
+        if let Some(bottom_left_corner) = grid.positions().next() {
+            for i in 0..player.received_garbage() {
+                let position = bottom_left_corner - Position::new(1, i as i32);
+                self.render_tetris_block(&position, TetrisColor::Red);
+            }
+        }
     }
 
     fn display_tetromino_in_play(&mut self, player: &TetrisPlayer, state: RunningState) {

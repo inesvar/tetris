@@ -76,6 +76,11 @@ impl TetrisPlayer {
     pub fn last_line_clear(&self) -> LineClear {
         self.score_manager.last_line_clear()
     }
+
+    /// Received garbage.
+    pub fn received_garbage(&self) -> u32 {
+        self.score_manager.received_garbage()
+    }
 }
 
 /// Constructors.
