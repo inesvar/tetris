@@ -3,7 +3,6 @@
 //! It's possible to play either locally or remotely.
 //! The keybindings are customizable.
 extern crate graphics;
-extern crate include_assets;
 extern crate opengl_graphics;
 extern crate piston;
 
@@ -12,7 +11,6 @@ use crate::{
     settings::OPENGL_VERSION,
 };
 use glfw_window::GlfwWindow;
-use include_assets::{include_dir, NamedArchive};
 use piston::{
     event_loop::{EventSettings, Events},
     input::{RenderEvent, UpdateEvent},
@@ -40,9 +38,8 @@ pub fn event_loop() {
     let mut bigger_window_size = false;
 
     // Create the app.
-    let assets_archive = NamedArchive::load(include_dir!("../assets"));
     let mut app = App::new();
-    let mut renderer = Piston2dOpenGlRenderer::new(OPENGL_VERSION, &assets_archive);
+    let mut renderer = Piston2dOpenGlRenderer::new(OPENGL_VERSION);
 
     // Start the event loop.
     let mut events = Events::new(EventSettings::new());

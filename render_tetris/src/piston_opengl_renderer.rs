@@ -1,7 +1,6 @@
 use super::assets::Assets;
 use graphics::types::Matrix2d;
 use graphics::{Context, DrawState};
-use include_assets::NamedArchive;
 use opengl_graphics::{GlGraphics, OpenGL};
 
 pub struct Piston2dOpenGlRenderer<'a> {
@@ -13,8 +12,8 @@ pub struct Piston2dOpenGlRenderer<'a> {
 }
 
 impl<'a> Piston2dOpenGlRenderer<'a> {
-    pub fn new(gl_version: OpenGL, assets_archive: &'a NamedArchive) -> Self {
-        let assets = Assets::new(assets_archive);
+    pub fn new(gl_version: OpenGL) -> Self {
+        let assets = Assets::default();
 
         Self {
             gl: GlGraphics::new(gl_version),
