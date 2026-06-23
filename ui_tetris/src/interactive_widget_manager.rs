@@ -8,7 +8,6 @@ use crate::keybindings::Keybindings;
 use arboard::Clipboard;
 use core_tetris::TetrisCommand;
 use graphics::math::Scalar;
-use local_ip_address::local_ip;
 use std::collections::HashMap;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
@@ -495,8 +494,7 @@ impl InteractiveWidgetManager {
     pub fn update_clipboard(&mut self) {
         if let Some(button) = self.buttons.get_mut(&ButtonType::CopyToClipboard) {
             if button.has_been_pressed() {
-                let ip = local_ip().unwrap().to_string();
-                //let ip = "127.0.0.1".to_string();
+                let ip = "127.0.0.1".to_string();
                 let text = format!("{}{}", ip, HOST_PORT);
                 let mut clipboard = Clipboard::new().expect("Clipboard is not supported");
                 clipboard
@@ -520,8 +518,7 @@ impl InteractiveWidgetManager {
             let text_input = self.get_input(TextInputType::IpAddressInput);
             let remote_ip = String::from(text_input.text.get_text());
             println!("remote ip is {remote_ip}");
-            let local_ip = local_ip().unwrap().to_string();
-            //let local_ip = "127.0.0.1".to_string();
+            let local_ip = "127.0.0.1".to_string();
             let local_ip = format!("{}{}", local_ip, GUEST_PORT);
 
             let join_room = Button::new_pressed(

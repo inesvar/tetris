@@ -9,8 +9,8 @@ edition = "2021"
 rand = { workspace = true }
 serde = { workspace = true }
 simple-mermaid = { workspace = true }
-rstest = { workspace = true }
 doctest-file = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }
+rstest = { workspace = true }
