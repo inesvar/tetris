@@ -1,24 +1,2 @@
-- ~~TETRIS hold : "a lock down must take place between holds"~~
-- CLEAN score should be nb lines cleared
-- CLEAN move wallkick to unit tests ? in order to use TetrominoMove !
-- FEATURE correct scoring and garbage :
-    - ~~add an enum for all line clear configurations~~
-    - ~~return a Option<LineClear> when locking down~~
-    - ~~somehow compute the number of hard dropped lines~~
-    - ~~t slot detection~~
-    - ~~last successful is rotate before lockdown (think about this)~~
-    - fix t tetromino wallkicks
-    - ~~right before lock down : is t in t slot ? is last succesful rotate ? => t_spin~~
-    - ~~t spin & mini t spin detection~~
-    - ~~create enum LineClearType~~
-    - ~~back to backs~~
-    - compute the "fake number of lines cleared"
-    - ~~compute the garbage~~
-    - ~~integration / unit tests for t spin~~
-- CLEAN return the number of garbage lines to send to the ennemy
-(this is a big change, requires lots of preparation)
-    - ~~decide whether to return LineClear or not~~
-    - ~~decide whether to store LineClear or not (cool for rendering !!)~~
-    - fix tests
-    - fix doc
-    - well done !
+- TETRIS fix t tetromino wallkicks
+- TETRIS compute the "fake number of lines cleared"

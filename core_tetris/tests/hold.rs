@@ -66,7 +66,6 @@ fn hold_resets() -> TetrisResult {
     );
     assert!(player
         .hold_queue()
-        .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
     player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
@@ -111,7 +110,6 @@ fn hold_resets() -> TetrisResult {
     );
     assert!(player
         .hold_queue()
-        .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::T));
 
     player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
@@ -136,7 +134,6 @@ fn hold_resets() -> TetrisResult {
     );
     assert!(player
         .hold_queue()
-        .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::T));
 
     player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
@@ -159,7 +156,6 @@ fn hold_resets() -> TetrisResult {
     );
     assert!(player
         .hold_queue()
-        .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
     Ok(())
@@ -210,7 +206,6 @@ fn cant_hold_twice() -> TetrisResult {
     );
     assert!(player
         .hold_queue()
-        .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
     player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
@@ -233,7 +228,6 @@ fn cant_hold_twice() -> TetrisResult {
     );
     assert!(player
         .hold_queue()
-        .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
     player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
@@ -258,7 +252,6 @@ fn cant_hold_twice() -> TetrisResult {
     );
     assert!(player
         .hold_queue()
-        .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
     player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
@@ -281,7 +274,6 @@ fn cant_hold_twice() -> TetrisResult {
     );
     assert!(player
         .hold_queue()
-        .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::T));
 
     Ok(())
@@ -339,7 +331,6 @@ fn hold_remembers() -> TetrisResult {
     );
     assert!(player
         .hold_queue()
-        .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::I));
 
     player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
@@ -392,7 +383,6 @@ fn hold_remembers() -> TetrisResult {
     );
     assert!(player
         .hold_queue()
-        .as_ref()
         .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::T));
 
     Ok(())

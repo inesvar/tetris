@@ -26,7 +26,6 @@ fn main() -> TetrisResult {
     // ANCHOR: tetris_player_basic_commands
     let garbage_rng = &mut MockRng::default(); // right-aligned garbage
     player.apply_player_move(TetrisCommand::Left, rng, garbage_rng)?;
-    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -44,7 +43,6 @@ fn main() -> TetrisResult {
         )
     );
     player.apply_player_move(TetrisCommand::Clockwise, rng, garbage_rng)?;
-    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -62,7 +60,6 @@ fn main() -> TetrisResult {
         )
     );
     player.apply_player_move(TetrisCommand::HardDrop, rng, garbage_rng)?;
-    assert_eq!(player.last_line_clear(), LineClear::None);
     assert_eq!(
         player.to_string(),
         concat!(
@@ -82,7 +79,9 @@ fn main() -> TetrisResult {
     // ANCHOR_END: tetris_player_basic_commands
     // ANCHOR: tetris_player_hold_command
     player.apply_player_move(TetrisCommand::Hold, rng, garbage_rng)?;
-    assert_eq!(player.last_line_clear(), LineClear::None);
+    assert!(player
+        .hold_queue()
+        .is_some_and(|tetromino| tetromino.kind() == TetrominoKind::O));
     assert_eq!(
         player.to_string(),
         concat!(

@@ -53,8 +53,8 @@ impl TetrisPlayer {
     }
 
     /// Tetromino in the **Hold Queue**, if there's one.
-    pub fn hold_queue(&self) -> &Option<Tetromino> {
-        &self.hold_queue
+    pub fn hold_queue(&self) -> Option<&Tetromino> {
+        self.hold_queue.as_ref()
     }
 
     /// Tetrominos in the **Next Queue**.
