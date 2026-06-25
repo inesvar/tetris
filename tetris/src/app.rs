@@ -112,7 +112,7 @@ impl App {
         let is_host = false;
         let player_config = PlayerConfig::Local;
 
-        let local_player: LocalPlayer = LocalPlayer::new(&player_config, Keybindings::new_local());
+        let local_player: LocalPlayer = LocalPlayer::new(Keybindings::new_local());
         let players: Vec<LocalPlayer> = vec![local_player];
         let rem_players: Vec<RemotePlayer> = vec![];
 
@@ -191,7 +191,7 @@ impl App {
 
         match &player_config {
             PlayerConfig::Local => {
-                local_player = LocalPlayer::new(&player_config, Keybindings::new_local());
+                local_player = LocalPlayer::new(Keybindings::new_local());
                 self.local_players = vec![local_player];
                 self.remote_player = vec![];
             }
@@ -207,7 +207,7 @@ impl App {
                 local_ip,
                 remote_ip: _,
             } => {
-                local_player = LocalPlayer::new(&player_config, Keybindings::new_local());
+                local_player = LocalPlayer::new(Keybindings::new_local());
                 self.local_players = vec![local_player];
                 if self.remote_player.is_empty() {
                     remote_player = RemotePlayer::new();
@@ -217,8 +217,8 @@ impl App {
                 self.is_host = local_ip.ends_with('0');
             }
             PlayerConfig::TwoLocal => {
-                local_player = LocalPlayer::new(&player_config, Keybindings::new_two_local(0));
-                let second_local = LocalPlayer::new(&player_config, Keybindings::new_two_local(1));
+                local_player = LocalPlayer::new(Keybindings::new_two_local(0));
+                let second_local = LocalPlayer::new(Keybindings::new_two_local(1));
                 self.local_players = vec![local_player, second_local];
                 self.remote_player = vec![];
             }
@@ -332,7 +332,10 @@ impl App {
                 };
                 self.set_player_config(player_config);
                 self.set_view(ViewState::Remote);
-                self.local_players[0].send_serialized(0);
+                self.send_message(OutboundMessage::TetrisPlayer((
+                    self.local_players[0].player_data(),
+                    0,
+                )));
             }
             _ => {}
         }

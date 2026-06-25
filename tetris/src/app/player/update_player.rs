@@ -42,10 +42,6 @@ impl LocalPlayer {
 
         self.keyboard.update();
 
-        if self.sender {
-            self.send_serialized(garbage_to_send);
-        }
-
         Ok(garbage_to_send)
     }
 }

@@ -1,31 +1,15 @@
 //! Define the general implementation of [LocalPlayer].
 use super::{input_commands::InputCommands, LocalPlayer, TetrisPlayer};
-use crate::{
-    app::{remote::OutboundMessage, PlayerConfig},
-    once,
-    settings::BAG_TYPE,
-};
+use crate::settings::BAG_TYPE;
 use piston::Key;
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
-use std::net::TcpStream;
 use ui_tetris::Keybindings;
 
 impl LocalPlayer {
-    pub fn new(player_config: &PlayerConfig, keybindings: Keybindings) -> Self {
+    pub fn new(keybindings: Keybindings) -> Self {
         let mut rng = Pcg32::seed_from_u64(0);
         let garbage_rng = Pcg32::seed_from_u64(0);
-
-        let mut remote_ip = String::from("");
-        let mut sender = false;
-        if let PlayerConfig::TwoRemote {
-            local_ip: _,
-            remote_ip: ip,
-        } = player_config
-        {
-            sender = true;
-            remote_ip = ip.to_string();
-        }
 
         let player_screen = TetrisPlayer::default(&mut rng, BAG_TYPE);
 
@@ -33,8 +17,6 @@ impl LocalPlayer {
             player_screen,
             keyboard: InputCommands::new(keybindings),
             freeze_frame: 0, // that's about 10 billion years at 60fps
-            sender,
-            remote_ip,
             rng,
             garbage_rng,
         }
@@ -73,18 +55,8 @@ impl LocalPlayer {
     pub(in crate::app) fn score(&self) -> u32 {
         self.player_screen.score()
     }
-}
 
-impl LocalPlayer {
-    /// Sends the player screen to the remote player and resets the new_completed_lines attribute.
-    pub(in crate::app) fn send_serialized(&mut self, garbage_to_send: u32) {
-        if let Ok(stream) = TcpStream::connect(&self.remote_ip) {
-            serde_cbor::to_writer::<TcpStream, OutboundMessage>(
-                stream,
-                &OutboundMessage::TetrisPlayer((&self.player_screen, garbage_to_send)),
-            )
-            .unwrap();
-        }
-        once!("sent serialized data to the remote");
+    pub(in crate::app) fn player_data(&self) -> &TetrisPlayer {
+        &self.player_screen
     }
 }

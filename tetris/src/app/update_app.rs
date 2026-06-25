@@ -63,6 +63,15 @@ impl App {
             // add garbage
             self.local_players[1].push_garbage(garbage_to_send[0]);
             self.local_players[0].push_garbage(garbage_to_send[1]);
+        } else if let PlayerConfig::TwoRemote {
+            local_ip: _,
+            remote_ip: _,
+        } = self.player_config
+        {
+            self.send_message(OutboundMessage::TetrisPlayer((
+                self.local_players[0].player_data(),
+                garbage_to_send[0],
+            )));
         }
     }
 
@@ -87,8 +96,8 @@ impl App {
             if self.clock > 3.0 {
                 self.start();
             }
-            for player in &mut self.local_players {
-                player.send_serialized(0);
+            for player in &self.local_players {
+                self.send_message(OutboundMessage::TetrisPlayer((player.player_data(), 0)));
             }
         } else if self.view_state.is_game() && self.running == RunningState::Running {
             self.update_running_game();
@@ -140,7 +149,10 @@ impl App {
                 });
                 self.set_view(ViewState::Remote);
                 self.send_message(OutboundMessage::Hello(local_ip));
-                self.local_players[0].send_serialized(0);
+                self.send_message(OutboundMessage::TetrisPlayer((
+                    self.local_players[0].player_data(),
+                    0,
+                )));
             }
             ButtonType::ToTwoLocalGame => {
                 if self.player_config != PlayerConfig::TwoLocal {
