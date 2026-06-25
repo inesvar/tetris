@@ -1,12 +1,9 @@
 //! Settings include sizes and colors in the UI and default keybindings.
-
-use crate::{app::OutboundMessage, app::PlayerConfig, once};
 use core_tetris::BagType;
 use opengl_graphics::OpenGL;
 use piston::Key;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_Y, SCALE_FACTOR};
 use serde::{Deserialize, Serialize};
-use std::net::TcpStream;
 
 // Change this to OpenGL::V2_1 if not working.
 pub const OPENGL_VERSION: OpenGL = OpenGL::V4_5;
@@ -42,53 +39,18 @@ pub struct Settings {
     pub seed: u64,
     pub bag_size: BagType,
     pub nb_next_tetromino: usize,
-    remote_ip: Option<String>,
 }
 
 impl Settings {
-    pub fn new(seed: u64, player_config: &PlayerConfig) -> Settings {
+    pub fn new(seed: u64) -> Settings {
         let bag_size = BAG_TYPE;
         let nb_next_tetromino = NB_NEXT_TETROMINO;
-        let mut remote_ip = None;
-        if let PlayerConfig::TwoRemote {
-            local_ip: _,
-            remote_ip: ip,
-        } = &player_config
-        {
-            remote_ip = Some(String::from(ip.as_str()))
-        }
 
         Settings {
             seed,
             bag_size,
             nb_next_tetromino,
-            remote_ip,
         }
-    }
-
-    pub fn set_player_config(&mut self, player_config: &PlayerConfig) {
-        if let PlayerConfig::TwoRemote {
-            local_ip: _,
-            remote_ip: ip,
-        } = &player_config
-        {
-            self.remote_ip = Some(String::from(ip.as_str()))
-        }
-    }
-
-    /// Sends serialized settings to the remote. Should never be called when there's no remote.
-    pub fn send(&self) {
-        if self.remote_ip.is_none() {
-            unreachable!()
-        }
-        if let Ok(stream) = TcpStream::connect(self.remote_ip.as_ref().unwrap()) {
-            serde_cbor::to_writer::<TcpStream, OutboundMessage>(
-                stream,
-                &OutboundMessage::Settings(self),
-            )
-            .unwrap();
-        }
-        once!("sent serialized settings to remote");
     }
 }
 

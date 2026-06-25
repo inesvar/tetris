@@ -116,7 +116,7 @@ impl App {
         let players: Vec<LocalPlayer> = vec![local_player];
         let rem_players: Vec<RemotePlayer> = vec![];
 
-        let settings_manager = Settings::new(seed, &player_config);
+        let settings_manager = Settings::new(seed);
 
         App {
             local_players: players,
@@ -224,7 +224,6 @@ impl App {
             }
         }
 
-        self.settings_manager.set_player_config(&player_config);
         self.player_config = player_config;
     }
 
@@ -320,7 +319,7 @@ impl App {
                 if self.is_host {
                     self.restart()
                 } else {
-                    self.settings_manager.send();
+                    self.send_message(OutboundMessage::Settings(&self.settings_manager));
                 }
             }
             GameFlowChange::Hello(remote_ip) => {
@@ -458,7 +457,7 @@ impl App {
                     println!("HOST SYNCHRONIZE");
                     let mut rng = rand::rng();
                     self.settings_manager.seed = rng.random();
-                    self.settings_manager.send();
+                    self.send_message(OutboundMessage::Settings(&self.settings_manager));
                 } else {
                     self.send_message(OutboundMessage::Restart);
                 }
