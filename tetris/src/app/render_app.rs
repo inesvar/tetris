@@ -33,15 +33,13 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
 
         match &app.view_state {
             ViewState::MainMenu | ViewState::CreateRoom | ViewState::JoinRoom => {
-                self.render_widget_manager(&app.widget_manager[0], &app.running)
+                self.render_widget_manager(&app.widget_manager, &app.running);
             }
             ViewState::Settings => {
-                for widget_manager in &app.widget_manager {
-                    self.render_widget_manager(widget_manager, &app.running);
-                }
+                self.render_widget_manager(&app.widget_manager, &app.running);
             }
             a if a.is_game() => {
-                self.render_widget_manager(&app.widget_manager[0], &app.running);
+                self.render_widget_manager(&app.widget_manager, &app.running);
 
                 for player in &app.local_players {
                     self.render_local_player(player, app.running);

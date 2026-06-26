@@ -20,8 +20,7 @@ pub use render_app::RenderTetrisGame;
 use std::cell::RefCell;
 use std::net::TcpStream;
 use ui_tetris::{
-    interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
-    Keybindings, GUEST_PORT, HOST_PORT,
+    interactive_widget_manager::InteractiveWidgetManager, Keybindings, GUEST_PORT, HOST_PORT,
 };
 
 /// Indicates whether the player commands lead the game to pause, resume, restart or no.
@@ -66,7 +65,7 @@ pub struct App {
     frame_counter: u64,
     running: RunningState,
     pub cursor_position: [f64; 2],
-    widget_manager: Vec<InteractiveWidgetManager>,
+    widget_manager: InteractiveWidgetManager,
     settings_manager: Settings,
     tcp_stream: RefCell<Option<TcpStream>>, // TODO: there should be a kind of "network manager handling this"
     is_synchronized: bool, // TODO: there should be a kind of "network manager handling this"
@@ -97,7 +96,7 @@ impl App {
             frame_counter: 0,
             running: RunningState::NotRunning,
             cursor_position: [0.0, 0.0],
-            widget_manager: vec![InteractiveWidgetManager::new_main_menu()],
+            widget_manager: InteractiveWidgetManager::new_main_menu(),
             settings_manager,
             tcp_stream: RefCell::new(None),
             is_synchronized: false,
@@ -176,8 +175,8 @@ impl App {
 
     pub fn handle_text_input(&mut self, input: &str) {
         match self.view_state {
-            ViewState::MainMenu => self.widget_manager[0].handle_text_input(input),
-            ViewState::JoinRoom => self.widget_manager[0].handle_text_input(input),
+            ViewState::MainMenu => self.widget_manager.handle_text_input(input),
+            ViewState::JoinRoom => self.widget_manager.handle_text_input(input),
             _ => {}
         }
     }
@@ -208,17 +207,10 @@ impl App {
 
     pub fn handle_key_press(&mut self, key: Key) {
         match &self.view_state {
-            ViewState::MainMenu => self.widget_manager[0].handle_key_press(key),
-            ViewState::Settings => {
-                for widget_manager in &mut self.widget_manager {
-                    widget_manager.handle_key_press(key);
-                }
-            }
-            ViewState::JoinRoom => self.widget_manager[0].handle_key_press(key),
             a if a.is_game() => {
                 self.handle_key_press_in_game(key);
             }
-            _ => {}
+            _ => self.widget_manager.handle_key_press(key),
         }
     }
 
@@ -299,69 +291,57 @@ impl App {
         if button != MouseButton::Left {
             return;
         }
-        for widget_manager in &mut self.widget_manager {
-            widget_manager.handle_left_click(&self.cursor_position);
-        }
+        self.widget_manager.handle_left_click(&self.cursor_position);
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
         if button != MouseButton::Left {
             return;
         }
-        for widget_manager in &mut self.widget_manager {
-            widget_manager.handle_left_click_release();
-        }
+        self.widget_manager.handle_left_click_release();
     }
 
     fn set_view(&mut self, view_state: ViewState) {
         println!("setting view to {:?}", view_state);
         let from_game = self.view_state.is_game();
         if self.view_state == ViewState::Settings {
-            for (id, widget_manager) in self.widget_manager.iter_mut().enumerate() {
-                self.local_players[id].set_new_keybindings(&widget_manager.get_new_keybindings());
+            for (id, player) in self.local_players.iter_mut().enumerate() {
+                player.set_new_keybindings(&self.widget_manager.get_new_keybindings(id));
             }
         }
         self.view_state = view_state;
         match self.view_state {
             ViewState::MainMenu => {
-                self.widget_manager = vec![InteractiveWidgetManager::new_main_menu()]
+                self.widget_manager = InteractiveWidgetManager::new_main_menu();
             }
-            ViewState::Settings => {
-                match &self.player_config {
-                    PlayerConfig::Local => {
-                        self.widget_manager = vec![InteractiveWidgetManager::new_settings(
-                            &self.local_players[0].get_keybindings(),
-                            SettingsType::OnePlayer,
-                            from_game,
-                        )]
-                    }
-                    _ => {
-                        self.widget_manager = vec![InteractiveWidgetManager::new_settings(
-                            &self.local_players[0].get_keybindings(),
-                            SettingsType::LeftPlayer,
-                            from_game,
-                        )]
-                    }
+            ViewState::Settings => match &self.player_config {
+                PlayerConfig::Local
+                | PlayerConfig::TwoRemote {
+                    local_ip: _,
+                    remote_ip: _,
+                } => {
+                    self.widget_manager = InteractiveWidgetManager::new_one_player_settings(
+                        &self.local_players[0].get_keybindings(),
+                        from_game,
+                    );
                 }
-                // TODO: this is so confusing, make widget_manager an `InteractiveWidgetManager`
-                // instead of a `Vec`
-                if self.player_config == PlayerConfig::TwoLocal {
-                    self.widget_manager
-                        .push(InteractiveWidgetManager::new_settings(
-                            &self.local_players[1].get_keybindings(),
-                            SettingsType::RightPlayer,
-                            from_game,
-                        ));
+                PlayerConfig::TwoLocal => {
+                    self.widget_manager = InteractiveWidgetManager::new_two_players_settings(
+                        &self.local_players[0].get_keybindings(),
+                        &self.local_players[1].get_keybindings(),
+                        from_game,
+                    );
                 }
-            }
+                _ => {}
+            },
             ViewState::TwoLocal => {
-                self.widget_manager = vec![InteractiveWidgetManager::new_two_player_game()];
+                self.widget_manager = InteractiveWidgetManager::new_two_player_game();
             }
             ViewState::Local => {
-                self.widget_manager = vec![InteractiveWidgetManager::new_single_player_game()];
+                self.widget_manager = InteractiveWidgetManager::new_single_player_game();
             }
             ViewState::Remote => {
-                self.widget_manager = vec![InteractiveWidgetManager::new_two_player_game()];
+                self.widget_manager = InteractiveWidgetManager::new_two_player_game();
             }
             ViewState::CreateRoom => {
                 /* let mut file = File::create("local_port.txt").unwrap();
@@ -369,12 +349,12 @@ impl App {
                 let local_ip = "127.0.0.1".to_string() + HOST_PORT;
                 //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
                 self.set_player_config(PlayerConfig::Viewer(local_ip));
-                self.widget_manager = vec![InteractiveWidgetManager::new_create_room()]
+                self.widget_manager = InteractiveWidgetManager::new_create_room();
             }
             ViewState::JoinRoom => {
                 /* let mut file = File::create("local_port.txt").unwrap();
                 file.write(GUEST_PORT.as_bytes()).unwrap(); */
-                self.widget_manager = vec![InteractiveWidgetManager::new_join_room()]
+                self.widget_manager = InteractiveWidgetManager::new_join_room();
             }
         }
     }

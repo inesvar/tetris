@@ -3,7 +3,10 @@ pub enum PlayerConfig {
     #[default]
     Local,
     TwoLocal,
-    TwoRemote { local_ip: String, remote_ip: String },
+    TwoRemote {
+        local_ip: String,
+        remote_ip: String,
+    },
     Viewer(String),
 }
 

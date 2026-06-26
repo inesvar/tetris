@@ -8,7 +8,8 @@ use ui_tetris::interactive_widget_manager::{ButtonType, TextType};
 
 impl App {
     fn update_running_game(&mut self) {
-        self.widget_manager[0].set_text(TextType::Timer, format_seconds(self.clock));
+        self.widget_manager
+            .set_text(TextType::Timer, format_seconds(self.clock));
         self.frame_counter = self.frame_counter.wrapping_add(1);
         // update the falling speed and freeze speed
         match self.clock {
@@ -85,12 +86,13 @@ impl App {
     pub fn update(&mut self, args: &UpdateArgs) {
         self.clock += args.dt;
         if self.view_state == ViewState::CreateRoom {
-            self.widget_manager[0].update_clipboard();
+            self.widget_manager.update_clipboard();
         } else if self.view_state == ViewState::JoinRoom {
-            self.widget_manager[0].update_clipboard();
-            self.widget_manager[0].update_from_text();
+            self.widget_manager.update_clipboard();
+            self.widget_manager.update_from_text();
         } else if self.view_state.is_game() && self.running == RunningState::Starting {
-            self.widget_manager[0].set_text(TextType::Timer, format_seconds(0.0));
+            self.widget_manager
+                .set_text(TextType::Timer, format_seconds(0.0));
             if self.clock > 3.0 {
                 self.start();
             }
@@ -102,7 +104,7 @@ impl App {
         }
 
         // then eventually change the view
-        let result = self.widget_manager[0].update_view();
+        let result = self.widget_manager.update_view();
         match result {
             ButtonType::ToPause => {
                 if self.view_state.is_game() {
