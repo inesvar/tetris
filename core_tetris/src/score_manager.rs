@@ -1,7 +1,7 @@
 use super::{LineClear, TetrisCommand};
 use serde::{Deserialize, Serialize};
 
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Default, Clone, Serialize, Deserialize, Debug)]
 pub(super) struct ScoreManager {
     score: u32,
     back_to_back: bool,

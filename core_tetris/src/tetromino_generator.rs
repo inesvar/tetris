@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 
 /// Tetromino generator.
-#[derive(Serialize, Deserialize, Default, Clone)]
+#[derive(Serialize, Deserialize, Default, Clone, Debug)]
 pub struct TetrominoGenerator {
     tetrominos: VecDeque<TetrominoKind>,
     bag_type: BagType,

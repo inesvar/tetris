@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 /// Their serializations rely on the position of their fields (0 and 1)
 /// in the struct so the Serialize implementations need to be updated
 /// accordingly in case of change of MessageType.
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub enum OutboundMessage<'a> {
     TetrisPlayer((&'a TetrisPlayer, u32)), // not acknowledged as it's sent regularly
     Settings(&'a Settings),                // sent by the host of the room
@@ -30,7 +30,7 @@ pub enum OutboundMessage<'a> {
     Kill,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub enum InboundMessage {
     TetrisPlayer((TetrisPlayer, u32)), // not acknowledged as it's sent regularly
     Settings(Settings),                // sent by the host of the room

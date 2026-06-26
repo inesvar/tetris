@@ -28,7 +28,7 @@ pub const NEXT_QUEUE_MAX_SIZE: usize = 6;
 /// [TetrisPlayer] is serializable and can be sent through the network
 /// to implement multi-player tetris games. Note that this is not very efficient because
 /// except the **Tetromino in Play**, most elements don't change between frames.
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct TetrisPlayer {
     grid: TetrisGrid,
     tetromino_in_play: Tetromino,
