@@ -1,2 +1,4 @@
+- make Hold queue and Next queue customizable
+- improve TetrisGrid
 - TETRIS fix t tetromino wallkicks
 - TETRIS compute the "fake number of lines cleared"
