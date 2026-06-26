@@ -2,16 +2,10 @@
 use core_tetris::BagType;
 use opengl_graphics::OpenGL;
 use piston::Key;
-use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_Y, SCALE_FACTOR};
 use serde::{Deserialize, Serialize};
 
 // Change this to OpenGL::V2_1 if not working.
 pub const OPENGL_VERSION: OpenGL = OpenGL::V4_5;
-
-// height of the title "Tetris" and "Press R to (re)start"
-pub const DEFAULT_TITLE_Y: f64 = 100.0 * SCALE_FACTOR;
-// height of the text on the left side indicating the score
-pub const DEFAULT_SCORE_TEXT_Y: f64 = DEFAULT_GRID_Y + 8.0 * BLOCK_SIZE;
 
 /****************************************/
 /*               COLORS                 */

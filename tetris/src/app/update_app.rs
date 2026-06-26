@@ -4,11 +4,11 @@
 use super::{remote::OutboundMessage, App, PlayerConfig, RunningState, ViewState};
 use crate::utils::formattings::format_seconds;
 use piston::UpdateArgs;
-use ui_tetris::interactive_widget_manager::ButtonType;
+use ui_tetris::interactive_widget_manager::{ButtonType, TextType};
 
 impl App {
     fn update_running_game(&mut self) {
-        self.timer_text.set_text(format_seconds(self.clock));
+        self.widget_manager[0].set_text(TextType::Timer, format_seconds(self.clock));
         self.frame_counter = self.frame_counter.wrapping_add(1);
         // update the falling speed and freeze speed
         match self.clock {
@@ -92,7 +92,7 @@ impl App {
             self.widget_manager[0].update_clipboard();
             self.widget_manager[0].update_from_text();
         } else if self.view_state.is_game() && self.running == RunningState::Starting {
-            self.timer_text.set_text(format_seconds(0.0));
+            self.widget_manager[0].set_text(TextType::Timer, format_seconds(0.0));
             if self.clock > 3.0 {
                 self.start();
             }

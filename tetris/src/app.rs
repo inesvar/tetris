@@ -17,12 +17,11 @@ use rand::RngExt;
 pub(super) use remote::OutboundMessage;
 use remote::RemotePlayer;
 pub use render_app::RenderTetrisGame;
-use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
 use std::cell::RefCell;
 use std::net::TcpStream;
 use ui_tetris::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
-    Keybindings, Text, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT, SILVER,
+    Keybindings, GUEST_PORT, HOST_PORT,
 };
 
 /// Indicates whether the player commands lead the game to pause, resume, restart or no.
@@ -65,10 +64,6 @@ pub struct App {
     pub clock: f64,
     frame_counter: u64,
     running: RunningState,
-    title_text: Text, // TODO: should not be in here, is it not part of the Game View ?
-    restart_text: Text, // TODO: should not be in here, is it not part of the Game View ?
-    pause_text: Text, // TODO: should not be in here, is it not part of the Game View ?
-    timer_text: Text, // TODO: should not be in here, is it not part of the Game View ?
     pub cursor_position: [f64; 2],
     widget_manager: Vec<InteractiveWidgetManager>,
     settings_manager: Settings,
@@ -97,34 +92,6 @@ impl App {
             remote_player: rem_players,
             player_config,
             view_state: ViewState::MainMenu,
-            title_text: Text::new_with_tetris_font(
-                "T",
-                DEFAULT_FONT_SIZE,
-                DEFAULT_WINDOW_WIDTH / 2.0,
-                DEFAULT_TITLE_Y,
-                SILVER,
-            ),
-            restart_text: Text::new(
-                "Press R to (re)start",
-                (DEFAULT_FONT_SIZE * 22) / 16,
-                DEFAULT_WINDOW_WIDTH / 2.0,
-                DEFAULT_TITLE_Y,
-                SILVER,
-            ),
-            timer_text: Text::new(
-                "",
-                DEFAULT_FONT_SIZE,
-                DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
-                DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,
-                SILVER,
-            ),
-            pause_text: Text::new(
-                "Press P to resume",
-                (DEFAULT_FONT_SIZE * 22) / 16,
-                DEFAULT_WINDOW_WIDTH / 2.0,
-                DEFAULT_TITLE_Y,
-                SILVER,
-            ),
             clock: 0.0,
             frame_counter: 0,
             running: RunningState::NotRunning,
@@ -375,6 +342,8 @@ impl App {
                         )]
                     }
                 }
+                // TODO: this is so confusing, make widget_manager an `InteractiveWidgetManager`
+                // instead of a `Vec`
                 if self.player_config == PlayerConfig::TwoLocal {
                     self.widget_manager
                         .push(InteractiveWidgetManager::new_settings(

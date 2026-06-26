@@ -13,7 +13,8 @@ pub(crate) use constants::*;
 pub(crate) use rectangle::Rectangle;
 
 pub use constants::{
-    DEFAULT_FONT_SIZE, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT,
+    DEFAULT_FONT_SIZE, DEFAULT_SCORE_TEXT_Y, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
+    GUEST_PORT, HOST_PORT,
 };
 pub use graphics::color::SILVER;
 pub use keybindings::Keybindings;

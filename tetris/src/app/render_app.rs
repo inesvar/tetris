@@ -3,19 +3,21 @@ use super::{App, RunningState, ViewState};
 use crate::app::player::LocalPlayer;
 use crate::app::remote::RemotePlayer;
 use crate::once;
-use crate::settings::{BG_COLOR, DEFAULT_SCORE_TEXT_Y};
+use crate::settings::BG_COLOR;
 use core_tetris::render::RenderTetrisPlayer;
 use graphics::Transformed;
 use piston::RenderArgs;
 use render_tetris::Piston2dOpenGlRenderer;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
-use ui_tetris::{RenderTetrisUi, Text, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, SILVER};
+use ui_tetris::{
+    RenderTetrisUi, Text, DEFAULT_FONT_SIZE, DEFAULT_SCORE_TEXT_Y, DEFAULT_WINDOW_WIDTH, SILVER,
+};
 
 pub trait RenderTetrisGame: RenderTetrisPlayer + RenderTetrisUi {
     type RenderArgs;
     fn render_app(&mut self, render_args: &RenderArgs, app: &App);
-    fn render_local_player(&mut self, local_player: &LocalPlayer, state: RunningState);
-    fn render_remote_player(&mut self, remote_player: &RemotePlayer, state: RunningState);
+    fn render_local_player(&mut self, local_player: &LocalPlayer, state: RunningState); // TODO: put score rendering inside !!
+    fn render_remote_player(&mut self, remote_player: &RemotePlayer, state: RunningState); // TODO: put score rendering inside !!
 }
 
 impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
@@ -31,25 +33,15 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
 
         match &app.view_state {
             ViewState::MainMenu | ViewState::CreateRoom | ViewState::JoinRoom => {
-                self.render_text(&app.title_text);
-                self.render_widget_manager(&app.widget_manager[0])
+                self.render_widget_manager(&app.widget_manager[0], &app.running)
             }
             ViewState::Settings => {
-                self.render_text(&app.title_text);
                 for widget_manager in &app.widget_manager {
-                    self.render_widget_manager(widget_manager);
+                    self.render_widget_manager(widget_manager, &app.running);
                 }
             }
             a if a.is_game() => {
-                self.render_widget_manager(&app.widget_manager[0]);
-                match app.running {
-                    RunningState::Running | RunningState::Starting => {
-                        self.render_text(&app.title_text)
-                    }
-                    RunningState::NotRunning => self.render_text(&app.restart_text),
-                    RunningState::Paused => self.render_text(&app.pause_text),
-                }
-                self.render_text(&app.timer_text);
+                self.render_widget_manager(&app.widget_manager[0], &app.running);
 
                 for player in &app.local_players {
                     // TODO: score rendering should eventually be in render_tetris

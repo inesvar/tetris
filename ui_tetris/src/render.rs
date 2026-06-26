@@ -1,16 +1,21 @@
 //! Implement [RenderTetrisUi] for [Piston2dOpenGlRenderer] (rendering [InteractiveWidgetManager] composed of [Text], [TextInput], [KeyInput], [Button]).
 use super::button::Button;
-use super::interactive_widget_manager::InteractiveWidgetManager;
+use super::interactive_widget_manager::{InteractiveWidgetManager, TextType};
 use super::key_input::KeyInput;
 use super::text::Text;
 use super::text_input::TextInput;
 use super::CURSOR_BLINK_PERIOD;
+use core_tetris::render::RunningState;
 use graphics::{color, CharacterCache, Transformed};
 use render_tetris::Piston2dOpenGlRenderer;
 
 /// Rendering an [InteractiveWidgetManager].
 pub trait RenderTetrisUi {
-    fn render_widget_manager(&mut self, manager: &InteractiveWidgetManager);
+    fn render_widget_manager(
+        &mut self,
+        manager: &InteractiveWidgetManager,
+        running_state: &RunningState,
+    );
     fn render_text_replace_content(&mut self, text_style: &Text, content: &str);
     fn render_text(&mut self, text: &Text) {
         self.render_text_replace_content(text, text.get_text());
@@ -107,7 +112,36 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         self.transform = old_transform;
     }
 
-    fn render_widget_manager(&mut self, manager: &InteractiveWidgetManager) {
+    fn render_widget_manager(
+        &mut self,
+        manager: &InteractiveWidgetManager,
+        running_state: &RunningState,
+    ) {
+        match running_state {
+            RunningState::NotRunning => {
+                if let Some(restart) = manager.texts.get(&TextType::Restart) {
+                    self.render_text(restart);
+                } else if let Some(title) = manager.texts.get(&TextType::Title) {
+                    self.render_text(title);
+                }
+            }
+            RunningState::Running | RunningState::Starting => {
+                if let Some(title) = manager.texts.get(&TextType::Title) {
+                    self.render_text(title);
+                }
+            }
+            RunningState::Paused => {
+                if let Some(pause) = manager.texts.get(&TextType::Pause) {
+                    self.render_text(pause);
+                } else if let Some(title) = manager.texts.get(&TextType::Title) {
+                    self.render_text(title);
+                }
+            }
+        }
+        if let Some(timer) = manager.texts.get(&TextType::Timer) {
+            self.render_text(timer);
+        }
+
         for button in manager.buttons.values() {
             self.render_button(button);
         }

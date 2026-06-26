@@ -1,13 +1,14 @@
 use super::{button::Button, key_input::KeyInput, text::Text, text_input::TextInput};
 use super::{
-    DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
-    DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
-    GUEST_PORT, HOST_PORT,
+    DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE,
+    DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_SCORE_TEXT_Y, DEFAULT_TITLE_Y,
+    DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT, SILVER,
 };
 use crate::keybindings::Keybindings;
 use arboard::Clipboard;
 use core_tetris::TetrisCommand;
 use graphics::math::Scalar;
+use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
 use std::collections::HashMap;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
@@ -50,6 +51,7 @@ pub enum SettingsType {
     RightPlayer,
 }
 
+#[derive(Hash, PartialEq, Eq)]
 pub enum TextType {
     Title,
     Restart,
@@ -116,6 +118,17 @@ impl InteractiveWidgetManager {
         buttons.insert(ButtonType::ToSettings, settings_button);
         buttons.insert(ButtonType::ToTwoLocalGame, create_two_player_game_button);
 
+        let title_text = Text::new_with_tetris_font(
+            "T",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+
+        let mut texts = HashMap::new();
+        texts.insert(TextType::Title, title_text);
+
         let text_inputs = HashMap::new();
 
         let key_inputs = HashMap::new();
@@ -124,7 +137,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
-            texts: HashMap::new(),
+            texts,
         }
     }
 
@@ -264,6 +277,17 @@ impl InteractiveWidgetManager {
 
         let text_inputs = HashMap::new();
 
+        let title_text = Text::new_with_tetris_font(
+            "T",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+
+        let mut texts = HashMap::new();
+        texts.insert(TextType::Title, title_text);
+
         let mut key_inputs = HashMap::new();
         key_inputs.insert(TetrisCommand::SoftDrop, fall_keys_input);
         key_inputs.insert(TetrisCommand::HardDrop, hard_drop_keys_input);
@@ -281,7 +305,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
-            texts: HashMap::new(),
+            texts,
         }
     }
 
@@ -315,6 +339,41 @@ impl InteractiveWidgetManager {
         buttons.insert(ButtonType::ToPause, pause_button);
         buttons.insert(ButtonType::ToSettings, settings_button);
 
+        let title_text = Text::new_with_tetris_font(
+            "T",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+        let restart_text = Text::new(
+            "Press R to (re)start",
+            (DEFAULT_FONT_SIZE * 22) / 16,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+        let timer_text = Text::new(
+            "",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
+            DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,
+            SILVER,
+        );
+        let pause_text = Text::new(
+            "Press P to resume",
+            (DEFAULT_FONT_SIZE * 22) / 16,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+
+        let mut texts = HashMap::new();
+        texts.insert(TextType::Title, title_text);
+        texts.insert(TextType::Restart, restart_text);
+        texts.insert(TextType::Timer, timer_text);
+        texts.insert(TextType::Pause, pause_text);
+
         let text_inputs = HashMap::new();
         let key_inputs = HashMap::new();
 
@@ -322,7 +381,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
-            texts: HashMap::new(),
+            texts,
         }
     }
 
@@ -356,6 +415,41 @@ impl InteractiveWidgetManager {
         buttons.insert(ButtonType::ToPause, pause_button);
         buttons.insert(ButtonType::ToSettings, settings_button);
 
+        let title_text = Text::new_with_tetris_font(
+            "T",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+        let restart_text = Text::new(
+            "Press R to (re)start",
+            (DEFAULT_FONT_SIZE * 22) / 16,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+        let timer_text = Text::new(
+            "",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
+            DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,
+            SILVER,
+        );
+        let pause_text = Text::new(
+            "Press P to resume",
+            (DEFAULT_FONT_SIZE * 22) / 16,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+
+        let mut texts = HashMap::new();
+        texts.insert(TextType::Title, title_text);
+        texts.insert(TextType::Restart, restart_text);
+        texts.insert(TextType::Timer, timer_text);
+        texts.insert(TextType::Pause, pause_text);
+
         let text_inputs = HashMap::new();
         let key_inputs = HashMap::new();
 
@@ -363,7 +457,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
-            texts: HashMap::new(),
+            texts,
         }
     }
 
@@ -387,6 +481,18 @@ impl InteractiveWidgetManager {
         let mut buttons = HashMap::new();
         buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
         buttons.insert(ButtonType::CopyToClipboard, copy_ip);
+
+        let title_text = Text::new_with_tetris_font(
+            "T",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+
+        let mut texts = HashMap::new();
+        texts.insert(TextType::Title, title_text);
+
         let text_inputs = HashMap::new();
         let key_inputs = HashMap::new();
 
@@ -394,7 +500,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
-            texts: HashMap::new(),
+            texts,
         }
     }
 
@@ -437,13 +543,24 @@ impl InteractiveWidgetManager {
         buttons.insert(ButtonType::PasteFromClipboard, paste_ip);
         let mut text_inputs = HashMap::new();
         text_inputs.insert(TextInputType::IpAddressInput, room_ip_input);
+
+        let title_text = Text::new_with_tetris_font(
+            "T",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+
+        let mut texts = HashMap::new();
+        texts.insert(TextType::Title, title_text);
         let key_inputs = HashMap::new();
 
         InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
-            texts: HashMap::new(),
+            texts,
         }
     }
 
@@ -503,6 +620,12 @@ impl InteractiveWidgetManager {
             }
         }
         keybindings_manager
+    }
+
+    pub fn set_text(&mut self, text_type: TextType, new_text: String) {
+        if let Some(text) = self.texts.get_mut(&text_type) {
+            text.set_text(new_text);
+        }
     }
 
     pub fn update_clipboard(&mut self) {

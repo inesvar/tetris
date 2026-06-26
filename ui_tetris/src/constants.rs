@@ -1,4 +1,4 @@
-use render_tetris::SCALE_FACTOR;
+use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_Y, SCALE_FACTOR};
 
 // window
 pub const DEFAULT_WINDOW_WIDTH: f64 = 650.0 * SCALE_FACTOR;
@@ -6,6 +6,8 @@ pub const DEFAULT_WINDOW_HEIGHT: f64 = 800.0 * SCALE_FACTOR;
 
 // text
 pub const DEFAULT_FONT_SIZE: u32 = (16.0 * SCALE_FACTOR) as u32;
+pub const DEFAULT_TITLE_Y: f64 = 100.0 * SCALE_FACTOR;
+pub const DEFAULT_SCORE_TEXT_Y: f64 = DEFAULT_GRID_Y + 8.0 * BLOCK_SIZE;
 
 // buttons
 pub const DEFAULT_BUTTON_WIDTH: f64 = 300.0 * SCALE_FACTOR;
