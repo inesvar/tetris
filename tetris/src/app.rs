@@ -73,9 +73,9 @@ pub enum ViewState {
     Settings,
     JoinRoom,
     CreateRoom,
-    Local,
-    TwoLocal,
-    Remote,
+    Local,    // TODO: this is the same view, conceptually it's the Game View
+    TwoLocal, // TODO: this is the same view, conceptually it's the Game View
+    Remote,   // TODO: this is the same view, conceptually it's the Game View
 }
 
 impl ViewState {
@@ -85,24 +85,24 @@ impl ViewState {
 }
 
 pub struct App {
-    local_players: Vec<LocalPlayer>,
-    remote_player: Vec<RemotePlayer>,
-    pub player_config: PlayerConfig,
+    local_players: Vec<LocalPlayer>, // TODO: what about storing the first two in the third ?
+    remote_player: Vec<RemotePlayer>, // TODO: what about storing the first two in the third ?
+    pub player_config: PlayerConfig, // TODO: what about storing the first two in the third ?
     view_state: ViewState,
     pub clock: f64,
     frame_counter: u64,
     running: RunningState,
-    title_text: Text,
-    restart_text: Text,
-    pause_text: Text,
-    timer_text: Text,
+    title_text: Text, // TODO: should not be in here, is it not part of the Game View ?
+    restart_text: Text, // TODO: should not be in here, is it not part of the Game View ?
+    pause_text: Text, // TODO: should not be in here, is it not part of the Game View ?
+    timer_text: Text, // TODO: should not be in here, is it not part of the Game View ?
     pub cursor_position: [f64; 2],
     widget_manager: Vec<InteractiveWidgetManager>,
     settings_manager: Settings,
-    is_synchronized: bool,
-    is_host: bool,
-    fall_speed_divide: u64,
-    freeze: u64,
+    is_synchronized: bool, // TODO: there should be a kind of "network manager handling this"
+    is_host: bool,         // TODO: there should be a kind of "network manager handling this"
+    fall_speed_divide: u64, // TODO: that's more of a tetris engine responsibility ?
+    freeze: u64,           // TODO: that's more of a tetris engine responsibility ?
 }
 
 impl App {
