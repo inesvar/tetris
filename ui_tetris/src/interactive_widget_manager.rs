@@ -1,4 +1,4 @@
-use super::{button::Button, key_input::KeyInput, text_input::TextInput};
+use super::{button::Button, key_input::KeyInput, text::Text, text_input::TextInput};
 use super::{
     DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
     DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH,
@@ -50,10 +50,18 @@ pub enum SettingsType {
     RightPlayer,
 }
 
+pub enum TextType {
+    Title,
+    Restart,
+    Pause,
+    Timer,
+}
+
 pub struct InteractiveWidgetManager {
     pub(super) buttons: HashMap<ButtonType, Button>,
     pub(super) text_inputs: HashMap<TextInputType, TextInput>,
     pub(super) key_inputs: HashMap<TetrisCommand, KeyInput>,
+    pub(super) texts: HashMap<TextType, Text>,
 }
 
 impl InteractiveWidgetManager {
@@ -116,6 +124,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
+            texts: HashMap::new(),
         }
     }
 
@@ -272,6 +281,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
+            texts: HashMap::new(),
         }
     }
 
@@ -312,6 +322,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
+            texts: HashMap::new(),
         }
     }
 
@@ -352,6 +363,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
+            texts: HashMap::new(),
         }
     }
 
@@ -382,6 +394,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
+            texts: HashMap::new(),
         }
     }
 
@@ -430,6 +443,7 @@ impl InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
+            texts: HashMap::new(),
         }
     }
 
