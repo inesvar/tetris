@@ -6,11 +6,12 @@ use super::{Position, TetrisColor, TetrisGrid, TetrisPlayer, Tetromino};
 ///
 /// Can be used to customize [TetrisPlayer] rendering through [RenderTetrisPlayer] functions.
 #[allow(missing_docs)]
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Default)]
 pub enum RunningState {
+    #[default]
+    NotRunning,
     Running,
     Paused,
-    NotRunning,
     Starting,
 }
 

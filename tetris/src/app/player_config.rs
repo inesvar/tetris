@@ -1,5 +1,6 @@
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Default)]
 pub enum PlayerConfig {
+    #[default]
     Local,
     TwoLocal,
     TwoRemote { local_ip: String, remote_ip: String },

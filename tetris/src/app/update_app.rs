@@ -83,8 +83,6 @@ impl App {
     ///     - if the game is running, update the grid and check that the game still runs
     /// - change the view if necessary
     pub fn update(&mut self, args: &UpdateArgs) {
-        // TODO: split in two functions
-        // first apply the changes inside the views
         self.clock += args.dt;
         if self.view_state == ViewState::CreateRoom {
             self.widget_manager[0].update_clipboard();
