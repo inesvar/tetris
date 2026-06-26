@@ -16,6 +16,7 @@ use rand::RngExt;
 pub(super) use remote::OutboundMessage;
 pub use render_app::RenderTetrisGame;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
+use std::cell::RefCell;
 use std::net::TcpStream;
 use ui_tetris::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
@@ -99,6 +100,7 @@ pub struct App {
     pub cursor_position: [f64; 2],
     widget_manager: Vec<InteractiveWidgetManager>,
     settings_manager: Settings,
+    tcp_stream: RefCell<Option<TcpStream>>, // TODO: there should be a kind of "network manager handling this"
     is_synchronized: bool, // TODO: there should be a kind of "network manager handling this"
     is_host: bool,         // TODO: there should be a kind of "network manager handling this"
     fall_speed_divide: u64, // TODO: that's more of a tetris engine responsibility ?
@@ -157,6 +159,7 @@ impl App {
             cursor_position: [0.0, 0.0],
             widget_manager: vec![InteractiveWidgetManager::new_main_menu()],
             settings_manager,
+            tcp_stream: RefCell::new(None),
             is_synchronized: false,
             is_host,
             fall_speed_divide: FALL_SPEED_DIVIDE,
@@ -205,10 +208,14 @@ impl App {
             }
             PlayerConfig::TwoRemote {
                 local_ip,
-                remote_ip: _,
+                remote_ip,
             } => {
                 local_player = LocalPlayer::new(Keybindings::new_local());
                 self.local_players = vec![local_player];
+                self.tcp_stream = RefCell::new(Some(
+                    TcpStream::connect(remote_ip).expect("Couldn't open tcp stream !"),
+                ));
+                println!("Opened TCP stream");
                 if self.remote_player.is_empty() {
                     remote_player = RemotePlayer::new();
                     self.remote_player = vec![remote_player];
@@ -501,15 +508,33 @@ impl App {
         self.is_synchronized = false;
     }
 
-    /// Sends message to the remote if there's a remote.
     fn send_message(&self, message: OutboundMessage) {
-        if let PlayerConfig::TwoRemote {
-            local_ip: _,
-            remote_ip,
-        } = &self.player_config
-        {
-            if let Ok(stream) = TcpStream::connect(remote_ip) {
-                serde_cbor::to_writer::<TcpStream, OutboundMessage>(stream, &message).unwrap();
+        // Try existing connection.
+        if let Some(stream) = self.tcp_stream.borrow().as_ref() {
+            if serde_cbor::to_writer(stream, &message).is_ok() {
+                return;
+            }
+
+            println!("Existing connection died.");
+        }
+
+        // Reconnect.
+        let remote_ip = match &self.player_config {
+            PlayerConfig::TwoRemote { remote_ip, .. } => remote_ip,
+            _ => return,
+        };
+
+        match TcpStream::connect(remote_ip) {
+            Ok(stream) => {
+                println!("Reconnected.");
+                *self.tcp_stream.borrow_mut() = Some(stream);
+
+                if let Some(stream) = self.tcp_stream.borrow().as_ref() {
+                    let _ = serde_cbor::to_writer(stream, &message);
+                }
+            }
+            Err(e) => {
+                println!("Reconnect failed: {:?}", e);
             }
         }
     }

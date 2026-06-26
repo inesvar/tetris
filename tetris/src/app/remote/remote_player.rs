@@ -6,8 +6,9 @@ use crate::{
 };
 use rand::SeedableRng;
 use rand_pcg::Pcg32;
+use serde::Deserialize;
 use std::{
-    net::{TcpListener, TcpStream},
+    net::TcpListener,
     sync::{Arc, Mutex, MutexGuard},
     thread,
 };
@@ -50,7 +51,9 @@ impl RemotePlayer {
             // for each incoming message
             for stream in listener.incoming() {
                 let stream = stream.unwrap();
-                let message = serde_cbor::from_reader::<InboundMessage, TcpStream>(stream).unwrap();
+                let mut de = serde_cbor::Deserializer::from_reader(stream);
+
+                let message = InboundMessage::deserialize(&mut de).unwrap();
                 once!("unwrapped from packet from remote");
                 match message {
                     InboundMessage::TetrisPlayer((new_screen, garbage_to_send)) => {
