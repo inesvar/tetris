@@ -1,19 +1,21 @@
 //! Application that handles the menu, game logic and configuration.
 mod player;
+mod player_config;
 mod remote;
 mod render_app;
 mod update_app;
 
-use self::player::LocalPlayer;
-pub use self::player::TetrisPlayer;
-use self::remote::RemotePlayer;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
 use core_tetris::render::RunningState;
 use piston::MouseButton;
 use piston_window::Key;
+use player::LocalPlayer;
+pub use player::TetrisPlayer;
+use player_config::PlayerConfig;
 use rand::RngExt;
 pub(super) use remote::OutboundMessage;
+use remote::RemotePlayer;
 pub use render_app::RenderTetrisGame;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
 use std::cell::RefCell;
@@ -22,36 +24,6 @@ use ui_tetris::{
     interactive_widget_manager::{InteractiveWidgetManager, SettingsType},
     Keybindings, Text, DEFAULT_FONT_SIZE, DEFAULT_WINDOW_WIDTH, GUEST_PORT, HOST_PORT, SILVER,
 };
-
-#[derive(PartialEq, Debug)]
-pub enum PlayerConfig {
-    Local,
-    TwoLocal,
-    TwoRemote { local_ip: String, remote_ip: String },
-    Viewer(String),
-}
-
-impl PlayerConfig {
-    pub fn is_remote(&self) -> bool {
-        matches!(
-            self,
-            PlayerConfig::TwoRemote {
-                local_ip: _,
-                remote_ip: _,
-            } | PlayerConfig::Viewer(_)
-        )
-    }
-
-    pub fn is_multiplayer(&self) -> bool {
-        matches!(
-            self,
-            PlayerConfig::TwoRemote {
-                local_ip: _,
-                remote_ip: _,
-            } | PlayerConfig::TwoLocal
-        )
-    }
-}
 
 /// Indicates whether the player commands lead the game to pause, resume, restart or no.
 /// The GameOver variant is only used for remote players.
