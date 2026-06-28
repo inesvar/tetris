@@ -8,6 +8,7 @@ render_tetris = { path = "../render_tetris" }
 core_tetris = { path = "../core_tetris" }
 piston = { workspace = true }
 piston2d-graphics = { workspace = true }
+local-ip-address = { workspace = true }
 arboard = { workspace = true }
 
 [dev-dependencies]

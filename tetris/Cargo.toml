@@ -17,6 +17,7 @@ rand = { workspace = true }
 serde = { workspace = true }
 serde_cbor = { workspace = true }
 rand_pcg = { workspace = true }
+local-ip-address = { workspace = true }
 simple-mermaid = { workspace = true }
 pistoncore-glfw_window = { workspace = true }
 

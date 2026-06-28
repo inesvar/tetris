@@ -8,6 +8,7 @@ mod update_app;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
 use core_tetris::render::RunningState;
+use local_ip_address::local_ip;
 use piston::MouseButton;
 use piston_window::Key;
 use player::LocalPlayer;
@@ -116,9 +117,9 @@ impl App {
         } = self.player_config
         {
             let server: String = if self.is_host {
-                "127.0.0.1".to_string() + HOST_PORT
+                local_ip().unwrap().to_string() + HOST_PORT
             } else {
-                "127.0.0.1".to_string() + GUEST_PORT
+                local_ip().unwrap().to_string() + GUEST_PORT
             };
             //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
             if let Ok(stream) = TcpStream::connect(server) {
@@ -262,7 +263,7 @@ impl App {
                 }
             }
             GameFlowChange::Hello(remote_ip) => {
-                let local_ip = "127.0.0.1".to_string() + HOST_PORT;
+                let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
                 //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
                 let player_config = PlayerConfig::TwoRemote {
                     local_ip,
@@ -346,7 +347,7 @@ impl App {
             ViewState::CreateRoom => {
                 /* let mut file = File::create("local_port.txt").unwrap();
                 file.write(HOST_PORT.as_bytes()).unwrap(); */
-                let local_ip = "127.0.0.1".to_string() + HOST_PORT;
+                let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
                 //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
                 self.set_player_config(PlayerConfig::Viewer(local_ip));
                 self.widget_manager = InteractiveWidgetManager::new_create_room();
