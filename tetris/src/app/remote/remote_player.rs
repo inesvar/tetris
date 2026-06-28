@@ -53,32 +53,33 @@ impl RemotePlayer {
                 let stream = stream.unwrap();
                 let mut de = serde_cbor::Deserializer::from_reader(stream);
 
-                let message = InboundMessage::deserialize(&mut de).unwrap();
-                once!("unwrapped from packet from remote");
-                match message {
-                    InboundMessage::TetrisPlayer((new_screen, garbage_to_send)) => {
-                        self_for_listener.update_screen(new_screen, garbage_to_send)
-                    }
-                    InboundMessage::Settings(new_settings) => {
-                        self_for_listener.update_game_flow(GameFlowChange::Sync(new_settings));
-                    }
-                    InboundMessage::GameOver => {
-                        self_for_listener.update_game_flow(GameFlowChange::GameOver);
-                    }
-                    InboundMessage::Pause => {
-                        self_for_listener.update_game_flow(GameFlowChange::Pause);
-                    }
-                    InboundMessage::Restart => {
-                        self_for_listener.update_game_flow(GameFlowChange::Restart);
-                    }
-                    InboundMessage::Resume => {
-                        self_for_listener.update_game_flow(GameFlowChange::Resume);
-                    }
-                    InboundMessage::Hello(remote_ip) => {
-                        self_for_listener.update_game_flow(GameFlowChange::Hello(remote_ip));
-                    }
-                    InboundMessage::Kill => {
-                        break;
+                while let Ok(message) = InboundMessage::deserialize(&mut de) {
+                    once!("unwrapped from packet from remote");
+                    match message {
+                        InboundMessage::TetrisPlayer((new_screen, garbage_to_send)) => {
+                            self_for_listener.update_screen(new_screen, garbage_to_send)
+                        }
+                        InboundMessage::Settings(new_settings) => {
+                            self_for_listener.update_game_flow(GameFlowChange::Sync(new_settings));
+                        }
+                        InboundMessage::GameOver => {
+                            self_for_listener.update_game_flow(GameFlowChange::GameOver);
+                        }
+                        InboundMessage::Pause => {
+                            self_for_listener.update_game_flow(GameFlowChange::Pause);
+                        }
+                        InboundMessage::Restart => {
+                            self_for_listener.update_game_flow(GameFlowChange::Restart);
+                        }
+                        InboundMessage::Resume => {
+                            self_for_listener.update_game_flow(GameFlowChange::Resume);
+                        }
+                        InboundMessage::Hello(remote_ip) => {
+                            self_for_listener.update_game_flow(GameFlowChange::Hello(remote_ip));
+                        }
+                        InboundMessage::Kill => {
+                            break;
+                        }
                     }
                 }
             }

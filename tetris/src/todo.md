@@ -9,6 +9,7 @@
 - CLEAN split and reorganize app.rs
 - CLEAN understand the state machine of death
 - CLEAN handle all kinds of errors that aren't handled
+- BUG fix game pausing
 
 # new features
 - CHECK fix paths for Windows in assets.rs -> done, has to be checked

@@ -1,3 +1,4 @@
+- CLEAN GarbageBalance code is wrong
 - make Hold queue and Next queue customizable
 - improve TetrisGrid
 - TETRIS fix t tetromino wallkicks
