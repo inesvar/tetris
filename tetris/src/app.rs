@@ -4,6 +4,7 @@ mod player_config;
 mod remote;
 mod render_app;
 mod update_app;
+mod view;
 
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
@@ -23,6 +24,7 @@ use std::net::TcpStream;
 use ui_tetris::{
     interactive_widget_manager::InteractiveWidgetManager, Keybindings, GUEST_PORT, HOST_PORT,
 };
+use view::ViewState;
 
 /// Indicates whether the player commands lead the game to pause, resume, restart or no.
 /// The GameOver variant is only used for remote players.
@@ -35,26 +37,6 @@ pub enum GameFlowChange {
     Sync(Settings),
     Hello(String),
     NoChange,
-}
-
-/// View state indicates what is on screen.
-/// The game states are handled differently with help of the [ViewState::is_game()] method.
-#[derive(Debug, PartialEq, Default)]
-pub enum ViewState {
-    #[default]
-    MainMenu,
-    Settings,
-    JoinRoom,
-    CreateRoom,
-    Local,    // TODO: this is the same view, conceptually it's the Game View
-    TwoLocal, // TODO: this is the same view, conceptually it's the Game View
-    Remote,   // TODO: this is the same view, conceptually it's the Game View
-}
-
-impl ViewState {
-    fn is_game(&self) -> bool {
-        matches!(self, Self::Local | Self::TwoLocal | Self::Remote)
-    }
 }
 
 pub struct App {
