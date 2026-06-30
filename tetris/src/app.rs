@@ -161,19 +161,20 @@ impl App {
     }
 
     fn handle_key_press_in_game(&mut self, key: Key) {
-        let mut game_flow_change = GameFlowChange::NoChange;
-
-        if self.running == RunningState::NotRunning && RESTART_KEYS.contains(&key) {
-            game_flow_change = GameFlowChange::Restart;
+        let game_flow_change = if self.running == RunningState::NotRunning && RESTART_KEYS.contains(&key) {
+            GameFlowChange::Restart
         } else if self.running == RunningState::Paused && PAUSE_KEYS.contains(&key) {
-            game_flow_change = GameFlowChange::Resume;
+            GameFlowChange::Resume
         } else if self.running == RunningState::Running && PAUSE_KEYS.contains(&key) {
-            game_flow_change = GameFlowChange::Pause;
-        } else if self.running == RunningState::Running {
-            for player in self.local_players.iter_mut() {
-                player.handle_key_press(key)
+            GameFlowChange::Pause
+        } else {
+            if self.running == RunningState::Running {
+                for player in self.local_players.iter_mut() {
+                    player.handle_key_press(key)
+                }
             }
-        }
+            GameFlowChange::NoChange
+        };
 
         match game_flow_change {
             GameFlowChange::Restart => self.restart(),
