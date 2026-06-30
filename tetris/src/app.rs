@@ -157,11 +157,7 @@ impl App {
     }
 
     pub fn handle_text_input(&mut self, input: &str) {
-        match self.view_state {
-            ViewState::MainMenu => self.widget_manager.handle_text_input(input),
-            ViewState::JoinRoom => self.widget_manager.handle_text_input(input),
-            _ => {}
-        }
+        self.widget_manager.handle_text_input(input)
     }
 
     fn handle_key_press_in_game(&mut self, key: Key) {
@@ -189,12 +185,10 @@ impl App {
     }
 
     pub fn handle_key_press(&mut self, key: Key) {
-        match &self.view_state {
-            a if a.is_game() => {
-                self.handle_key_press_in_game(key);
-            }
-            _ => self.widget_manager.handle_key_press(key),
+        if self.view_state.is_game() {
+            self.handle_key_press_in_game(key);
         }
+        self.widget_manager.handle_key_press(key);
     }
 
     // TODO: add doc
@@ -231,11 +225,9 @@ impl App {
                 }
             }
             GameFlowChange::Sync(new_settings) => {
-                self.settings_manager.seed = new_settings.seed;
-                self.settings_manager.bag_size = new_settings.bag_size;
-                self.settings_manager.nb_next_tetromino = new_settings.nb_next_tetromino;
+                self.settings_manager = new_settings;
                 for player in &mut self.local_players {
-                    player.reset(new_settings.seed);
+                    player.reset(self.settings_manager.seed);
                 }
                 self.is_synchronized = true;
                 if self.is_host {
@@ -258,7 +250,7 @@ impl App {
                     0,
                 )));
             }
-            _ => {}
+            GameFlowChange::NoChange => {}
         }
     }
 
@@ -271,17 +263,15 @@ impl App {
     }
 
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
-        if button != MouseButton::Left {
-            return;
+        if button == MouseButton::Left {
+            self.widget_manager.handle_left_click(&self.cursor_position);
         }
-        self.widget_manager.handle_left_click(&self.cursor_position);
     }
 
     pub fn handle_mouse_release(&mut self, button: MouseButton) {
-        if button != MouseButton::Left {
-            return;
+        if button == MouseButton::Left {
+            self.widget_manager.handle_left_click_release();
         }
-        self.widget_manager.handle_left_click_release();
     }
 
     fn set_view(&mut self, view_state: ViewState) {
