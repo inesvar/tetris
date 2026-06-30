@@ -160,8 +160,8 @@ impl App {
         self.widget_manager.handle_text_input(input)
     }
 
-    fn handle_key_press_in_game(&mut self, key: Key) {
-        let game_flow_change = if self.running == RunningState::NotRunning && RESTART_KEYS.contains(&key) {
+    fn handle_key_press_in_game(&mut self, key: Key) -> GameFlowChange {
+        if self.running == RunningState::NotRunning && RESTART_KEYS.contains(&key) {
             GameFlowChange::Restart
         } else if self.running == RunningState::Paused && PAUSE_KEYS.contains(&key) {
             GameFlowChange::Resume
@@ -174,20 +174,39 @@ impl App {
                 }
             }
             GameFlowChange::NoChange
-        };
+        }
+    }
 
+    fn update_game_flow(&mut self, game_flow_change: GameFlowChange) {
         match game_flow_change {
-            GameFlowChange::Restart => self.restart(),
-            GameFlowChange::Resume => self.pause(),
-            GameFlowChange::Pause => self.pause(),
-            GameFlowChange::GameOver => self.game_over(),
+            GameFlowChange::Restart => {
+                if self.running == RunningState::NotRunning {
+                    self.restart()
+                }
+            },
+            GameFlowChange::Resume => {
+                if self.running == RunningState::Paused {
+                    self.pause()
+                }
+            },
+            GameFlowChange::Pause => {
+                if self.running == RunningState::Running {
+                    self.pause()
+                }
+            },
+            GameFlowChange::GameOver => {
+                if self.running == RunningState::Running {
+                    self.game_over()
+                }
+            },
             _ => {}
         }
     }
 
     pub fn handle_key_press(&mut self, key: Key) {
         if self.view_state.is_game() {
-            self.handle_key_press_in_game(key);
+            let game_flow_change = self.handle_key_press_in_game(key);
+            self.update_game_flow(game_flow_change);
         }
         self.widget_manager.handle_key_press(key);
     }
@@ -202,28 +221,12 @@ impl App {
             game_flow_change = player.get_game_flow();
         }
         match game_flow_change {
-            GameFlowChange::GameOver => {
-                if self.running == RunningState::Running {
-                    self.game_over()
-                }
+            GameFlowChange::GameOver | GameFlowChange::Pause => {
+                self.update_game_flow(game_flow_change);
             }
-            GameFlowChange::Pause => {
-                if self.running == RunningState::Running {
-                    self.pause()
-                }
-            }
-            GameFlowChange::Resume => {
-                if self.running == RunningState::Paused {
-                    self.set_view(ViewState::Remote);
-                    self.pause()
-                }
-            }
-            GameFlowChange::Restart => {
-                once!("restart was received");
-                if self.running == RunningState::NotRunning {
-                    self.set_view(ViewState::Remote);
-                    self.restart()
-                }
+            GameFlowChange::Resume | GameFlowChange::Restart => {
+                self.set_view(ViewState::Remote);
+                self.update_game_flow(game_flow_change);
             }
             GameFlowChange::Sync(new_settings) => {
                 self.settings_manager = new_settings;
