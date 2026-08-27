@@ -16,7 +16,7 @@ use std::{
 pub struct RemotePlayer {
     screen: Arc<Mutex<TetrisPlayer>>,
     first_screen_received: Arc<Mutex<bool>>,
-    game_flow_message: Arc<Mutex<GameFlowChange>>,
+    game_flow_message: Arc<Mutex<GameFlowChange>>, // TODO: why GameFlowChange and not InboundMessage ? + why not queue ? messages could be lost...
     garbage_to_send: Arc<Mutex<u32>>,
 }
 

@@ -27,20 +27,12 @@ a solution for this is connecting to the same mobile hotspot.
 
 # Troubleshooting
 
-## Wait, what is cargo?? The command to launch the game doesn't work on my machine :/
-
-Then you can refer to the Great Rust Documentation : https://doc.rust-lang.org/cargo/getting-started/installation.html.
-
 # Linker error for -lxcb-shape on Ubuntu
 
 I think this fixes it
 ```
 sudo apt-get install libxcb-shape0-dev libxcb-xfixes0-dev
 ```
-
-## You're somewhat familiar with Rust and don't like the falling speed?
-
-Then you're interested by the variable *gravity* in main.rs, set it how it fits you.
 
 ## Building for Windows from linux
 
@@ -54,7 +46,7 @@ You can build your crate easily with:
 
 ## You want to export a convenient zip?
 
-See `export_exe.sh` and `export_linux.sh`.
+See `export_executable.sh` and `export_windows_executable.sh`.
 
 ## Mermaid legend
 
