@@ -1,6 +1,6 @@
 use super::InboundMessage;
 use crate::{
-    app::{GameFlowChange, TetrisPlayer},
+    tetris_game::{GameFlowChange, TetrisPlayer},
     once,
     settings::BAG_TYPE,
 };
@@ -125,7 +125,7 @@ impl RemotePlayer {
     }
 
     /// Returns the game_flow_message and resets it
-    pub(in crate::app) fn get_game_flow(&self) -> GameFlowChange {
+    pub(in crate::tetris_game) fn get_game_flow(&self) -> GameFlowChange {
         let mut last_game_flow: GameFlowChange = GameFlowChange::NoChange;
         {
             std::mem::swap(
@@ -139,15 +139,15 @@ impl RemotePlayer {
         last_game_flow
     }
 
-    pub(in crate::app) fn received_first_screen(&self) -> bool {
+    pub(in crate::tetris_game) fn received_first_screen(&self) -> bool {
         *self.first_screen_received.lock().unwrap()
     }
 
-    pub(in crate::app) fn get_player(&self) -> MutexGuard<'_, TetrisPlayer> {
+    pub(in crate::tetris_game) fn get_player(&self) -> MutexGuard<'_, TetrisPlayer> {
         self.screen.lock().unwrap()
     }
 
-    pub(in crate::app) fn score(&self) -> u32 {
+    pub(in crate::tetris_game) fn score(&self) -> u32 {
         {
             let player = self.get_player();
             player.score()

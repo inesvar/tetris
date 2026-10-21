@@ -52,11 +52,11 @@ impl LocalPlayer {
         self.player_screen.push_garbage(completed_lines);
     }
 
-    pub(in crate::app) fn score(&self) -> u32 {
+    pub(in crate::tetris_game) fn score(&self) -> u32 {
         self.player_screen.score()
     }
 
-    pub(in crate::app) fn player_data(&self) -> &TetrisPlayer {
+    pub(in crate::tetris_game) fn player_data(&self) -> &TetrisPlayer {
         &self.player_screen
     }
 }

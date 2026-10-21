@@ -1,7 +1,7 @@
 //! Define the render function of [App].
 use super::{App, RunningState, ViewState};
-use crate::app::player::LocalPlayer;
-use crate::app::remote::RemotePlayer;
+use crate::tetris_game::player::LocalPlayer;
+use crate::tetris_game::remote::RemotePlayer;
 use crate::once;
 use crate::settings::BG_COLOR;
 use core_tetris::render::RenderTetrisPlayer;
