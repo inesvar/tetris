@@ -1,8 +1,8 @@
 use super::InboundMessage;
 use crate::{
-    tetris_game::{GameFlowChange, TetrisPlayer},
     once,
     settings::BAG_TYPE,
+    tetris_game::{GameFlowChange, TetrisPlayer},
 };
 use rand::SeedableRng;
 use rand_pcg::Pcg32;

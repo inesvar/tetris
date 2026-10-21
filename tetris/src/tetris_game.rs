@@ -6,9 +6,9 @@ mod render_app;
 mod update_app;
 mod view;
 
+use crate::game_flow_change::GameFlowChange;
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
-use crate::game_flow_change::GameFlowChange;
 use core_tetris::render::RunningState;
 use local_ip_address::local_ip;
 use piston::MouseButton;
@@ -27,22 +27,26 @@ use ui_tetris::{
 };
 use view::ViewState;
 
-pub struct App {
+pub struct TetrisGame {
     local_players: Vec<LocalPlayer>, // TODO: what about storing the first two in the third ?
     remote_player: Vec<RemotePlayer>, // TODO: what about storing the first two in the third ?
     pub player_config: PlayerConfig, // TODO: what about storing the first two in the third ?
-    view_state: ViewState,
-    pub clock: f64,
-    frame_counter: u64,
     running: RunningState,
-    pub cursor_position: [f64; 2],
-    widget_manager: InteractiveWidgetManager,
-    settings_manager: Settings,
     tcp_stream: RefCell<Option<TcpStream>>, // TODO: there should be a kind of "network manager handling this"
     is_synchronized: bool, // TODO: there should be a kind of "network manager handling this"
     is_host: bool,         // TODO: there should be a kind of "network manager handling this"
+    pub clock: f64,
+    settings_manager: Settings,
+}
+
+pub struct App {
+    game: TetrisGame,
+    view_state: ViewState,
+    frame_counter: u64,
+    pub cursor_position: [f64; 2],
+    widget_manager: InteractiveWidgetManager,
     fall_speed_divide: u64, // TODO: that's more of a tetris engine responsibility ?
-    freeze: u64,           // TODO: that's more of a tetris engine responsibility ?
+    freeze: u64,            // TODO: that's more of a tetris engine responsibility ?
 }
 
 impl App {
@@ -58,25 +62,31 @@ impl App {
 
         let settings_manager = Settings::new(seed);
 
-        App {
+        let game = TetrisGame {
             local_players: players,
             remote_player: rem_players,
             player_config,
-            view_state: ViewState::MainMenu,
-            clock: 0.0,
-            frame_counter: 0,
             running: RunningState::NotRunning,
-            cursor_position: [0.0, 0.0],
-            widget_manager: InteractiveWidgetManager::new_main_menu(),
-            settings_manager,
             tcp_stream: RefCell::new(None),
             is_synchronized: false,
             is_host,
+            settings_manager,
+            clock: 0.0,
+        };
+
+        App {
+            game,
+            view_state: ViewState::MainMenu,
+            frame_counter: 0,
+            cursor_position: [0.0, 0.0],
+            widget_manager: InteractiveWidgetManager::new_main_menu(),
             fall_speed_divide: FALL_SPEED_DIVIDE,
             freeze: FREEZE,
         }
     }
+}
 
+impl TetrisGame {
     pub fn set_player_config(&mut self, player_config: PlayerConfig) {
         // make the game unactive
         self.running = RunningState::NotRunning;
@@ -143,11 +153,15 @@ impl App {
 
         self.player_config = player_config;
     }
+}
 
+impl App {
     pub fn handle_text_input(&mut self, input: &str) {
         self.widget_manager.handle_text_input(input)
     }
+}
 
+impl TetrisGame {
     fn handle_key_press_in_game(&mut self, key: Key) -> GameFlowChange {
         if self.running == RunningState::NotRunning && RESTART_KEYS.contains(&key) {
             GameFlowChange::Restart
@@ -171,61 +185,66 @@ impl App {
                 if self.running == RunningState::NotRunning {
                     self.restart()
                 }
-            },
+            }
             GameFlowChange::Resume => {
                 if self.running == RunningState::Paused {
                     self.pause()
                 }
-            },
+            }
             GameFlowChange::Pause => {
                 if self.running == RunningState::Running {
                     self.pause()
                 }
-            },
+            }
             GameFlowChange::GameOver => {
                 if self.running == RunningState::Running {
                     self.game_over()
                 }
-            },
+            }
             _ => {}
         }
     }
+}
 
+impl App {
     pub fn handle_key_press(&mut self, key: Key) {
         if self.view_state.is_game() {
-            let game_flow_change = self.handle_key_press_in_game(key);
-            self.update_game_flow(game_flow_change);
+            let game_flow_change = self.game.handle_key_press_in_game(key);
+            self.game.update_game_flow(game_flow_change);
         }
         self.widget_manager.handle_key_press(key);
     }
+}
 
+impl App {
     // TODO: add doc
     pub fn handle_remote(&mut self) {
         once!("handle remote was called");
         let mut game_flow_change: GameFlowChange = GameFlowChange::NoChange;
-        for player in &self.remote_player {
+        for player in &self.game.remote_player {
             // supposing there's only one player
             // TODO : change this for multiple remote players
             game_flow_change = player.get_game_flow();
         }
         match game_flow_change {
             GameFlowChange::GameOver | GameFlowChange::Pause => {
-                self.update_game_flow(game_flow_change);
+                self.game.update_game_flow(game_flow_change);
             }
             GameFlowChange::Resume | GameFlowChange::Restart => {
                 self.set_view(ViewState::Remote);
-                self.update_game_flow(game_flow_change);
+                self.game.update_game_flow(game_flow_change);
             }
             GameFlowChange::Sync(new_settings) => {
-                self.settings_manager = new_settings;
-                for player in &mut self.local_players {
-                    player.reset(self.settings_manager.seed);
+                self.game.settings_manager = new_settings;
+                for player in &mut self.game.local_players {
+                    player.reset(self.game.settings_manager.seed);
                 }
-                self.is_synchronized = true;
-                if self.is_host {
-                    self.restart()
+                self.game.is_synchronized = true;
+                if self.game.is_host {
+                    self.game.restart()
                 } else {
-                    self.send_message(OutboundMessage::Settings(&self.settings_manager));
+                    self.game
+                        .send_message(OutboundMessage::Settings(&self.game.settings_manager));
                 }
             }
             GameFlowChange::Hello(remote_ip) => {
@@ -235,10 +254,10 @@ impl App {
                     local_ip,
                     remote_ip,
                 };
-                self.set_player_config(player_config);
+                self.game.set_player_config(player_config);
                 self.set_view(ViewState::Remote);
-                self.send_message(OutboundMessage::TetrisPlayer((
-                    self.local_players[0].player_data(),
+                self.game.send_message(OutboundMessage::TetrisPlayer((
+                    self.game.local_players[0].player_data(),
                     0,
                 )));
             }
@@ -248,12 +267,28 @@ impl App {
 
     pub fn handle_key_release(&mut self, key: Key) {
         if self.view_state.is_game() {
-            for player in &mut self.local_players {
-                player.handle_key_release(key);
-            }
+            self.game.handle_key_release(key);
         }
     }
 
+    pub fn is_remote(&self) -> bool {
+        self.game.player_config.is_remote()
+    }
+
+    pub fn is_multiplayer(&self) -> bool {
+        self.game.player_config.is_multiplayer()
+    }
+}
+
+impl TetrisGame {
+    pub fn handle_key_release(&mut self, key: Key) {
+        for player in &mut self.local_players {
+            player.handle_key_release(key);
+        }
+    }
+}
+
+impl App {
     pub fn handle_mouse_press(&mut self, button: MouseButton) {
         if button == MouseButton::Left {
             self.widget_manager.handle_left_click(&self.cursor_position);
@@ -270,7 +305,7 @@ impl App {
         println!("setting view to {:?}", view_state);
         let from_game = self.view_state.is_game();
         if self.view_state == ViewState::Settings {
-            for (id, player) in self.local_players.iter_mut().enumerate() {
+            for (id, player) in self.game.local_players.iter_mut().enumerate() {
                 player.set_new_keybindings(&self.widget_manager.get_new_keybindings(id));
             }
         }
@@ -279,21 +314,21 @@ impl App {
             ViewState::MainMenu => {
                 self.widget_manager = InteractiveWidgetManager::new_main_menu();
             }
-            ViewState::Settings => match &self.player_config {
+            ViewState::Settings => match &self.game.player_config {
                 PlayerConfig::Local
                 | PlayerConfig::TwoRemote {
                     local_ip: _,
                     remote_ip: _,
                 } => {
                     self.widget_manager = InteractiveWidgetManager::new_one_player_settings(
-                        &self.local_players[0].get_keybindings(),
+                        &self.game.local_players[0].get_keybindings(),
                         from_game,
                     );
                 }
                 PlayerConfig::TwoLocal => {
                     self.widget_manager = InteractiveWidgetManager::new_two_players_settings(
-                        &self.local_players[0].get_keybindings(),
-                        &self.local_players[1].get_keybindings(),
+                        &self.game.local_players[0].get_keybindings(),
+                        &self.game.local_players[1].get_keybindings(),
                         from_game,
                     );
                 }
@@ -313,7 +348,7 @@ impl App {
                 file.write(HOST_PORT.as_bytes()).unwrap(); */
                 let local_ip = local_ip().unwrap().to_string() + HOST_PORT;
                 //let local_ip = "127.0.0.1".to_string() + HOST_PORT;
-                self.set_player_config(PlayerConfig::Viewer(local_ip));
+                self.game.set_player_config(PlayerConfig::Viewer(local_ip));
                 self.widget_manager = InteractiveWidgetManager::new_create_room();
             }
             ViewState::JoinRoom => {
@@ -323,7 +358,9 @@ impl App {
             }
         }
     }
+}
 
+impl TetrisGame {
     fn pause(&mut self) {
         if self.running == RunningState::Paused {
             println!("RESUME");
@@ -335,6 +372,7 @@ impl App {
             self.running = RunningState::Paused;
         }
     }
+
     /// Starts a countdown then starts the game. Inn TwoRemote mode, sends a synchronizing message.
     fn restart(&mut self) {
         match &self.player_config {

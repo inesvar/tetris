@@ -1,9 +1,9 @@
 //! Define the render function of [App].
 use super::{App, RunningState, ViewState};
-use crate::tetris_game::player::LocalPlayer;
-use crate::tetris_game::remote::RemotePlayer;
 use crate::once;
 use crate::settings::BG_COLOR;
+use crate::tetris_game::player::LocalPlayer;
+use crate::tetris_game::remote::RemotePlayer;
 use core_tetris::render::RenderTetrisPlayer;
 use graphics::Transformed;
 use piston::RenderArgs;
@@ -26,27 +26,27 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
     fn render_app(&mut self, args: &RenderArgs, app: &App) {
         let ctx = self.gl.draw_begin(args.viewport());
 
-        self.update(&ctx, app.clock);
+        self.update(&ctx, app.game.clock);
 
         // Clear the screen.
         graphics::clear(BG_COLOR, &mut self.gl);
 
         match &app.view_state {
             ViewState::MainMenu | ViewState::CreateRoom | ViewState::JoinRoom => {
-                self.render_widget_manager(&app.widget_manager, &app.running);
+                self.render_widget_manager(&app.widget_manager, &app.game.running);
             }
             ViewState::Settings => {
-                self.render_widget_manager(&app.widget_manager, &app.running);
+                self.render_widget_manager(&app.widget_manager, &app.game.running);
             }
             a if a.is_game() => {
-                self.render_widget_manager(&app.widget_manager, &app.running);
+                self.render_widget_manager(&app.widget_manager, &app.game.running);
 
-                for player in &app.local_players {
-                    self.render_local_player(player, app.running);
+                for player in &app.game.local_players {
+                    self.render_local_player(player, app.game.running);
                     self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH, 0.0);
                 }
-                for player in &app.remote_player {
-                    self.render_remote_player(player, app.running);
+                for player in &app.game.remote_player {
+                    self.render_remote_player(player, app.game.running);
                     self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH, 0.0);
                 }
             }

@@ -5,7 +5,7 @@ mod remote_player;
 
 pub use self::remote_player::RemotePlayer;
 
-use crate::{tetris_game::TetrisPlayer, settings::Settings};
+use crate::{settings::Settings, tetris_game::TetrisPlayer};
 use serde::{Deserialize, Serialize};
 
 /// MessageType represents all different kinds of messages that can be sent.

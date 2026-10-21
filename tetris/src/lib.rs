@@ -7,8 +7,8 @@ extern crate opengl_graphics;
 extern crate piston;
 
 use crate::{
-    tetris_game::{App, RenderTetrisGame},
     settings::OPENGL_VERSION,
+    tetris_game::{App, RenderTetrisGame},
 };
 use glfw_window::GlfwWindow;
 use piston::{
@@ -23,8 +23,8 @@ use std::time::SystemTime;
 use ui_tetris::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 
 mod game_flow_change;
-mod tetris_game;
 mod settings;
+mod tetris_game;
 mod utils;
 
 /// Creates the window and the application, runs the event loop.
@@ -74,7 +74,7 @@ pub fn event_loop() {
         }
 
         // Update the size of the window if necessary.
-        if app.player_config.is_multiplayer() {
+        if app.is_multiplayer() {
             if !bigger_window_size {
                 window.set_size([DEFAULT_WINDOW_WIDTH * 2.0, DEFAULT_WINDOW_HEIGHT]);
                 bigger_window_size = true;
@@ -85,7 +85,7 @@ pub fn event_loop() {
         }
 
         // Handle the optional remote user input.
-        if app.player_config.is_remote() {
+        if app.is_remote() {
             once!("main knows that we're remote");
             app.handle_remote();
         }
