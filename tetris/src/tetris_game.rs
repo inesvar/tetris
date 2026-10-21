@@ -8,6 +8,7 @@ mod view;
 
 use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::{once, settings::*};
+use crate::game_flow_change::GameFlowChange;
 use core_tetris::render::RunningState;
 use local_ip_address::local_ip;
 use piston::MouseButton;
@@ -25,19 +26,6 @@ use ui_tetris::{
     interactive_widget_manager::InteractiveWidgetManager, Keybindings, GUEST_PORT, HOST_PORT,
 };
 use view::ViewState;
-
-/// Indicates whether the player commands lead the game to pause, resume, restart or no.
-/// The GameOver variant is only used for remote players.
-#[derive(Debug, PartialEq)]
-pub enum GameFlowChange {
-    Restart,
-    Resume,
-    Pause,
-    GameOver,
-    Sync(Settings),
-    Hello(String),
-    NoChange,
-}
 
 pub struct App {
     local_players: Vec<LocalPlayer>, // TODO: what about storing the first two in the third ?

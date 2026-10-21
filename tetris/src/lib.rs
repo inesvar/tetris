@@ -22,6 +22,7 @@ use render_tetris::Piston2dOpenGlRenderer;
 use std::time::SystemTime;
 use ui_tetris::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 
+mod game_flow_change;
 mod tetris_game;
 mod settings;
 mod utils;
