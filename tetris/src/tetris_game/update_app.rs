@@ -1,7 +1,8 @@
 //! Define the update function of [App].
 //!
 //! [update()](App::update()) is called before each render when the game is active.
-use super::{remote::OutboundMessage, App, PlayerConfig, RunningState, ViewState};
+use super::{remote::OutboundMessage, PlayerConfig, RunningState};
+use crate::app::{App, ViewState};
 use crate::utils::formattings::format_seconds;
 use piston::UpdateArgs;
 use ui_tetris::interactive_widget_manager::{ButtonType, TextType};

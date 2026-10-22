@@ -125,7 +125,7 @@ impl RemotePlayer {
     }
 
     /// Returns the game_flow_message and resets it
-    pub(in crate::tetris_game) fn get_game_flow(&self) -> GameFlowChange {
+    pub(crate) fn get_game_flow(&self) -> GameFlowChange {
         let mut last_game_flow: GameFlowChange = GameFlowChange::NoChange;
         {
             std::mem::swap(

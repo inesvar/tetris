@@ -6,10 +6,7 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 
-use crate::{
-    settings::OPENGL_VERSION,
-    tetris_game::{App, RenderTetrisGame},
-};
+use crate::{app::App, settings::OPENGL_VERSION, tetris_game::RenderTetrisGame};
 use glfw_window::GlfwWindow;
 use piston::{
     event_loop::{EventSettings, Events},
@@ -22,6 +19,7 @@ use render_tetris::Piston2dOpenGlRenderer;
 use std::time::SystemTime;
 use ui_tetris::{DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 
+mod app;
 mod game_flow_change;
 mod settings;
 mod tetris_game;

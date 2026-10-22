@@ -1,5 +1,6 @@
 //! Define the render function of [App].
-use super::{App, RunningState, ViewState};
+use super::RunningState;
+use crate::app::{App, ViewState};
 use crate::once;
 use crate::settings::BG_COLOR;
 use crate::tetris_game::player::LocalPlayer;

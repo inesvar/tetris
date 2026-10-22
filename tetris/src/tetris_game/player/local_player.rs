@@ -34,7 +34,7 @@ impl LocalPlayer {
         &self.player_screen
     }
 
-    pub fn get_keybindings(&mut self) -> Keybindings {
+    pub fn get_keybindings(&self) -> Keybindings {
         self.keyboard.get_keybindings()
     }
 

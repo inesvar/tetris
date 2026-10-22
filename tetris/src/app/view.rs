@@ -13,7 +13,7 @@ pub enum ViewState {
 }
 
 impl ViewState {
-    pub(super) fn is_game(&self) -> bool {
+    pub(crate) fn is_game(&self) -> bool {
         matches!(self, Self::Local | Self::TwoLocal | Self::Remote)
     }
 }
