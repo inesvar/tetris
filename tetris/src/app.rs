@@ -17,6 +17,7 @@ pub struct App {
     pub widget_manager: InteractiveWidgetManager,
     pub fall_speed_divide: u64, // TODO: that's more of a tetris engine responsibility ?
     pub freeze: u64,            // TODO: that's more of a tetris engine responsibility ?
+    pub clock: f64,
 }
 
 impl App {
@@ -29,6 +30,7 @@ impl App {
             widget_manager: InteractiveWidgetManager::new_main_menu(),
             fall_speed_divide: FALL_SPEED_DIVIDE,
             freeze: FREEZE,
+            clock: 0.0,
         }
     }
 

@@ -87,13 +87,14 @@ impl App {
     ///     - if the game is running, update the grid and check that the game still runs
     /// - change the view if necessary
     pub fn update(&mut self, args: &UpdateArgs) {
-        self.game.clock += args.dt;
+        self.clock += args.dt;
         if self.view_state == ViewState::CreateRoom {
             self.widget_manager.update_clipboard();
         } else if self.view_state == ViewState::JoinRoom {
             self.widget_manager.update_clipboard();
             self.widget_manager.update_from_text();
         } else if self.view_state.is_game() && self.game.running == RunningState::Starting {
+            self.game.clock += args.dt;
             self.widget_manager
                 .set_text(TextType::Timer, format_seconds(0.0));
             if self.game.clock > 3.0 {
@@ -104,6 +105,7 @@ impl App {
                     .send_message(OutboundMessage::TetrisPlayer((player.player_data(), 0)));
             }
         } else if self.view_state.is_game() && self.game.running == RunningState::Running {
+            self.game.clock += args.dt;
             self.update_running_game();
         }
 

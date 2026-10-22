@@ -27,7 +27,7 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
     fn render_app(&mut self, args: &RenderArgs, app: &App) {
         let ctx = self.gl.draw_begin(args.viewport());
 
-        self.update(&ctx, app.game.clock);
+        self.update(&ctx, app.clock);
 
         // Clear the screen.
         graphics::clear(BG_COLOR, &mut self.gl);
