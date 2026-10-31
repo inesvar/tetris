@@ -17,7 +17,10 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
         let grid_transform = self.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
         self.transform = grid_transform;
 
-        self.display_tetris_grid(player, state);
+        self.display_tetris_grid(player);
+        if state == RunningState::Starting {
+            self.display_starting_countdown(player);
+        }
         self.display_tetromino_in_play(player, state);
         self.display_hold_queue(player);
         self.display_next_queue(player);
@@ -26,7 +29,7 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
         self.transform = old_transform;
     }
 
-    fn display_tetris_grid(&mut self, player: &TetrisPlayer, state: RunningState) {
+    fn display_tetris_grid(&mut self, player: &TetrisPlayer) {
         let grid = player.grid();
         let empty_dims: Rectangle = [
             0.0,
@@ -37,10 +40,6 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
         rectangle(GRID_BG_COLOR, empty_dims, self.transform, &mut self.gl);
         let outline_rect = graphics::Rectangle::new_border(GRID_COLOR, GRID_THICKNESS * 2.0);
         outline_rect.draw(empty_dims, &self.draw_state, self.transform, &mut self.gl);
-
-        if state == RunningState::Starting {
-            self.display_starting_countdown(player.grid(), player.tetromino_in_play().color());
-        }
 
         self.render_tetris_grid(grid);
     }

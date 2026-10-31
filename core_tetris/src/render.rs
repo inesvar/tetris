@@ -27,14 +27,14 @@ pub enum RunningState {
 #[allow(missing_docs)]
 pub trait RenderTetrisPlayer {
     fn display_player(&mut self, player: &TetrisPlayer, state: RunningState) {
-        self.display_tetris_grid(player, state);
+        self.display_tetris_grid(player);
         self.display_tetromino_in_play(player, state);
         self.display_hold_queue(player);
         self.display_next_queue(player);
         self.display_garbage_queue(player);
     }
 
-    fn display_tetris_grid(&mut self, player: &TetrisPlayer, _state: RunningState) {
+    fn display_tetris_grid(&mut self, player: &TetrisPlayer) {
         self.render_tetris_grid(player.grid());
     }
 
