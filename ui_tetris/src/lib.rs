@@ -2,6 +2,7 @@
 mod button;
 mod constants;
 pub mod interactive_widget_manager;
+pub mod interactive_widget_managers_creation;
 mod key_input;
 mod keybindings;
 mod rectangle;
