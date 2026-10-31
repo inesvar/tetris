@@ -18,12 +18,9 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
         self.transform = grid_transform;
 
         self.display_tetris_grid(player, state);
-
         self.display_tetromino_in_play(player, state);
-
-        self.display_hold_queue(player, state);
-
-        self.display_next_queue(player, state);
+        self.display_hold_queue(player);
+        self.display_next_queue(player);
 
         self.transform = old_transform;
     }
@@ -68,7 +65,7 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
         }
     }
 
-    fn display_hold_queue(&mut self, player: &TetrisPlayer, _: RunningState) {
+    fn display_hold_queue(&mut self, player: &TetrisPlayer) {
         // drawing a border for the hold piece
         let old_transform = self.transform;
         self.transform = self.transform.trans(
@@ -91,7 +88,7 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
         self.transform = old_transform;
     }
 
-    fn display_next_queue(&mut self, player: &TetrisPlayer, _: RunningState) {
+    fn display_next_queue(&mut self, player: &TetrisPlayer) {
         let Some(next_queue) = player.next_queue() else {
             return;
         };

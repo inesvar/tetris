@@ -29,16 +29,16 @@ pub trait RenderTetrisPlayer {
     fn display_player(&mut self, player: &TetrisPlayer, state: RunningState) {
         self.display_tetris_grid(player, state);
         self.display_tetromino_in_play(player, state);
-        self.display_hold_queue(player, state);
-        self.display_next_queue(player, state);
+        self.display_hold_queue(player);
+        self.display_next_queue(player);
     }
 
     fn display_tetris_grid(&mut self, player: &TetrisPlayer, _state: RunningState) {
         self.render_tetris_grid(player.grid());
     }
 
-    fn display_hold_queue(&mut self, _player: &TetrisPlayer, _state: RunningState) {}
-    fn display_next_queue(&mut self, _player: &TetrisPlayer, _state: RunningState) {}
+    fn display_hold_queue(&mut self, _player: &TetrisPlayer) {}
+    fn display_next_queue(&mut self, _player: &TetrisPlayer) {}
 
     fn display_tetromino_in_play(&mut self, player: &TetrisPlayer, _state: RunningState) {
         self.render_tetromino(player.tetromino_in_play());
