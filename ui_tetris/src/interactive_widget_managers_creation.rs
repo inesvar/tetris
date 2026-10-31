@@ -17,22 +17,24 @@ use std::collections::HashMap;
 impl InteractiveWidgetManager {
     pub(super) fn add_button(
         &mut self,
-        button_type: ButtonType,
+        button_type: impl Into<ButtonType>,
         center_x: Scalar,
         center_y: Scalar,
     ) {
+        let button_type = button_type.into();
         let button = Button::new(center_x, center_y, &button_type.to_string());
         self.buttons.insert(button_type, button);
     }
 
     pub(super) fn add_button_custom_size(
         &mut self,
-        button_type: ButtonType,
+        button_type: impl Into<ButtonType>,
         center_x: Scalar,
         center_y: Scalar,
         width: Scalar,
         height: Scalar,
     ) {
+        let button_type = button_type.into();
         let button =
             Button::new_custom_size(center_x, center_y, width, height, &button_type.to_string());
         self.buttons.insert(button_type, button);
@@ -63,27 +65,27 @@ impl InteractiveWidgetManager {
         };
 
         manager.add_button(
-            ViewChangeButton::ToSinglePlayerGame.into(),
+            ViewChangeButton::ToSinglePlayerGame,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0 - DEFAULT_BUTTON_Y_SPACING,
         );
         manager.add_button(
-            ViewChangeButton::ToCreateRoom.into(),
+            ViewChangeButton::ToCreateRoom,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0,
         );
         manager.add_button(
-            ViewChangeButton::ToJoinRoom.into(),
+            ViewChangeButton::ToJoinRoom,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
         );
         manager.add_button(
-            ViewChangeButton::ToSettings.into(),
+            ViewChangeButton::ToSettings,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
         );
         manager.add_button(
-            ViewChangeButton::ToTwoLocalGame.into(),
+            ViewChangeButton::ToTwoLocalGame,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
         );
@@ -209,7 +211,7 @@ impl InteractiveWidgetManager {
 
         if !from_game {
             manager.add_button_custom_size(
-                ViewChangeButton::BackToMainMenu.into(),
+                ViewChangeButton::BackToMainMenu,
                 (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
                 (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
                 DEFAULT_BUTTON_WIDTH / 6.0,
@@ -217,7 +219,7 @@ impl InteractiveWidgetManager {
             );
         } else {
             manager.add_button_custom_size(
-                ViewChangeButton::BackToGame.into(),
+                ViewChangeButton::BackToGame,
                 (60.0 * DEFAULT_WINDOW_WIDTH + horizontal_offset) / 65.0,
                 (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
                 DEFAULT_BUTTON_WIDTH / 6.0,
@@ -277,7 +279,7 @@ impl InteractiveWidgetManager {
         };
 
         manager.add_button_custom_size(
-            ViewChangeButton::BackToMainMenu.into(),
+            ViewChangeButton::BackToMainMenu,
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
@@ -285,7 +287,7 @@ impl InteractiveWidgetManager {
         );
 
         manager.add_button_custom_size(
-            ViewChangeButton::ToPause.into(),
+            ViewChangeButton::ToPause,
             (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 5.0,
@@ -293,7 +295,7 @@ impl InteractiveWidgetManager {
         );
 
         manager.add_button_custom_size(
-            ViewChangeButton::ToSettings.into(),
+            ViewChangeButton::ToSettings,
             (58.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 3.5,
@@ -352,7 +354,7 @@ impl InteractiveWidgetManager {
         };
 
         manager.add_button_custom_size(
-            ViewChangeButton::BackToMainMenu.into(),
+            ViewChangeButton::BackToMainMenu,
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
@@ -360,7 +362,7 @@ impl InteractiveWidgetManager {
         );
 
         manager.add_button_custom_size(
-            ViewChangeButton::ToPause.into(),
+            ViewChangeButton::ToPause,
             (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 5.0,
@@ -368,7 +370,7 @@ impl InteractiveWidgetManager {
         );
 
         manager.add_button_custom_size(
-            ViewChangeButton::ToSettings.into(),
+            ViewChangeButton::ToSettings,
             (123.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 3.5,
@@ -403,7 +405,7 @@ impl InteractiveWidgetManager {
         };
 
         manager.add_button_custom_size(
-            ViewChangeButton::BackToMainMenu.into(),
+            ViewChangeButton::BackToMainMenu,
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
@@ -411,7 +413,7 @@ impl InteractiveWidgetManager {
         );
 
         manager.add_button(
-            CurrentViewButton::CopyToClipboard.into(),
+            CurrentViewButton::CopyToClipboard,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0,
         );
@@ -451,19 +453,19 @@ impl InteractiveWidgetManager {
         };
 
         manager.add_button_custom_size(
-            ViewChangeButton::BackToMainMenu.into(),
+            ViewChangeButton::BackToMainMenu,
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
         manager.add_button(
-            CurrentViewButton::ToTwoRemoteGame.into(),
+            CurrentViewButton::ToTwoRemoteGame,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0,
         );
         manager.add_button(
-            CurrentViewButton::PasteFromClipboard.into(),
+            CurrentViewButton::PasteFromClipboard,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
         );
