@@ -1,4 +1,5 @@
 use crate::text_input::TextInput;
+use crate::{DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH};
 use graphics::math::Scalar;
 use piston::Key;
 
@@ -12,8 +13,6 @@ impl KeyInput {
     pub(super) fn new_with_info(
         center_x: Scalar,
         center_y: Scalar,
-        width: Scalar,
-        height: Scalar,
         keys: &[Key],
         info_text: &str,
     ) -> Self {
@@ -21,8 +20,8 @@ impl KeyInput {
         let text_input = TextInput::new_with_text_info(
             center_x,
             center_y,
-            width,
-            height,
+            DEFAULT_KEY_INPUT_WIDTH,
+            DEFAULT_KEY_INPUT_HEIGHT,
             &placeholder,
             info_text,
         );

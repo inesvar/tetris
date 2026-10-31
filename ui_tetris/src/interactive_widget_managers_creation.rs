@@ -5,8 +5,7 @@ use super::interactive_widget_manager::{
 use super::{button::Button, key_input::KeyInput, text::Text, text_input::TextInput};
 use super::{
     DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE,
-    DEFAULT_KEY_INPUT_HEIGHT, DEFAULT_KEY_INPUT_WIDTH, DEFAULT_SCORE_TEXT_Y, DEFAULT_TITLE_Y,
-    DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, SILVER,
+    DEFAULT_SCORE_TEXT_Y, DEFAULT_TITLE_Y, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, SILVER,
 };
 use crate::keybindings::Keybindings;
 use core_tetris::TetrisCommand;
@@ -105,8 +104,6 @@ impl InteractiveWidgetManager {
             let fall_keys_input = KeyInput::new_with_info(
                 DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
                 DEFAULT_WINDOW_HEIGHT / 2.0,
-                DEFAULT_KEY_INPUT_WIDTH,
-                DEFAULT_KEY_INPUT_HEIGHT,
                 setting.get_keys(TetrisCommand::SoftDrop),
                 "Soft Drop Keys :",
             );
@@ -114,8 +111,6 @@ impl InteractiveWidgetManager {
             let hard_drop_keys_input = KeyInput::new_with_info(
                 DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
                 DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-                DEFAULT_KEY_INPUT_WIDTH,
-                DEFAULT_KEY_INPUT_HEIGHT,
                 setting.get_keys(TetrisCommand::HardDrop),
                 "Hard Drop Keys :",
             );
@@ -123,8 +118,6 @@ impl InteractiveWidgetManager {
             let right_keys_input = KeyInput::new_with_info(
                 DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
                 DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
-                DEFAULT_KEY_INPUT_WIDTH,
-                DEFAULT_KEY_INPUT_HEIGHT,
                 setting.get_keys(TetrisCommand::Right),
                 "Right Keys :",
             );
@@ -132,8 +125,6 @@ impl InteractiveWidgetManager {
             let left_keys_input = KeyInput::new_with_info(
                 DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
                 DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
-                DEFAULT_KEY_INPUT_WIDTH,
-                DEFAULT_KEY_INPUT_HEIGHT,
                 setting.get_keys(TetrisCommand::Left),
                 "Left Keys :",
             );
@@ -141,8 +132,6 @@ impl InteractiveWidgetManager {
             let rotate_clockwise_keys_input = KeyInput::new_with_info(
                 DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
                 DEFAULT_WINDOW_HEIGHT / 2.0,
-                DEFAULT_KEY_INPUT_WIDTH,
-                DEFAULT_KEY_INPUT_HEIGHT,
                 setting.get_keys(TetrisCommand::Clockwise),
                 "Rotate Clockwise Keys :",
             );
@@ -150,8 +139,6 @@ impl InteractiveWidgetManager {
             let rotate_counterclockwise_keys_input = KeyInput::new_with_info(
                 DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
                 DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-                DEFAULT_KEY_INPUT_WIDTH,
-                DEFAULT_KEY_INPUT_HEIGHT,
                 setting.get_keys(TetrisCommand::Counterclockwise),
                 "Rotate Counterclockwise Keys :",
             );
@@ -159,8 +146,6 @@ impl InteractiveWidgetManager {
             let rotate_half_turn_keys_input = KeyInput::new_with_info(
                 DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
                 DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
-                DEFAULT_KEY_INPUT_WIDTH,
-                DEFAULT_KEY_INPUT_HEIGHT,
                 setting.get_keys(TetrisCommand::HalfTurn),
                 "Rotate Half Turn Keys :",
             );
@@ -168,8 +153,6 @@ impl InteractiveWidgetManager {
             let hold_tetromino_keys_input = KeyInput::new_with_info(
                 DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
                 DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
-                DEFAULT_KEY_INPUT_WIDTH,
-                DEFAULT_KEY_INPUT_HEIGHT,
                 setting.get_keys(TetrisCommand::Hold),
                 "Hold Tetromino Keys :",
             );
