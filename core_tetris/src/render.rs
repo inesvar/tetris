@@ -31,6 +31,7 @@ pub trait RenderTetrisPlayer {
         self.display_tetromino_in_play(player, state);
         self.display_hold_queue(player);
         self.display_next_queue(player);
+        self.display_garbage_queue(player);
     }
 
     fn display_tetris_grid(&mut self, player: &TetrisPlayer, _state: RunningState) {
@@ -39,6 +40,7 @@ pub trait RenderTetrisPlayer {
 
     fn display_hold_queue(&mut self, _player: &TetrisPlayer) {}
     fn display_next_queue(&mut self, _player: &TetrisPlayer) {}
+    fn display_garbage_queue(&mut self, _player: &TetrisPlayer) {}
 
     fn display_tetromino_in_play(&mut self, player: &TetrisPlayer, _state: RunningState) {
         self.render_tetromino(player.tetromino_in_play());

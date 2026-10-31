@@ -21,6 +21,7 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
         self.display_tetromino_in_play(player, state);
         self.display_hold_queue(player);
         self.display_next_queue(player);
+        self.display_garbage_queue(player);
 
         self.transform = old_transform;
     }
@@ -42,7 +43,10 @@ impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
         }
 
         self.render_tetris_grid(grid);
-        if let Some(bottom_left_corner) = grid.positions().next() {
+    }
+
+    fn display_garbage_queue(&mut self, player: &TetrisPlayer) {
+        if let Some(bottom_left_corner) = player.grid().positions().next() {
             for i in 0..player.received_garbage() {
                 let position = bottom_left_corner - Position::new(1, i as i32);
                 self.render_tetris_block(&position, TetrisColor::Red);
