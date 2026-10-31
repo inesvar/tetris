@@ -14,8 +14,25 @@ use std::collections::HashMap;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum ButtonType {
+    ViewChange(ViewChangeButton),
+    CurrentView(CurrentViewButton),
+}
+
+impl From<ViewChangeButton> for ButtonType {
+    fn from(value: ViewChangeButton) -> Self {
+        ButtonType::ViewChange(value)
+    }
+}
+
+impl From<CurrentViewButton> for ButtonType {
+    fn from(value: CurrentViewButton) -> Self {
+        ButtonType::CurrentView(value)
+    }
+}
+
+#[derive(Hash, Eq, PartialEq, Clone, Debug)]
+pub enum ViewChangeButton {
     ToSinglePlayerGame,
-    ToTwoRemoteGame,
     ToTwoRemoteGameInfo { local_ip: String, remote_ip: String },
     ToCreateRoom,
     ToJoinRoom,
@@ -23,18 +40,14 @@ pub enum ButtonType {
     BackToMainMenu,
     BackToGame,
     ToTwoLocalGame,
-    ToPause,
-    CopyToClipboard,
-    PasteFromClipboard,
-    Nothing,
+    ToPause, // TODO: should be in the next enum
 }
 
-impl ButtonType {
-    fn view_changer(&self) -> bool {
-        *self != Self::CopyToClipboard
-            && *self != Self::ToTwoRemoteGame
-            && *self != Self::PasteFromClipboard
-    }
+#[derive(Hash, Eq, PartialEq, Clone, Debug)]
+pub enum CurrentViewButton {
+    CopyToClipboard,
+    PasteFromClipboard,
+    ToTwoRemoteGame, // TODO: that's weird...
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
@@ -103,13 +116,16 @@ impl InteractiveWidgetManager {
 
         let mut buttons = HashMap::new();
         buttons.insert(
-            ButtonType::ToSinglePlayerGame,
+            ViewChangeButton::ToSinglePlayerGame.into(),
             create_single_player_game_button,
         );
-        buttons.insert(ButtonType::ToCreateRoom, create_room_button);
-        buttons.insert(ButtonType::ToJoinRoom, join_room_button);
-        buttons.insert(ButtonType::ToSettings, settings_button);
-        buttons.insert(ButtonType::ToTwoLocalGame, create_two_player_game_button);
+        buttons.insert(ViewChangeButton::ToCreateRoom.into(), create_room_button);
+        buttons.insert(ViewChangeButton::ToJoinRoom.into(), join_room_button);
+        buttons.insert(ViewChangeButton::ToSettings.into(), settings_button);
+        buttons.insert(
+            ViewChangeButton::ToTwoLocalGame.into(),
+            create_two_player_game_button,
+        );
 
         let title_text = Text::new_with_tetris_font(
             "T",
@@ -239,7 +255,10 @@ impl InteractiveWidgetManager {
                 DEFAULT_BUTTON_HEIGHT / 2.0,
                 "Back",
             );
-            buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
+            buttons.insert(
+                ViewChangeButton::BackToMainMenu.into(),
+                back_to_main_menu_button,
+            );
         } else {
             let back_to_game_button = Button::new(
                 (60.0 * DEFAULT_WINDOW_WIDTH + horizontal_offset) / 65.0,
@@ -248,7 +267,7 @@ impl InteractiveWidgetManager {
                 DEFAULT_BUTTON_HEIGHT / 2.0,
                 "Back",
             );
-            buttons.insert(ButtonType::BackToGame, back_to_game_button);
+            buttons.insert(ViewChangeButton::BackToGame.into(), back_to_game_button);
         }
 
         let title_text = Text::new_with_tetris_font(
@@ -296,9 +315,12 @@ impl InteractiveWidgetManager {
         );
 
         let mut buttons = HashMap::new();
-        buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
-        buttons.insert(ButtonType::ToPause, pause_button);
-        buttons.insert(ButtonType::ToSettings, settings_button);
+        buttons.insert(
+            ViewChangeButton::BackToMainMenu.into(),
+            back_to_main_menu_button,
+        );
+        buttons.insert(ViewChangeButton::ToPause.into(), pause_button);
+        buttons.insert(ViewChangeButton::ToSettings.into(), settings_button);
 
         let title_text = Text::new_with_tetris_font(
             "T",
@@ -372,9 +394,12 @@ impl InteractiveWidgetManager {
         );
 
         let mut buttons = HashMap::new();
-        buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
-        buttons.insert(ButtonType::ToPause, pause_button);
-        buttons.insert(ButtonType::ToSettings, settings_button);
+        buttons.insert(
+            ViewChangeButton::BackToMainMenu.into(),
+            back_to_main_menu_button,
+        );
+        buttons.insert(ViewChangeButton::ToPause.into(), pause_button);
+        buttons.insert(ViewChangeButton::ToSettings.into(), settings_button);
 
         let title_text = Text::new_with_tetris_font(
             "T",
@@ -440,8 +465,11 @@ impl InteractiveWidgetManager {
         );
 
         let mut buttons = HashMap::new();
-        buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
-        buttons.insert(ButtonType::CopyToClipboard, copy_ip);
+        buttons.insert(
+            ViewChangeButton::BackToMainMenu.into(),
+            back_to_main_menu_button,
+        );
+        buttons.insert(CurrentViewButton::CopyToClipboard.into(), copy_ip);
 
         let title_text = Text::new_with_tetris_font(
             "T",
@@ -499,9 +527,12 @@ impl InteractiveWidgetManager {
         );
 
         let mut buttons = HashMap::new();
-        buttons.insert(ButtonType::BackToMainMenu, back_to_main_menu_button);
-        buttons.insert(ButtonType::ToTwoRemoteGame, join_room);
-        buttons.insert(ButtonType::PasteFromClipboard, paste_ip);
+        buttons.insert(
+            ViewChangeButton::BackToMainMenu.into(),
+            back_to_main_menu_button,
+        );
+        buttons.insert(CurrentViewButton::ToTwoRemoteGame.into(), join_room);
+        buttons.insert(CurrentViewButton::PasteFromClipboard.into(), paste_ip);
         let mut text_inputs = HashMap::new();
         text_inputs.insert(TextInputType::IpAddressInput, room_ip_input);
 
@@ -593,7 +624,10 @@ impl InteractiveWidgetManager {
     }
 
     pub fn update_clipboard(&mut self) {
-        if let Some(button) = self.buttons.get_mut(&ButtonType::CopyToClipboard) {
+        if let Some(button) = self
+            .buttons
+            .get_mut(&CurrentViewButton::CopyToClipboard.into())
+        {
             if button.has_been_pressed() {
                 let ip = local_ip().unwrap().to_string();
                 //let ip = "127.0.0.1".to_string();
@@ -604,7 +638,10 @@ impl InteractiveWidgetManager {
                     .expect("Setting the clipboard failed");
             }
         };
-        if let Some(button) = self.buttons.get_mut(&ButtonType::PasteFromClipboard) {
+        if let Some(button) = self
+            .buttons
+            .get_mut(&CurrentViewButton::PasteFromClipboard.into())
+        {
             if button.has_been_pressed() {
                 let mut clipboard = Clipboard::new().expect("Clipboard is not supported");
                 let ip = clipboard.get_text().expect("Getting the clipboard failed");
@@ -615,7 +652,7 @@ impl InteractiveWidgetManager {
     }
 
     pub fn update_from_text(&mut self) {
-        let button = self.get_button(&ButtonType::ToTwoRemoteGame);
+        let button = self.get_button(&CurrentViewButton::ToTwoRemoteGame.into());
         if button.has_been_pressed() {
             let text_input = self.get_input(TextInputType::IpAddressInput);
             let remote_ip = String::from(text_input.text.get_text());
@@ -633,22 +670,25 @@ impl InteractiveWidgetManager {
             );
 
             self.buttons.insert(
-                ButtonType::ToTwoRemoteGameInfo {
+                ViewChangeButton::ToTwoRemoteGameInfo {
                     local_ip,
                     remote_ip,
-                },
+                }
+                .into(),
                 join_room,
             );
         }
     }
 
-    pub fn update_view(&mut self) -> ButtonType {
+    pub fn update_view(&mut self) -> Option<ViewChangeButton> {
         for (button_type, button) in self.buttons.iter_mut() {
-            if button_type.view_changer() && button.has_been_pressed() {
-                println!("button type is {:?}", button_type);
-                return button_type.clone();
+            if let ButtonType::ViewChange(view_change_button) = button_type {
+                if button.has_been_pressed() {
+                    println!("button type is {:?}", button_type);
+                    return Some(view_change_button.clone());
+                }
             }
         }
-        ButtonType::Nothing
+        None
     }
 }

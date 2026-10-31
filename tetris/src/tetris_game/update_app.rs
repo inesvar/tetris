@@ -5,7 +5,7 @@ use super::{remote::OutboundMessage, PlayerConfig, RunningState};
 use crate::app::{App, ViewState};
 use crate::utils::formattings::format_seconds;
 use piston::UpdateArgs;
-use ui_tetris::interactive_widget_manager::{ButtonType, TextType};
+use ui_tetris::interactive_widget_manager::{TextType, ViewChangeButton};
 
 impl App {
     fn update_running_game(&mut self) {
@@ -110,42 +110,43 @@ impl App {
         }
 
         // then eventually change the view
-        let result = self.widget_manager.update_view();
+        let Some(result) = self.widget_manager.update_view() else {
+            return;
+        };
         match result {
-            ButtonType::ToPause => {
+            ViewChangeButton::ToPause => {
                 if self.view_state.is_game() {
                     self.game.pause()
                 }
             }
-            ButtonType::Nothing => {}
-            ButtonType::BackToMainMenu => {
+            ViewChangeButton::BackToMainMenu => {
                 println!("back to main menu");
                 if self.game.running == RunningState::Running {
                     self.game.pause()
                 };
                 self.set_view(ViewState::MainMenu)
             }
-            ButtonType::ToSettings => {
+            ViewChangeButton::ToSettings => {
                 if self.game.running == RunningState::Running {
                     self.game.pause()
                 };
                 self.set_view(ViewState::Settings)
             }
-            ButtonType::ToSinglePlayerGame => {
+            ViewChangeButton::ToSinglePlayerGame => {
                 if self.game.player_config != PlayerConfig::Local {
                     self.game.set_player_config(PlayerConfig::Local);
                 }
                 self.set_view(ViewState::Local)
             }
-            ButtonType::ToCreateRoom => self.set_view(ViewState::CreateRoom),
-            ButtonType::ToJoinRoom => {
+            ViewChangeButton::ToCreateRoom => self.set_view(ViewState::CreateRoom),
+            ViewChangeButton::ToJoinRoom => {
                 if self.game.player_config == PlayerConfig::Local {
                     self.set_view(ViewState::JoinRoom)
                 } else if self.game.player_config.is_remote() {
                     self.set_view(ViewState::Remote)
                 }
             }
-            ButtonType::ToTwoRemoteGameInfo {
+            ViewChangeButton::ToTwoRemoteGameInfo {
                 local_ip,
                 remote_ip,
             } => {
@@ -160,13 +161,13 @@ impl App {
                     0,
                 )));
             }
-            ButtonType::ToTwoLocalGame => {
+            ViewChangeButton::ToTwoLocalGame => {
                 if self.game.player_config != PlayerConfig::TwoLocal {
                     self.game.set_player_config(PlayerConfig::TwoLocal);
                 }
                 self.set_view(ViewState::TwoLocal);
             }
-            ButtonType::BackToGame => match &self.game.player_config {
+            ViewChangeButton::BackToGame => match &self.game.player_config {
                 PlayerConfig::TwoLocal => self.set_view(ViewState::TwoLocal),
                 PlayerConfig::Local => self.set_view(ViewState::Local),
                 PlayerConfig::TwoRemote {
@@ -175,7 +176,6 @@ impl App {
                 } => self.set_view(ViewState::Remote),
                 _ => unreachable!(),
             },
-            _ => {}
         }
     }
 }
