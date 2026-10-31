@@ -9,6 +9,7 @@ use core_tetris::TetrisCommand;
 use graphics::math::Scalar;
 use local_ip_address::local_ip;
 use std::collections::HashMap;
+use std::fmt;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum ButtonType {
@@ -28,6 +29,15 @@ impl From<CurrentViewButton> for ButtonType {
     }
 }
 
+impl fmt::Display for ButtonType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ButtonType::ViewChange(view_change_button) => view_change_button.fmt(f),
+            ButtonType::CurrentView(current_view_button) => current_view_button.fmt(f),
+        }
+    }
+}
+
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum ViewChangeButton {
     ToSinglePlayerGame,
@@ -41,11 +51,37 @@ pub enum ViewChangeButton {
     ToPause, // TODO: should be in the next enum
 }
 
+impl fmt::Display for ViewChangeButton {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            ViewChangeButton::ToSinglePlayerGame => "Single-player game",
+            ViewChangeButton::ToTwoRemoteGameInfo { .. } => "Join this room",
+            ViewChangeButton::ToCreateRoom => "Create new room",
+            ViewChangeButton::ToJoinRoom => "Join room",
+            ViewChangeButton::ToSettings => "Settings",
+            ViewChangeButton::BackToMainMenu => "Back",
+            ViewChangeButton::BackToGame => "Back",
+            ViewChangeButton::ToTwoLocalGame => "Two-player game",
+            ViewChangeButton::ToPause => "Pause",
+        })
+    }
+}
+
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum CurrentViewButton {
     CopyToClipboard,
     PasteFromClipboard,
     ToTwoRemoteGame, // TODO: that's weird...
+}
+
+impl fmt::Display for CurrentViewButton {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            CurrentViewButton::CopyToClipboard => "Copy room IP",
+            CurrentViewButton::PasteFromClipboard => "Paste",
+            CurrentViewButton::ToTwoRemoteGame => "Join room",
+        })
+    }
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
@@ -176,22 +212,21 @@ impl InteractiveWidgetManager {
             //let local_ip = "127.0.0.1".to_string();
             let local_ip = format!("{}{}", local_ip, GUEST_PORT);
 
+            let button_type: ButtonType = ViewChangeButton::ToTwoRemoteGameInfo {
+                local_ip,
+                remote_ip,
+            }
+            .into();
+
             let join_room = Button::new_pressed(
                 DEFAULT_WINDOW_WIDTH / 2.0,
                 DEFAULT_WINDOW_HEIGHT / 2.0,
                 DEFAULT_BUTTON_WIDTH,
                 DEFAULT_BUTTON_HEIGHT,
-                "Join this room",
+                &button_type.to_string(),
             );
 
-            self.buttons.insert(
-                ViewChangeButton::ToTwoRemoteGameInfo {
-                    local_ip,
-                    remote_ip,
-                }
-                .into(),
-                join_room,
-            );
+            self.buttons.insert(button_type, join_room);
         }
     }
 

@@ -1,5 +1,6 @@
 use super::interactive_widget_manager::{
-    CurrentViewButton, InteractiveWidgetManager, TextInputType, TextType, ViewChangeButton,
+    ButtonType, CurrentViewButton, InteractiveWidgetManager, TextInputType, TextType,
+    ViewChangeButton,
 };
 use super::{button::Button, key_input::KeyInput, text::Text, text_input::TextInput};
 use super::{
@@ -9,54 +10,36 @@ use super::{
 };
 use crate::keybindings::Keybindings;
 use core_tetris::TetrisCommand;
+use graphics::math::Scalar;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
 use std::collections::HashMap;
 
 impl InteractiveWidgetManager {
+    pub(super) fn add_button(
+        &mut self,
+        button_type: ButtonType,
+        center_x: Scalar,
+        center_y: Scalar,
+    ) {
+        let button = Button::new(center_x, center_y, &button_type.to_string());
+        self.buttons.insert(button_type, button);
+    }
+
+    pub(super) fn add_button_custom_size(
+        &mut self,
+        button_type: ButtonType,
+        center_x: Scalar,
+        center_y: Scalar,
+        width: Scalar,
+        height: Scalar,
+    ) {
+        let button =
+            Button::new_custom_size(center_x, center_y, width, height, &button_type.to_string());
+        self.buttons.insert(button_type, button);
+    }
+
     pub fn new_main_menu() -> InteractiveWidgetManager {
-        let create_single_player_game_button = Button::new(
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0 - DEFAULT_BUTTON_Y_SPACING,
-            "Single-player game",
-        );
-
-        let create_room_button = Button::new(
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0,
-            "Create new room",
-        );
-
-        let join_room_button = Button::new(
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-            "Join room",
-        );
-
-        let settings_button = Button::new(
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
-            "Settings",
-        );
-
-        let create_two_player_game_button = Button::new(
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
-            "two-player game",
-        );
-
-        let mut buttons = HashMap::new();
-        buttons.insert(
-            ViewChangeButton::ToSinglePlayerGame.into(),
-            create_single_player_game_button,
-        );
-        buttons.insert(ViewChangeButton::ToCreateRoom.into(), create_room_button);
-        buttons.insert(ViewChangeButton::ToJoinRoom.into(), join_room_button);
-        buttons.insert(ViewChangeButton::ToSettings.into(), settings_button);
-        buttons.insert(
-            ViewChangeButton::ToTwoLocalGame.into(),
-            create_two_player_game_button,
-        );
-
+        let buttons = HashMap::new();
         let title_text = Text::new_with_tetris_font(
             "T",
             DEFAULT_FONT_SIZE,
@@ -72,12 +55,40 @@ impl InteractiveWidgetManager {
 
         let key_inputs = HashMap::new();
 
-        InteractiveWidgetManager {
+        let mut manager = InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
             texts,
-        }
+        };
+
+        manager.add_button(
+            ViewChangeButton::ToSinglePlayerGame.into(),
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0 - DEFAULT_BUTTON_Y_SPACING,
+        );
+        manager.add_button(
+            ViewChangeButton::ToCreateRoom.into(),
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0,
+        );
+        manager.add_button(
+            ViewChangeButton::ToJoinRoom.into(),
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
+        );
+        manager.add_button(
+            ViewChangeButton::ToSettings.into(),
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
+        );
+        manager.add_button(
+            ViewChangeButton::ToTwoLocalGame.into(),
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
+        );
+
+        manager
     }
 
     pub fn new_settings(
@@ -176,29 +187,49 @@ impl InteractiveWidgetManager {
             horizontal_offset += DEFAULT_WINDOW_WIDTH;
         }
 
-        let mut buttons = HashMap::new();
+        let buttons = HashMap::new();
+
+        let title_text = Text::new_with_tetris_font(
+            "T",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+
+        let mut texts = HashMap::new();
+        texts.insert(TextType::Title, title_text);
+
+        let mut manager = InteractiveWidgetManager {
+            buttons,
+            text_inputs,
+            key_inputs,
+            texts,
+        };
+
         if !from_game {
-            let back_to_main_menu_button = Button::new_custom_size(
+            manager.add_button_custom_size(
+                ViewChangeButton::BackToMainMenu.into(),
                 (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
                 (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
                 DEFAULT_BUTTON_WIDTH / 6.0,
                 DEFAULT_BUTTON_HEIGHT / 2.0,
-                "Back",
-            );
-            buttons.insert(
-                ViewChangeButton::BackToMainMenu.into(),
-                back_to_main_menu_button,
             );
         } else {
-            let back_to_game_button = Button::new_custom_size(
+            manager.add_button_custom_size(
+                ViewChangeButton::BackToGame.into(),
                 (60.0 * DEFAULT_WINDOW_WIDTH + horizontal_offset) / 65.0,
                 (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
                 DEFAULT_BUTTON_WIDTH / 6.0,
                 DEFAULT_BUTTON_HEIGHT / 2.0,
-                "Back",
             );
-            buttons.insert(ViewChangeButton::BackToGame.into(), back_to_game_button);
         }
+
+        manager
+    }
+
+    pub fn new_single_player_game() -> InteractiveWidgetManager {
+        let buttons = HashMap::new();
 
         let title_text = Text::new_with_tetris_font(
             "T",
@@ -207,50 +238,73 @@ impl InteractiveWidgetManager {
             DEFAULT_TITLE_Y,
             SILVER,
         );
+        let restart_text = Text::new(
+            "Press R to (re)start",
+            (DEFAULT_FONT_SIZE * 22) / 16,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+        let timer_text = Text::new(
+            "",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
+            DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,
+            SILVER,
+        );
+        let pause_text = Text::new(
+            "Press P to resume",
+            (DEFAULT_FONT_SIZE * 22) / 16,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
 
         let mut texts = HashMap::new();
         texts.insert(TextType::Title, title_text);
+        texts.insert(TextType::Restart, restart_text);
+        texts.insert(TextType::Timer, timer_text);
+        texts.insert(TextType::Pause, pause_text);
 
-        InteractiveWidgetManager {
+        let text_inputs = HashMap::new();
+        let key_inputs = HashMap::new();
+
+        let mut manager = InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
             texts,
-        }
-    }
+        };
 
-    pub fn new_single_player_game() -> InteractiveWidgetManager {
-        let back_to_main_menu_button = Button::new_custom_size(
+        manager.add_button_custom_size(
+            ViewChangeButton::BackToMainMenu.into(),
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
-            "Back",
         );
 
-        let pause_button = Button::new_custom_size(
+        manager.add_button_custom_size(
+            ViewChangeButton::ToPause.into(),
             (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 5.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
-            "Pause",
         );
 
-        let settings_button = Button::new_custom_size(
+        manager.add_button_custom_size(
+            ViewChangeButton::ToSettings.into(),
             (58.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 3.5,
             DEFAULT_BUTTON_HEIGHT / 2.0,
-            "Settings",
         );
 
-        let mut buttons = HashMap::new();
-        buttons.insert(
-            ViewChangeButton::BackToMainMenu.into(),
-            back_to_main_menu_button,
-        );
-        buttons.insert(ViewChangeButton::ToPause.into(), pause_button);
-        buttons.insert(ViewChangeButton::ToSettings.into(), settings_button);
+        manager
+    }
+
+    pub fn new_two_player_game() -> InteractiveWidgetManager {
+        let buttons = HashMap::new();
 
         let title_text = Text::new_with_tetris_font(
             "T",
@@ -290,114 +344,42 @@ impl InteractiveWidgetManager {
         let text_inputs = HashMap::new();
         let key_inputs = HashMap::new();
 
-        InteractiveWidgetManager {
+        let mut manager = InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
             texts,
-        }
-    }
+        };
 
-    pub fn new_two_player_game() -> InteractiveWidgetManager {
-        let back_to_main_menu_button = Button::new_custom_size(
+        manager.add_button_custom_size(
+            ViewChangeButton::BackToMainMenu.into(),
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
-            "Back",
         );
 
-        let pause_button = Button::new_custom_size(
+        manager.add_button_custom_size(
+            ViewChangeButton::ToPause.into(),
             (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 5.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
-            "Pause",
         );
 
-        let settings_button = Button::new_custom_size(
+        manager.add_button_custom_size(
+            ViewChangeButton::ToSettings.into(),
             (123.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 3.5,
             DEFAULT_BUTTON_HEIGHT / 2.0,
-            "Settings",
         );
 
-        let mut buttons = HashMap::new();
-        buttons.insert(
-            ViewChangeButton::BackToMainMenu.into(),
-            back_to_main_menu_button,
-        );
-        buttons.insert(ViewChangeButton::ToPause.into(), pause_button);
-        buttons.insert(ViewChangeButton::ToSettings.into(), settings_button);
-
-        let title_text = Text::new_with_tetris_font(
-            "T",
-            DEFAULT_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
-        let restart_text = Text::new(
-            "Press R to (re)start",
-            (DEFAULT_FONT_SIZE * 22) / 16,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
-        let timer_text = Text::new(
-            "",
-            DEFAULT_FONT_SIZE,
-            DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
-            DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,
-            SILVER,
-        );
-        let pause_text = Text::new(
-            "Press P to resume",
-            (DEFAULT_FONT_SIZE * 22) / 16,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
-
-        let mut texts = HashMap::new();
-        texts.insert(TextType::Title, title_text);
-        texts.insert(TextType::Restart, restart_text);
-        texts.insert(TextType::Timer, timer_text);
-        texts.insert(TextType::Pause, pause_text);
-
-        let text_inputs = HashMap::new();
-        let key_inputs = HashMap::new();
-
-        InteractiveWidgetManager {
-            buttons,
-            text_inputs,
-            key_inputs,
-            texts,
-        }
+        manager
     }
 
     pub fn new_create_room() -> InteractiveWidgetManager {
-        let back_to_main_menu_button = Button::new_custom_size(
-            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
-            DEFAULT_BUTTON_WIDTH / 6.0,
-            DEFAULT_BUTTON_HEIGHT / 2.0,
-            "Back",
-        );
-
-        let copy_ip = Button::new(
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0,
-            "Copy room IP",
-        );
-
-        let mut buttons = HashMap::new();
-        buttons.insert(
-            ViewChangeButton::BackToMainMenu.into(),
-            back_to_main_menu_button,
-        );
-        buttons.insert(CurrentViewButton::CopyToClipboard.into(), copy_ip);
+        let buttons = HashMap::new();
 
         let title_text = Text::new_with_tetris_font(
             "T",
@@ -413,28 +395,32 @@ impl InteractiveWidgetManager {
         let text_inputs = HashMap::new();
         let key_inputs = HashMap::new();
 
-        InteractiveWidgetManager {
+        let mut manager = InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
             texts,
-        }
-    }
+        };
 
-    pub fn new_join_room() -> InteractiveWidgetManager {
-        let back_to_main_menu_button = Button::new_custom_size(
+        manager.add_button_custom_size(
+            ViewChangeButton::BackToMainMenu.into(),
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
-            "Back",
         );
 
-        let join_room = Button::new(
+        manager.add_button(
+            CurrentViewButton::CopyToClipboard.into(),
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0,
-            "Join room",
         );
+
+        manager
+    }
+
+    pub fn new_join_room() -> InteractiveWidgetManager {
+        let buttons = HashMap::new();
 
         let room_ip_input = TextInput::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
@@ -442,19 +428,6 @@ impl InteractiveWidgetManager {
             "Join room",
         );
 
-        let paste_ip = Button::new(
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-            "Paste",
-        );
-
-        let mut buttons = HashMap::new();
-        buttons.insert(
-            ViewChangeButton::BackToMainMenu.into(),
-            back_to_main_menu_button,
-        );
-        buttons.insert(CurrentViewButton::ToTwoRemoteGame.into(), join_room);
-        buttons.insert(CurrentViewButton::PasteFromClipboard.into(), paste_ip);
         let mut text_inputs = HashMap::new();
         text_inputs.insert(TextInputType::IpAddressInput, room_ip_input);
 
@@ -470,11 +443,31 @@ impl InteractiveWidgetManager {
         texts.insert(TextType::Title, title_text);
         let key_inputs = HashMap::new();
 
-        InteractiveWidgetManager {
+        let mut manager = InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
             texts,
-        }
+        };
+
+        manager.add_button_custom_size(
+            ViewChangeButton::BackToMainMenu.into(),
+            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
+            DEFAULT_BUTTON_WIDTH / 6.0,
+            DEFAULT_BUTTON_HEIGHT / 2.0,
+        );
+        manager.add_button(
+            CurrentViewButton::ToTwoRemoteGame.into(),
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0,
+        );
+        manager.add_button(
+            CurrentViewButton::PasteFromClipboard.into(),
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
+        );
+
+        manager
     }
 }
