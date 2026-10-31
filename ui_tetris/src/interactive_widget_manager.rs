@@ -77,40 +77,30 @@ impl InteractiveWidgetManager {
         let create_single_player_game_button = Button::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0 - DEFAULT_BUTTON_Y_SPACING,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
             "Single-player game",
         );
 
         let create_room_button = Button::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
             "Create new room",
         );
 
         let join_room_button = Button::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
             "Join room",
         );
 
         let settings_button = Button::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
             "Settings",
         );
 
         let create_two_player_game_button = Button::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
             "two-player game",
         );
 
@@ -248,7 +238,7 @@ impl InteractiveWidgetManager {
 
         let mut buttons = HashMap::new();
         if !from_game {
-            let back_to_main_menu_button = Button::new(
+            let back_to_main_menu_button = Button::new_custom_size(
                 (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
                 (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
                 DEFAULT_BUTTON_WIDTH / 6.0,
@@ -260,7 +250,7 @@ impl InteractiveWidgetManager {
                 back_to_main_menu_button,
             );
         } else {
-            let back_to_game_button = Button::new(
+            let back_to_game_button = Button::new_custom_size(
                 (60.0 * DEFAULT_WINDOW_WIDTH + horizontal_offset) / 65.0,
                 (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
                 DEFAULT_BUTTON_WIDTH / 6.0,
@@ -290,7 +280,7 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_single_player_game() -> InteractiveWidgetManager {
-        let back_to_main_menu_button = Button::new(
+        let back_to_main_menu_button = Button::new_custom_size(
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
@@ -298,7 +288,7 @@ impl InteractiveWidgetManager {
             "Back",
         );
 
-        let pause_button = Button::new(
+        let pause_button = Button::new_custom_size(
             (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 5.0,
@@ -306,7 +296,7 @@ impl InteractiveWidgetManager {
             "Pause",
         );
 
-        let settings_button = Button::new(
+        let settings_button = Button::new_custom_size(
             (58.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 3.5,
@@ -369,7 +359,7 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_two_player_game() -> InteractiveWidgetManager {
-        let back_to_main_menu_button = Button::new(
+        let back_to_main_menu_button = Button::new_custom_size(
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
@@ -377,7 +367,7 @@ impl InteractiveWidgetManager {
             "Back",
         );
 
-        let pause_button = Button::new(
+        let pause_button = Button::new_custom_size(
             (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 5.0,
@@ -385,7 +375,7 @@ impl InteractiveWidgetManager {
             "Pause",
         );
 
-        let settings_button = Button::new(
+        let settings_button = Button::new_custom_size(
             (123.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 3.5,
@@ -448,7 +438,7 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_create_room() -> InteractiveWidgetManager {
-        let back_to_main_menu_button = Button::new(
+        let back_to_main_menu_button = Button::new_custom_size(
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
@@ -459,8 +449,6 @@ impl InteractiveWidgetManager {
         let copy_ip = Button::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
             "Copy room IP",
         );
 
@@ -494,7 +482,7 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_join_room() -> InteractiveWidgetManager {
-        let back_to_main_menu_button = Button::new(
+        let back_to_main_menu_button = Button::new_custom_size(
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
             (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
             DEFAULT_BUTTON_WIDTH / 6.0,
@@ -505,24 +493,18 @@ impl InteractiveWidgetManager {
         let join_room = Button::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
             "Join room",
         );
 
         let room_ip_input = TextInput::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 3.0,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
             "Join room",
         );
 
         let paste_ip = Button::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-            DEFAULT_BUTTON_WIDTH,
-            DEFAULT_BUTTON_HEIGHT,
             "Paste",
         );
 

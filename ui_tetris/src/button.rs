@@ -1,6 +1,6 @@
 use super::text::Text;
 use super::Rectangle;
-use super::DEFAULT_FONT_SIZE;
+use super::{DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_FONT_SIZE};
 use graphics::color::{BLACK, GRAY, SILVER};
 use graphics::types::{Color, Scalar};
 
@@ -17,7 +17,17 @@ pub struct Button {
 }
 
 impl Button {
-    pub(super) fn new(
+    pub(super) fn new(center_x: Scalar, center_y: Scalar, text: &str) -> Self {
+        Self::new_custom_size(
+            center_x,
+            center_y,
+            DEFAULT_BUTTON_WIDTH,
+            DEFAULT_BUTTON_HEIGHT,
+            text,
+        )
+    }
+
+    pub(super) fn new_custom_size(
         center_x: Scalar,
         center_y: Scalar,
         width: Scalar,

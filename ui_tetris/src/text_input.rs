@@ -1,6 +1,8 @@
 use super::text::Text;
 use super::Rectangle;
-use super::{DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE};
+use super::{
+    DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE,
+};
 use graphics::color::SILVER;
 use graphics::math::Scalar;
 use piston::Key;
@@ -14,14 +16,15 @@ pub struct TextInput {
 }
 
 impl TextInput {
-    pub(super) fn new(
-        center_x: Scalar,
-        center_y: Scalar,
-        width: Scalar,
-        height: Scalar,
-        placeholder: &str,
-    ) -> Self {
-        TextInput::new_with_text_info(center_x, center_y, width, height, placeholder, "")
+    pub(super) fn new(center_x: Scalar, center_y: Scalar, placeholder: &str) -> Self {
+        TextInput::new_with_text_info(
+            center_x,
+            center_y,
+            DEFAULT_BUTTON_WIDTH,
+            DEFAULT_BUTTON_HEIGHT,
+            placeholder,
+            "",
+        )
     }
 
     pub(super) fn new_with_text_info(
