@@ -15,20 +15,7 @@ use std::collections::HashMap;
 
 impl InteractiveWidgetManager {
     pub fn new_main_menu() -> InteractiveWidgetManager {
-        let buttons = HashMap::new();
-
-        let texts = HashMap::new();
-
-        let text_inputs = HashMap::new();
-
-        let key_inputs = HashMap::new();
-
-        let mut manager = InteractiveWidgetManager {
-            buttons,
-            text_inputs,
-            key_inputs,
-            texts,
-        };
+        let mut manager = InteractiveWidgetManager::default();
 
         manager.add_title_text();
 
@@ -50,20 +37,7 @@ impl InteractiveWidgetManager {
         settings: impl Iterator<Item = Keybindings>,
         from_game: bool,
     ) -> InteractiveWidgetManager {
-        let buttons = HashMap::new();
-
-        let texts = HashMap::new();
-
-        let text_inputs = HashMap::new();
-
-        let key_inputs = HashMap::new();
-
-        let mut manager = InteractiveWidgetManager {
-            buttons,
-            text_inputs,
-            key_inputs,
-            texts,
-        };
+        let mut manager = InteractiveWidgetManager::default();
 
         manager.add_title_text();
 
@@ -277,19 +251,7 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_create_room() -> InteractiveWidgetManager {
-        let buttons = HashMap::new();
-
-        let texts = HashMap::new();
-
-        let text_inputs = HashMap::new();
-        let key_inputs = HashMap::new();
-
-        let mut manager = InteractiveWidgetManager {
-            buttons,
-            text_inputs,
-            key_inputs,
-            texts,
-        };
+        let mut manager = InteractiveWidgetManager::default();
 
         manager.add_title_text();
 

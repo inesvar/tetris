@@ -99,6 +99,7 @@ pub enum TextType {
     Timer,
 }
 
+#[derive(Default)]
 pub struct InteractiveWidgetManager {
     pub(super) buttons: HashMap<ButtonType, Button>,
     pub(super) text_inputs: HashMap<TextInputType, TextInput>,
