@@ -38,30 +38,15 @@ impl InteractiveWidgetManager {
             texts,
         };
 
-        manager.add_button(
-            ViewChangeButton::ToSinglePlayerGame,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0 - DEFAULT_BUTTON_Y_SPACING,
-        );
-        manager.add_button(
-            ViewChangeButton::ToCreateRoom,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0,
-        );
-        manager.add_button(
-            ViewChangeButton::ToJoinRoom,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-        );
-        manager.add_button(
-            ViewChangeButton::ToSettings,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
-        );
-        manager.add_button(
-            ViewChangeButton::ToTwoLocalGame,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
+        manager.add_central_column_buttons(
+            [
+                ViewChangeButton::ToSinglePlayerGame,
+                ViewChangeButton::ToCreateRoom,
+                ViewChangeButton::ToJoinRoom,
+                ViewChangeButton::ToSettings,
+                ViewChangeButton::ToTwoLocalGame,
+            ],
+            1,
         );
 
         manager
@@ -370,11 +355,7 @@ impl InteractiveWidgetManager {
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
 
-        manager.add_button(
-            CurrentViewButton::CopyToClipboard,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0,
-        );
+        manager.add_central_column_buttons([CurrentViewButton::CopyToClipboard], 0);
 
         manager
     }
@@ -417,18 +398,30 @@ impl InteractiveWidgetManager {
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
-        manager.add_button(
-            CurrentViewButton::ToTwoRemoteGame,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0,
-        );
-        manager.add_button(
-            CurrentViewButton::PasteFromClipboard,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
+        manager.add_central_column_buttons(
+            [
+                CurrentViewButton::ToTwoRemoteGame,
+                CurrentViewButton::PasteFromClipboard,
+            ],
+            0,
         );
 
         manager
+    }
+
+    fn add_central_column_buttons(
+        &mut self,
+        buttons: impl IntoIterator<Item = impl Into<ButtonType>>,
+        nb_buttons_above_middle: i32,
+    ) {
+        for (pos, button_type) in buttons.into_iter().enumerate() {
+            self.add_button(
+                button_type,
+                DEFAULT_WINDOW_WIDTH / 2.0,
+                DEFAULT_WINDOW_HEIGHT / 2.0
+                    + DEFAULT_BUTTON_Y_SPACING * (pos as i32 - nb_buttons_above_middle) as f64,
+            );
+        }
     }
 
     pub(super) fn add_button(
