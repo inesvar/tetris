@@ -15,9 +15,7 @@ use std::collections::HashMap;
 
 impl InteractiveWidgetManager {
     pub fn new_main_menu() -> InteractiveWidgetManager {
-        let mut manager = InteractiveWidgetManager::default();
-
-        manager.add_title_text();
+        let mut manager = Self::new_tetris_view();
 
         manager.add_central_column_buttons(
             [
@@ -37,9 +35,7 @@ impl InteractiveWidgetManager {
         settings: impl Iterator<Item = Keybindings>,
         from_game: bool,
     ) -> InteractiveWidgetManager {
-        let mut manager = InteractiveWidgetManager::default();
-
-        manager.add_title_text();
+        let mut manager = Self::new_tetris_view();
 
         let mut horizontal_offset = 0.0;
 
@@ -251,12 +247,9 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_create_room() -> InteractiveWidgetManager {
-        let mut manager = InteractiveWidgetManager::default();
-
-        manager.add_title_text();
+        let mut manager = Self::new_tetris_view();
 
         manager.add_back_to_menu_button();
-
         manager.add_central_column_buttons([CurrentViewButton::CopyToClipboard], 0);
 
         manager
@@ -296,6 +289,12 @@ impl InteractiveWidgetManager {
             0,
         );
 
+        manager
+    }
+
+    fn new_tetris_view() -> Self {
+        let mut manager = Self::default();
+        manager.add_title_text();
         manager
     }
 
