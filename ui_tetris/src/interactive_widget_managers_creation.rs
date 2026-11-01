@@ -40,67 +40,19 @@ impl InteractiveWidgetManager {
         let mut horizontal_offset = 0.0;
 
         for (i, setting) in settings.enumerate() {
-            manager.add_key_input(
-                TetrisCommand::SoftDrop,
+            manager.add_two_column_key_inputs(
+                [
+                    TetrisCommand::SoftDrop,
+                    TetrisCommand::Clockwise,
+                    TetrisCommand::HardDrop,
+                    TetrisCommand::Counterclockwise,
+                    TetrisCommand::Right,
+                    TetrisCommand::HalfTurn,
+                    TetrisCommand::Left,
+                    TetrisCommand::Hold,
+                ],
                 i,
-                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0,
-                &setting,
-            );
-
-            manager.add_key_input(
-                TetrisCommand::HardDrop,
-                i,
-                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-                &setting,
-            );
-
-            manager.add_key_input(
-                TetrisCommand::Right,
-                i,
-                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
-                &setting,
-            );
-
-            manager.add_key_input(
-                TetrisCommand::Left,
-                i,
-                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
-                &setting,
-            );
-
-            manager.add_key_input(
-                TetrisCommand::Clockwise,
-                i,
-                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0,
-                &setting,
-            );
-
-            manager.add_key_input(
-                TetrisCommand::Counterclockwise,
-                i,
-                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-                &setting,
-            );
-
-            manager.add_key_input(
-                TetrisCommand::HalfTurn,
-                i,
-                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
-                &setting,
-            );
-
-            manager.add_key_input(
-                TetrisCommand::Hold,
-                i,
-                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
+                horizontal_offset,
                 &setting,
             );
 
@@ -335,6 +287,19 @@ impl InteractiveWidgetManager {
         }
     }
 
+    fn add_two_column_key_inputs(
+        &mut self,
+        key_inputs: impl IntoIterator<Item = TetrisCommand>,
+        player_id: usize,
+        horizontal_offset: Scalar,
+        keybindings: &Keybindings,
+    ) {
+        for (index, command) in key_inputs.into_iter().enumerate() {
+            let (x, y) = grid_cell_center(index, 2);
+            self.add_key_input(command, player_id, x + horizontal_offset, y, keybindings);
+        }
+    }
+
     fn add_key_input(
         &mut self,
         command: TetrisCommand,
@@ -376,4 +341,15 @@ impl InteractiveWidgetManager {
             Button::new_custom_size(center_x, center_y, width, height, &button_type.to_string());
         self.buttons.insert(button_type, button);
     }
+}
+
+fn grid_cell_center(index: usize, nb_columns: usize) -> (Scalar, Scalar) {
+    let nb_columns = nb_columns.max(1);
+    let column = index % nb_columns;
+    let row = index / nb_columns;
+    (
+        DEFAULT_WINDOW_WIDTH / (2.0 * nb_columns as Scalar)
+            + column as Scalar * (DEFAULT_WINDOW_WIDTH / nb_columns as Scalar),
+        DEFAULT_WINDOW_HEIGHT / 2.0 + row as Scalar * DEFAULT_BUTTON_Y_SPACING,
+    )
 }
