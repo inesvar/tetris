@@ -1,3 +1,4 @@
+use super::{BIGGER_FONT_SIZE, DEFAULT_TITLE_Y, SILVER, WINDOW_HALF_WIDTH};
 use graphics::types::{Color, FontSize, Scalar};
 
 #[derive(Clone)]
@@ -31,6 +32,17 @@ impl Text {
 
     pub fn new(text: &str, font_size: FontSize, x: Scalar, y: Scalar, color: Color) -> Text {
         Text::inner_new(text, false, font_size, x, y, color)
+    }
+
+    pub fn new_title(text: &str) -> Text {
+        Text::inner_new(
+            text,
+            false,
+            BIGGER_FONT_SIZE,
+            WINDOW_HALF_WIDTH,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        )
     }
 
     pub fn new_with_tetris_font(

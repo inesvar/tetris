@@ -4,9 +4,9 @@ use super::interactive_widget_manager::{
 };
 use super::{button::Button, key_input::KeyInput, text::Text, text_input::TextInput};
 use super::{
-    BIGGER_FONT_SIZE, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
-    DEFAULT_FONT_SIZE, DEFAULT_SCORE_TEXT_Y, DEFAULT_TITLE_Y, DEFAULT_WINDOW_HEIGHT,
-    DEFAULT_WINDOW_WIDTH, SILVER, TOP_LINE_HEIGHT, WINDOW_HALF_WIDTH,
+    DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE,
+    DEFAULT_SCORE_TEXT_Y, DEFAULT_TITLE_Y, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, SILVER,
+    TOP_LINE_HEIGHT, WINDOW_HALF_WIDTH,
 };
 use crate::keybindings::Keybindings;
 use core_tetris::TetrisCommand;
@@ -77,31 +77,7 @@ impl InteractiveWidgetManager {
     pub fn new_single_player_game() -> InteractiveWidgetManager {
         let mut manager = InteractiveWidgetManager::new_tetris_view();
 
-        let restart_text = Text::new(
-            "Press R to (re)start",
-            BIGGER_FONT_SIZE,
-            WINDOW_HALF_WIDTH,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
-        let timer_text = Text::new(
-            "",
-            DEFAULT_FONT_SIZE,
-            DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
-            DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,
-            SILVER,
-        );
-        let pause_text = Text::new(
-            "Press P to resume",
-            BIGGER_FONT_SIZE,
-            WINDOW_HALF_WIDTH,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
-
-        manager.texts.insert(TextType::Restart, restart_text);
-        manager.texts.insert(TextType::Timer, timer_text);
-        manager.texts.insert(TextType::Pause, pause_text);
+        manager.add_tetris_game_texts();
 
         manager.add_back_to_menu_button();
 
@@ -127,31 +103,7 @@ impl InteractiveWidgetManager {
     pub fn new_two_player_game() -> InteractiveWidgetManager {
         let mut manager = InteractiveWidgetManager::new_tetris_view();
 
-        let restart_text = Text::new(
-            "Press R to (re)start",
-            BIGGER_FONT_SIZE,
-            WINDOW_HALF_WIDTH,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
-        let timer_text = Text::new(
-            "",
-            DEFAULT_FONT_SIZE,
-            DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
-            DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,
-            SILVER,
-        );
-        let pause_text = Text::new(
-            "Press P to resume",
-            BIGGER_FONT_SIZE,
-            WINDOW_HALF_WIDTH,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
-
-        manager.texts.insert(TextType::Restart, restart_text);
-        manager.texts.insert(TextType::Timer, timer_text);
-        manager.texts.insert(TextType::Pause, pause_text);
+        manager.add_tetris_game_texts();
 
         manager.add_back_to_menu_button();
 
@@ -287,6 +239,22 @@ impl InteractiveWidgetManager {
         let button_type = button_type.into();
         let button = Button::new(center_x, center_y, &button_type.to_string());
         self.buttons.insert(button_type, button);
+    }
+
+    fn add_tetris_game_texts(&mut self) {
+        let restart_text = Text::new_title("Press R to (re)start");
+        let timer_text = Text::new(
+            "",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_GRID_X - 4.0 * BLOCK_SIZE,
+            DEFAULT_SCORE_TEXT_Y + 1.5 * BLOCK_SIZE,
+            SILVER,
+        );
+        let pause_text = Text::new_title("Press P to resume");
+
+        self.texts.insert(TextType::Restart, restart_text);
+        self.texts.insert(TextType::Timer, timer_text);
+        self.texts.insert(TextType::Pause, pause_text);
     }
 
     fn add_button_custom_size(
