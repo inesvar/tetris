@@ -12,7 +12,6 @@ use crate::keybindings::Keybindings;
 use core_tetris::TetrisCommand;
 use graphics::math::Scalar;
 use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
-use std::collections::HashMap;
 
 impl InteractiveWidgetManager {
     pub fn new_main_menu() -> InteractiveWidgetManager {
@@ -76,7 +75,8 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_single_player_game() -> InteractiveWidgetManager {
-        let buttons = HashMap::new();
+        let mut manager = InteractiveWidgetManager::new_tetris_view();
+
         let restart_text = Text::new(
             "Press R to (re)start",
             BIGGER_FONT_SIZE,
@@ -99,22 +99,9 @@ impl InteractiveWidgetManager {
             SILVER,
         );
 
-        let mut texts = HashMap::new();
-        texts.insert(TextType::Restart, restart_text);
-        texts.insert(TextType::Timer, timer_text);
-        texts.insert(TextType::Pause, pause_text);
-
-        let text_inputs = HashMap::new();
-        let key_inputs = HashMap::new();
-
-        let mut manager = InteractiveWidgetManager {
-            buttons,
-            text_inputs,
-            key_inputs,
-            texts,
-        };
-
-        manager.add_title_text();
+        manager.texts.insert(TextType::Restart, restart_text);
+        manager.texts.insert(TextType::Timer, timer_text);
+        manager.texts.insert(TextType::Pause, pause_text);
 
         manager.add_back_to_menu_button();
 
@@ -138,7 +125,8 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_two_player_game() -> InteractiveWidgetManager {
-        let buttons = HashMap::new();
+        let mut manager = InteractiveWidgetManager::new_tetris_view();
+
         let restart_text = Text::new(
             "Press R to (re)start",
             BIGGER_FONT_SIZE,
@@ -161,22 +149,9 @@ impl InteractiveWidgetManager {
             SILVER,
         );
 
-        let mut texts = HashMap::new();
-        texts.insert(TextType::Restart, restart_text);
-        texts.insert(TextType::Timer, timer_text);
-        texts.insert(TextType::Pause, pause_text);
-
-        let text_inputs = HashMap::new();
-        let key_inputs = HashMap::new();
-
-        let mut manager = InteractiveWidgetManager {
-            buttons,
-            text_inputs,
-            key_inputs,
-            texts,
-        };
-
-        manager.add_title_text();
+        manager.texts.insert(TextType::Restart, restart_text);
+        manager.texts.insert(TextType::Timer, timer_text);
+        manager.texts.insert(TextType::Pause, pause_text);
 
         manager.add_back_to_menu_button();
 
@@ -209,7 +184,7 @@ impl InteractiveWidgetManager {
     }
 
     pub fn new_join_room() -> InteractiveWidgetManager {
-        let buttons = HashMap::new();
+        let mut manager = InteractiveWidgetManager::new_tetris_view();
 
         let room_ip_input = TextInput::new(
             DEFAULT_WINDOW_WIDTH / 2.0,
@@ -217,21 +192,9 @@ impl InteractiveWidgetManager {
             "Join room",
         );
 
-        let mut text_inputs = HashMap::new();
-        text_inputs.insert(TextInputType::IpAddressInput, room_ip_input);
-
-        let texts = HashMap::new();
-
-        let key_inputs = HashMap::new();
-
-        let mut manager = InteractiveWidgetManager {
-            buttons,
-            text_inputs,
-            key_inputs,
-            texts,
-        };
-
-        manager.add_title_text();
+        manager
+            .text_inputs
+            .insert(TextInputType::IpAddressInput, room_ip_input);
 
         manager.add_back_to_menu_button();
         manager.add_central_column_buttons(
