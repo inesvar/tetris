@@ -404,7 +404,7 @@ impl InteractiveWidgetManager {
         }
     }
 
-    pub(super) fn add_button(
+    fn add_button(
         &mut self,
         button_type: impl Into<ButtonType>,
         center_x: Scalar,
@@ -415,7 +415,7 @@ impl InteractiveWidgetManager {
         self.buttons.insert(button_type, button);
     }
 
-    pub(super) fn add_button_custom_size(
+    fn add_button_custom_size(
         &mut self,
         button_type: impl Into<ButtonType>,
         center_x: Scalar,
