@@ -56,82 +56,6 @@ impl InteractiveWidgetManager {
         settings: impl Iterator<Item = Keybindings>,
         from_game: bool,
     ) -> InteractiveWidgetManager {
-        let text_inputs = HashMap::new();
-        let mut key_inputs = HashMap::new();
-        let mut horizontal_offset = 0.0;
-
-        for (i, setting) in settings.enumerate() {
-            let fall_keys_input = KeyInput::new_with_info(
-                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0,
-                setting.get_keys(TetrisCommand::SoftDrop),
-                "Soft Drop Keys :",
-            );
-
-            let hard_drop_keys_input = KeyInput::new_with_info(
-                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-                setting.get_keys(TetrisCommand::HardDrop),
-                "Hard Drop Keys :",
-            );
-
-            let right_keys_input = KeyInput::new_with_info(
-                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
-                setting.get_keys(TetrisCommand::Right),
-                "Right Keys :",
-            );
-
-            let left_keys_input = KeyInput::new_with_info(
-                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
-                setting.get_keys(TetrisCommand::Left),
-                "Left Keys :",
-            );
-
-            let rotate_clockwise_keys_input = KeyInput::new_with_info(
-                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0,
-                setting.get_keys(TetrisCommand::Clockwise),
-                "Rotate Clockwise Keys :",
-            );
-
-            let rotate_counterclockwise_keys_input = KeyInput::new_with_info(
-                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
-                setting.get_keys(TetrisCommand::Counterclockwise),
-                "Rotate Counterclockwise Keys :",
-            );
-
-            let rotate_half_turn_keys_input = KeyInput::new_with_info(
-                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
-                setting.get_keys(TetrisCommand::HalfTurn),
-                "Rotate Half Turn Keys :",
-            );
-
-            let hold_tetromino_keys_input = KeyInput::new_with_info(
-                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
-                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
-                setting.get_keys(TetrisCommand::Hold),
-                "Hold Tetromino Keys :",
-            );
-
-            key_inputs.insert((TetrisCommand::SoftDrop, i), fall_keys_input);
-            key_inputs.insert((TetrisCommand::HardDrop, i), hard_drop_keys_input);
-            key_inputs.insert((TetrisCommand::Right, i), right_keys_input);
-            key_inputs.insert((TetrisCommand::Left, i), left_keys_input);
-            key_inputs.insert((TetrisCommand::Clockwise, i), rotate_clockwise_keys_input);
-            key_inputs.insert(
-                (TetrisCommand::Counterclockwise, i),
-                rotate_counterclockwise_keys_input,
-            );
-            key_inputs.insert((TetrisCommand::HalfTurn, i), rotate_half_turn_keys_input);
-            key_inputs.insert((TetrisCommand::Hold, i), hold_tetromino_keys_input);
-
-            horizontal_offset += DEFAULT_WINDOW_WIDTH;
-        }
-
         let buttons = HashMap::new();
 
         let title_text = Text::new_with_tetris_font(
@@ -145,12 +69,86 @@ impl InteractiveWidgetManager {
         let mut texts = HashMap::new();
         texts.insert(TextType::Title, title_text);
 
+        let text_inputs = HashMap::new();
+
+        let key_inputs = HashMap::new();
+
         let mut manager = InteractiveWidgetManager {
             buttons,
             text_inputs,
             key_inputs,
             texts,
         };
+
+        let mut horizontal_offset = 0.0;
+
+        for (i, setting) in settings.enumerate() {
+            manager.add_key_input(
+                TetrisCommand::SoftDrop,
+                i,
+                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
+                DEFAULT_WINDOW_HEIGHT / 2.0,
+                &setting,
+            );
+
+            manager.add_key_input(
+                TetrisCommand::HardDrop,
+                i,
+                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
+                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
+                &setting,
+            );
+
+            manager.add_key_input(
+                TetrisCommand::Right,
+                i,
+                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
+                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
+                &setting,
+            );
+
+            manager.add_key_input(
+                TetrisCommand::Left,
+                i,
+                DEFAULT_WINDOW_WIDTH / 4.0 + horizontal_offset,
+                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
+                &setting,
+            );
+
+            manager.add_key_input(
+                TetrisCommand::Clockwise,
+                i,
+                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
+                DEFAULT_WINDOW_HEIGHT / 2.0,
+                &setting,
+            );
+
+            manager.add_key_input(
+                TetrisCommand::Counterclockwise,
+                i,
+                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
+                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 1.0,
+                &setting,
+            );
+
+            manager.add_key_input(
+                TetrisCommand::HalfTurn,
+                i,
+                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
+                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 2.0,
+                &setting,
+            );
+
+            manager.add_key_input(
+                TetrisCommand::Hold,
+                i,
+                DEFAULT_WINDOW_WIDTH * 3.0 / 4.0 + horizontal_offset,
+                DEFAULT_WINDOW_HEIGHT / 2.0 + DEFAULT_BUTTON_Y_SPACING * 3.0,
+                &setting,
+            );
+
+            horizontal_offset += DEFAULT_WINDOW_WIDTH;
+        }
 
         if !from_game {
             manager.add_back_to_menu_button();
@@ -402,6 +400,23 @@ impl InteractiveWidgetManager {
                     + DEFAULT_BUTTON_Y_SPACING * (pos as f64 - nb_buttons_above_middle as f64),
             );
         }
+    }
+
+    fn add_key_input(
+        &mut self,
+        command: TetrisCommand,
+        player: usize,
+        center_x: Scalar,
+        center_y: Scalar,
+        keybindings: &Keybindings,
+    ) {
+        let key_input = KeyInput::new_with_info(
+            center_x,
+            center_y,
+            keybindings.get_keys(command),
+            &format!("{command} Keys :"),
+        );
+        self.key_inputs.insert((command, player), key_input);
     }
 
     fn add_button(
