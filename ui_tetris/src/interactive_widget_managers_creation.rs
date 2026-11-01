@@ -16,16 +16,8 @@ use std::collections::HashMap;
 impl InteractiveWidgetManager {
     pub fn new_main_menu() -> InteractiveWidgetManager {
         let buttons = HashMap::new();
-        let title_text = Text::new_with_tetris_font(
-            "T",
-            DEFAULT_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
 
-        let mut texts = HashMap::new();
-        texts.insert(TextType::Title, title_text);
+        let texts = HashMap::new();
 
         let text_inputs = HashMap::new();
 
@@ -37,6 +29,8 @@ impl InteractiveWidgetManager {
             key_inputs,
             texts,
         };
+
+        manager.add_title_text();
 
         manager.add_central_column_buttons(
             [
@@ -58,16 +52,7 @@ impl InteractiveWidgetManager {
     ) -> InteractiveWidgetManager {
         let buttons = HashMap::new();
 
-        let title_text = Text::new_with_tetris_font(
-            "T",
-            DEFAULT_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
-
-        let mut texts = HashMap::new();
-        texts.insert(TextType::Title, title_text);
+        let texts = HashMap::new();
 
         let text_inputs = HashMap::new();
 
@@ -79,6 +64,8 @@ impl InteractiveWidgetManager {
             key_inputs,
             texts,
         };
+
+        manager.add_title_text();
 
         let mut horizontal_offset = 0.0;
 
@@ -167,14 +154,6 @@ impl InteractiveWidgetManager {
 
     pub fn new_single_player_game() -> InteractiveWidgetManager {
         let buttons = HashMap::new();
-
-        let title_text = Text::new_with_tetris_font(
-            "T",
-            DEFAULT_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
         let restart_text = Text::new(
             "Press R to (re)start",
             (DEFAULT_FONT_SIZE * 22) / 16,
@@ -198,7 +177,6 @@ impl InteractiveWidgetManager {
         );
 
         let mut texts = HashMap::new();
-        texts.insert(TextType::Title, title_text);
         texts.insert(TextType::Restart, restart_text);
         texts.insert(TextType::Timer, timer_text);
         texts.insert(TextType::Pause, pause_text);
@@ -212,6 +190,8 @@ impl InteractiveWidgetManager {
             key_inputs,
             texts,
         };
+
+        manager.add_title_text();
 
         manager.add_back_to_menu_button();
 
@@ -236,14 +216,6 @@ impl InteractiveWidgetManager {
 
     pub fn new_two_player_game() -> InteractiveWidgetManager {
         let buttons = HashMap::new();
-
-        let title_text = Text::new_with_tetris_font(
-            "T",
-            DEFAULT_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
         let restart_text = Text::new(
             "Press R to (re)start",
             (DEFAULT_FONT_SIZE * 22) / 16,
@@ -267,7 +239,6 @@ impl InteractiveWidgetManager {
         );
 
         let mut texts = HashMap::new();
-        texts.insert(TextType::Title, title_text);
         texts.insert(TextType::Restart, restart_text);
         texts.insert(TextType::Timer, timer_text);
         texts.insert(TextType::Pause, pause_text);
@@ -281,6 +252,8 @@ impl InteractiveWidgetManager {
             key_inputs,
             texts,
         };
+
+        manager.add_title_text();
 
         manager.add_back_to_menu_button();
 
@@ -306,16 +279,7 @@ impl InteractiveWidgetManager {
     pub fn new_create_room() -> InteractiveWidgetManager {
         let buttons = HashMap::new();
 
-        let title_text = Text::new_with_tetris_font(
-            "T",
-            DEFAULT_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
-
-        let mut texts = HashMap::new();
-        texts.insert(TextType::Title, title_text);
+        let texts = HashMap::new();
 
         let text_inputs = HashMap::new();
         let key_inputs = HashMap::new();
@@ -326,6 +290,8 @@ impl InteractiveWidgetManager {
             key_inputs,
             texts,
         };
+
+        manager.add_title_text();
 
         manager.add_back_to_menu_button();
 
@@ -346,16 +312,8 @@ impl InteractiveWidgetManager {
         let mut text_inputs = HashMap::new();
         text_inputs.insert(TextInputType::IpAddressInput, room_ip_input);
 
-        let title_text = Text::new_with_tetris_font(
-            "T",
-            DEFAULT_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
+        let texts = HashMap::new();
 
-        let mut texts = HashMap::new();
-        texts.insert(TextType::Title, title_text);
         let key_inputs = HashMap::new();
 
         let mut manager = InteractiveWidgetManager {
@@ -364,6 +322,8 @@ impl InteractiveWidgetManager {
             key_inputs,
             texts,
         };
+
+        manager.add_title_text();
 
         manager.add_back_to_menu_button();
         manager.add_central_column_buttons(
@@ -385,6 +345,18 @@ impl InteractiveWidgetManager {
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
+    }
+
+    fn add_title_text(&mut self) {
+        let title_text = Text::new_with_tetris_font(
+            "T",
+            DEFAULT_FONT_SIZE,
+            DEFAULT_WINDOW_WIDTH / 2.0,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        );
+
+        self.texts.insert(TextType::Title, title_text);
     }
 
     fn add_central_column_buttons(
