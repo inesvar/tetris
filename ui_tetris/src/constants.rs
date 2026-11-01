@@ -4,6 +4,9 @@ use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_Y, SCALE_FACTOR};
 pub const DEFAULT_WINDOW_WIDTH: f64 = 650.0 * SCALE_FACTOR;
 pub const DEFAULT_WINDOW_HEIGHT: f64 = 800.0 * SCALE_FACTOR;
 
+// window positions
+pub const TOP_LINE_HEIGHT: f64 = (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0;
+
 // text
 pub const DEFAULT_FONT_SIZE: u32 = (16.0 * SCALE_FACTOR) as u32;
 pub const BIGGER_FONT_SIZE: u32 = (22.0 * SCALE_FACTOR) as u32;

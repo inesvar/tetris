@@ -6,7 +6,7 @@ use super::{button::Button, key_input::KeyInput, text::Text, text_input::TextInp
 use super::{
     BIGGER_FONT_SIZE, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
     DEFAULT_FONT_SIZE, DEFAULT_SCORE_TEXT_Y, DEFAULT_TITLE_Y, DEFAULT_WINDOW_HEIGHT,
-    DEFAULT_WINDOW_WIDTH, SILVER,
+    DEFAULT_WINDOW_WIDTH, SILVER, TOP_LINE_HEIGHT,
 };
 use crate::keybindings::Keybindings;
 use core_tetris::TetrisCommand;
@@ -65,7 +65,7 @@ impl InteractiveWidgetManager {
             manager.add_button_custom_size(
                 ViewChangeButton::BackToGame,
                 (60.0 * DEFAULT_WINDOW_WIDTH + horizontal_offset) / 65.0,
-                (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
+                TOP_LINE_HEIGHT,
                 DEFAULT_BUTTON_WIDTH / 6.0,
                 DEFAULT_BUTTON_HEIGHT / 2.0,
             );
@@ -108,7 +108,7 @@ impl InteractiveWidgetManager {
         manager.add_button_custom_size(
             ViewChangeButton::ToPause,
             (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
+            TOP_LINE_HEIGHT,
             DEFAULT_BUTTON_WIDTH / 5.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
@@ -116,7 +116,7 @@ impl InteractiveWidgetManager {
         manager.add_button_custom_size(
             ViewChangeButton::ToSettings,
             (58.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
+            TOP_LINE_HEIGHT,
             DEFAULT_BUTTON_WIDTH / 3.5,
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
@@ -158,7 +158,7 @@ impl InteractiveWidgetManager {
         manager.add_button_custom_size(
             ViewChangeButton::ToPause,
             (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
+            TOP_LINE_HEIGHT,
             DEFAULT_BUTTON_WIDTH / 5.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
@@ -166,7 +166,7 @@ impl InteractiveWidgetManager {
         manager.add_button_custom_size(
             ViewChangeButton::ToSettings,
             (123.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
+            TOP_LINE_HEIGHT,
             DEFAULT_BUTTON_WIDTH / 3.5,
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
@@ -218,7 +218,7 @@ impl InteractiveWidgetManager {
         self.add_button_custom_size(
             ViewChangeButton::BackToMainMenu,
             (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
+            TOP_LINE_HEIGHT,
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
