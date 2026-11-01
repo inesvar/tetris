@@ -1,4 +1,4 @@
-use super::{BIGGER_FONT_SIZE, DEFAULT_TITLE_Y, SILVER, WINDOW_HALF_WIDTH};
+use super::{BIGGER_FONT_SIZE, DEFAULT_FONT_SIZE, DEFAULT_TITLE_Y, SILVER, WINDOW_HALF_WIDTH};
 use graphics::types::{Color, FontSize, Scalar};
 
 #[derive(Clone)]
@@ -45,14 +45,15 @@ impl Text {
         )
     }
 
-    pub fn new_with_tetris_font(
-        text: &str,
-        font_size: FontSize,
-        x: Scalar,
-        y: Scalar,
-        color: Color,
-    ) -> Text {
-        Text::inner_new(text, true, font_size, x, y, color)
+    pub fn new_tetris_app_title() -> Text {
+        Text::inner_new(
+            "T",
+            true,
+            DEFAULT_FONT_SIZE,
+            WINDOW_HALF_WIDTH,
+            DEFAULT_TITLE_Y,
+            SILVER,
+        )
     }
 
     pub fn set_text(&mut self, text: String) {

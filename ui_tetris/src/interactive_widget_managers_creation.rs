@@ -5,8 +5,8 @@ use super::interactive_widget_manager::{
 use super::{button::Button, key_input::KeyInput, text::Text, text_input::TextInput};
 use super::{
     DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE,
-    DEFAULT_SCORE_TEXT_Y, DEFAULT_TITLE_Y, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, SILVER,
-    TOP_LINE_HEIGHT, WINDOW_HALF_WIDTH,
+    DEFAULT_SCORE_TEXT_Y, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, SILVER, TOP_LINE_HEIGHT,
+    WINDOW_HALF_WIDTH,
 };
 use crate::keybindings::Keybindings;
 use core_tetris::TetrisCommand;
@@ -135,7 +135,9 @@ impl InteractiveWidgetManager {
 
     fn new_tetris_view() -> Self {
         let mut manager = Self::default();
-        manager.add_title_text();
+        manager
+            .texts
+            .insert(TextType::Title, Text::new_tetris_app_title());
         manager
     }
 
@@ -147,18 +149,6 @@ impl InteractiveWidgetManager {
             DEFAULT_BUTTON_WIDTH / 6.0,
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
-    }
-
-    fn add_title_text(&mut self) {
-        let title_text = Text::new_with_tetris_font(
-            "T",
-            DEFAULT_FONT_SIZE,
-            WINDOW_HALF_WIDTH,
-            DEFAULT_TITLE_Y,
-            SILVER,
-        );
-
-        self.texts.insert(TextType::Title, title_text);
     }
 
     fn add_central_column_buttons(
