@@ -2,7 +2,7 @@ use graphics::rectangle;
 use graphics::types;
 use graphics::types::Scalar;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub(super) struct Rectangle {
     pub(super) center_x: Scalar,
     pub(super) center_y: Scalar,

@@ -3,12 +3,13 @@ use super::Rectangle;
 use super::{DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_FONT_SIZE};
 use graphics::color::{BLACK, GRAY, SILVER};
 use graphics::types::{Color, Scalar};
+use std::cell::Cell;
 
 /// Button that changes color when pressed.
 /// The widget manager will know the button was pressed when it makes its next query.
 #[derive(Clone)]
 pub struct Button {
-    pub(super) rect: Rectangle,
+    pub(super) rect: Cell<Rectangle>,
     pub(super) text: Text,
     color: Color,
     color_when_pressed: Color,
@@ -35,7 +36,7 @@ impl Button {
         text: &str,
     ) -> Self {
         Button {
-            rect: Rectangle::new(center_x, center_y, width, height),
+            rect: Cell::new(Rectangle::new(center_x, center_y, width, height)),
             text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, BLACK),
             color: SILVER,
             color_when_pressed: GRAY,
@@ -52,7 +53,7 @@ impl Button {
         text: &str,
     ) -> Self {
         Button {
-            rect: Rectangle::new(center_x, center_y, width, height),
+            rect: Cell::new(Rectangle::new(center_x, center_y, width, height)),
             text: Text::new(text, DEFAULT_FONT_SIZE, 0.0, 0.0, BLACK),
             color: SILVER,
             color_when_pressed: GRAY,
@@ -68,7 +69,7 @@ impl Button {
     }
 
     pub(super) fn handle_left_click(&mut self, cursor_position: &[Scalar; 2]) {
-        if self.rect.contains(cursor_position) {
+        if self.rect.get().contains(cursor_position) {
             println!("button press");
             self.is_pressed = true;
             self.has_been_pressed = true;

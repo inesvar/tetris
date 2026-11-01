@@ -97,11 +97,11 @@ impl RenderTetrisUi for Piston2dOpenGlRenderer<'_> {
         let rectangle = graphics::Rectangle::new(button.color());
 
         let old_transform = self.transform;
-        let (center_x, center_y) = button.rect.get_center();
+        let (center_x, center_y) = button.rect.get().get_center();
         self.transform = self.transform.trans(center_x, center_y);
 
         rectangle.draw(
-            button.rect.get_dimensions(),
+            button.rect.get().get_dimensions(),
             &self.draw_state,
             self.transform,
             &mut self.gl,
