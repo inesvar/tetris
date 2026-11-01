@@ -6,7 +6,7 @@ use super::{button::Button, key_input::KeyInput, text::Text, text_input::TextInp
 use super::{
     BIGGER_FONT_SIZE, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
     DEFAULT_FONT_SIZE, DEFAULT_SCORE_TEXT_Y, DEFAULT_TITLE_Y, DEFAULT_WINDOW_HEIGHT,
-    DEFAULT_WINDOW_WIDTH, SILVER, TOP_LINE_HEIGHT,
+    DEFAULT_WINDOW_WIDTH, SILVER, TOP_LINE_HEIGHT, WINDOW_HALF_WIDTH,
 };
 use crate::keybindings::Keybindings;
 use core_tetris::TetrisCommand;
@@ -80,7 +80,7 @@ impl InteractiveWidgetManager {
         let restart_text = Text::new(
             "Press R to (re)start",
             BIGGER_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
+            WINDOW_HALF_WIDTH,
             DEFAULT_TITLE_Y,
             SILVER,
         );
@@ -94,7 +94,7 @@ impl InteractiveWidgetManager {
         let pause_text = Text::new(
             "Press P to resume",
             BIGGER_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
+            WINDOW_HALF_WIDTH,
             DEFAULT_TITLE_Y,
             SILVER,
         );
@@ -130,7 +130,7 @@ impl InteractiveWidgetManager {
         let restart_text = Text::new(
             "Press R to (re)start",
             BIGGER_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
+            WINDOW_HALF_WIDTH,
             DEFAULT_TITLE_Y,
             SILVER,
         );
@@ -144,7 +144,7 @@ impl InteractiveWidgetManager {
         let pause_text = Text::new(
             "Press P to resume",
             BIGGER_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
+            WINDOW_HALF_WIDTH,
             DEFAULT_TITLE_Y,
             SILVER,
         );
@@ -186,11 +186,8 @@ impl InteractiveWidgetManager {
     pub fn new_join_room() -> InteractiveWidgetManager {
         let mut manager = InteractiveWidgetManager::new_tetris_view();
 
-        let room_ip_input = TextInput::new(
-            DEFAULT_WINDOW_WIDTH / 2.0,
-            DEFAULT_WINDOW_HEIGHT / 3.0,
-            "Join room",
-        );
+        let room_ip_input =
+            TextInput::new(WINDOW_HALF_WIDTH, DEFAULT_WINDOW_HEIGHT / 3.0, "Join room");
 
         manager
             .text_inputs
@@ -228,7 +225,7 @@ impl InteractiveWidgetManager {
         let title_text = Text::new_with_tetris_font(
             "T",
             DEFAULT_FONT_SIZE,
-            DEFAULT_WINDOW_WIDTH / 2.0,
+            WINDOW_HALF_WIDTH,
             DEFAULT_TITLE_Y,
             SILVER,
         );
@@ -244,7 +241,7 @@ impl InteractiveWidgetManager {
         for (pos, button_type) in buttons.into_iter().enumerate() {
             self.add_button(
                 button_type,
-                DEFAULT_WINDOW_WIDTH / 2.0,
+                WINDOW_HALF_WIDTH,
                 DEFAULT_WINDOW_HEIGHT / 2.0
                     + DEFAULT_BUTTON_Y_SPACING * (pos as f64 - nb_buttons_above_middle as f64),
             );

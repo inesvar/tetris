@@ -6,6 +6,7 @@ pub const DEFAULT_WINDOW_HEIGHT: f64 = 800.0 * SCALE_FACTOR;
 
 // window positions
 pub const TOP_LINE_HEIGHT: f64 = (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0;
+pub const WINDOW_HALF_WIDTH: f64 = DEFAULT_WINDOW_WIDTH / 2.0;
 
 // text
 pub const DEFAULT_FONT_SIZE: u32 = (16.0 * SCALE_FACTOR) as u32;
