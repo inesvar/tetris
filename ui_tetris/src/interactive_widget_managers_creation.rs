@@ -4,8 +4,9 @@ use super::interactive_widget_manager::{
 };
 use super::{button::Button, key_input::KeyInput, text::Text, text_input::TextInput};
 use super::{
-    DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING, DEFAULT_FONT_SIZE,
-    DEFAULT_SCORE_TEXT_Y, DEFAULT_TITLE_Y, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, SILVER,
+    BIGGER_FONT_SIZE, DEFAULT_BUTTON_HEIGHT, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_Y_SPACING,
+    DEFAULT_FONT_SIZE, DEFAULT_SCORE_TEXT_Y, DEFAULT_TITLE_Y, DEFAULT_WINDOW_HEIGHT,
+    DEFAULT_WINDOW_WIDTH, SILVER,
 };
 use crate::keybindings::Keybindings;
 use core_tetris::TetrisCommand;
@@ -78,7 +79,7 @@ impl InteractiveWidgetManager {
         let buttons = HashMap::new();
         let restart_text = Text::new(
             "Press R to (re)start",
-            (DEFAULT_FONT_SIZE * 22) / 16,
+            BIGGER_FONT_SIZE,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_TITLE_Y,
             SILVER,
@@ -92,7 +93,7 @@ impl InteractiveWidgetManager {
         );
         let pause_text = Text::new(
             "Press P to resume",
-            (DEFAULT_FONT_SIZE * 22) / 16,
+            BIGGER_FONT_SIZE,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_TITLE_Y,
             SILVER,
@@ -140,7 +141,7 @@ impl InteractiveWidgetManager {
         let buttons = HashMap::new();
         let restart_text = Text::new(
             "Press R to (re)start",
-            (DEFAULT_FONT_SIZE * 22) / 16,
+            BIGGER_FONT_SIZE,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_TITLE_Y,
             SILVER,
@@ -154,7 +155,7 @@ impl InteractiveWidgetManager {
         );
         let pause_text = Text::new(
             "Press P to resume",
-            (DEFAULT_FONT_SIZE * 22) / 16,
+            BIGGER_FONT_SIZE,
             DEFAULT_WINDOW_WIDTH / 2.0,
             DEFAULT_TITLE_Y,
             SILVER,
