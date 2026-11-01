@@ -153,13 +153,7 @@ impl InteractiveWidgetManager {
         };
 
         if !from_game {
-            manager.add_button_custom_size(
-                ViewChangeButton::BackToMainMenu,
-                (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-                (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
-                DEFAULT_BUTTON_WIDTH / 6.0,
-                DEFAULT_BUTTON_HEIGHT / 2.0,
-            );
+            manager.add_back_to_menu_button();
         } else {
             manager.add_button_custom_size(
                 ViewChangeButton::BackToGame,
@@ -221,13 +215,7 @@ impl InteractiveWidgetManager {
             texts,
         };
 
-        manager.add_button_custom_size(
-            ViewChangeButton::BackToMainMenu,
-            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
-            DEFAULT_BUTTON_WIDTH / 6.0,
-            DEFAULT_BUTTON_HEIGHT / 2.0,
-        );
+        manager.add_back_to_menu_button();
 
         manager.add_button_custom_size(
             ViewChangeButton::ToPause,
@@ -296,13 +284,7 @@ impl InteractiveWidgetManager {
             texts,
         };
 
-        manager.add_button_custom_size(
-            ViewChangeButton::BackToMainMenu,
-            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
-            DEFAULT_BUTTON_WIDTH / 6.0,
-            DEFAULT_BUTTON_HEIGHT / 2.0,
-        );
+        manager.add_back_to_menu_button();
 
         manager.add_button_custom_size(
             ViewChangeButton::ToPause,
@@ -347,13 +329,7 @@ impl InteractiveWidgetManager {
             texts,
         };
 
-        manager.add_button_custom_size(
-            ViewChangeButton::BackToMainMenu,
-            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
-            DEFAULT_BUTTON_WIDTH / 6.0,
-            DEFAULT_BUTTON_HEIGHT / 2.0,
-        );
+        manager.add_back_to_menu_button();
 
         manager.add_central_column_buttons([CurrentViewButton::CopyToClipboard], 0);
 
@@ -391,13 +367,7 @@ impl InteractiveWidgetManager {
             texts,
         };
 
-        manager.add_button_custom_size(
-            ViewChangeButton::BackToMainMenu,
-            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
-            DEFAULT_BUTTON_WIDTH / 6.0,
-            DEFAULT_BUTTON_HEIGHT / 2.0,
-        );
+        manager.add_back_to_menu_button();
         manager.add_central_column_buttons(
             [
                 CurrentViewButton::ToTwoRemoteGame,
@@ -407,6 +377,16 @@ impl InteractiveWidgetManager {
         );
 
         manager
+    }
+
+    fn add_back_to_menu_button(&mut self) {
+        self.add_button_custom_size(
+            ViewChangeButton::BackToMainMenu,
+            (5.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            (5.0 * DEFAULT_WINDOW_HEIGHT) / 70.0,
+            DEFAULT_BUTTON_WIDTH / 6.0,
+            DEFAULT_BUTTON_HEIGHT / 2.0,
+        );
     }
 
     fn add_central_column_buttons(
