@@ -399,7 +399,7 @@ impl InteractiveWidgetManager {
                 button_type,
                 DEFAULT_WINDOW_WIDTH / 2.0,
                 DEFAULT_WINDOW_HEIGHT / 2.0
-                    + DEFAULT_BUTTON_Y_SPACING * (pos as i32 - nb_buttons_above_middle) as f64,
+                    + DEFAULT_BUTTON_Y_SPACING * (pos as f64 - nb_buttons_above_middle as f64),
             );
         }
     }
