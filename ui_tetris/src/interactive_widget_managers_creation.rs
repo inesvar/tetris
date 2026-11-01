@@ -14,31 +14,6 @@ use render_tetris::{BLOCK_SIZE, DEFAULT_GRID_X};
 use std::collections::HashMap;
 
 impl InteractiveWidgetManager {
-    pub(super) fn add_button(
-        &mut self,
-        button_type: impl Into<ButtonType>,
-        center_x: Scalar,
-        center_y: Scalar,
-    ) {
-        let button_type = button_type.into();
-        let button = Button::new(center_x, center_y, &button_type.to_string());
-        self.buttons.insert(button_type, button);
-    }
-
-    pub(super) fn add_button_custom_size(
-        &mut self,
-        button_type: impl Into<ButtonType>,
-        center_x: Scalar,
-        center_y: Scalar,
-        width: Scalar,
-        height: Scalar,
-    ) {
-        let button_type = button_type.into();
-        let button =
-            Button::new_custom_size(center_x, center_y, width, height, &button_type.to_string());
-        self.buttons.insert(button_type, button);
-    }
-
     pub fn new_main_menu() -> InteractiveWidgetManager {
         let buttons = HashMap::new();
         let title_text = Text::new_with_tetris_font(
@@ -454,5 +429,30 @@ impl InteractiveWidgetManager {
         );
 
         manager
+    }
+
+    pub(super) fn add_button(
+        &mut self,
+        button_type: impl Into<ButtonType>,
+        center_x: Scalar,
+        center_y: Scalar,
+    ) {
+        let button_type = button_type.into();
+        let button = Button::new(center_x, center_y, &button_type.to_string());
+        self.buttons.insert(button_type, button);
+    }
+
+    pub(super) fn add_button_custom_size(
+        &mut self,
+        button_type: impl Into<ButtonType>,
+        center_x: Scalar,
+        center_y: Scalar,
+        width: Scalar,
+        height: Scalar,
+    ) {
+        let button_type = button_type.into();
+        let button =
+            Button::new_custom_size(center_x, center_y, width, height, &button_type.to_string());
+        self.buttons.insert(button_type, button);
     }
 }
