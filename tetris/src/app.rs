@@ -96,13 +96,13 @@ impl App {
                     InteractiveWidgetManager::new_settings(self.game.keybindings(), from_game);
             }
             ViewState::TwoLocal => {
-                self.widget_manager = InteractiveWidgetManager::new_two_player_game();
+                self.widget_manager = InteractiveWidgetManager::new_tetris_game(2);
             }
             ViewState::Local => {
-                self.widget_manager = InteractiveWidgetManager::new_single_player_game();
+                self.widget_manager = InteractiveWidgetManager::new_tetris_game(1);
             }
             ViewState::Remote => {
-                self.widget_manager = InteractiveWidgetManager::new_two_player_game();
+                self.widget_manager = InteractiveWidgetManager::new_tetris_game(2);
             }
             ViewState::CreateRoom => {
                 /* let mut file = File::create("local_port.txt").unwrap();

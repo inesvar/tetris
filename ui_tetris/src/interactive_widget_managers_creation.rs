@@ -74,7 +74,7 @@ impl InteractiveWidgetManager {
         manager
     }
 
-    pub fn new_single_player_game() -> InteractiveWidgetManager {
+    pub fn new_tetris_game(nb_players: usize) -> InteractiveWidgetManager {
         let mut manager = InteractiveWidgetManager::new_tetris_view();
 
         manager.add_tetris_game_texts();
@@ -89,35 +89,11 @@ impl InteractiveWidgetManager {
             DEFAULT_BUTTON_HEIGHT / 2.0,
         );
 
-        manager.add_button_custom_size(
-            ViewChangeButton::ToSettings,
-            (58.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            TOP_LINE_HEIGHT,
-            DEFAULT_BUTTON_WIDTH / 3.5,
-            DEFAULT_BUTTON_HEIGHT / 2.0,
-        );
-
-        manager
-    }
-
-    pub fn new_two_player_game() -> InteractiveWidgetManager {
-        let mut manager = InteractiveWidgetManager::new_tetris_view();
-
-        manager.add_tetris_game_texts();
-
-        manager.add_back_to_menu_button();
-
-        manager.add_button_custom_size(
-            ViewChangeButton::ToPause,
-            (13.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
-            TOP_LINE_HEIGHT,
-            DEFAULT_BUTTON_WIDTH / 5.0,
-            DEFAULT_BUTTON_HEIGHT / 2.0,
-        );
+        let window_width = DEFAULT_WINDOW_WIDTH * nb_players as f64;
 
         manager.add_button_custom_size(
             ViewChangeButton::ToSettings,
-            (123.0 * DEFAULT_WINDOW_WIDTH) / 65.0,
+            window_width - 7.0 / 65.0 * DEFAULT_WINDOW_WIDTH,
             TOP_LINE_HEIGHT,
             DEFAULT_BUTTON_WIDTH / 3.5,
             DEFAULT_BUTTON_HEIGHT / 2.0,
