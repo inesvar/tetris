@@ -32,6 +32,7 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
         // Clear the screen.
         graphics::clear(BG_COLOR, &mut self.gl);
 
+        // TODO can be collapsed
         match &app.view_state {
             ViewState::MainMenu | ViewState::CreateRoom | ViewState::JoinRoom => {
                 self.render_widget_manager(&app.widget_manager, &app.game.running);
@@ -39,7 +40,7 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
             ViewState::Settings => {
                 self.render_widget_manager(&app.widget_manager, &app.game.running);
             }
-            a if a.is_game() => {
+            ViewState::Game(_) => {
                 self.render_widget_manager(&app.widget_manager, &app.game.running);
 
                 for player in &app.game.local_players {

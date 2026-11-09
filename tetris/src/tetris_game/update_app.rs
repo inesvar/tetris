@@ -93,7 +93,9 @@ impl App {
         } else if self.view_state == ViewState::JoinRoom {
             self.widget_manager.update_clipboard();
             self.widget_manager.update_from_text();
-        } else if self.view_state.is_game() && self.game.running == RunningState::Starting {
+        } else if matches!(self.view_state, ViewState::Game(_))
+            && self.game.running == RunningState::Starting
+        {
             self.game.clock += args.dt;
             self.widget_manager
                 .set_text(TextType::Timer, format_seconds(0.0));
@@ -104,7 +106,9 @@ impl App {
                 self.game
                     .send_message(OutboundMessage::TetrisPlayer((player.player_data(), 0)));
             }
-        } else if self.view_state.is_game() && self.game.running == RunningState::Running {
+        } else if matches!(self.view_state, ViewState::Game(_))
+            && self.game.running == RunningState::Running
+        {
             self.game.clock += args.dt;
             self.update_running_game();
         }
@@ -115,7 +119,7 @@ impl App {
         };
         match result {
             ViewChangeButton::ToPause => {
-                if self.view_state.is_game() {
+                if matches!(self.view_state, ViewState::Game(_)) {
                     self.game.pause()
                 }
             }
@@ -136,14 +140,14 @@ impl App {
                 if self.game.player_config != PlayerConfig::Local {
                     self.game.set_player_config(PlayerConfig::Local);
                 }
-                self.set_view(ViewState::Local)
+                self.set_view(ViewState::Game(1))
             }
             ViewChangeButton::ToCreateRoom => self.set_view(ViewState::CreateRoom),
             ViewChangeButton::ToJoinRoom => {
                 if self.game.player_config == PlayerConfig::Local {
                     self.set_view(ViewState::JoinRoom)
                 } else if self.game.player_config.is_remote() {
-                    self.set_view(ViewState::Remote)
+                    self.set_view(ViewState::Game(2))
                 }
             }
             ViewChangeButton::ToTwoRemoteGameInfo {
@@ -154,7 +158,7 @@ impl App {
                     local_ip: local_ip.clone(),
                     remote_ip,
                 });
-                self.set_view(ViewState::Remote);
+                self.set_view(ViewState::Game(2));
                 self.game.send_message(OutboundMessage::Hello(local_ip));
                 self.game.send_message(OutboundMessage::TetrisPlayer((
                     self.game.local_players[0].player_data(),
@@ -165,15 +169,15 @@ impl App {
                 if self.game.player_config != PlayerConfig::TwoLocal {
                     self.game.set_player_config(PlayerConfig::TwoLocal);
                 }
-                self.set_view(ViewState::TwoLocal);
+                self.set_view(ViewState::Game(2))
             }
             ViewChangeButton::BackToGame => match &self.game.player_config {
-                PlayerConfig::TwoLocal => self.set_view(ViewState::TwoLocal),
-                PlayerConfig::Local => self.set_view(ViewState::Local),
+                PlayerConfig::TwoLocal => self.set_view(ViewState::Game(2)),
+                PlayerConfig::Local => self.set_view(ViewState::Game(1)),
                 PlayerConfig::TwoRemote {
                     local_ip: _,
                     remote_ip: _,
-                } => self.set_view(ViewState::Remote),
+                } => self.set_view(ViewState::Game(2)),
                 _ => unreachable!(),
             },
         }

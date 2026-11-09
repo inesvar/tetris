@@ -194,7 +194,7 @@ impl TetrisGame {
             }
             GameFlowChange::Resume | GameFlowChange::Restart => {
                 self.update_game_flow(game_flow_change);
-                Some(ViewState::Remote)
+                Some(ViewState::Game(2))
             }
             GameFlowChange::Sync(new_settings) => {
                 self.settings_manager = new_settings;
@@ -221,7 +221,7 @@ impl TetrisGame {
                     self.local_players[0].player_data(),
                     0,
                 )));
-                Some(ViewState::Remote)
+                Some(ViewState::Game(2))
             }
             GameFlowChange::NoChange => None,
         }

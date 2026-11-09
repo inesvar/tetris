@@ -7,13 +7,5 @@ pub enum ViewState {
     Settings,
     JoinRoom,
     CreateRoom,
-    Local,    // TODO: this is the same view, conceptually it's the Game View
-    TwoLocal, // TODO: this is the same view, conceptually it's the Game View
-    Remote,   // TODO: this is the same view, conceptually it's the Game View
-}
-
-impl ViewState {
-    pub(crate) fn is_game(&self) -> bool {
-        matches!(self, Self::Local | Self::TwoLocal | Self::Remote)
-    }
+    Game(usize),
 }

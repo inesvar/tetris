@@ -39,7 +39,7 @@ impl App {
     }
 
     pub fn handle_key_press(&mut self, key: Key) {
-        if self.view_state.is_game() {
+        if matches!(self.view_state, ViewState::Game(_)) {
             let game_flow_change = self.game.handle_key_press_in_game(key);
             self.game.update_game_flow(game_flow_change);
         }
@@ -53,7 +53,7 @@ impl App {
     }
 
     pub fn handle_key_release(&mut self, key: Key) {
-        if self.view_state.is_game() {
+        if matches!(self.view_state, ViewState::Game(_)) {
             self.game.handle_key_release(key);
         }
     }
@@ -80,7 +80,7 @@ impl App {
 
     pub(crate) fn set_view(&mut self, view_state: ViewState) {
         println!("setting view to {:?}", view_state);
-        let from_game = self.view_state.is_game();
+        let from_game = matches!(self.view_state, ViewState::Game(_));
         if self.view_state == ViewState::Settings {
             for (id, player) in self.game.mut_local_players().iter_mut().enumerate() {
                 player.set_new_keybindings(&self.widget_manager.get_new_keybindings(id));
@@ -95,14 +95,8 @@ impl App {
                 self.widget_manager =
                     InteractiveWidgetManager::new_settings(self.game.keybindings(), from_game);
             }
-            ViewState::TwoLocal => {
-                self.widget_manager = InteractiveWidgetManager::new_tetris_game(2);
-            }
-            ViewState::Local => {
-                self.widget_manager = InteractiveWidgetManager::new_tetris_game(1);
-            }
-            ViewState::Remote => {
-                self.widget_manager = InteractiveWidgetManager::new_tetris_game(2);
+            ViewState::Game(nb_players) => {
+                self.widget_manager = InteractiveWidgetManager::new_tetris_game(nb_players);
             }
             ViewState::CreateRoom => {
                 /* let mut file = File::create("local_port.txt").unwrap();
