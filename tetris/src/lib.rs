@@ -6,7 +6,7 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 
-use crate::{app::App, settings::OPENGL_VERSION, tetris_game::RenderTetrisGame};
+use crate::{app::App, settings::OPENGL_VERSION, tetris_game::RenderTetrisApp};
 use glfw_window::GlfwWindow;
 use piston::{
     event_loop::{EventSettings, Events},

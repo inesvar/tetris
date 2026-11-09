@@ -16,7 +16,7 @@ pub(super) use player_config::PlayerConfig;
 use rand::RngExt;
 pub(super) use remote::OutboundMessage;
 use remote::RemotePlayer;
-pub use render_app::RenderTetrisGame;
+pub use render_app::RenderTetrisApp;
 use std::cell::RefCell;
 use std::net::TcpStream;
 use ui_tetris::{Keybindings, GUEST_PORT, HOST_PORT};
