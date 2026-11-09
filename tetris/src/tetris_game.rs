@@ -166,16 +166,8 @@ impl TetrisGame {
                     self.restart()
                 }
             }
-            GameFlowChange::Resume => {
-                if self.running == RunningState::Paused {
-                    self.pause()
-                }
-            }
-            GameFlowChange::Pause => {
-                if self.running == RunningState::Running {
-                    self.pause()
-                }
-            }
+            GameFlowChange::Resume => self.resume(),
+            GameFlowChange::Pause => self.pause(),
             GameFlowChange::GameOver => {
                 if self.running == RunningState::Running {
                     self.game_over()
@@ -239,7 +231,7 @@ impl TetrisGame {
         }
     }
 
-    fn pause(&mut self) {
+    fn toggle_pause(&mut self) {
         if self.running == RunningState::Paused {
             println!("RESUME");
             self.send_message(OutboundMessage::Resume);
@@ -248,6 +240,22 @@ impl TetrisGame {
             println!("PAUSE");
             self.send_message(OutboundMessage::Pause);
             self.running = RunningState::Paused;
+        }
+    }
+
+    fn pause(&mut self) {
+        if self.running == RunningState::Running {
+            println!("PAUSE");
+            self.send_message(OutboundMessage::Pause);
+            self.running = RunningState::Paused;
+        }
+    }
+
+    fn resume(&mut self) {
+        if self.running == RunningState::Paused {
+            println!("RESUME");
+            self.send_message(OutboundMessage::Resume);
+            self.running = RunningState::Running;
         }
     }
 

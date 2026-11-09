@@ -121,20 +121,16 @@ impl App {
         match result {
             ViewChangeButton::ToPause => {
                 if matches!(self.view_state, ViewState::Game(_)) {
-                    self.game.pause()
+                    self.game.toggle_pause()
                 }
             }
             ViewChangeButton::BackToMainMenu => {
                 println!("back to main menu");
-                if self.game.running == RunningState::Running {
-                    self.game.pause()
-                };
+                self.game.pause();
                 self.set_view(ViewState::MainMenu)
             }
             ViewChangeButton::ToSettings => {
-                if self.game.running == RunningState::Running {
-                    self.game.pause()
-                };
+                self.game.pause();
                 self.set_view(ViewState::Settings)
             }
             ViewChangeButton::ToSinglePlayerGame => {
