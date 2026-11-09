@@ -12,14 +12,14 @@ use graphics::types::{Rectangle, Scalar};
 use graphics::{rectangle, Image, Transformed};
 
 impl RenderTetrisPlayer for Piston2dOpenGlRenderer<'_> {
-    fn display_player(&mut self, player: &TetrisPlayer, state: RunningState) {
+    fn display_player(&mut self, player: &TetrisPlayer, state: RunningState, game_clock: f64) {
         let old_transform = self.transform;
         let grid_transform = self.transform.trans(DEFAULT_GRID_X, DEFAULT_GRID_Y);
         self.transform = grid_transform;
 
         self.display_tetris_grid(player);
         if state == RunningState::Starting {
-            self.display_starting_countdown(player);
+            self.display_starting_countdown(player, game_clock);
         }
         self.display_tetromino_in_play(player, state);
         self.display_hold_queue(player);

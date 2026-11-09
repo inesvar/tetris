@@ -18,8 +18,18 @@ pub trait RenderTetrisApp: RenderTetrisPlayer + RenderTetrisUi {
     type RenderArgs;
     fn render_app(&mut self, render_args: &RenderArgs, app: &App);
     fn render_tetris_game(&mut self, game: &TetrisGame);
-    fn render_local_player(&mut self, local_player: &LocalPlayer, state: RunningState);
-    fn render_remote_player(&mut self, remote_player: &RemotePlayer, state: RunningState);
+    fn render_local_player(
+        &mut self,
+        local_player: &LocalPlayer,
+        state: RunningState,
+        game_clock: f64,
+    );
+    fn render_remote_player(
+        &mut self,
+        remote_player: &RemotePlayer,
+        state: RunningState,
+        game_clock: f64,
+    );
     fn render_player_score(&mut self, score: u32);
 }
 
@@ -44,21 +54,31 @@ impl RenderTetrisApp for Piston2dOpenGlRenderer<'_> {
 
     fn render_tetris_game(&mut self, game: &TetrisGame) {
         for player in &game.local_players {
-            self.render_local_player(player, game.running);
+            self.render_local_player(player, game.running, game.clock);
             self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH, 0.0);
         }
         for player in &game.remote_player {
-            self.render_remote_player(player, game.running);
+            self.render_remote_player(player, game.running, game.clock);
             self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH, 0.0);
         }
     }
 
-    fn render_local_player(&mut self, local_player: &LocalPlayer, state: RunningState) {
+    fn render_local_player(
+        &mut self,
+        local_player: &LocalPlayer,
+        state: RunningState,
+        game_clock: f64,
+    ) {
         self.render_player_score(local_player.score());
-        self.display_player(local_player.get_player(), state);
+        self.display_player(local_player.get_player(), state, game_clock);
     }
 
-    fn render_remote_player(&mut self, remote_player: &RemotePlayer, state: RunningState) {
+    fn render_remote_player(
+        &mut self,
+        remote_player: &RemotePlayer,
+        state: RunningState,
+        game_clock: f64,
+    ) {
         self.render_player_score(remote_player.score());
 
         if !remote_player.received_first_screen() {
@@ -66,7 +86,7 @@ impl RenderTetrisApp for Piston2dOpenGlRenderer<'_> {
         }
         {
             let screen = remote_player.get_player();
-            self.display_player(&screen, state);
+            self.display_player(&screen, state, game_clock);
         }
         once!("render was done");
     }

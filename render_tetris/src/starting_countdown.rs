@@ -2,12 +2,12 @@ use super::Piston2dOpenGlRenderer;
 use core_tetris::{render::RenderTetrisPlayer, Position, TetrisGrid, TetrisPlayer};
 
 impl Piston2dOpenGlRenderer<'_> {
-    pub(super) fn display_starting_countdown(&mut self, player: &TetrisPlayer) {
+    pub(super) fn display_starting_countdown(&mut self, player: &TetrisPlayer, game_clock: f64) {
         let grid = player.grid();
-        let blocks: &[Position] = match self.elapsed_secs {
-            0.0..1.0 => &one(grid),
+        let blocks: &[Position] = match game_clock {
+            0.0..1.0 => &three(grid),
             1.0..2.0 => &two(grid),
-            _ => &three(grid),
+            _ => &one(grid),
         };
 
         let color = player.tetromino_in_play().color();

@@ -26,7 +26,7 @@ pub enum RunningState {
 /// a `render_text` method.
 #[allow(missing_docs)]
 pub trait RenderTetrisPlayer {
-    fn display_player(&mut self, player: &TetrisPlayer, state: RunningState) {
+    fn display_player(&mut self, player: &TetrisPlayer, state: RunningState, _game_clock: f64) {
         self.display_tetris_grid(player);
         self.display_tetromino_in_play(player, state);
         self.display_hold_queue(player);
