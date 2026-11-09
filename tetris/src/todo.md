@@ -1,15 +1,12 @@
-- CLEAN the clock should pause during a game pause :
-    the renderer and the app should have a separate clock
-    the app should pause its clock during tetris pause, while the renderer should not
-    but both should start when a new game is launched (countdown)
+- CLEAN split TetrisGame into multiple structs
+- THINK should the text rendering from ui_tetris go to render_tetris ?
+- BUG if one key binds to multiple actions 
 - PERF use tokio to outsource tcp comms
 - FEAT today key inputs are sent to the tetris game and mouse inputs to the app... something more flexible would be great
 - BUG the tetrominos should not change the first time the game is started...
-- ~~PERF share one TcpStream~~
-- CLEAN split and reorganize app.rs
-- CLEAN understand the state machine of death
+- CLEAN ViewState::Game should not contain a number
+- THINK understand the state machine of death and find a more readable way to write it
 - CLEAN handle all kinds of errors that aren't handled
-- BUG fix game pausing
 
 # new features
 - CHECK fix paths for Windows in assets.rs -> done, has to be checked
