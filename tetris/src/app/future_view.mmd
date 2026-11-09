@@ -1,0 +1,29 @@
+stateDiagram
+    [*] --> MainMenu
+    state Initial {
+        MainMenu: MainMenu
+        Settings: Settings
+        JoinRoom: JoinRoom
+        CreateRoom: CreateRoom
+
+        MainMenu --> Settings
+        Settings --> MainMenu
+        MainMenu --> JoinRoom
+        JoinRoom --> MainMenu
+        MainMenu --> CreateRoom
+        CreateRoom --> MainMenu
+    }
+    MainMenu --> Game
+    CreateRoom --> Game : on success
+    JoinRoom --> Game : on success
+
+    state InGame {
+        Game: Game
+        InGameSettings: Settings (Back leads to the game)
+        InGameMenu: MainMenu (Back leads to the game)
+
+        Game --> InGameSettings
+        InGameSettings --> Game
+        Game --> InGameMenu
+        InGameMenu --> Game
+    }

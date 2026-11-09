@@ -1,0 +1,14 @@
+stateDiagram
+    [*] --> MainMenu
+    MainMenu --> Settings
+    MainMenu --> Game
+    Settings --> MainMenu
+    Game --> InGameSettings
+    InGameSettings --> Game
+    Game --> MainMenu
+    MainMenu --> JoinRoom
+    JoinRoom --> MainMenu
+    MainMenu --> CreateRoom
+    CreateRoom --> MainMenu
+    CreateRoom --> Game : maybe
+    JoinRoom --> Game : maybe
