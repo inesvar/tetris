@@ -32,27 +32,16 @@ impl RenderTetrisGame for Piston2dOpenGlRenderer<'_> {
         // Clear the screen.
         graphics::clear(BG_COLOR, &mut self.gl);
 
-        // TODO can be collapsed
-        match &app.view_state {
-            ViewState::MainMenu | ViewState::CreateRoom | ViewState::JoinRoom => {
-                self.render_widget_manager(&app.widget_manager, &app.game.running);
+        self.render_widget_manager(&app.widget_manager, &app.game.running);
+        if matches!(app.view_state, ViewState::Game(_)) {
+            for player in &app.game.local_players {
+                self.render_local_player(player, app.game.running);
+                self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH, 0.0);
             }
-            ViewState::Settings => {
-                self.render_widget_manager(&app.widget_manager, &app.game.running);
+            for player in &app.game.remote_player {
+                self.render_remote_player(player, app.game.running);
+                self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH, 0.0);
             }
-            ViewState::Game(_) => {
-                self.render_widget_manager(&app.widget_manager, &app.game.running);
-
-                for player in &app.game.local_players {
-                    self.render_local_player(player, app.game.running);
-                    self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH, 0.0);
-                }
-                for player in &app.game.remote_player {
-                    self.render_remote_player(player, app.game.running);
-                    self.transform = self.transform.trans(DEFAULT_WINDOW_WIDTH, 0.0);
-                }
-            }
-            _ => unreachable!(),
         }
 
         self.gl.draw_end();
