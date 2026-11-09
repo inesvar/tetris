@@ -31,6 +31,9 @@ pub struct TetrisGame {
     is_host: bool,         // TODO: there should be a kind of "network manager handling this"
     pub clock: f64,
     settings_manager: Settings,
+    pub fall_speed_divide: u64, // TODO: that's more of a tetris engine responsibility ?
+    pub freeze: u64,            // TODO: that's more of a tetris engine responsibility ?
+    pub frame_counter: u64,
 }
 
 impl TetrisGame {
@@ -56,6 +59,9 @@ impl TetrisGame {
             is_host,
             settings_manager,
             clock: 0.0,
+            fall_speed_divide: FALL_SPEED_DIVIDE,
+            freeze: FREEZE,
+            frame_counter: 0,
         }
     }
 

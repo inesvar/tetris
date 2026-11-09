@@ -1,4 +1,3 @@
-use crate::settings::{FALL_SPEED_DIVIDE, FREEZE};
 use crate::tetris_game::{PlayerConfig, TetrisGame};
 use local_ip_address::local_ip;
 use piston::MouseButton;
@@ -12,11 +11,8 @@ mod view;
 pub struct App {
     pub game: TetrisGame,
     pub view_state: ViewState,
-    pub frame_counter: u64,
     pub cursor_position: [f64; 2],
     pub widget_manager: InteractiveWidgetManager,
-    pub fall_speed_divide: u64, // TODO: that's more of a tetris engine responsibility ?
-    pub freeze: u64,            // TODO: that's more of a tetris engine responsibility ?
     pub clock: f64,
 }
 
@@ -25,11 +21,8 @@ impl App {
         App {
             game: TetrisGame::new(),
             view_state: ViewState::MainMenu,
-            frame_counter: 0,
             cursor_position: [0.0, 0.0],
             widget_manager: InteractiveWidgetManager::new_main_menu(),
-            fall_speed_divide: FALL_SPEED_DIVIDE,
-            freeze: FREEZE,
             clock: 0.0,
         }
     }

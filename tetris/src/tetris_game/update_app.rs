@@ -3,17 +3,16 @@
 //! [update()](App::update()) is called before each render when the game is active.
 use super::{remote::OutboundMessage, PlayerConfig, RunningState};
 use crate::app::{App, ViewState};
+use crate::tetris_game::TetrisGame;
 use crate::utils::formattings::format_seconds;
 use piston::UpdateArgs;
 use ui_tetris::interactive_widget_manager::{TextType, ViewChangeButton};
 
-impl App {
+impl TetrisGame {
     fn update_running_game(&mut self) {
-        self.widget_manager
-            .set_text(TextType::Timer, format_seconds(self.game.clock));
         self.frame_counter = self.frame_counter.wrapping_add(1);
         // update the falling speed and freeze speed
-        match self.game.clock {
+        match self.clock {
             i if i <= 30.0 => {
                 self.fall_speed_divide = 50;
                 self.freeze = 50
@@ -39,11 +38,11 @@ impl App {
         if let PlayerConfig::TwoRemote {
             local_ip: _,
             remote_ip: _,
-        } = self.game.player_config
+        } = self.player_config
         {
             // add garbage
-            for player in &mut self.game.local_players {
-                let completed_lines = self.game.remote_player[0].get_garbage_to_send();
+            for player in &mut self.local_players {
+                let completed_lines = self.remote_player[0].get_garbage_to_send();
                 if completed_lines != 0 {
                     println!("the adversary completed {} lines", completed_lines);
                 }
@@ -52,26 +51,26 @@ impl App {
         }
         // update
         let mut garbage_to_send = Vec::new();
-        for local_player in &mut self.game.local_players {
+        for local_player in &mut self.local_players {
             let res = local_player.update(self.frame_counter, self.fall_speed_divide, self.freeze);
             let Ok(garbage) = res else {
-                self.game.game_over();
+                self.game_over();
                 return;
             };
             garbage_to_send.push(garbage);
         }
 
-        if let PlayerConfig::TwoLocal = self.game.player_config {
+        if let PlayerConfig::TwoLocal = self.player_config {
             // add garbage
-            self.game.local_players[1].push_garbage(garbage_to_send[0]);
-            self.game.local_players[0].push_garbage(garbage_to_send[1]);
+            self.local_players[1].push_garbage(garbage_to_send[0]);
+            self.local_players[0].push_garbage(garbage_to_send[1]);
         } else if let PlayerConfig::TwoRemote {
             local_ip: _,
             remote_ip: _,
-        } = self.game.player_config
+        } = self.player_config
         {
-            self.game.send_message(OutboundMessage::TetrisPlayer((
-                self.game.local_players[0].player_data(),
+            self.send_message(OutboundMessage::TetrisPlayer((
+                self.local_players[0].player_data(),
                 garbage_to_send[0],
             )));
         }
@@ -110,7 +109,9 @@ impl App {
             && self.game.running == RunningState::Running
         {
             self.game.clock += args.dt;
-            self.update_running_game();
+            self.widget_manager
+                .set_text(TextType::Timer, format_seconds(self.game.clock));
+            self.game.update_running_game();
         }
 
         // then eventually change the view
