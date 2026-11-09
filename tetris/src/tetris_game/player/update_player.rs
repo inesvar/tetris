@@ -23,7 +23,7 @@ impl LocalPlayer {
             }
         }
 
-        if frame_counter % fall_speed_divide == 0
+        if frame_counter.is_multiple_of(fall_speed_divide)
             && !self.player_screen.apply_gravity()
             && self.freeze_frame < frame_counter
         {
